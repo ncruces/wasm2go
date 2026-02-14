@@ -16,7 +16,8 @@ type translator struct {
 	in  *bufio.Reader
 	out ast.File
 
-	types []funcType
+	types   []funcType
+	exports map[string]export
 }
 
 func translate(name string, r io.Reader, w io.Writer) error {
@@ -97,6 +98,8 @@ func (t *translator) readSection() error {
 	switch sectionID(b) {
 	case sectionType:
 		return t.readTypeSection()
+	case sectionExport:
+		return t.readExportSection()
 	default:
 		return t.skipSection()
 	}
@@ -109,13 +112,13 @@ func (t *translator) readTypeSection() error {
 		return err
 	}
 
-	types, err := readLEB128(t.in)
+	numTypes, err := readLEB128(t.in)
 	if err != nil {
 		return err
 	}
 
-	var buf []byte
-	t.types = make([]funcType, types)
+	var types []byte
+	t.types = make([]funcType, numTypes)
 	for i := range t.types {
 		form, err := t.in.ReadByte()
 		if err != nil {
@@ -127,31 +130,74 @@ func (t *translator) readTypeSection() error {
 			return errors.New("only function types are supported")
 		}
 
-		// Parse parameters
+		// Parse parameter types.
 		n, err := readLEB128(t.in)
 		if err != nil {
 			return err
 		}
 
-		buf = slices.Grow(buf[:0], int(n))[:n]
-		_, err = io.ReadFull(t.in, buf)
+		types = slices.Grow(types[:0], int(n))[:n]
+		_, err = io.ReadFull(t.in, types)
 		if err != nil {
 			return err
 		}
-		t.types[i].params = string(buf)
+		t.types[i].params = string(types)
 
-		// Parse results
+		// Parse result types.
 		n, err = readLEB128(t.in)
 		if err != nil {
 			return err
 		}
 
-		buf = slices.Grow(buf[:0], int(n))[:n]
-		_, err = io.ReadFull(t.in, buf)
+		types = slices.Grow(types[:0], int(n))[:n]
+		_, err = io.ReadFull(t.in, types)
 		if err != nil {
 			return err
 		}
-		t.types[i].results = string(buf)
+		t.types[i].results = string(types)
+	}
+	return nil
+}
+
+type export struct {
+	kind  byte
+	index uint64
+}
+
+func (t *translator) readExportSection() error {
+	_, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	numExports, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	var name []byte
+	t.exports = make(map[string]export, numExports)
+	for range numExports {
+		n, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+
+		name = slices.Grow(name[:0], int(n))[:n]
+		_, err = io.ReadFull(t.in, name)
+		if err != nil {
+			return err
+		}
+
+		kind, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+		index, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		t.exports[string(name)] = export{kind: kind, index: index}
 	}
 	return nil
 }
