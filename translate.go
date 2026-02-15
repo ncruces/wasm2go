@@ -9,6 +9,7 @@ import (
 	"go/printer"
 	"go/token"
 	"io"
+	"log"
 	"slices"
 )
 
@@ -16,8 +17,9 @@ type translator struct {
 	in  *bufio.Reader
 	out ast.File
 
-	types   []funcType
-	exports map[string]export
+	types     []funcType
+	functions []funcType
+	exports   map[string]export
 }
 
 func translate(name string, r io.Reader, w io.Writer) error {
@@ -48,11 +50,6 @@ func translate(name string, r io.Reader, w io.Writer) error {
 	return out.Flush()
 }
 
-type funcType struct {
-	params  string
-	results string
-}
-
 type sectionID byte
 
 const (
@@ -71,6 +68,31 @@ const (
 	sectionDataCount
 )
 
+func (t *translator) readSection() error {
+	id, err := t.in.ReadByte()
+	if err != nil {
+		return err
+	}
+
+	size, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	switch sectionID(id) {
+	case sectionType:
+		return t.readTypeSection()
+	case sectionFunction:
+		return t.readFunctionSection()
+	case sectionExport:
+		return t.readExportSection()
+	default:
+		log.Printf("skipped section %d", id)
+		_, err = t.in.Discard(int(size))
+		return err
+	}
+}
+
 type wasmType byte
 
 const (
@@ -80,38 +102,12 @@ const (
 	f64 wasmType = 0x7c
 )
 
-func (t translator) skipSection() error {
-	size, err := readLEB128(t.in)
-	if err != nil {
-		return err
-	}
-	_, err = t.in.Discard(int(size))
-	return err
-}
-
-func (t *translator) readSection() error {
-	b, err := t.in.ReadByte()
-	if err != nil {
-		return err
-	}
-
-	switch sectionID(b) {
-	case sectionType:
-		return t.readTypeSection()
-	case sectionExport:
-		return t.readExportSection()
-	default:
-		return t.skipSection()
-	}
+type funcType struct {
+	params  string // the wasmType of parameters
+	results string // the wasmType of results
 }
 
 func (t *translator) readTypeSection() error {
-	// Read the size of the Type section.
-	_, err := readLEB128(t.in)
-	if err != nil {
-		return err
-	}
-
 	numTypes, err := readLEB128(t.in)
 	if err != nil {
 		return err
@@ -159,17 +155,38 @@ func (t *translator) readTypeSection() error {
 	return nil
 }
 
-type export struct {
-	kind  byte
-	index uint64
-}
-
-func (t *translator) readExportSection() error {
-	_, err := readLEB128(t.in)
+func (t *translator) readFunctionSection() error {
+	numFuncs, err := readLEB128(t.in)
 	if err != nil {
 		return err
 	}
 
+	t.functions = make([]funcType, numFuncs)
+	for i := range t.functions {
+		index, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		t.functions[i] = t.types[index]
+	}
+	return nil
+}
+
+type exportKind byte
+
+const (
+	functionExport exportKind = iota
+	tableExport
+	memoryExport
+	globalExport
+)
+
+type export struct {
+	kind  exportKind
+	index int
+}
+
+func (t *translator) readExportSection() error {
 	numExports, err := readLEB128(t.in)
 	if err != nil {
 		return err
@@ -197,7 +214,10 @@ func (t *translator) readExportSection() error {
 		if err != nil {
 			return err
 		}
-		t.exports[string(name)] = export{kind: kind, index: index}
+		t.exports[string(name)] = export{
+			kind:  exportKind(kind),
+			index: int(index),
+		}
 	}
 	return nil
 }
