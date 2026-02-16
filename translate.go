@@ -86,6 +86,8 @@ func (t *translator) readSection() error {
 		return t.readFunctionSection()
 	case sectionExport:
 		return t.readExportSection()
+	case sectionCode:
+		return t.readCodeSection()
 	default:
 		log.Printf("skipped section %d", id)
 		_, err = t.in.Discard(int(size))
@@ -220,6 +222,131 @@ func (t *translator) readExportSection() error {
 		}
 	}
 	return nil
+}
+
+func (t *translator) readCodeSection() error {
+	numFuncs, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	for i := range numFuncs {
+		log.Printf("Code for function %d", i)
+		_, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+
+		numLocals, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		for range numLocals {
+			n, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			typ, err := t.in.ReadByte()
+			if err != nil {
+				return err
+			}
+			log.Printf("  Local: %d x %v", n, wasmType(typ))
+		}
+
+		for depth := 1; depth > 0; {
+			opcode, err := t.in.ReadByte()
+			if err != nil {
+				return err
+			}
+
+			switch opcode {
+			case 0x02, 0x03, 0x04: // block, loop, if
+				depth++
+				bt, err := t.readBlockType()
+				if err != nil {
+					return err
+				}
+				var name string
+				switch opcode {
+				case 0x02:
+					name = "block"
+				case 0x03:
+					name = "loop"
+				case 0x04:
+					name = "if"
+				}
+				log.Printf("  %s %#v", name, bt)
+			case 0x05: // else
+				log.Println("  else")
+			case 0x0b: // end
+				depth--
+				log.Println("  end")
+			case 0x0c: // br
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				log.Printf("  br %d", idx)
+			case 0x1b: // select
+				log.Println("  select")
+			case 0x20: // local.get
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				log.Printf("  local.get %d", idx)
+			case 0x21: // local.set
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				log.Printf("  local.set %d", idx)
+			case 0x22: // local.tee
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				log.Printf("  local.tee %d", idx)
+			case 0x41: // i32.const
+				val, err := readSignedLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				log.Printf("  i32.const %d", val)
+			case 0x4a: // i32.gt_s
+				log.Println("  i32.gt_s")
+			case 0x6a: // i32.add
+				log.Println("  i32.add")
+			case 0x6b: // i32.sub
+				log.Println("  i32.sub")
+			default:
+				return fmt.Errorf("unsupported opcode: 0x%x", opcode)
+			}
+		}
+	}
+	return nil
+}
+
+func (t *translator) readBlockType() (typ funcType, err error) {
+	i, err := readSignedLEB128(t.in)
+	if err != nil {
+		return
+	}
+	switch i {
+	case -1:
+		typ.results = string([]wasmType{i32})
+	case -2:
+		typ.results = string([]wasmType{i64})
+	case -3:
+		typ.results = string([]wasmType{f32})
+	case -4:
+		typ.results = string([]wasmType{f64})
+	case -64:
+		break
+	default:
+		return t.types[i], nil
+	}
+	return
 }
 
 func readHeader(r io.Reader) error {
