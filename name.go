@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -20,4 +21,8 @@ func identifier(s string) string {
 		}
 		return '_'
 	}, s)
+}
+
+func local[T interface{ int | uint64 }](i T) string {
+	return "v" + strconv.Itoa(int(i))
 }

@@ -8,8 +8,18 @@ import (
 	"go/printer"
 	"go/token"
 	"io"
-	"log"
 	"slices"
+	"strconv"
+)
+
+var (
+	int32Ident  = ast.NewIdent("int32")
+	modTypIdent = ast.NewIdent("Module")
+	modVarIdent = ast.NewIdent("m")
+	modRecvList = &ast.FieldList{List: []*ast.Field{{
+		Names: []*ast.Ident{modVarIdent},
+		Type:  modTypIdent,
+	}}}
 )
 
 type translator struct {
@@ -167,7 +177,44 @@ func (t *translator) readTypeSection() error {
 }
 
 type funcRef struct {
+	typ  funcType
 	decl *ast.FuncDecl
+
+	stack  []*ast.Expr
+	blocks []block
+	labels int
+	temps  int
+}
+
+type block struct {
+	typ         funcType
+	body        *ast.BlockStmt
+	ifStmt      *ast.IfStmt
+	results     []*ast.Ident
+	label       string
+	loopPos     int
+	unreachable bool
+}
+
+func (f *funcRef) push(expr ast.Expr) {
+	f.stack = append(f.stack, &expr)
+}
+
+func (f *funcRef) pushTemp(expr ast.Expr) {
+	id := f.makeTempVar()
+	blk := &f.blocks[len(f.blocks)-1]
+	blk.body.List = append(blk.body.List, &ast.AssignStmt{
+		Tok: token.DEFINE,
+		Lhs: []ast.Expr{id},
+		Rhs: []ast.Expr{expr},
+	})
+	f.push(id)
+}
+
+func (f *funcRef) pop() ast.Expr {
+	expr := *f.stack[len(f.stack)-1]
+	f.stack = f.stack[:len(f.stack)-1]
+	return expr
 }
 
 func (t *translator) readFunctionSection() error {
@@ -182,38 +229,42 @@ func (t *translator) readFunctionSection() error {
 		if err != nil {
 			return err
 		}
-		decl := &ast.FuncDecl{
-			Recv: &ast.FieldList{List: []*ast.Field{{
-				Names: []*ast.Ident{ast.NewIdent("m")},
-				Type:  ast.NewIdent("Module"),
-			}}},
-			Type: makeFuncType(t.types[index]),
+		fn := &t.functions[i]
+		fn.typ = t.types[index]
+		fn.decl = &ast.FuncDecl{
+			Type: makeFuncType(fn.typ),
+			Recv: modRecvList,
 		}
-		t.out.Decls = append(t.out.Decls, decl)
-		t.functions[i].decl = decl
+		t.out.Decls = append(t.out.Decls, fn.decl)
 	}
 	return nil
 }
 
 func makeFuncType(t funcType) *ast.FuncType {
-	params := makeFieldList(t.params)
-	results := makeFieldList(t.results)
-	if params == nil {
-		params = &ast.FieldList{}
+	return &ast.FuncType{
+		Params:  makeParamsList(t.params),
+		Results: makeResultsList(t.results),
 	}
-	return &ast.FuncType{Params: params, Results: results}
 }
 
-func makeFieldList(types string) *ast.FieldList {
+func makeParamsList(types string) *ast.FieldList {
+	list := make([]*ast.Field, len(types))
+	for i, t := range []byte(types) {
+		list[i] = &ast.Field{
+			Names: []*ast.Ident{ast.NewIdent(local(i))},
+			Type:  ast.NewIdent(wasmType(t).String()),
+		}
+	}
+	return &ast.FieldList{List: list}
+}
+
+func makeResultsList(types string) *ast.FieldList {
 	if len(types) == 0 {
 		return nil
 	}
 	list := make([]*ast.Field, len(types))
 	for i, t := range []byte(types) {
-		name := wasmType(t).String()
-		list[i] = &ast.Field{
-			Type: ast.NewIdent(name),
-		}
+		list[i] = &ast.Field{Type: ast.NewIdent(wasmType(t).String())}
 	}
 	return &ast.FieldList{List: list}
 }
@@ -284,100 +335,322 @@ func (t *translator) readCodeSection() error {
 	}
 
 	for i := range numFuncs {
-		log.Printf("Code for function %d", i)
 		_, err := readLEB128(t.in)
 		if err != nil {
 			return err
 		}
 
-		numLocals, err := readLEB128(t.in)
+		err = t.readCodeForFunction(t.functions[i])
 		if err != nil {
 			return err
 		}
-		for range numLocals {
-			n, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			typ, err := t.in.ReadByte()
-			if err != nil {
-				return err
-			}
-			log.Printf("  Local: %d x %v", n, wasmType(typ))
-		}
-
-		for depth := 1; depth > 0; {
-			opcode, err := t.in.ReadByte()
-			if err != nil {
-				return err
-			}
-
-			switch opcode {
-			case 0x02, 0x03, 0x04: // block, loop, if
-				depth++
-				bt, err := t.readBlockType()
-				if err != nil {
-					return err
-				}
-				var name string
-				switch opcode {
-				case 0x02:
-					name = "block"
-				case 0x03:
-					name = "loop"
-				case 0x04:
-					name = "if"
-				}
-				log.Printf("  %s %#v", name, bt)
-			case 0x05: // else
-				log.Println("  else")
-			case 0x0b: // end
-				depth--
-				log.Println("  end")
-			case 0x0c: // br
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				log.Printf("  br %d", idx)
-			case 0x1b: // select
-				log.Println("  select")
-			case 0x20: // local.get
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				log.Printf("  local.get %d", idx)
-			case 0x21: // local.set
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				log.Printf("  local.set %d", idx)
-			case 0x22: // local.tee
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				log.Printf("  local.tee %d", idx)
-			case 0x41: // i32.const
-				val, err := readSignedLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				log.Printf("  i32.const %d", val)
-			case 0x4a: // i32.gt_s
-				log.Println("  i32.gt_s")
-			case 0x6a: // i32.add
-				log.Println("  i32.add")
-			case 0x6b: // i32.sub
-				log.Println("  i32.sub")
-			default:
-				return fmt.Errorf("unsupported opcode: %x", opcode)
-			}
-		}
 	}
 	return nil
+}
+
+func (t *translator) readCodeForFunction(fn funcRef) error {
+	fn.decl.Body = &ast.BlockStmt{}
+	fn.blocks = []block{{body: fn.decl.Body}}
+
+	numLocals, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+	localIndex := len(fn.typ.params)
+	for range numLocals {
+		n, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		typ, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+
+		names := make([]*ast.Ident, int(n))
+		for j := range int(n) {
+			names[j] = ast.NewIdent(local(localIndex))
+			localIndex++
+		}
+		fn.decl.Body.List = append(fn.decl.Body.List, &ast.DeclStmt{
+			Decl: &ast.GenDecl{
+				Tok: token.VAR,
+				Specs: []ast.Spec{
+					&ast.ValueSpec{
+						Names: names,
+						Type:  ast.NewIdent(wasmType(typ).String()),
+					},
+				},
+			},
+		})
+	}
+
+	for {
+		opcode, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+
+		blk := &fn.blocks[len(fn.blocks)-1]
+
+		switch opcode {
+		case 0x02, 0x03, 0x04: // block, loop, if
+			bt, err := t.readBlockType()
+			if err != nil {
+				return err
+			}
+
+			parent := &fn.blocks[len(fn.blocks)-1]
+			resultVars := make([]*ast.Ident, len(bt.results))
+			for i, t := range []byte(bt.results) {
+				resultVars[i] = fn.makeTempVar()
+				parent.body.List = append(parent.body.List, &ast.DeclStmt{
+					Decl: &ast.GenDecl{
+						Tok: token.VAR,
+						Specs: []ast.Spec{
+							&ast.ValueSpec{
+								Names: []*ast.Ident{resultVars[i]},
+								Type:  ast.NewIdent(wasmType(t).String()),
+							},
+						},
+					},
+				})
+			}
+
+			b := block{
+				typ:     bt,
+				body:    &ast.BlockStmt{},
+				results: resultVars,
+			}
+
+			var stmt ast.Stmt
+			switch opcode {
+			case 0x02: // block
+				stmt = b.body
+
+			case 0x03: // loop
+				b.loopPos = ^len(parent.body.List)
+				stmt = b.body
+
+			case 0x04: // if
+				cond := fn.pop()
+				b.ifStmt = &ast.IfStmt{
+					Cond: &ast.BinaryExpr{
+						X:  cond,
+						Op: token.NEQ,
+						Y:  &ast.BasicLit{Kind: token.INT, Value: "0"},
+					},
+					Body: b.body,
+				}
+				stmt = b.ifStmt
+			}
+
+			blk.body.List = append(blk.body.List, stmt)
+			fn.blocks = append(fn.blocks, b)
+
+		case 0x05: // else
+			if !blk.unreachable {
+				for i := len(blk.results) - 1; i >= 0; i-- {
+					blk.body.List = append(blk.body.List, &ast.AssignStmt{
+						Lhs: []ast.Expr{blk.results[i]},
+						Rhs: []ast.Expr{fn.pop()},
+						Tok: token.ASSIGN,
+					})
+				}
+			}
+			blk.body = &ast.BlockStmt{}
+			blk.ifStmt.Else = blk.body
+			blk.unreachable = false
+
+		case 0x0b: // end
+			if !blk.unreachable {
+				for i := len(blk.results) - 1; i >= 0; i-- {
+					blk.body.List = append(blk.body.List, &ast.AssignStmt{
+						Lhs: []ast.Expr{blk.results[i]},
+						Rhs: []ast.Expr{fn.pop()},
+						Tok: token.ASSIGN,
+					})
+				}
+			}
+
+			fn.blocks = fn.blocks[:len(fn.blocks)-1]
+			if len(fn.blocks) == 0 {
+				if !blk.unreachable && len(fn.typ.results) > 0 {
+					res := make([]ast.Expr, len(fn.typ.results))
+					for i := range res {
+						res[len(res)-1-i] = fn.pop()
+					}
+					fn.decl.Body.List = append(fn.decl.Body.List, &ast.ReturnStmt{
+						Results: res,
+					})
+				}
+				return nil
+			}
+
+			if blk.label != "" {
+				parent := &fn.blocks[len(fn.blocks)-1]
+				if blk.loopPos != 0 {
+					parent.body.List[^blk.loopPos] = &ast.LabeledStmt{
+						Label: ast.NewIdent(blk.label),
+						Stmt:  parent.body.List[^blk.loopPos],
+					}
+				} else {
+					parent.body.List = append(parent.body.List, &ast.LabeledStmt{
+						Label: ast.NewIdent(blk.label),
+						Stmt:  &ast.EmptyStmt{},
+					})
+				}
+			}
+			for _, v := range blk.results {
+				fn.push(v)
+			}
+
+		case 0x0c: // br
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			b := &fn.blocks[len(fn.blocks)-1-int(i)]
+			if b.label == "" {
+				b.label = fmt.Sprintf("l%d", fn.labels)
+				fn.labels++
+			}
+
+			if b.loopPos == 0 {
+				for i := len(b.results) - 1; i >= 0; i-- {
+					blk.body.List = append(blk.body.List, &ast.AssignStmt{
+						Lhs: []ast.Expr{b.results[i]},
+						Rhs: []ast.Expr{fn.pop()},
+						Tok: token.ASSIGN,
+					})
+				}
+			}
+
+			blk.unreachable = true
+			if int(i) < len(fn.blocks)-1 {
+				blk.body.List = append(blk.body.List,
+					&ast.BranchStmt{Tok: token.GOTO, Label: ast.NewIdent(b.label)})
+			} else {
+				ret := &ast.ReturnStmt{}
+				if len(fn.typ.results) > 0 {
+					ret.Results = make([]ast.Expr, len(fn.typ.results))
+					for i := len(b.results) - 1; i >= 0; i-- {
+						ret.Results[i] = fn.pop()
+					}
+				}
+				blk.body.List = append(blk.body.List, ret)
+			}
+
+		case 0x1b: // select
+			cond := fn.pop()
+			id := fn.makeTempVar()
+			blk.body.List = append(blk.body.List, &ast.AssignStmt{
+				Tok: token.DEFINE,
+				Lhs: []ast.Expr{id},
+				Rhs: []ast.Expr{fn.pop()},
+			}, &ast.IfStmt{
+				Cond: &ast.BinaryExpr{
+					X:  cond,
+					Op: token.NEQ,
+					Y:  &ast.BasicLit{Kind: token.INT, Value: "0"},
+				},
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{
+						&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: []ast.Expr{id},
+							Rhs: []ast.Expr{fn.pop()},
+						},
+					},
+				},
+			})
+			fn.push(id)
+
+		case 0x20: // local.get
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			fn.pushTemp(ast.NewIdent(local(i)))
+
+		case 0x21, 0x22: // local.set, local.tee
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			val := fn.pop()
+			blk.body.List = append(blk.body.List, &ast.AssignStmt{
+				Lhs: []ast.Expr{ast.NewIdent(local(i))},
+				Rhs: []ast.Expr{val},
+				Tok: token.ASSIGN,
+			})
+			if opcode == 0x22 { // local.tee
+				fn.push(val)
+			}
+
+		case 0x41: // i32.const
+			i, err := readSignedLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			fn.push(&ast.CallExpr{
+				Fun: int32Ident,
+				Args: []ast.Expr{&ast.BasicLit{
+					Value: strconv.FormatInt(i, 10),
+					Kind:  token.INT,
+				}},
+			})
+
+		case 0x4a: // i32.gt_s
+			id := fn.makeTempVar()
+			blk.body.List = append(blk.body.List, &ast.DeclStmt{
+				Decl: &ast.GenDecl{
+					Tok: token.VAR,
+					Specs: []ast.Spec{
+						&ast.ValueSpec{
+							Names: []*ast.Ident{id},
+							Type:  int32Ident,
+						},
+					},
+				},
+			}, &ast.IfStmt{
+				Cond: &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: token.GTR},
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{
+						&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: []ast.Expr{id},
+							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
+						},
+					},
+				},
+			})
+			fn.push(id)
+
+		case 0x6a: // i32.add
+			fn.pushTemp(&ast.BinaryExpr{
+				Y:  fn.pop(),
+				X:  fn.pop(),
+				Op: token.ADD,
+			})
+
+		case 0x6b: // i32.sub
+			fn.pushTemp(&ast.BinaryExpr{
+				Y:  fn.pop(),
+				X:  fn.pop(),
+				Op: token.SUB,
+			})
+
+		default:
+			return fmt.Errorf("unsupported opcode: %x", opcode)
+		}
+	}
+}
+
+func (fn *funcRef) makeTempVar() *ast.Ident {
+	id := ast.NewIdent("t" + strconv.Itoa(fn.temps))
+	fn.temps++
+	return id
 }
 
 func (t *translator) readBlockType() (typ funcType, err error) {

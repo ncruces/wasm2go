@@ -17,3 +17,6 @@ as we can ask our compiler to avoid emmiting it.
 
 The current goal is to compile the `fib.wasm` module,
 which exports a single function.
+
+Because Go makes a distinction between statements and expresions,
+we use a stack-to-register approach to translate Wasm to Go.
