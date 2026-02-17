@@ -661,160 +661,119 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 			})
 
 		case 0x46: // i32.eq
-			id := fn.makeTempVar()
-			blk.body.List = append(blk.body.List, &ast.DeclStmt{
-				Decl: &ast.GenDecl{
-					Tok: token.VAR,
-					Specs: []ast.Spec{
-						&ast.ValueSpec{
-							Names: []*ast.Ident{id},
-							Type:  int32Ident,
-						},
-					},
-				},
-			}, &ast.IfStmt{
-				Cond: &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: token.EQL},
-				Body: &ast.BlockStmt{
-					List: []ast.Stmt{
-						&ast.AssignStmt{
-							Tok: token.ASSIGN,
-							Lhs: []ast.Expr{id},
-							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
-						},
-					},
-				},
-			})
-			fn.push(id)
+			fn.i32Cmp(token.EQL)
 
 		case 0x49: // i32.lt_u
-			id := fn.makeTempVar()
-			blk.body.List = append(blk.body.List, &ast.DeclStmt{
-				Decl: &ast.GenDecl{
-					Tok: token.VAR,
-					Specs: []ast.Spec{
-						&ast.ValueSpec{
-							Names: []*ast.Ident{id},
-							Type:  int32Ident,
-						},
-					},
-				},
-			}, &ast.IfStmt{
-				Cond: &ast.BinaryExpr{
-					Y: &ast.CallExpr{
-						Fun:  uint32Ident,
-						Args: []ast.Expr{fn.pop()},
-					},
-					X: &ast.CallExpr{
-						Fun:  uint32Ident,
-						Args: []ast.Expr{fn.pop()},
-					},
-					Op: token.LSS},
-				Body: &ast.BlockStmt{
-					List: []ast.Stmt{
-						&ast.AssignStmt{
-							Tok: token.ASSIGN,
-							Lhs: []ast.Expr{id},
-							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
-						},
-					},
-				},
-			})
-			fn.push(id)
+			fn.u32Cmp(token.LSS)
 
 		case 0x4a: // i32.gt_s
-			id := fn.makeTempVar()
-			blk.body.List = append(blk.body.List, &ast.DeclStmt{
-				Decl: &ast.GenDecl{
-					Tok: token.VAR,
-					Specs: []ast.Spec{
-						&ast.ValueSpec{
-							Names: []*ast.Ident{id},
-							Type:  int32Ident,
-						},
-					},
-				},
-			}, &ast.IfStmt{
-				Cond: &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: token.GTR},
-				Body: &ast.BlockStmt{
-					List: []ast.Stmt{
-						&ast.AssignStmt{
-							Tok: token.ASSIGN,
-							Lhs: []ast.Expr{id},
-							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
-						},
-					},
-				},
-			})
-			fn.push(id)
+			fn.i32Cmp(token.GTR)
 
 		case 0x4f: // i32.ge_u
-			id := fn.makeTempVar()
-			blk.body.List = append(blk.body.List, &ast.DeclStmt{
-				Decl: &ast.GenDecl{
-					Tok: token.VAR,
-					Specs: []ast.Spec{
-						&ast.ValueSpec{
-							Names: []*ast.Ident{id},
-							Type:  int32Ident,
-						},
-					},
-				},
-			}, &ast.IfStmt{
-				Cond: &ast.BinaryExpr{
-					Y: &ast.CallExpr{
-						Fun:  uint32Ident,
-						Args: []ast.Expr{fn.pop()},
-					},
-					X: &ast.CallExpr{
-						Fun:  uint32Ident,
-						Args: []ast.Expr{fn.pop()},
-					},
-					Op: token.GEQ},
-				Body: &ast.BlockStmt{
-					List: []ast.Stmt{
-						&ast.AssignStmt{
-							Tok: token.ASSIGN,
-							Lhs: []ast.Expr{id},
-							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
-						},
-					},
-				},
-			})
-			fn.push(id)
+			fn.u32Cmp(token.GEQ)
 
 		case 0x6a: // i32.add
-			fn.pushTemp(&ast.BinaryExpr{
-				Y:  fn.pop(),
-				X:  fn.pop(),
-				Op: token.ADD,
-			})
+			fn.i32BinOp(token.ADD)
 
 		case 0x6b: // i32.sub
-			fn.pushTemp(&ast.BinaryExpr{
-				Y:  fn.pop(),
-				X:  fn.pop(),
-				Op: token.SUB,
-			})
+			fn.i32BinOp(token.SUB)
 
 		case 0x70: // i32.rem_u
-			fn.pushTemp(&ast.CallExpr{
-				Fun: int32Ident,
-				Args: []ast.Expr{&ast.BinaryExpr{
-					Y: &ast.CallExpr{
-						Fun:  uint32Ident,
-						Args: []ast.Expr{fn.pop()},
-					},
-					X: &ast.CallExpr{
-						Fun:  uint32Ident,
-						Args: []ast.Expr{fn.pop()},
-					},
-					Op: token.REM,
-				}}})
+			fn.u32BinOp(token.REM)
 
 		default:
 			return fmt.Errorf("unsupported opcode: %x", opcode)
 		}
 	}
+}
+
+func (fn *funcRef) i32BinOp(op token.Token) {
+	fn.pushTemp(&ast.BinaryExpr{
+		Y:  fn.pop(),
+		X:  fn.pop(),
+		Op: op,
+	})
+}
+
+func (fn *funcRef) u32BinOp(op token.Token) {
+	fn.pushTemp(&ast.CallExpr{
+		Fun: int32Ident,
+		Args: []ast.Expr{&ast.BinaryExpr{
+			Y: &ast.CallExpr{
+				Fun:  uint32Ident,
+				Args: []ast.Expr{fn.pop()},
+			},
+			X: &ast.CallExpr{
+				Fun:  uint32Ident,
+				Args: []ast.Expr{fn.pop()},
+			},
+			Op: op,
+		}}})
+}
+
+func (fn *funcRef) i32Cmp(op token.Token) {
+	id := fn.makeTempVar()
+	blk := fn.blocks[len(fn.blocks)-1]
+	blk.body.List = append(blk.body.List, &ast.DeclStmt{
+		Decl: &ast.GenDecl{
+			Tok: token.VAR,
+			Specs: []ast.Spec{
+				&ast.ValueSpec{
+					Names: []*ast.Ident{id},
+					Type:  int32Ident,
+				},
+			},
+		},
+	}, &ast.IfStmt{
+		Cond: &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{
+				&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{id},
+					Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
+				},
+			},
+		},
+	})
+	fn.push(id)
+}
+
+func (fn *funcRef) u32Cmp(op token.Token) {
+	id := fn.makeTempVar()
+	blk := fn.blocks[len(fn.blocks)-1]
+	blk.body.List = append(blk.body.List, &ast.DeclStmt{
+		Decl: &ast.GenDecl{
+			Tok: token.VAR,
+			Specs: []ast.Spec{
+				&ast.ValueSpec{
+					Names: []*ast.Ident{id},
+					Type:  int32Ident,
+				},
+			},
+		},
+	}, &ast.IfStmt{
+		Cond: &ast.BinaryExpr{
+			Y: &ast.CallExpr{
+				Fun:  uint32Ident,
+				Args: []ast.Expr{fn.pop()},
+			},
+			X: &ast.CallExpr{
+				Fun:  uint32Ident,
+				Args: []ast.Expr{fn.pop()},
+			},
+			Op: op},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{
+				&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{id},
+					Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
+				},
+			},
+		},
+	})
+	fn.push(id)
 }
 
 func (fn *funcRef) makeTempVar() *ast.Ident {

@@ -68,7 +68,7 @@ l1:
 
 func main() {
 	var m Module
-	for i := range 15 {
+	for i := range 25 {
 		println("is_prime", i, m.Xis_prime(int32(i)))
 	}
 }
