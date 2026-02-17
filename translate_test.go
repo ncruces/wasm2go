@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-//go:embed fib.wasm
+//go:embed samples/fib.wasm
 var fib string
 
 func Test_translate(t *testing.T) {

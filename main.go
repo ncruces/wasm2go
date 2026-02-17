@@ -1,7 +1,13 @@
 package main
 
-import "os"
+import (
+	"log"
+	"os"
+)
 
 func main() {
-	translate(os.Args[1], os.Stdin, os.Stdout)
+	err := translate(os.Args[1], os.Stdin, os.Stdout)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -14,6 +14,7 @@ import (
 
 var (
 	int32Ident  = ast.NewIdent("int32")
+	uint32Ident = ast.NewIdent("uint32")
 	modTypIdent = ast.NewIdent("Module")
 	modVarIdent = ast.NewIdent("m")
 	modRecvList = &ast.FieldList{List: []*ast.Field{{
@@ -534,12 +535,70 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				ret := &ast.ReturnStmt{}
 				if len(fn.typ.results) > 0 {
 					ret.Results = make([]ast.Expr, len(fn.typ.results))
-					for i := len(b.results) - 1; i >= 0; i-- {
+					for i := len(ret.Results) - 1; i >= 0; i-- {
 						ret.Results[i] = fn.pop()
 					}
 				}
 				blk.body.List = append(blk.body.List, ret)
 			}
+
+		case 0x0d: // br_if
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			cond := fn.pop()
+
+			b := &fn.blocks[len(fn.blocks)-1-int(i)]
+			if b.label == "" {
+				b.label = fmt.Sprintf("l%d", fn.labels)
+				fn.labels++
+			}
+
+			ifStmt := &ast.IfStmt{
+				Cond: &ast.BinaryExpr{
+					X:  cond,
+					Op: token.NEQ,
+					Y:  &ast.BasicLit{Kind: token.INT, Value: "0"},
+				},
+				Body: &ast.BlockStmt{},
+			}
+
+			if b.loopPos == 0 {
+				for j := range b.results {
+					ifStmt.Body.List = append(ifStmt.Body.List, &ast.AssignStmt{
+						Lhs: []ast.Expr{b.results[j]},
+						Rhs: []ast.Expr{*fn.stack[len(fn.stack)-len(b.results)+j]},
+						Tok: token.ASSIGN,
+					})
+				}
+			}
+
+			if int(i) < len(fn.blocks)-1 {
+				ifStmt.Body.List = append(ifStmt.Body.List,
+					&ast.BranchStmt{Tok: token.GOTO, Label: ast.NewIdent(b.label)})
+			} else {
+				ret := &ast.ReturnStmt{}
+				if len(fn.typ.results) > 0 {
+					ret.Results = make([]ast.Expr, len(fn.typ.results))
+					for j := range ret.Results {
+						ret.Results[j] = *fn.stack[len(fn.stack)-len(ret.Results)+j]
+					}
+				}
+				ifStmt.Body.List = append(ifStmt.Body.List, ret)
+			}
+			blk.body.List = append(blk.body.List, ifStmt)
+
+		case 0x0f: // return
+			ret := &ast.ReturnStmt{}
+			if len(fn.typ.results) > 0 {
+				ret.Results = make([]ast.Expr, len(fn.typ.results))
+				for i := len(ret.Results) - 1; i >= 0; i-- {
+					ret.Results[i] = fn.pop()
+				}
+			}
+			blk.body.List = append(blk.body.List, ret)
+			blk.unreachable = true
 
 		case 0x1b: // select
 			cond := fn.pop()
@@ -601,6 +660,67 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				}},
 			})
 
+		case 0x46: // i32.eq
+			id := fn.makeTempVar()
+			blk.body.List = append(blk.body.List, &ast.DeclStmt{
+				Decl: &ast.GenDecl{
+					Tok: token.VAR,
+					Specs: []ast.Spec{
+						&ast.ValueSpec{
+							Names: []*ast.Ident{id},
+							Type:  int32Ident,
+						},
+					},
+				},
+			}, &ast.IfStmt{
+				Cond: &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: token.EQL},
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{
+						&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: []ast.Expr{id},
+							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
+						},
+					},
+				},
+			})
+			fn.push(id)
+
+		case 0x49: // i32.lt_u
+			id := fn.makeTempVar()
+			blk.body.List = append(blk.body.List, &ast.DeclStmt{
+				Decl: &ast.GenDecl{
+					Tok: token.VAR,
+					Specs: []ast.Spec{
+						&ast.ValueSpec{
+							Names: []*ast.Ident{id},
+							Type:  int32Ident,
+						},
+					},
+				},
+			}, &ast.IfStmt{
+				Cond: &ast.BinaryExpr{
+					Y: &ast.CallExpr{
+						Fun:  uint32Ident,
+						Args: []ast.Expr{fn.pop()},
+					},
+					X: &ast.CallExpr{
+						Fun:  uint32Ident,
+						Args: []ast.Expr{fn.pop()},
+					},
+					Op: token.LSS},
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{
+						&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: []ast.Expr{id},
+							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
+						},
+					},
+				},
+			})
+			fn.push(id)
+
 		case 0x4a: // i32.gt_s
 			id := fn.makeTempVar()
 			blk.body.List = append(blk.body.List, &ast.DeclStmt{
@@ -627,6 +747,41 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 			})
 			fn.push(id)
 
+		case 0x4f: // i32.ge_u
+			id := fn.makeTempVar()
+			blk.body.List = append(blk.body.List, &ast.DeclStmt{
+				Decl: &ast.GenDecl{
+					Tok: token.VAR,
+					Specs: []ast.Spec{
+						&ast.ValueSpec{
+							Names: []*ast.Ident{id},
+							Type:  int32Ident,
+						},
+					},
+				},
+			}, &ast.IfStmt{
+				Cond: &ast.BinaryExpr{
+					Y: &ast.CallExpr{
+						Fun:  uint32Ident,
+						Args: []ast.Expr{fn.pop()},
+					},
+					X: &ast.CallExpr{
+						Fun:  uint32Ident,
+						Args: []ast.Expr{fn.pop()},
+					},
+					Op: token.GEQ},
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{
+						&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: []ast.Expr{id},
+							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
+						},
+					},
+				},
+			})
+			fn.push(id)
+
 		case 0x6a: // i32.add
 			fn.pushTemp(&ast.BinaryExpr{
 				Y:  fn.pop(),
@@ -640,6 +795,21 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				X:  fn.pop(),
 				Op: token.SUB,
 			})
+
+		case 0x70: // i32.rem_u
+			fn.pushTemp(&ast.CallExpr{
+				Fun: int32Ident,
+				Args: []ast.Expr{&ast.BinaryExpr{
+					Y: &ast.CallExpr{
+						Fun:  uint32Ident,
+						Args: []ast.Expr{fn.pop()},
+					},
+					X: &ast.CallExpr{
+						Fun:  uint32Ident,
+						Args: []ast.Expr{fn.pop()},
+					},
+					Op: token.REM,
+				}}})
 
 		default:
 			return fmt.Errorf("unsupported opcode: %x", opcode)
