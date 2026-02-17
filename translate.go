@@ -662,24 +662,51 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 
 		case 0x46: // i32.eq
 			fn.i32Cmp(token.EQL)
-
+		case 0x47: // i32.ne
+			fn.i32Cmp(token.NEQ)
+		case 0x48: // i32.lt_s
+			fn.i32Cmp(token.LSS)
 		case 0x49: // i32.lt_u
 			fn.u32Cmp(token.LSS)
-
 		case 0x4a: // i32.gt_s
 			fn.i32Cmp(token.GTR)
-
+		case 0x4b: // i32.gt_u
+			fn.u32Cmp(token.GTR)
+		case 0x4c: // i32.le_s
+			fn.i32Cmp(token.LEQ)
+		case 0x4d: // i32.le_u
+			fn.u32Cmp(token.LEQ)
+		case 0x4e: // i32.ge_s
+			fn.i32Cmp(token.GEQ)
 		case 0x4f: // i32.ge_u
 			fn.u32Cmp(token.GEQ)
 
 		case 0x6a: // i32.add
 			fn.i32BinOp(token.ADD)
-
 		case 0x6b: // i32.sub
 			fn.i32BinOp(token.SUB)
-
+		case 0x6c: // i32.mul
+			fn.i32BinOp(token.MUL)
+		case 0x6d: // i32.div_s
+			fn.i32BinOp(token.QUO)
+		case 0x6e: // i32.div_u
+			fn.u32BinOp(token.QUO)
+		case 0x6f: // i32.rem_s
+			fn.i32BinOp(token.REM)
 		case 0x70: // i32.rem_u
 			fn.u32BinOp(token.REM)
+		case 0x71: // i32.and
+			fn.i32BinOp(token.AND)
+		case 0x72: // i32.or
+			fn.i32BinOp(token.OR)
+		case 0x73: // i32.xor
+			fn.i32BinOp(token.XOR)
+		case 0x74: // i32.shl
+			fn.i32BinOp(token.SHL)
+		case 0x75: // i32.shr_s
+			fn.i32BinOp(token.SHR)
+		case 0x76: // i32.shr_u
+			fn.u32BinOp(token.SHR)
 
 		default:
 			return fmt.Errorf("unsupported opcode: %x", opcode)
