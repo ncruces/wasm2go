@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	_ "embed"
 	"math"
 	"os"
@@ -25,13 +26,13 @@ func Test_generate(t *testing.T) {
 			}
 			defer in.Close()
 
-			out, err := os.Create(path + ".go")
+			var out bytes.Buffer
+			err = translate(name, in, &out)
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer out.Close()
 
-			err = translate(name, in, out)
+			err = os.WriteFile(path+".go", out.Bytes(), 0644)
 			if err != nil {
 				t.Fatal(err)
 			}
