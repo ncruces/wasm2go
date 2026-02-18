@@ -9,28 +9,16 @@ type Module struct {
 func (m Module) Xis_prime(v0 int32) int32 {
 	var v1 int32
 	t0 := v0
-	var t1 int32
 	if uint32(t0) < uint32(int32(2)) {
-		t1 = 1
-	}
-	if t1 != 0 {
 		return int32(0)
 	}
 	t2 := v0
-	var t3 int32
 	if t2 == int32(2) {
-		t3 = 1
-	}
-	if t3 != 0 {
 		return int32(1)
 	}
 	t4 := v0
 	t5 := int32(uint32(t4) % uint32(int32(2)))
-	var t6 int32
 	if t5 == int32(0) {
-		t6 = 1
-	}
-	if t6 != 0 {
 		return int32(0)
 	}
 	v1 = int32(3)
@@ -39,21 +27,13 @@ l1:
 		{
 			t7 := v1
 			t8 := v0
-			var t9 int32
 			if uint32(t7) >= uint32(t8) {
-				t9 = 1
-			}
-			if t9 != 0 {
 				goto l0
 			}
 			t10 := v0
 			t11 := v1
 			t12 := int32(uint32(t10) % uint32(t11))
-			var t13 int32
 			if t12 == int32(0) {
-				t13 = 1
-			}
-			if t13 != 0 {
 				return int32(0)
 			}
 			t14 := v1

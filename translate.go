@@ -181,10 +181,50 @@ type funcRef struct {
 	typ  funcType
 	decl *ast.FuncDecl
 
+	cond   ast.Expr
 	stack  []*ast.Expr
 	blocks []block
 	labels int
 	temps  int
+}
+
+func (fn *funcRef) push(expr ast.Expr) {
+	fn.stack = append(fn.stack, &expr)
+	fn.cond = nil
+}
+
+func (fn *funcRef) pushTemp(expr ast.Expr) {
+	id := fn.makeTempVar()
+	blk := &fn.blocks[len(fn.blocks)-1]
+	blk.append(&ast.AssignStmt{
+		Tok: token.DEFINE,
+		Lhs: []ast.Expr{id},
+		Rhs: []ast.Expr{expr},
+	})
+	fn.push(id)
+}
+
+func (fn *funcRef) pop() ast.Expr {
+	expr := *fn.stack[len(fn.stack)-1]
+	fn.stack = fn.stack[:len(fn.stack)-1]
+	fn.cond = nil
+	return expr
+}
+
+func (fn *funcRef) popAsCond() ast.Expr {
+	cond := fn.cond
+	val := fn.pop()
+
+	if cond == nil {
+		return &ast.BinaryExpr{
+			X: val, Op: token.NEQ,
+			Y: &ast.BasicLit{Kind: token.INT, Value: "0"},
+		}
+	}
+
+	lst := &fn.blocks[len(fn.blocks)-1].body.List
+	*lst = (*lst)[:len(*lst)-2]
+	return cond
 }
 
 type block struct {
@@ -197,25 +237,9 @@ type block struct {
 	unreachable bool
 }
 
-func (f *funcRef) push(expr ast.Expr) {
-	f.stack = append(f.stack, &expr)
-}
-
-func (f *funcRef) pushTemp(expr ast.Expr) {
-	id := f.makeTempVar()
-	blk := &f.blocks[len(f.blocks)-1]
-	blk.body.List = append(blk.body.List, &ast.AssignStmt{
-		Tok: token.DEFINE,
-		Lhs: []ast.Expr{id},
-		Rhs: []ast.Expr{expr},
-	})
-	f.push(id)
-}
-
-func (f *funcRef) pop() ast.Expr {
-	expr := *f.stack[len(f.stack)-1]
-	f.stack = f.stack[:len(f.stack)-1]
-	return expr
+func (b *block) append(stmts ...ast.Stmt) {
+	lst := &b.body.List
+	*lst = append(*lst, stmts...)
 }
 
 func (t *translator) readFunctionSection() error {
@@ -401,11 +425,10 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				return err
 			}
 
-			parent := &fn.blocks[len(fn.blocks)-1]
 			resultVars := make([]*ast.Ident, len(bt.results))
 			for i, t := range []byte(bt.results) {
 				resultVars[i] = fn.makeTempVar()
-				parent.body.List = append(parent.body.List, &ast.DeclStmt{
+				blk.append(&ast.DeclStmt{
 					Decl: &ast.GenDecl{
 						Tok: token.VAR,
 						Specs: []ast.Spec{
@@ -430,29 +453,24 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				stmt = b.body
 
 			case 0x03: // loop
-				b.loopPos = ^len(parent.body.List)
+				b.loopPos = ^len(blk.body.List)
 				stmt = b.body
 
 			case 0x04: // if
-				cond := fn.pop()
 				b.ifStmt = &ast.IfStmt{
-					Cond: &ast.BinaryExpr{
-						X:  cond,
-						Op: token.NEQ,
-						Y:  &ast.BasicLit{Kind: token.INT, Value: "0"},
-					},
+					Cond: fn.popAsCond(),
 					Body: b.body,
 				}
 				stmt = b.ifStmt
 			}
 
-			blk.body.List = append(blk.body.List, stmt)
 			fn.blocks = append(fn.blocks, b)
+			blk.append(stmt)
 
 		case 0x05: // else
 			if !blk.unreachable {
 				for i := len(blk.results) - 1; i >= 0; i-- {
-					blk.body.List = append(blk.body.List, &ast.AssignStmt{
+					blk.append(&ast.AssignStmt{
 						Lhs: []ast.Expr{blk.results[i]},
 						Rhs: []ast.Expr{fn.pop()},
 						Tok: token.ASSIGN,
@@ -466,7 +484,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 		case 0x0b: // end
 			if !blk.unreachable {
 				for i := len(blk.results) - 1; i >= 0; i-- {
-					blk.body.List = append(blk.body.List, &ast.AssignStmt{
+					blk.append(&ast.AssignStmt{
 						Lhs: []ast.Expr{blk.results[i]},
 						Rhs: []ast.Expr{fn.pop()},
 						Tok: token.ASSIGN,
@@ -496,14 +514,14 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 						Stmt:  parent.body.List[^blk.loopPos],
 					}
 				} else {
-					parent.body.List = append(parent.body.List, &ast.LabeledStmt{
+					parent.append(&ast.LabeledStmt{
 						Label: ast.NewIdent(blk.label),
 						Stmt:  &ast.EmptyStmt{},
 					})
 				}
 			}
-			for _, v := range blk.results {
-				fn.push(v)
+			for _, id := range blk.results {
+				fn.push(id)
 			}
 
 		case 0x0c: // br
@@ -519,7 +537,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 
 			if b.loopPos == 0 {
 				for i := len(b.results) - 1; i >= 0; i-- {
-					blk.body.List = append(blk.body.List, &ast.AssignStmt{
+					blk.append(&ast.AssignStmt{
 						Lhs: []ast.Expr{b.results[i]},
 						Rhs: []ast.Expr{fn.pop()},
 						Tok: token.ASSIGN,
@@ -529,8 +547,8 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 
 			blk.unreachable = true
 			if int(i) < len(fn.blocks)-1 {
-				blk.body.List = append(blk.body.List,
-					&ast.BranchStmt{Tok: token.GOTO, Label: ast.NewIdent(b.label)})
+				blk.append(&ast.BranchStmt{
+					Tok: token.GOTO, Label: ast.NewIdent(b.label)})
 			} else {
 				ret := &ast.ReturnStmt{}
 				if len(fn.typ.results) > 0 {
@@ -539,7 +557,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 						ret.Results[i] = fn.pop()
 					}
 				}
-				blk.body.List = append(blk.body.List, ret)
+				blk.append(ret)
 			}
 
 		case 0x0d: // br_if
@@ -547,7 +565,6 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 			if err != nil {
 				return err
 			}
-			cond := fn.pop()
 
 			b := &fn.blocks[len(fn.blocks)-1-int(i)]
 			if b.label == "" {
@@ -556,11 +573,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 			}
 
 			ifStmt := &ast.IfStmt{
-				Cond: &ast.BinaryExpr{
-					X:  cond,
-					Op: token.NEQ,
-					Y:  &ast.BasicLit{Kind: token.INT, Value: "0"},
-				},
+				Cond: fn.popAsCond(),
 				Body: &ast.BlockStmt{},
 			}
 
@@ -587,7 +600,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				}
 				ifStmt.Body.List = append(ifStmt.Body.List, ret)
 			}
-			blk.body.List = append(blk.body.List, ifStmt)
+			blk.append(ifStmt)
 
 		case 0x0f: // return
 			ret := &ast.ReturnStmt{}
@@ -597,22 +610,18 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 					ret.Results[i] = fn.pop()
 				}
 			}
-			blk.body.List = append(blk.body.List, ret)
+			blk.append(ret)
 			blk.unreachable = true
 
 		case 0x1b: // select
-			cond := fn.pop()
+			cond := fn.popAsCond()
 			id := fn.makeTempVar()
-			blk.body.List = append(blk.body.List, &ast.AssignStmt{
+			blk.append(&ast.AssignStmt{
 				Tok: token.DEFINE,
 				Lhs: []ast.Expr{id},
 				Rhs: []ast.Expr{fn.pop()},
 			}, &ast.IfStmt{
-				Cond: &ast.BinaryExpr{
-					X:  cond,
-					Op: token.NEQ,
-					Y:  &ast.BasicLit{Kind: token.INT, Value: "0"},
-				},
+				Cond: cond,
 				Body: &ast.BlockStmt{
 					List: []ast.Stmt{
 						&ast.AssignStmt{
@@ -638,7 +647,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				return err
 			}
 			val := fn.pop()
-			blk.body.List = append(blk.body.List, &ast.AssignStmt{
+			blk.append(&ast.AssignStmt{
 				Lhs: []ast.Expr{ast.NewIdent(local(i))},
 				Rhs: []ast.Expr{val},
 				Tok: token.ASSIGN,
@@ -740,8 +749,10 @@ func (fn *funcRef) u32BinOp(op token.Token) {
 
 func (fn *funcRef) i32Cmp(op token.Token) {
 	id := fn.makeTempVar()
-	blk := fn.blocks[len(fn.blocks)-1]
-	blk.body.List = append(blk.body.List, &ast.DeclStmt{
+	cond := &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op}
+
+	blk := &fn.blocks[len(fn.blocks)-1]
+	blk.append(&ast.DeclStmt{
 		Decl: &ast.GenDecl{
 			Tok: token.VAR,
 			Specs: []ast.Spec{
@@ -752,7 +763,7 @@ func (fn *funcRef) i32Cmp(op token.Token) {
 			},
 		},
 	}, &ast.IfStmt{
-		Cond: &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op},
+		Cond: cond,
 		Body: &ast.BlockStmt{
 			List: []ast.Stmt{
 				&ast.AssignStmt{
@@ -764,12 +775,24 @@ func (fn *funcRef) i32Cmp(op token.Token) {
 		},
 	})
 	fn.push(id)
+	fn.cond = cond
 }
 
 func (fn *funcRef) u32Cmp(op token.Token) {
 	id := fn.makeTempVar()
-	blk := fn.blocks[len(fn.blocks)-1]
-	blk.body.List = append(blk.body.List, &ast.DeclStmt{
+	cond := &ast.BinaryExpr{
+		Y: &ast.CallExpr{
+			Fun:  uint32Ident,
+			Args: []ast.Expr{fn.pop()},
+		},
+		X: &ast.CallExpr{
+			Fun:  uint32Ident,
+			Args: []ast.Expr{fn.pop()},
+		},
+		Op: op}
+
+	blk := &fn.blocks[len(fn.blocks)-1]
+	blk.append(&ast.DeclStmt{
 		Decl: &ast.GenDecl{
 			Tok: token.VAR,
 			Specs: []ast.Spec{
@@ -780,16 +803,7 @@ func (fn *funcRef) u32Cmp(op token.Token) {
 			},
 		},
 	}, &ast.IfStmt{
-		Cond: &ast.BinaryExpr{
-			Y: &ast.CallExpr{
-				Fun:  uint32Ident,
-				Args: []ast.Expr{fn.pop()},
-			},
-			X: &ast.CallExpr{
-				Fun:  uint32Ident,
-				Args: []ast.Expr{fn.pop()},
-			},
-			Op: op},
+		Cond: cond,
 		Body: &ast.BlockStmt{
 			List: []ast.Stmt{
 				&ast.AssignStmt{
@@ -801,6 +815,7 @@ func (fn *funcRef) u32Cmp(op token.Token) {
 		},
 	})
 	fn.push(id)
+	fn.cond = cond
 }
 
 func (fn *funcRef) makeTempVar() *ast.Ident {
