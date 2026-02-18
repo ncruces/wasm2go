@@ -38,13 +38,13 @@ func Test_generate(t *testing.T) {
 }
 
 func Test_fib(t *testing.T) {
-	want := []int32{0, 1, 1, 2, 3, 5, 8, 13, 21}
+	want := []int64{0, 1, 1, 2, 3, 5, 8, 13, 21}
 
 	var m fib.Module
 
-	var got []int32
+	var got []int64
 	for i := range want {
-		got = append(got, m.Xfibonacci(int32(i)))
+		got = append(got, m.Xfibonacci(int64(i)))
 	}
 
 	if !slices.Equal(got, want) {

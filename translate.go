@@ -14,7 +14,9 @@ import (
 
 var (
 	int32Ident  = ast.NewIdent("int32")
+	int64Ident  = ast.NewIdent("int64")
 	uint32Ident = ast.NewIdent("uint32")
+	uint64Ident = ast.NewIdent("uint64")
 	modTypIdent = ast.NewIdent("Module")
 	modVarIdent = ast.NewIdent("m")
 	modRecvList = &ast.FieldList{List: []*ast.Field{{
@@ -435,6 +437,11 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				return err
 			}
 
+			var cond ast.Expr
+			if opcode == 0x04 { // if
+				cond = fn.popAsCond()
+			}
+
 			resultVars := make([]*ast.Ident, len(bt.results))
 			for i, t := range []byte(bt.results) {
 				resultVars[i] = fn.makeTempVar()
@@ -467,10 +474,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				stmt = b.body
 
 			case 0x04: // if
-				b.ifStmt = &ast.IfStmt{
-					Cond: fn.popAsCond(),
-					Body: b.body,
-				}
+				b.ifStmt = &ast.IfStmt{Cond: cond, Body: b.body}
 				stmt = b.ifStmt
 			}
 
@@ -679,69 +683,146 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				}},
 			})
 
+		case 0x42: // i64.const
+			i, err := readSignedLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			fn.push(&ast.CallExpr{
+				Fun: int64Ident,
+				Args: []ast.Expr{&ast.BasicLit{
+					Value: strconv.FormatInt(i, 10),
+					Kind:  token.INT,
+				}},
+			})
+
 		case 0x45: // i32.eqz
-			fn.i32Eqz()
+			fn.eqzOp()
 		case 0x46: // i32.eq
-			fn.i32Cmp(token.EQL)
+			fn.cmpOp(token.EQL)
 		case 0x47: // i32.ne
-			fn.i32Cmp(token.NEQ)
+			fn.cmpOp(token.NEQ)
 		case 0x48: // i32.lt_s
-			fn.i32Cmp(token.LSS)
+			fn.cmpOp(token.LSS)
 		case 0x49: // i32.lt_u
-			fn.u32Cmp(token.LSS)
+			fn.cmpOpU32(token.LSS)
 		case 0x4a: // i32.gt_s
-			fn.i32Cmp(token.GTR)
+			fn.cmpOp(token.GTR)
 		case 0x4b: // i32.gt_u
-			fn.u32Cmp(token.GTR)
+			fn.cmpOpU32(token.GTR)
 		case 0x4c: // i32.le_s
-			fn.i32Cmp(token.LEQ)
+			fn.cmpOp(token.LEQ)
 		case 0x4d: // i32.le_u
-			fn.u32Cmp(token.LEQ)
+			fn.cmpOpU32(token.LEQ)
 		case 0x4e: // i32.ge_s
-			fn.i32Cmp(token.GEQ)
+			fn.cmpOp(token.GEQ)
 		case 0x4f: // i32.ge_u
-			fn.u32Cmp(token.GEQ)
+			fn.cmpOpU32(token.GEQ)
+
+		case 0x50: // i64.eqz
+			fn.eqzOp()
+		case 0x51: // i64.eq
+			fn.cmpOp(token.EQL)
+		case 0x52: // i64.ne
+			fn.cmpOp(token.NEQ)
+		case 0x53: // i64.lt_s
+			fn.cmpOp(token.LSS)
+		case 0x54: // i64.lt_u
+			fn.cmpOpU64(token.LSS)
+		case 0x55: // i64.gt_s
+			fn.cmpOp(token.GTR)
+		case 0x56: // i64.gt_u
+			fn.cmpOpU64(token.GTR)
+		case 0x57: // i64.le_s
+			fn.cmpOp(token.LEQ)
+		case 0x58: // i64.le_u
+			fn.cmpOpU64(token.LEQ)
+		case 0x59: // i64.ge_s
+			fn.cmpOp(token.GEQ)
+		case 0x5a: // i64.ge_u
+			fn.cmpOpU64(token.GEQ)
 
 		case 0x67: // i32.clz
 			t.goImports["math/bits"] = struct{}{}
-			fn.i32BitOp("LeadingZeros32")
+			fn.bitOp("LeadingZeros32", int32Ident, uint32Ident)
 		case 0x68: // i32.ctz
 			t.goImports["math/bits"] = struct{}{}
-			fn.i32BitOp("TrailingZeros32")
+			fn.bitOp("TrailingZeros32", int32Ident, uint32Ident)
 		case 0x69: // i32.popcnt
 			t.goImports["math/bits"] = struct{}{}
-			fn.i32BitOp("OnesCount32")
+			fn.bitOp("OnesCount32", int32Ident, uint32Ident)
 
 		case 0x6a: // i32.add
-			fn.i32BinOp(token.ADD)
+			fn.binOp(token.ADD)
 		case 0x6b: // i32.sub
-			fn.i32BinOp(token.SUB)
+			fn.binOp(token.SUB)
 		case 0x6c: // i32.mul
-			fn.i32BinOp(token.MUL)
+			fn.binOp(token.MUL)
 		case 0x6d: // i32.div_s
-			fn.i32BinOp(token.QUO)
+			fn.binOp(token.QUO)
 		case 0x6e: // i32.div_u
-			fn.u32BinOp(token.QUO)
+			fn.binOpU32(token.QUO)
 		case 0x6f: // i32.rem_s
-			fn.i32BinOp(token.REM)
+			fn.binOp(token.REM)
 		case 0x70: // i32.rem_u
-			fn.u32BinOp(token.REM)
+			fn.binOpU32(token.REM)
 		case 0x71: // i32.and
-			fn.i32BinOp(token.AND)
+			fn.binOp(token.AND)
 		case 0x72: // i32.or
-			fn.i32BinOp(token.OR)
+			fn.binOp(token.OR)
 		case 0x73: // i32.xor
-			fn.i32BinOp(token.XOR)
+			fn.binOp(token.XOR)
 		case 0x74: // i32.shl
-			fn.i32BinOp(token.SHL)
+			fn.binOp(token.SHL)
 		case 0x75: // i32.shr_s
-			fn.i32BinOp(token.SHR)
+			fn.binOp(token.SHR)
 		case 0x76: // i32.shr_u
-			fn.u32BinOp(token.SHR)
+			fn.binOpU32(token.SHR)
 
 		case 0x77, 0x78: // i32.rotl, i32.rotr
 			t.goImports["math/bits"] = struct{}{}
-			fn.i32RotOp(opcode == 0x78)
+			fn.rotOp(opcode == 0x77, "RotateLeft32", int32Ident, uint32Ident)
+
+		case 0x79: // i64.clz
+			t.goImports["math/bits"] = struct{}{}
+			fn.bitOp("LeadingZeros64", int64Ident, uint64Ident)
+		case 0x7a: // i64.ctz
+			t.goImports["math/bits"] = struct{}{}
+			fn.bitOp("TrailingZeros64", int64Ident, uint64Ident)
+		case 0x7b: // i64.popcnt
+			t.goImports["math/bits"] = struct{}{}
+			fn.bitOp("OnesCount64", int64Ident, uint64Ident)
+
+		case 0x7c: // i64.add
+			fn.binOp(token.ADD)
+		case 0x7d: // i64.sub
+			fn.binOp(token.SUB)
+		case 0x7e: // i64.mul
+			fn.binOp(token.MUL)
+		case 0x7f: // i64.div_s
+			fn.binOp(token.QUO)
+		case 0x80: // i64.div_u
+			fn.binOpU64(token.QUO)
+		case 0x81: // i64.rem_s
+			fn.binOp(token.REM)
+		case 0x82: // i64.rem_u
+			fn.binOpU64(token.REM)
+		case 0x83: // i64.and
+			fn.binOp(token.AND)
+		case 0x84: // i64.or
+			fn.binOp(token.OR)
+		case 0x85: // i64.xor
+			fn.binOp(token.XOR)
+		case 0x86: // i64.shl
+			fn.binOp(token.SHL)
+		case 0x87: // i64.shr_s
+			fn.binOp(token.SHR)
+		case 0x88: // i64.shr_u
+			fn.binOpU64(token.SHR)
+
+		case 0x89, 0x8a: // i64.rotl, i64.rotr
+			t.goImports["math/bits"] = struct{}{}
+			fn.rotOp(opcode == 0x89, "RotateLeft64", int64Ident, uint64Ident)
 
 		default:
 			return fmt.Errorf("unsupported opcode: %x", opcode)
@@ -749,7 +830,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 	}
 }
 
-func (fn *funcRef) i32BinOp(op token.Token) {
+func (fn *funcRef) binOp(op token.Token) {
 	fn.pushTemp(&ast.BinaryExpr{
 		Y:  fn.pop(),
 		X:  fn.pop(),
@@ -757,7 +838,7 @@ func (fn *funcRef) i32BinOp(op token.Token) {
 	})
 }
 
-func (fn *funcRef) u32BinOp(op token.Token) {
+func (fn *funcRef) binOpU32(op token.Token) {
 	fn.pushTemp(&ast.CallExpr{
 		Fun: int32Ident,
 		Args: []ast.Expr{&ast.BinaryExpr{
@@ -773,41 +854,57 @@ func (fn *funcRef) u32BinOp(op token.Token) {
 		}}})
 }
 
-func (fn *funcRef) i32BitOp(name string) {
+func (fn *funcRef) binOpU64(op token.Token) {
 	fn.pushTemp(&ast.CallExpr{
-		Fun: int32Ident,
+		Fun: int64Ident,
+		Args: []ast.Expr{&ast.BinaryExpr{
+			Y: &ast.CallExpr{
+				Fun:  uint64Ident,
+				Args: []ast.Expr{fn.pop()},
+			},
+			X: &ast.CallExpr{
+				Fun:  uint64Ident,
+				Args: []ast.Expr{fn.pop()},
+			},
+			Op: op,
+		}}})
+}
+
+func (fn *funcRef) bitOp(name string, intIndent, uintIndent *ast.Ident) {
+	fn.pushTemp(&ast.CallExpr{
+		Fun: intIndent,
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   ast.NewIdent("bits"),
 				Sel: ast.NewIdent(name),
 			},
 			Args: []ast.Expr{&ast.CallExpr{
-				Fun:  uint32Ident,
+				Fun:  uintIndent,
 				Args: []ast.Expr{fn.pop()},
 			}},
 		}},
 	})
 }
 
-func (fn *funcRef) i32RotOp(rotr bool) {
+func (fn *funcRef) rotOp(rotl bool, name string, intIndent, uintIndent *ast.Ident) {
 	var count ast.Expr = &ast.CallExpr{
 		Fun:  ast.NewIdent("int"),
 		Args: []ast.Expr{fn.pop()},
 	}
-	if rotr {
+	if !rotl {
 		count = &ast.UnaryExpr{Op: token.SUB, X: count}
 	}
 
 	fn.pushTemp(&ast.CallExpr{
-		Fun: int32Ident,
+		Fun: intIndent,
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   ast.NewIdent("bits"),
-				Sel: ast.NewIdent("RotateLeft32"),
+				Sel: ast.NewIdent(name),
 			},
 			Args: []ast.Expr{
 				&ast.CallExpr{
-					Fun:  uint32Ident,
+					Fun:  uintIndent,
 					Args: []ast.Expr{fn.pop()},
 				},
 				count,
@@ -816,7 +913,7 @@ func (fn *funcRef) i32RotOp(rotr bool) {
 	})
 }
 
-func (fn *funcRef) i32Eqz() {
+func (fn *funcRef) eqzOp() {
 	fn.emitCondition(&ast.BinaryExpr{
 		X:  fn.pop(),
 		Op: token.EQL,
@@ -824,11 +921,11 @@ func (fn *funcRef) i32Eqz() {
 	})
 }
 
-func (fn *funcRef) i32Cmp(op token.Token) {
+func (fn *funcRef) cmpOp(op token.Token) {
 	fn.emitCondition(&ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op})
 }
 
-func (fn *funcRef) u32Cmp(op token.Token) {
+func (fn *funcRef) cmpOpU32(op token.Token) {
 	fn.emitCondition(&ast.BinaryExpr{
 		Y: &ast.CallExpr{
 			Fun:  uint32Ident,
@@ -836,6 +933,19 @@ func (fn *funcRef) u32Cmp(op token.Token) {
 		},
 		X: &ast.CallExpr{
 			Fun:  uint32Ident,
+			Args: []ast.Expr{fn.pop()},
+		},
+		Op: op})
+}
+
+func (fn *funcRef) cmpOpU64(op token.Token) {
+	fn.emitCondition(&ast.BinaryExpr{
+		Y: &ast.CallExpr{
+			Fun:  uint64Ident,
+			Args: []ast.Expr{fn.pop()},
+		},
+		X: &ast.CallExpr{
+			Fun:  uint64Ident,
 			Args: []ast.Expr{fn.pop()},
 		},
 		Op: op})
