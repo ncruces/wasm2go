@@ -1,19 +1,21 @@
+#include <stdint.h>
+
 #define PI 3.14159265358979323846264338327950288419716939937510582097494459 // https://oeis.org/A000796
 
 double sin(double n) {
   if (n == 0) return n;
   if (!__builtin_isfinite(n)) return __builtin_nan("");
 
-	long long k = (long long)(n * (2 / PI) + 0.5);
+	int64_t k = (int64_t)(n * (2 / PI) + __builtin_copysign(0.5, n));
 	double t = n - k * (0.5 * PI);
 
   double sin = t;
 	double cos = 1;
 
 	int halvings = 0;
-  while (__builtin_fabs(sin) > 0x1p-53) {
-    halvings++;
+  while (__builtin_fabs(sin) > 0x1p-27) {
     sin *= 0.5;
+    halvings++;
   }
 
 	for (int i = 0; i < halvings; i++) {
@@ -22,14 +24,16 @@ double sin(double n) {
 		cos = 1 - 2 * (s * s);
 	}
 
-  switch (k) {
-  default:
+  switch (k & 3) {
+  case 0:
     return sin;
   case 1:
-    return -sin;
-  case 2:
-    return -cos;
-  case 3:
     return cos;
+  case 2:
+    return -sin;
+  case 3:
+    return -cos;
+  default:
+    __builtin_unreachable();
   }
 }

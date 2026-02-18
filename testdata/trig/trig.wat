@@ -32,7 +32,7 @@
      (i64.const 9218868437227405311)
     )
    )
-   (local.set $0
+   (local.set $1
     (f64.add
      (local.get $0)
      (f64.mul
@@ -44,7 +44,10 @@
            (local.get $0)
            (f64.const 0.6366197723675814)
           )
-          (f64.const 0.5)
+          (f64.copysign
+           (f64.const 0.5)
+           (local.get $0)
+          )
          )
         )
        )
@@ -58,106 +61,98 @@
      (if (result f64)
       (f64.gt
        (f64.abs
-        (local.get $0)
+        (local.get $1)
        )
-       (f64.const 1.1102230246251565e-16)
+       (f64.const 7.450580596923828e-09)
       )
       (then
-       (local.set $0
-        (f64.mul
-         (local.get $0)
-         (f64.const 0.5)
-        )
-       )
        (local.set $3
         (i32.add
          (local.get $3)
          (i32.const 1)
         )
        )
+       (local.set $1
+        (f64.mul
+         (local.get $1)
+         (f64.const 0.5)
+        )
+       )
        (br $label)
       )
       (else
-       (local.set $1
+       (local.set $0
         (f64.const 1)
        )
-       (block $block1
-        (loop $label1
-         (if
-          (local.get $3)
-          (then
-           (local.set $3
-            (i32.sub
-             (local.get $3)
-             (i32.const 1)
-            )
-           )
-           (local.set $2
-            (f64.mul
-             (local.get $0)
-             (local.get $0)
-            )
-           )
-           (local.set $0
-            (f64.add
-             (local.tee $0
-              (f64.mul
-               (local.get $1)
-               (local.get $0)
-              )
-             )
-             (local.get $0)
-            )
-           )
-           (local.set $1
-            (f64.sub
-             (f64.const 1)
-             (f64.add
-              (local.get $2)
-              (local.get $2)
-             )
-            )
-           )
-           (br $label1)
-          )
-          (else
-           (block $block2
-            (if
-             (i64.gt_u
-              (local.tee $4
-               (i64.sub
-                (local.get $4)
-                (i64.const 1)
-               )
-              )
-              (i64.const 2)
-             )
-             (then
-              (return
-               (local.get $0)
-              )
-             )
-            )
-            (br_table $block1 $block $block2
+       (block $block3
+        (block $block2
+         (loop $label1
+          (if
+           (local.get $3)
+           (then
+            (local.set $3
              (i32.sub
-              (i32.wrap_i64
-               (local.get $4)
-              )
+              (local.get $3)
               (i32.const 1)
              )
             )
+            (local.set $2
+             (f64.mul
+              (local.get $1)
+              (local.get $1)
+             )
+            )
+            (local.set $1
+             (f64.add
+              (local.tee $0
+               (f64.mul
+                (local.get $0)
+                (local.get $1)
+               )
+              )
+              (local.get $0)
+             )
+            )
+            (local.set $0
+             (f64.sub
+              (f64.const 1)
+              (f64.add
+               (local.get $2)
+               (local.get $2)
+              )
+             )
+            )
+            (br $label1)
+           )
+           (else
+            (block $block1
+             (br_table $block1 $block2 $block3 $block
+              (i32.sub
+               (i32.and
+                (i32.wrap_i64
+                 (local.get $4)
+                )
+                (i32.const 3)
+               )
+               (i32.const 1)
+              )
+             )
+            )
            )
           )
+         )
+         (return
+          (local.get $0)
          )
         )
         (return
          (f64.neg
-          (local.get $0)
+          (local.get $1)
          )
         )
        )
        (f64.neg
-        (local.get $1)
+        (local.get $0)
        )
       )
      )
@@ -167,3 +162,4 @@
   (local.get $1)
  )
 )
+

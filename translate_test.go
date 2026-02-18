@@ -2,16 +2,18 @@ package main
 
 import (
 	_ "embed"
+	"math"
 	"os"
 	"slices"
 	"testing"
 
 	"github.com/ncruces/wasm2go/testdata/fib"
 	"github.com/ncruces/wasm2go/testdata/primes"
+	"github.com/ncruces/wasm2go/testdata/trig"
 )
 
 func Test_generate(t *testing.T) {
-	tests := []string{"fib", "primes"}
+	tests := []string{"fib", "primes", "trig"}
 
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -81,6 +83,30 @@ func Test_primes(t *testing.T) {
 	var got []int32
 	for i := range want {
 		got = append(got, m.Xis_prime(int32(i)))
+	}
+
+	if !slices.Equal(got, want) {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
+func Test_trig(t *testing.T) {
+	want := []float32{
+		float32(math.Sin(0)),
+		float32(math.Sin(1)),
+		float32(math.Sin(2)),
+		float32(math.Sin(3)),
+		float32(math.Sin(4)),
+		float32(math.Sin(5)),
+		float32(math.Sin(6)),
+		float32(math.Sin(7)),
+	}
+
+	var m trig.Module
+
+	var got []float32
+	for i := range want {
+		got = append(got, float32(m.Xsin(float64(i))))
 	}
 
 	if !slices.Equal(got, want) {
