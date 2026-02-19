@@ -202,38 +202,44 @@ type funcRef struct {
 	decl *ast.FuncDecl
 	pkgs set[string]
 
+	top    ast.Expr
 	cond   ast.Expr
-	stack  []*ast.Expr
+	stack  []ast.Expr
 	blocks []block
 	labels int
 	temps  int
 }
 
-func (fn *funcRef) pushVal(expr ast.Expr) {
-	fn.stack = append(fn.stack, &expr)
+// Pushes expr (a literal, constant or materialized temporary) to the value stack.
+func (fn *funcRef) pushConst(expr ast.Expr) {
+	fn.stack = append(fn.stack, expr)
 	fn.cond = nil
+	fn.top = nil
 }
 
-func (fn *funcRef) pushVar(expr ast.Expr) {
-	val := fn.makeTempVar()
+// Pushes the materialization of expr to the value stack.
+func (fn *funcRef) push(expr ast.Expr) {
+	tmp := fn.makeTempVar()
 	blk := &fn.blocks[len(fn.blocks)-1]
 	blk.append(&ast.AssignStmt{
 		Tok: token.DEFINE,
-		Lhs: []ast.Expr{val},
+		Lhs: []ast.Expr{tmp},
 		Rhs: []ast.Expr{expr},
 	})
-	fn.pushVal(val)
+	fn.pushConst(tmp)
+	fn.top = expr
 }
 
+// Pushes the integer materialization of cond the value stack.
 func (fn *funcRef) pushCond(cond ast.Expr) {
-	val := fn.makeTempVar()
+	tmp := fn.makeTempVar()
 	blk := &fn.blocks[len(fn.blocks)-1]
 	blk.append(&ast.DeclStmt{
 		Decl: &ast.GenDecl{
 			Tok: token.VAR,
 			Specs: []ast.Spec{
 				&ast.ValueSpec{
-					Names: []*ast.Ident{val},
+					Names: []*ast.Ident{tmp},
 					Type:  int32Ident,
 				},
 			},
@@ -244,36 +250,55 @@ func (fn *funcRef) pushCond(cond ast.Expr) {
 			List: []ast.Stmt{
 				&ast.AssignStmt{
 					Tok: token.ASSIGN,
-					Lhs: []ast.Expr{val},
+					Lhs: []ast.Expr{tmp},
 					Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
 				},
 			},
 		},
 	})
-	fn.pushVal(val)
+	fn.pushConst(tmp)
 	fn.cond = cond
 }
 
-func (fn *funcRef) pop() ast.Expr {
-	expr := *fn.stack[len(fn.stack)-1]
-	fn.stack = fn.stack[:len(fn.stack)-1]
+// Pops a materialized value from the value stack.
+func (fn *funcRef) popCopy() ast.Expr {
+	expr := pop(&fn.stack)
 	fn.cond = nil
+	fn.top = nil
 	return expr
 }
 
-func (fn *funcRef) popAsCond() ast.Expr {
-	cond := fn.cond
-	val := fn.pop()
+// Pops a (possibly unevaluated) value from the value stack.
+// The value must be immediately used once and only once.
+func (fn *funcRef) pop() ast.Expr {
+	expr := pop(&fn.stack)
+	top := fn.top
+	fn.cond = nil
+	fn.top = nil
+	if top == nil {
+		return expr
+	}
 
+	pop(&fn.blocks[len(fn.blocks)-1].body.List)
+	return top
+}
+
+// Pops a (possibly unevaluated) condition from the value stack.
+// The condition must be immediately used once and only once.
+func (fn *funcRef) popCond() ast.Expr {
+	expr := pop(&fn.stack)
+	cond := fn.cond
+	fn.cond = nil
+	fn.top = nil
 	if cond == nil {
 		return &ast.BinaryExpr{
-			X: val, Op: token.NEQ,
+			X: expr, Op: token.NEQ,
 			Y: &ast.BasicLit{Kind: token.INT, Value: "0"},
 		}
 	}
 
-	lst := &fn.blocks[len(fn.blocks)-1].body.List
-	*lst = (*lst)[:len(*lst)-2]
+	pop(&fn.blocks[len(fn.blocks)-1].body.List)
+	pop(&fn.blocks[len(fn.blocks)-1].body.List)
 	return cond
 }
 
@@ -290,6 +315,18 @@ type block struct {
 func (b *block) append(stmts ...ast.Stmt) {
 	lst := &b.body.List
 	*lst = append(*lst, stmts...)
+}
+
+func (b *block) setResults(fn *funcRef) {
+	if !b.unreachable {
+		for i := len(b.results) - 1; i >= 0; i-- {
+			b.append(&ast.AssignStmt{
+				Lhs: []ast.Expr{b.results[i]},
+				Rhs: []ast.Expr{fn.pop()},
+				Tok: token.ASSIGN,
+			})
+		}
+	}
 }
 
 func (t *translator) readFunctionSection() error {
@@ -416,7 +453,7 @@ func (t *translator) readCodeSection() error {
 			return err
 		}
 
-		err = t.readCodeForFunction(t.functions[i])
+		err = t.readCodeForFunction(&t.functions[i])
 		if err != nil {
 			return err
 		}
@@ -424,16 +461,20 @@ func (t *translator) readCodeSection() error {
 	return nil
 }
 
-func (t *translator) readCodeForFunction(fn funcRef) error {
-	fn.decl.Body = &ast.BlockStmt{}
-	fn.blocks = []block{{body: fn.decl.Body}}
+func (t *translator) readCodeForFunction(fn *funcRef) error {
+	body := &ast.BlockStmt{}
+	fn.decl.Body = body
+	fn.blocks = []block{{body: body}}
 
-	numLocals, err := readLEB128(t.in)
+	numVars, err := readLEB128(t.in)
 	if err != nil {
 		return err
 	}
-	localIndex := len(fn.typ.params)
-	for range numLocals {
+
+	// Declare local variables.
+	// Parameters are predeclared locals.
+	numLocals := len(fn.typ.params)
+	for range numVars {
 		n, err := readLEB128(t.in)
 		if err != nil {
 			return err
@@ -444,11 +485,11 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 		}
 
 		names := make([]*ast.Ident, int(n))
-		for j := range int(n) {
-			names[j] = ast.NewIdent(local(localIndex))
-			localIndex++
+		for i := range int(n) {
+			names[i] = ast.NewIdent(local(numLocals))
+			numLocals++
 		}
-		fn.decl.Body.List = append(fn.decl.Body.List, &ast.DeclStmt{
+		body.List = append(body.List, &ast.DeclStmt{
 			Decl: &ast.GenDecl{
 				Tok: token.VAR,
 				Specs: []ast.Spec{
@@ -478,18 +519,19 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 
 			var cond ast.Expr
 			if opcode == 0x04 { // if
-				cond = fn.popAsCond()
+				cond = fn.popCond()
 			}
 
-			resultVars := make([]*ast.Ident, len(bt.results))
+			// Declare block results outside the block.
+			results := make([]*ast.Ident, len(bt.results))
 			for i, t := range []byte(bt.results) {
-				resultVars[i] = fn.makeTempVar()
+				results[i] = fn.makeTempVar()
 				blk.append(&ast.DeclStmt{
 					Decl: &ast.GenDecl{
 						Tok: token.VAR,
 						Specs: []ast.Spec{
 							&ast.ValueSpec{
-								Names: []*ast.Ident{resultVars[i]},
+								Names: []*ast.Ident{results[i]},
 								Type:  ast.NewIdent(wasmType(t).String()),
 							},
 						},
@@ -497,201 +539,137 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				})
 			}
 
-			b := block{
+			childBlk := block{
 				typ:     bt,
 				body:    &ast.BlockStmt{},
-				results: resultVars,
+				results: results,
 			}
 
 			var stmt ast.Stmt
 			switch opcode {
 			case 0x02: // block
-				stmt = b.body
+				stmt = childBlk.body
 
 			case 0x03: // loop
-				b.loopPos = ^len(blk.body.List)
-				stmt = b.body
+				// Remember the loop start position.
+				// Bitwise not makes the zero value useful (not a loop).
+				childBlk.loopPos = ^len(blk.body.List)
+				stmt = childBlk.body
 
 			case 0x04: // if
-				b.ifStmt = &ast.IfStmt{Cond: cond, Body: b.body}
-				stmt = b.ifStmt
+				// We need to remember the if statement
+				// so we can attach an else branch.
+				childBlk.ifStmt = &ast.IfStmt{Cond: cond, Body: childBlk.body}
+				stmt = childBlk.ifStmt
 			}
 
-			fn.blocks = append(fn.blocks, b)
+			fn.blocks = append(fn.blocks, childBlk)
 			blk.append(stmt)
 
 		case 0x05: // else
-			if !blk.unreachable {
-				for i := len(blk.results) - 1; i >= 0; i-- {
-					blk.append(&ast.AssignStmt{
-						Lhs: []ast.Expr{blk.results[i]},
-						Rhs: []ast.Expr{fn.pop()},
-						Tok: token.ASSIGN,
-					})
-				}
-			}
+			// Set the results of the if branch.
+			blk.setResults(fn)
+			// Create a new block at the same level,
+			// make it the else branch.
 			blk.body = &ast.BlockStmt{}
 			blk.ifStmt.Else = blk.body
 			blk.unreachable = false
 
 		case 0x0b: // end
-			if !blk.unreachable {
-				for i := len(blk.results) - 1; i >= 0; i-- {
-					blk.append(&ast.AssignStmt{
-						Lhs: []ast.Expr{blk.results[i]},
-						Rhs: []ast.Expr{fn.pop()},
-						Tok: token.ASSIGN,
-					})
-				}
-			}
-
-			fn.blocks = fn.blocks[:len(fn.blocks)-1]
-			if len(fn.blocks) == 0 {
+			if len(fn.blocks) == 1 { // End of the function body.
 				if !blk.unreachable && len(fn.typ.results) > 0 {
-					res := make([]ast.Expr, len(fn.typ.results))
-					for i := range res {
-						res[len(res)-1-i] = fn.pop()
+					ret := &ast.ReturnStmt{}
+					ret.Results = make([]ast.Expr, len(fn.typ.results))
+					for i := len(ret.Results) - 1; i >= 0; i-- {
+						ret.Results[i] = fn.pop()
 					}
-					fn.decl.Body.List = append(fn.decl.Body.List, &ast.ReturnStmt{
-						Results: res,
-					})
+					blk.append(ret)
 				}
 				return nil
 			}
 
-			if blk.label != nil {
+			// Set block results, but push them again
+			// so they're available to the parent block.
+			blk.setResults(fn)
+			for _, val := range blk.results {
+				fn.pushConst(val)
+			}
+
+			pop(&fn.blocks)
+			if blk.label != nil { // Add the label if requested.
 				parent := &fn.blocks[len(fn.blocks)-1]
-				if blk.loopPos != 0 {
+				if blk.loopPos != 0 { // At the start for loops.
 					parent.body.List[^blk.loopPos] = &ast.LabeledStmt{
 						Stmt:  parent.body.List[^blk.loopPos],
 						Label: blk.label,
 					}
-				} else {
+				} else { // At the end for other block types.
 					parent.append(&ast.LabeledStmt{
 						Stmt:  &ast.EmptyStmt{},
 						Label: blk.label,
 					})
 				}
 			}
-			for _, val := range blk.results {
-				fn.pushVal(val)
-			}
 
 		case 0x0c: // br
-			i, err := readLEB128(t.in)
+			// How many nested blocks are we exiting?
+			n, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			b := &fn.blocks[len(fn.blocks)-1-int(i)]
-			if b.label == nil {
-				b.label = fn.makeLabel()
-			}
+			n = uint64(len(fn.blocks)) - n - 1
 
-			if b.loopPos == 0 {
-				for i := len(b.results) - 1; i >= 0; i-- {
-					blk.append(&ast.AssignStmt{
-						Lhs: []ast.Expr{b.results[i]},
-						Rhs: []ast.Expr{fn.pop()},
-						Tok: token.ASSIGN,
-					})
-				}
-			}
-
-			blk.unreachable = true
-			if int(i) < len(fn.blocks)-1 {
-				blk.append(&ast.BranchStmt{Tok: token.GOTO, Label: b.label})
-			} else {
-				ret := &ast.ReturnStmt{}
-				if len(fn.typ.results) > 0 {
-					ret.Results = make([]ast.Expr, len(fn.typ.results))
-					for i := len(ret.Results) - 1; i >= 0; i-- {
-						ret.Results[i] = fn.pop()
-					}
-				}
-				blk.append(ret)
-			}
+			blk.append(fn.branch(n))
+			blk.unreachable = true // After an uncoditional goto.
 
 		case 0x0d: // br_if
-			i, err := readLEB128(t.in)
+			// How many nested blocks would we exit?
+			n, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
+			n = uint64(len(fn.blocks)) - n - 1
 
-			b := &fn.blocks[len(fn.blocks)-1-int(i)]
-			if b.label == nil {
-				b.label = fn.makeLabel()
-			}
-
-			ifStmt := &ast.IfStmt{
-				Cond: fn.popAsCond(),
-				Body: &ast.BlockStmt{},
-			}
-
-			if b.loopPos == 0 {
-				for j := range b.results {
-					ifStmt.Body.List = append(ifStmt.Body.List, &ast.AssignStmt{
-						Lhs: []ast.Expr{b.results[j]},
-						Rhs: []ast.Expr{*fn.stack[len(fn.stack)-len(b.results)+j]},
-						Tok: token.ASSIGN,
-					})
-				}
-			}
-
-			if int(i) < len(fn.blocks)-1 {
-				ifStmt.Body.List = append(ifStmt.Body.List, &ast.BranchStmt{Tok: token.GOTO, Label: b.label})
-			} else {
-				ret := &ast.ReturnStmt{}
-				if len(fn.typ.results) > 0 {
-					ret.Results = make([]ast.Expr, len(fn.typ.results))
-					for j := range ret.Results {
-						ret.Results[j] = *fn.stack[len(fn.stack)-len(ret.Results)+j]
-					}
-				}
-				ifStmt.Body.List = append(ifStmt.Body.List, ret)
-			}
-			blk.append(ifStmt)
+			// Conditional break.
+			blk.append(&ast.IfStmt{
+				Cond: fn.popCond(),
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{fn.branch(n)},
+				},
+			})
 
 		case 0x0e: // br_table
 			numTargets, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			targets := make([]int, numTargets)
+			targets := make([]uint64, numTargets)
 			for i := range targets {
 				target, err := readLEB128(t.in)
 				if err != nil {
 					return err
 				}
-				targets[i] = int(target)
+				targets[i] = uint64(len(fn.blocks)) - target - 1
 			}
 			defaultTarget, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
+			defaultTarget = uint64(len(fn.blocks)) - defaultTarget - 1
 
-			index := fn.pop()
-
-			arity := len(fn.blocks[len(fn.blocks)-1-int(defaultTarget)].results)
-			if int(defaultTarget) == len(fn.blocks)-1 {
-				arity = len(fn.typ.results)
-			}
-			args := make([]ast.Expr, arity)
-			for i := range args {
-				args[i] = fn.pop()
-			}
-
-			sw := &ast.SwitchStmt{Tag: index, Body: &ast.BlockStmt{}}
+			sw := &ast.SwitchStmt{Tag: fn.pop(), Body: &ast.BlockStmt{
+				List: []ast.Stmt{&ast.CaseClause{
+					Body: []ast.Stmt{fn.branch(defaultTarget)},
+				}},
+			}}
 			for i, target := range targets {
 				sw.Body.List = append(sw.Body.List, &ast.CaseClause{
 					List: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}},
-					Body: fn.branchStmts(target, args),
+					Body: []ast.Stmt{fn.branch(target)},
 				})
 			}
-			sw.Body.List = append(sw.Body.List, &ast.CaseClause{
-				Body: fn.branchStmts(int(defaultTarget), args),
-			})
 			blk.append(sw)
-			blk.unreachable = true
+			blk.unreachable = true // After switch.
 
 		case 0x0f: // return
 			ret := &ast.ReturnStmt{}
@@ -702,10 +680,10 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				}
 			}
 			blk.append(ret)
-			blk.unreachable = true
+			blk.unreachable = true // After an uncoditional return.
 
 		case 0x1b: // select
-			cond := fn.popAsCond()
+			cond := fn.popCond()
 			val := fn.makeTempVar()
 			blk.append(&ast.AssignStmt{
 				Tok: token.DEFINE,
@@ -718,41 +696,50 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 						&ast.AssignStmt{
 							Tok: token.ASSIGN,
 							Lhs: []ast.Expr{val},
-							Rhs: []ast.Expr{fn.pop()},
+							Rhs: []ast.Expr{fn.popCopy()}, // must eval
 						},
 					},
 				},
 			})
-			fn.pushVal(val)
+			fn.pushConst(val)
 
 		case 0x20: // local.get
 			i, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			fn.pushVar(ast.NewIdent(local(i)))
+			fn.push(ast.NewIdent(local(i)))
 
-		case 0x21, 0x22: // local.set, local.tee
+		case 0x21: // local.set
 			i, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			val := fn.pop()
+			blk.append(&ast.AssignStmt{
+				Lhs: []ast.Expr{ast.NewIdent(local(i))},
+				Rhs: []ast.Expr{fn.pop()},
+				Tok: token.ASSIGN,
+			})
+
+		case 0x22: // local.tee
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			val := fn.popCopy() // will be reused
 			blk.append(&ast.AssignStmt{
 				Lhs: []ast.Expr{ast.NewIdent(local(i))},
 				Rhs: []ast.Expr{val},
 				Tok: token.ASSIGN,
 			})
-			if opcode == 0x22 { // local.tee
-				fn.pushVal(val)
-			}
+			fn.pushConst(val)
 
 		case 0x41: // i32.const
 			i, err := readSignedLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			fn.pushVal(&ast.CallExpr{
+			fn.pushConst(&ast.CallExpr{
 				Fun: int32Ident,
 				Args: []ast.Expr{&ast.BasicLit{
 					Value: strconv.FormatInt(i, 10),
@@ -765,7 +752,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 			if err != nil {
 				return err
 			}
-			fn.pushVal(&ast.CallExpr{
+			fn.pushConst(&ast.CallExpr{
 				Fun: int64Ident,
 				Args: []ast.Expr{&ast.BasicLit{
 					Value: strconv.FormatInt(i, 10),
@@ -779,7 +766,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 				return err
 			}
 			fn.pkgs.add("math")
-			fn.pushVal(&ast.CallExpr{
+			fn.pushConst(&ast.CallExpr{
 				Fun: &ast.SelectorExpr{
 					X:   ast.NewIdent("math"),
 					Sel: ast.NewIdent("Float64frombits"),
@@ -920,7 +907,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 		case 0x99: // f64.abs
 			fn.uniMath("Abs")
 		case 0x9a: // f64.neg
-			fn.pushVar(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+			fn.push(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
 		case 0x9b: // f64.ceil
 			fn.uniMath("Ceil")
 		case 0x9c: // f64.floor
@@ -943,10 +930,10 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 		case 0xa6: // f64.copysign
 			fn.binMath("Copysign")
 		case 0xa7: // i32.wrap_i64
-			fn.pushVar(&ast.CallExpr{Fun: int32Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: int32Ident, Args: []ast.Expr{fn.pop()}})
 
 		case 0xb9: // f64.convert_i64_s
-			fn.pushVar(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
 
 		case 0xbd: // i64.reinterpret_f64
 			fn.float64bits()
@@ -960,7 +947,7 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 			case 0x06: // i64.trunc_sat_f64_s
 				t.helpers.add(i64_trunc_sat_f64_s)
 				fn.pkgs.add("math")
-				fn.pushVar(&ast.CallExpr{
+				fn.push(&ast.CallExpr{
 					Fun:  ast.NewIdent("i64_trunc_sat_f64_s"),
 					Args: []ast.Expr{fn.pop()}})
 			default:
@@ -973,40 +960,33 @@ func (t *translator) readCodeForFunction(fn funcRef) error {
 	}
 }
 
-func (fn *funcRef) branchStmts(labelIdx int, args []ast.Expr) []ast.Stmt {
-	b := &fn.blocks[len(fn.blocks)-1-labelIdx]
-	if b.label == nil {
-		b.label = fn.makeLabel()
-	}
-
-	var stmts []ast.Stmt
-	if b.loopPos == 0 {
-		for i := range b.results {
-			stmts = append(stmts, &ast.AssignStmt{
-				Lhs: []ast.Expr{b.results[len(b.results)-1-i]},
-				Rhs: []ast.Expr{args[i]},
-				Tok: token.ASSIGN,
-			})
-		}
-	}
-
-	if labelIdx < len(fn.blocks)-1 {
-		stmts = append(stmts, &ast.BranchStmt{Tok: token.GOTO, Label: b.label})
-	} else {
+func (fn *funcRef) branch(n uint64) ast.Stmt {
+	// Returning from the function body.
+	if n == 0 {
 		ret := &ast.ReturnStmt{}
 		if len(fn.typ.results) > 0 {
 			ret.Results = make([]ast.Expr, len(fn.typ.results))
-			for i := range ret.Results {
-				ret.Results[len(ret.Results)-1-i] = args[i]
+			for i := len(ret.Results) - 1; i >= 0; i-- {
+				ret.Results[i] = fn.pop()
 			}
 		}
-		stmts = append(stmts, ret)
+		return ret
 	}
-	return stmts
+
+	// Create a label for the block we're jumping to.
+	targetBlk := &fn.blocks[n]
+	if targetBlk.label == nil {
+		targetBlk.label = fn.makeLabel()
+	}
+	// If it's not a loop, set results.
+	if targetBlk.loopPos == 0 {
+		targetBlk.setResults(fn)
+	}
+	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
 }
 
 func (fn *funcRef) binOp(op token.Token) {
-	fn.pushVar(&ast.BinaryExpr{
+	fn.push(&ast.BinaryExpr{
 		Y:  fn.pop(),
 		X:  fn.pop(),
 		Op: op,
@@ -1014,7 +994,7 @@ func (fn *funcRef) binOp(op token.Token) {
 }
 
 func (fn *funcRef) binOpU32(op token.Token) {
-	fn.pushVar(&ast.CallExpr{
+	fn.push(&ast.CallExpr{
 		Fun: int32Ident,
 		Args: []ast.Expr{&ast.BinaryExpr{
 			Y: &ast.CallExpr{
@@ -1030,7 +1010,7 @@ func (fn *funcRef) binOpU32(op token.Token) {
 }
 
 func (fn *funcRef) binOpU64(op token.Token) {
-	fn.pushVar(&ast.CallExpr{
+	fn.push(&ast.CallExpr{
 		Fun: int64Ident,
 		Args: []ast.Expr{&ast.BinaryExpr{
 			Y: &ast.CallExpr{
@@ -1047,7 +1027,7 @@ func (fn *funcRef) binOpU64(op token.Token) {
 
 func (fn *funcRef) bitOp(name string, intIndent, uintIndent *ast.Ident) {
 	fn.pkgs.add("math/bits")
-	fn.pushVar(&ast.CallExpr{
+	fn.push(&ast.CallExpr{
 		Fun: intIndent,
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
@@ -1072,7 +1052,7 @@ func (fn *funcRef) rotOp(name string, rotl bool, intIndent, uintIndent *ast.Iden
 	}
 
 	fn.pkgs.add("math/bits")
-	fn.pushVar(&ast.CallExpr{
+	fn.push(&ast.CallExpr{
 		Fun: intIndent,
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
@@ -1092,7 +1072,7 @@ func (fn *funcRef) rotOp(name string, rotl bool, intIndent, uintIndent *ast.Iden
 
 func (fn *funcRef) uniMath(name string) {
 	fn.pkgs.add("math")
-	fn.pushVar(&ast.CallExpr{
+	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   ast.NewIdent("math"),
 			Sel: ast.NewIdent(name),
@@ -1105,7 +1085,7 @@ func (fn *funcRef) binMath(name string) {
 	fn.pkgs.add("math")
 	y := fn.pop()
 	x := fn.pop()
-	fn.pushVar(&ast.CallExpr{
+	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   ast.NewIdent("math"),
 			Sel: ast.NewIdent(name),
@@ -1116,7 +1096,7 @@ func (fn *funcRef) binMath(name string) {
 
 func (fn *funcRef) float64bits() {
 	fn.pkgs.add("math")
-	fn.pushVar(&ast.CallExpr{
+	fn.push(&ast.CallExpr{
 		Fun: int64Ident,
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
