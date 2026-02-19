@@ -216,6 +216,7 @@ type funcRef struct {
 	typ  funcType
 	decl *ast.FuncDecl
 	pkgs set[string]
+	hlps set[string]
 
 	top    ast.Expr
 	cond   ast.Expr
@@ -359,6 +360,7 @@ func (t *translator) readFunctionSection() error {
 		fn := &t.functions[i]
 		fn.typ = t.types[index]
 		fn.pkgs = t.packages
+		fn.hlps = t.helpers
 		fn.decl = &ast.FuncDecl{
 			Type: makeFuncType(fn.typ),
 			Recv: modRecvList,
@@ -947,6 +949,24 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0xa7: // i32.wrap_i64
 			fn.push(&ast.CallExpr{Fun: int32Ident, Args: []ast.Expr{fn.pop()}})
 
+		case 0xa8: // i32.trunc_f32_s
+			fn.floatTrunc("i32_trunc_f32_s")
+		case 0xa9: // i32.trunc_f32_u
+			fn.floatTrunc("i32_trunc_f32_u")
+		case 0xaa: // i32.trunc_f64_s
+			fn.floatTrunc("i32_trunc_f64_s")
+		case 0xab: // i32.trunc_f64_u
+			fn.floatTrunc("i32_trunc_f64_u")
+
+		case 0xae: // i64.trunc_f32_s
+			fn.floatTrunc("i64_trunc_f32_s")
+		case 0xaf: // i64.trunc_f32_u
+			fn.floatTrunc("i64_trunc_f32_u")
+		case 0xb0: // i64.trunc_f64_s
+			fn.floatTrunc("i64_trunc_f64_s")
+		case 0xb1: // i64.trunc_f64_u
+			fn.floatTrunc("i64_trunc_f64_u")
+
 		case 0xb9: // f64.convert_i64_s
 			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
 
@@ -959,12 +979,22 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 				return err
 			}
 			switch code {
+			case 0x00: // i32.trunc_sat_f32_s
+				fn.floatTrunc("i32_trunc_sat_f32_s")
+			case 0x01: // i32.trunc_sat_f32_u
+				fn.floatTrunc("i32_trunc_sat_f32_u")
+			case 0x02: // i32.trunc_sat_f64_s
+				fn.floatTrunc("i32_trunc_sat_f64_s")
+			case 0x03: // i32.trunc_sat_f64_u
+				fn.floatTrunc("i32_trunc_sat_f64_u")
+			case 0x04: // i64.trunc_sat_f32_s
+				fn.floatTrunc("i64_trunc_sat_f32_s")
+			case 0x05: // i64.trunc_sat_f32_u
+				fn.floatTrunc("i64_trunc_sat_f32_u")
 			case 0x06: // i64.trunc_sat_f64_s
-				t.helpers.add("i64_trunc_sat_f64_s")
-				fn.pkgs.add("math")
-				fn.push(&ast.CallExpr{
-					Fun:  ast.NewIdent("i64_trunc_sat_f64_s"),
-					Args: []ast.Expr{fn.pop()}})
+				fn.floatTrunc("i64_trunc_sat_f64_s")
+			case 0x07: // i64.trunc_sat_f64_u
+				fn.floatTrunc("i64_trunc_sat_f64_u")
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
 			}
@@ -1120,6 +1150,15 @@ func (fn *funcRef) float64bits() {
 			},
 			Args: []ast.Expr{fn.pop()},
 		}},
+	})
+}
+
+func (fn *funcRef) floatTrunc(name string) {
+	fn.pkgs.add("math")
+	fn.hlps.add(name)
+	fn.push(&ast.CallExpr{
+		Fun:  ast.NewIdent(name),
+		Args: []ast.Expr{fn.pop()},
 	})
 }
 
