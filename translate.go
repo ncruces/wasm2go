@@ -19,6 +19,7 @@ var (
 	int64Ident   = ast.NewIdent("int64")
 	uint32Ident  = ast.NewIdent("uint32")
 	uint64Ident  = ast.NewIdent("uint64")
+	float32Ident = ast.NewIdent("float32")
 	float64Ident = ast.NewIdent("float64")
 	modTypIdent  = ast.NewIdent("Module")
 	modVarIdent  = ast.NewIdent("m")
@@ -777,6 +778,23 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 				}},
 			})
 
+		case 0x43: // f32.const
+			var i uint32
+			if err := binary.Read(t.in, binary.LittleEndian, &i); err != nil {
+				return err
+			}
+			fn.pkgs.add("math")
+			fn.pushConst(&ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   ast.NewIdent("math"),
+					Sel: ast.NewIdent("Float32frombits"),
+				},
+				Args: []ast.Expr{&ast.BasicLit{
+					Value: strconv.FormatUint(uint64(i), 10),
+					Kind:  token.INT,
+				}},
+			})
+
 		case 0x44: // f64.const
 			var i uint64
 			if err := binary.Read(t.in, binary.LittleEndian, &i); err != nil {
@@ -840,8 +858,23 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x5a: // i64.ge_u
 			fn.cmpOpU64(token.GEQ)
 
+		case 0x5b: // f32.eq
+			fn.cmpOp(token.EQL)
+		case 0x5c: // f32.ne
+			fn.cmpOp(token.NEQ)
+		case 0x5d: // f32.lt
+			fn.cmpOp(token.LSS)
+		case 0x5e: // f32.gt
+			fn.cmpOp(token.GTR)
+		case 0x5f: // f32.le
+			fn.cmpOp(token.LEQ)
+		case 0x60: // f32.ge
+			fn.cmpOp(token.GEQ)
+
 		case 0x61: // f64.eq
 			fn.cmpOp(token.EQL)
+		case 0x62: // f64.ne
+			fn.cmpOp(token.NEQ)
 		case 0x63: // f64.lt
 			fn.cmpOp(token.LSS)
 		case 0x64: // f64.gt
@@ -921,6 +954,35 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x89, 0x8a: // i64.rotl, i64.rotr
 			fn.rotOp("RotateLeft64", opcode == 0x89, int64Ident, uint64Ident)
 
+		case 0x8b: // f32.abs
+			fn.uniMath32("Abs")
+		case 0x8c: // f32.neg
+			fn.push(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+		case 0x8d: // f32.ceil
+			fn.uniMath32("Ceil")
+		case 0x8e: // f32.floor
+			fn.uniMath32("Floor")
+		case 0x8f: // f32.trunc
+			fn.uniMath32("Trunc")
+		case 0x90: // f32.nearest
+			fn.uniMath32("RoundToEven")
+		case 0x91: // f32.sqrt
+			fn.uniMath32("Sqrt")
+		case 0x92: // f32.add
+			fn.binOp(token.ADD)
+		case 0x93: // f32.sub
+			fn.binOp(token.SUB)
+		case 0x94: // f32.mul
+			fn.binOp(token.MUL)
+		case 0x95: // f32.div
+			fn.binOp(token.QUO)
+		case 0x96: // f32.min
+			fn.binBuiltin("min")
+		case 0x97: // f32.max
+			fn.binBuiltin("max")
+		case 0x98: // f32.copysign
+			fn.binMath32("Copysign")
+
 		case 0x99: // f64.abs
 			fn.uniMath("Abs")
 		case 0x9a: // f64.neg
@@ -943,7 +1005,10 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.binOp(token.MUL)
 		case 0xa3: // f64.div
 			fn.binOp(token.QUO)
-
+		case 0xa4: // f64.min
+			fn.binBuiltin("min")
+		case 0xa5: // f64.max
+			fn.binBuiltin("max")
 		case 0xa6: // f64.copysign
 			fn.binMath("Copysign")
 		case 0xa7: // i32.wrap_i64
@@ -967,11 +1032,44 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0xb1: // i64.trunc_f64_u
 			fn.floatTrunc("i64_trunc_f64_u")
 
+		case 0xb2: // f32.convert_i32_s
+			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{fn.pop()}})
+		case 0xb3: // f32.convert_i32_u
+			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{
+				&ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{fn.pop()}},
+			}})
+		case 0xb4: // f32.convert_i64_s
+			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{fn.pop()}})
+		case 0xb5: // f32.convert_i64_u
+			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{
+				&ast.CallExpr{Fun: uint64Ident, Args: []ast.Expr{fn.pop()}},
+			}})
+		case 0xb6: // f32.demote_f64
+			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{fn.pop()}})
+
+		case 0xb7: // f64.convert_i32_s
+			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
+		case 0xb8: // f64.convert_i32_u
+			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{
+				&ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{fn.pop()}},
+			}})
 		case 0xb9: // f64.convert_i64_s
 			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
+		case 0xba: // f64.convert_i64_u
+			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{
+				&ast.CallExpr{Fun: uint64Ident, Args: []ast.Expr{fn.pop()}},
+			}})
+		case 0xbb: // f64.promote_f32
+			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
 
+		case 0xbc: // i32.reinterpret_f32
+			fn.float32bits()
 		case 0xbd: // i64.reinterpret_f64
 			fn.float64bits()
+		case 0xbe: // f32.reinterpret_i32
+			fn.float32frombits()
+		case 0xbf: // f64.reinterpret_i64
+			fn.float64frombits()
 
 		case 0xfc:
 			code, err := readLEB128(t.in)
@@ -1139,6 +1237,65 @@ func (fn *funcRef) binMath(name string) {
 	})
 }
 
+func (fn *funcRef) uniMath32(name string) {
+	fn.pkgs.add("math")
+	fn.push(&ast.CallExpr{
+		Fun: float32Ident,
+		Args: []ast.Expr{&ast.CallExpr{
+			Fun: &ast.SelectorExpr{
+				X:   ast.NewIdent("math"),
+				Sel: ast.NewIdent(name),
+			},
+			Args: []ast.Expr{&ast.CallExpr{
+				Fun:  float64Ident,
+				Args: []ast.Expr{fn.pop()},
+			}},
+		}},
+	})
+}
+
+func (fn *funcRef) binMath32(name string) {
+	fn.pkgs.add("math")
+	y := fn.pop()
+	x := fn.pop()
+	fn.push(&ast.CallExpr{
+		Fun: float32Ident,
+		Args: []ast.Expr{&ast.CallExpr{
+			Fun: &ast.SelectorExpr{
+				X:   ast.NewIdent("math"),
+				Sel: ast.NewIdent(name),
+			},
+			Args: []ast.Expr{
+				&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{x}},
+				&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{y}},
+			},
+		}},
+	})
+}
+
+func (fn *funcRef) binBuiltin(name string) {
+	y := fn.pop()
+	x := fn.pop()
+	fn.push(&ast.CallExpr{
+		Fun:  ast.NewIdent(name),
+		Args: []ast.Expr{x, y},
+	})
+}
+
+func (fn *funcRef) float32bits() {
+	fn.pkgs.add("math")
+	fn.push(&ast.CallExpr{
+		Fun: int32Ident,
+		Args: []ast.Expr{&ast.CallExpr{
+			Fun: &ast.SelectorExpr{
+				X:   ast.NewIdent("math"),
+				Sel: ast.NewIdent("Float32bits"),
+			},
+			Args: []ast.Expr{fn.pop()},
+		}},
+	})
+}
+
 func (fn *funcRef) float64bits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
@@ -1148,6 +1305,34 @@ func (fn *funcRef) float64bits() {
 				X:   ast.NewIdent("math"),
 				Sel: ast.NewIdent("Float64bits"),
 			},
+			Args: []ast.Expr{fn.pop()},
+		}},
+	})
+}
+
+func (fn *funcRef) float32frombits() {
+	fn.pkgs.add("math")
+	fn.push(&ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X:   ast.NewIdent("math"),
+			Sel: ast.NewIdent("Float32frombits"),
+		},
+		Args: []ast.Expr{&ast.CallExpr{
+			Fun:  uint32Ident,
+			Args: []ast.Expr{fn.pop()},
+		}},
+	})
+}
+
+func (fn *funcRef) float64frombits() {
+	fn.pkgs.add("math")
+	fn.push(&ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X:   ast.NewIdent("math"),
+			Sel: ast.NewIdent("Float64frombits"),
+		},
+		Args: []ast.Expr{&ast.CallExpr{
+			Fun:  uint64Ident,
 			Args: []ast.Expr{fn.pop()},
 		}},
 	})

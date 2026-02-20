@@ -1,6 +1,6 @@
 # wasm2go
 
-This project is trying to build a Wasm to Go translator.
+This project is creating a Wasm to Go translator.
 
 The input is a Wasm module, and the output is a single Go source file,
 with no dependencies beyond the standard library.
@@ -10,7 +10,7 @@ that exports a single structure called `Module`.
 
 The methods of this structure will be the Wasm module's exported functions.
 
-Only a minimal set of the Wasm specification will be supported,
+Only a subset of the Wasm specification will be supported,
 as the goal is to translate specific Wasm modules to Go.
 For example, we don't need to implement SIMD,
 as we can ask (e.g.) LLVM to avoid emmiting it.
