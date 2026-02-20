@@ -22,7 +22,7 @@ type translator struct {
 	out ast.File
 
 	types     []funcType
-	functions []funcRef
+	functions []funcCompiler
 	exports   map[string]export
 	packages  set[string]
 	helpers   set[string]
@@ -123,34 +123,6 @@ func (t *translator) readSection() error {
 	}
 }
 
-type wasmType byte
-
-const (
-	i32 wasmType = 127 - iota
-	i64
-	f32
-	f64
-)
-
-func (t wasmType) Ident() *ast.Ident {
-	switch t {
-	case i32:
-		return newID("int32")
-	case i64:
-		return newID("int64")
-	case f32:
-		return newID("float32")
-	case f64:
-		return newID("float64")
-	}
-	panic(fmt.Sprintf("unsupported type: %x", byte(t)))
-}
-
-type funcType struct {
-	params  string // wasmType of parameters
-	results string // wasmType of results
-}
-
 func (t *translator) readTypeSection() error {
 	numTypes, err := readLEB128(t.in)
 	if err != nil {
@@ -198,146 +170,13 @@ func (t *translator) readTypeSection() error {
 	return nil
 }
 
-type funcRef struct {
-	typ  funcType
-	decl *ast.FuncDecl
-	pkgs set[string]
-	hlps set[string]
-
-	top    ast.Expr
-	cond   ast.Expr
-	stack  []ast.Expr
-	blocks []block
-	labels int
-	temps  int
-}
-
-// Pushes expr (a literal, constant or materialized temporary) to the value stack.
-func (fn *funcRef) pushConst(expr ast.Expr) {
-	fn.stack = append(fn.stack, expr)
-	fn.cond = nil
-	fn.top = nil
-}
-
-// Pushes the materialization of expr to the value stack.
-func (fn *funcRef) push(expr ast.Expr) {
-	tmp := fn.newTempVar()
-	blk := &fn.blocks[len(fn.blocks)-1]
-	blk.append(&ast.AssignStmt{
-		Tok: token.DEFINE,
-		Lhs: []ast.Expr{tmp},
-		Rhs: []ast.Expr{expr},
-	})
-	fn.pushConst(tmp)
-	fn.top = expr
-}
-
-// Pushes the integer materialization of cond the value stack.
-func (fn *funcRef) pushCond(cond ast.Expr) {
-	tmp := fn.newTempVar()
-	blk := &fn.blocks[len(fn.blocks)-1]
-	blk.append(&ast.DeclStmt{
-		Decl: &ast.GenDecl{
-			Tok: token.VAR,
-			Specs: []ast.Spec{
-				&ast.ValueSpec{
-					Names: []*ast.Ident{tmp},
-					Type:  newID("int32"),
-				},
-			},
-		},
-	}, &ast.IfStmt{
-		Cond: cond,
-		Body: &ast.BlockStmt{
-			List: []ast.Stmt{
-				&ast.AssignStmt{
-					Tok: token.ASSIGN,
-					Lhs: []ast.Expr{tmp},
-					Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}},
-				},
-			},
-		},
-	})
-	fn.pushConst(tmp)
-	fn.cond = cond
-}
-
-// Pops a materialized value from the value stack.
-func (fn *funcRef) popCopy() ast.Expr {
-	expr := pop(&fn.stack)
-	fn.cond = nil
-	fn.top = nil
-	return expr
-}
-
-// Pops a (possibly unevaluated) value from the value stack.
-// The value must be immediately used once and only once.
-func (fn *funcRef) pop() ast.Expr {
-	expr := pop(&fn.stack)
-	top := fn.top
-	fn.cond = nil
-	fn.top = nil
-	if top == nil {
-		return expr
-	}
-
-	pop(&fn.blocks[len(fn.blocks)-1].body.List)
-	return top
-}
-
-// Pops a (possibly unevaluated) condition from the value stack.
-// The condition must be immediately used once and only once.
-func (fn *funcRef) popCond() ast.Expr {
-	expr := pop(&fn.stack)
-	cond := fn.cond
-	fn.cond = nil
-	fn.top = nil
-	if cond == nil {
-		return &ast.BinaryExpr{
-			X: expr, Op: token.NEQ,
-			Y: &ast.BasicLit{Kind: token.INT, Value: "0"},
-		}
-	}
-
-	pop(&fn.blocks[len(fn.blocks)-1].body.List)
-	pop(&fn.blocks[len(fn.blocks)-1].body.List)
-	return cond
-}
-
-type block struct {
-	typ         funcType
-	body        *ast.BlockStmt
-	ifStmt      *ast.IfStmt
-	results     []*ast.Ident
-	label       *ast.Ident
-	loopPos     int
-	unreachable bool
-}
-
-func (b *block) append(stmts ...ast.Stmt) {
-	lst := &b.body.List
-	*lst = append(*lst, stmts...)
-}
-
-func (b *block) setResults(fn *funcRef) {
-	if !b.unreachable {
-		for i := len(b.results) - 1; i >= 0; i-- {
-			b.append(&ast.AssignStmt{
-				Lhs: []ast.Expr{b.results[i]},
-				Rhs: []ast.Expr{fn.pop()},
-				Tok: token.ASSIGN,
-			})
-		}
-	}
-}
-
 func (t *translator) readFunctionSection() error {
 	numFuncs, err := readLEB128(t.in)
 	if err != nil {
 		return err
 	}
 
-	t.functions = make([]funcRef, numFuncs)
+	t.functions = make([]funcCompiler, numFuncs)
 	for i := range t.functions {
 		index, err := readLEB128(t.in)
 		if err != nil {
@@ -345,58 +184,13 @@ func (t *translator) readFunctionSection() error {
 		}
 		fn := &t.functions[i]
 		fn.typ = t.types[index]
-		fn.pkgs = t.packages
-		fn.hlps = t.helpers
 		fn.decl = &ast.FuncDecl{
-			Type: makeFuncType(fn.typ),
 			Recv: modRecvList,
+			Type: fn.typ.toAST(),
 		}
 		t.out.Decls = append(t.out.Decls, fn.decl)
 	}
 	return nil
-}
-
-func makeFuncType(t funcType) *ast.FuncType {
-	return &ast.FuncType{
-		Params:  makeParamsList(t.params),
-		Results: makeResultsList(t.results),
-	}
-}
-
-func makeParamsList(types string) *ast.FieldList {
-	list := make([]*ast.Field, len(types))
-	for i, t := range []byte(types) {
-		list[i] = &ast.Field{
-			Names: []*ast.Ident{localVar(i)},
-			Type:  wasmType(t).Ident(),
-		}
-	}
-	return &ast.FieldList{List: list}
-}
-
-func makeResultsList(types string) *ast.FieldList {
-	if len(types) == 0 {
-		return nil
-	}
-	list := make([]*ast.Field, len(types))
-	for i, t := range []byte(types) {
-		list[i] = &ast.Field{Type: wasmType(t).Ident()}
-	}
-	return &ast.FieldList{List: list}
-}
-
-type exportKind byte
-
-const (
-	functionExport exportKind = iota
-	tableExport
-	memoryExport
-	globalExport
-)
-
-type export struct {
-	kind  exportKind
-	index int
 }
 
 func (t *translator) readExportSection() error {
@@ -464,10 +258,11 @@ func (t *translator) readCodeSection() error {
 	return nil
 }
 
-func (t *translator) readCodeForFunction(fn *funcRef) error {
+func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 	body := &ast.BlockStmt{}
+	fn.translator = t
 	fn.decl.Body = body
-	fn.blocks = []block{{body: body}}
+	fn.blocks = []funcBlock{{body: body}}
 
 	numVars, err := readLEB128(t.in)
 	if err != nil {
@@ -553,7 +348,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 				})
 			}
 
-			childBlk := block{
+			childBlk := funcBlock{
 				typ:     bt,
 				body:    &ast.BlockStmt{},
 				results: results,
@@ -782,7 +577,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			if err := binary.Read(t.in, binary.LittleEndian, &i); err != nil {
 				return err
 			}
-			fn.pkgs.add("math")
+			fn.packages.add("math")
 			fn.pushConst(&ast.CallExpr{
 				Fun: &ast.SelectorExpr{
 					X:   newID("math"),
@@ -799,7 +594,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			if err := binary.Read(t.in, binary.LittleEndian, &i); err != nil {
 				return err
 			}
-			fn.pkgs.add("math")
+			fn.packages.add("math")
 			fn.pushConst(&ast.CallExpr{
 				Fun: &ast.SelectorExpr{
 					X:   newID("math"),
@@ -1102,339 +897,6 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			return fmt.Errorf("unsupported opcode: %x", opcode)
 		}
 	}
-}
-
-func (fn *funcRef) branch(n uint64) ast.Stmt {
-	// Returning from the function body.
-	if n == 0 {
-		ret := &ast.ReturnStmt{}
-		if len(fn.typ.results) > 0 {
-			ret.Results = make([]ast.Expr, len(fn.typ.results))
-			for i := len(ret.Results) - 1; i >= 0; i-- {
-				ret.Results[i] = fn.pop()
-			}
-		}
-		return ret
-	}
-
-	// Create a label for the block we're jumping to.
-	targetBlk := &fn.blocks[n]
-	if targetBlk.label == nil {
-		targetBlk.label = fn.newLabel()
-	}
-	// If it's not a loop, set results.
-	if targetBlk.loopPos == 0 {
-		targetBlk.setResults(fn)
-	}
-	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
-}
-
-// Pushes a type conversion, first to types[0], then to types[1] and so on.
-func (fn *funcRef) convert(types ...string) {
-	x := fn.pop()
-	for _, t := range types {
-		x = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{x}}
-	}
-	fn.push(x)
-}
-
-// Pushes a binary operator.
-func (fn *funcRef) binOp(op token.Token) {
-	fn.push(&ast.BinaryExpr{
-		Y:  fn.pop(),
-		X:  fn.pop(),
-		Op: op,
-	})
-}
-
-// Pushes a binary uint32 operator.
-// Requires casts to unsigned and back.
-func (fn *funcRef) binOpU32(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("int32"),
-		Args: []ast.Expr{&ast.BinaryExpr{
-			Y: &ast.CallExpr{
-				Fun:  newID("uint32"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			X: &ast.CallExpr{
-				Fun:  newID("uint32"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			Op: op,
-		}}})
-}
-
-// Pushes a binary uint64 operator.
-// Requires casts to unsigned and back.
-func (fn *funcRef) binOpU64(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("int64"),
-		Args: []ast.Expr{&ast.BinaryExpr{
-			Y: &ast.CallExpr{
-				Fun:  newID("uint64"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			X: &ast.CallExpr{
-				Fun:  newID("uint64"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			Op: op,
-		}}})
-}
-
-// Pushes a binary float64 operator.
-// Requires casting the result,
-// to avoid operations being combined against the Wasm spec.
-func (fn *funcRef) binOpF64(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("float64"),
-		Args: []ast.Expr{&ast.BinaryExpr{
-			Y:  fn.pop(),
-			X:  fn.pop(),
-			Op: op,
-		}}})
-}
-
-// Pushes a binary float32 operator.
-// Requires casting the result,
-// to avoid operations being combined against the Wasm spec.
-func (fn *funcRef) binOpF32(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("float32"),
-		Args: []ast.Expr{&ast.BinaryExpr{
-			Y:  fn.pop(),
-			X:  fn.pop(),
-			Op: op,
-		}}})
-}
-
-// Pushes a unary bitwise call.
-func (fn *funcRef) bitOp(name string) {
-	bits := name[len(name)-2:]
-
-	fn.pkgs.add("math/bits")
-	fn.push(&ast.CallExpr{
-		Fun: newID("int" + bits),
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("bits"),
-				Sel: newID(name),
-			},
-			Args: []ast.Expr{&ast.CallExpr{
-				Fun:  newID("uint" + bits),
-				Args: []ast.Expr{fn.pop()},
-			}},
-		}},
-	})
-}
-
-// Pushes a unary float64 math call.
-func (fn *funcRef) uniMath64(name string) {
-	fn.pkgs.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID(name),
-		},
-		Args: []ast.Expr{fn.pop()},
-	})
-}
-
-// Pushes a binary float64 math call.
-func (fn *funcRef) binMath64(name string) {
-	fn.pkgs.add("math")
-	y := fn.pop()
-	x := fn.pop()
-	fn.push(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID(name),
-		},
-		Args: []ast.Expr{x, y},
-	})
-}
-
-// Pushes a unary float32 math call.
-func (fn *funcRef) uniMath32(name string) {
-	fn.pkgs.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: newID("float32"),
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID(name),
-			},
-			Args: []ast.Expr{&ast.CallExpr{
-				Fun:  newID("float64"),
-				Args: []ast.Expr{fn.pop()},
-			}},
-		}},
-	})
-}
-
-// Pushes a binary float32 math call.
-func (fn *funcRef) binMath32(name string) {
-	fn.pkgs.add("math")
-	y := fn.pop()
-	x := fn.pop()
-	fn.push(&ast.CallExpr{
-		Fun: newID("float32"),
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID(name),
-			},
-			Args: []ast.Expr{
-				&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{x}},
-				&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{y}},
-			},
-		}},
-	})
-}
-
-// Pushes a Float32bits call.
-func (fn *funcRef) float32bits() {
-	fn.pkgs.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: newID("int32"),
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID("Float32bits"),
-			},
-			Args: []ast.Expr{fn.pop()},
-		}},
-	})
-}
-
-// Pushes a Float64bits call.
-func (fn *funcRef) float64bits() {
-	fn.pkgs.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: newID("int64"),
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID("Float64bits"),
-			},
-			Args: []ast.Expr{fn.pop()},
-		}},
-	})
-}
-
-// Pushes a Float32frombits call.
-func (fn *funcRef) float32frombits() {
-	fn.pkgs.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID("Float32frombits"),
-		},
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun:  newID("uint32"),
-			Args: []ast.Expr{fn.pop()},
-		}},
-	})
-}
-
-// Pushes a Float64frombits call.
-func (fn *funcRef) float64frombits() {
-	fn.pkgs.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID("Float64frombits"),
-		},
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun:  newID("uint64"),
-			Args: []ast.Expr{fn.pop()},
-		}},
-	})
-}
-
-// Pushes a unary helper call.
-func (fn *funcRef) uniHelper(name string, pkgs ...string) {
-	fn.hlps.add(name)
-	for _, p := range pkgs {
-		fn.pkgs.add(p)
-	}
-
-	fn.push(&ast.CallExpr{
-		Fun:  newID(name),
-		Args: []ast.Expr{fn.pop()},
-	})
-}
-
-// Pushes a binary helper call.
-func (fn *funcRef) binHelper(name string, pkgs ...string) {
-	fn.hlps.add(name)
-	for _, p := range pkgs {
-		fn.pkgs.add(p)
-	}
-
-	y := fn.pop()
-	x := fn.pop()
-	fn.push(&ast.CallExpr{
-		Fun:  newID(name),
-		Args: []ast.Expr{x, y},
-	})
-}
-
-// Pushes a binary builtin call.
-func (fn *funcRef) binBuiltin(name string) {
-	y := fn.pop()
-	x := fn.pop()
-	fn.push(&ast.CallExpr{
-		Fun:  newID(name),
-		Args: []ast.Expr{x, y},
-	})
-}
-
-// Pushes a zero equality comparison operator.
-func (fn *funcRef) eqzOp() {
-	fn.pushCond(&ast.BinaryExpr{
-		X:  fn.pop(),
-		Op: token.EQL,
-		Y:  &ast.BasicLit{Kind: token.INT, Value: "0"},
-	})
-}
-
-// Pushes a comparision operation.
-func (fn *funcRef) cmpOp(op token.Token) {
-	fn.pushCond(&ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op})
-}
-
-// Pushes a uint32 comparision operation.
-// Requires casting to unsigned.
-func (fn *funcRef) cmpOpU32(op token.Token) {
-	id := newID("uint32")
-	fn.pushCond(&ast.BinaryExpr{
-		Y: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
-		X: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
-		Op: op})
-}
-
-// Pushes a uint64 comparision operation.
-// Requires casting to unsigned.
-func (fn *funcRef) cmpOpU64(op token.Token) {
-	id := newID("uint64")
-	fn.pushCond(&ast.BinaryExpr{
-		Y: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
-		X: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
-		Op: op})
 }
 
 func (t *translator) readBlockType() (typ funcType, err error) {

@@ -25,11 +25,11 @@ func (m Module) Xsin(v0 float64) float64 {
 		}
 		t7 := v0
 		t8 := v0
-		t9 := t8 * math.Float64frombits(4603909380684499075)
-		t13 := i64_trunc_sat_f64_s(t9 + math.Copysign(math.Float64frombits(4602678819172646912), v0))
+		t9 := float64(t8 * math.Float64frombits(4603909380684499075))
+		t13 := i64_trunc_sat_f64_s(float64(t9 + math.Copysign(math.Float64frombits(4602678819172646912), v0)))
 		v4 = t13
 		t14 := float64(t13)
-		v1 = t7 + t14*math.Float64frombits(13833125093779451160)
+		v1 = float64(t7 + float64(t14*math.Float64frombits(13833125093779451160)))
 		var t17 float64
 	l1:
 		{
@@ -39,7 +39,7 @@ func (m Module) Xsin(v0 float64) float64 {
 				t22 := v3
 				v3 = t22 + int32(1)
 				t24 := v1
-				v1 = t24 * math.Float64frombits(4602678819172646912)
+				v1 = float64(t24 * math.Float64frombits(4602678819172646912))
 				goto l1
 			} else {
 				v0 = math.Float64frombits(4607182418800017408)
@@ -52,13 +52,13 @@ func (m Module) Xsin(v0 float64) float64 {
 								t27 := v3
 								v3 = t27 - int32(1)
 								t29 := v1
-								v2 = t29 * v1
+								v2 = float64(t29 * v1)
 								t32 := v0
-								t34 := t32 * v1
+								t34 := float64(t32 * v1)
 								v0 = t34
-								v1 = t34 + v0
+								v1 = float64(t34 + v0)
 								t37 := v2
-								v0 = math.Float64frombits(4607182418800017408) - (t37 + v2)
+								v0 = float64(math.Float64frombits(4607182418800017408) - float64(t37+v2))
 								goto l2
 							} else {
 								{

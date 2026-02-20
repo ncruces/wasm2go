@@ -39,14 +39,10 @@ func localVar[T interface{ int | uint64 }](i T) *ast.Ident {
 	return newID("v" + strconv.Itoa(int(i)))
 }
 
-func (fn *funcRef) newTempVar() *ast.Ident {
-	id := newID("t" + strconv.Itoa(fn.temps))
-	fn.temps++
-	return id
+func tempVar(i int) *ast.Ident {
+	return newID("t" + strconv.Itoa(i))
 }
 
-func (fn *funcRef) newLabel() *ast.Ident {
-	lbl := newID("l" + strconv.Itoa(fn.labels))
-	fn.labels++
-	return lbl
+func labelId(i int) *ast.Ident {
+	return newID("l" + strconv.Itoa(i))
 }
