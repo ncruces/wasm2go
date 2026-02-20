@@ -1,6 +1,9 @@
 package helpers
 
-import "math"
+import (
+	"math"
+	"math/bits"
+)
 
 func i32_div_s(x, y int32) int32 {
 	if x == math.MinInt32 && y == -1 {
@@ -15,6 +18,48 @@ func i64_div_s(x, y int64) int64 {
 	}
 	return x / y
 }
+
+func i32_shl(x, y int32) int32 {
+	return x << (y & 31)
+}
+
+func i32_shr_s(x, y int32) int32 {
+	return x >> (y & 31)
+}
+
+func i32_shr_u(x, y int32) int32 {
+	return int32(uint32(x) >> (y & 31))
+}
+
+func i64_shl(x, y int64) int64 {
+	return x << (y & 63)
+}
+
+func i64_shr_s(x, y int64) int64 {
+	return x >> (y & 63)
+}
+
+func i64_shr_u(x, y int64) int64 {
+	return int64(uint64(x) >> (y & 63))
+}
+
+func i32_rotl(x, y int32) int32 {
+	return int32(bits.RotateLeft32(uint32(x), +int(y)&31))
+}
+
+func i32_rotr(x, y int32) int32 {
+	return int32(bits.RotateLeft32(uint32(x), -int(y)&31))
+}
+
+func i64_rotl(x, y int64) int64 {
+	return int64(bits.RotateLeft64(uint64(x), +int(y)&63))
+}
+
+func i64_rotr(x, y int64) int64 {
+	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
+}
+
+// go.dev/issues/76264 can speed these up
 
 func i32_trunc_f64_s(f float64) int32 {
 	x := math.Trunc(f)

@@ -896,7 +896,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x6c: // i32.mul
 			fn.binOp(token.MUL)
 		case 0x6d: // i32.div_s
-			fn.intDiv("i32_div_s")
+			fn.binHelper("i32_div_s", "math")
 		case 0x6e: // i32.div_u
 			fn.binOpU32(token.QUO)
 		case 0x6f: // i32.rem_s
@@ -910,15 +910,15 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x73: // i32.xor
 			fn.binOp(token.XOR)
 		case 0x74: // i32.shl
-			fn.shiftOp(token.SHL, "int32")
+			fn.binHelper("i32_shl")
 		case 0x75: // i32.shr_s
-			fn.shiftOp(token.SHR, "int32")
+			fn.binHelper("i32_shr_s")
 		case 0x76: // i32.shr_u
-			fn.shiftOp(token.SHR, "uint32")
+			fn.binHelper("i32_shr_u")
 		case 0x77: // i32.rotl
-			fn.rotOp("RotateLeft32", true)
+			fn.binHelper("i32_rotl", "bits")
 		case 0x78: // i32.rotr
-			fn.rotOp("RotateLeft32", false)
+			fn.binHelper("i32_rotr", "bits")
 
 		case 0x79: // i64.clz
 			fn.bitOp("LeadingZeros64")
@@ -933,7 +933,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x7e: // i64.mul
 			fn.binOp(token.MUL)
 		case 0x7f: // i64.div_s
-			fn.intDiv("i64_div_s")
+			fn.binHelper("i64_div_s", "math")
 		case 0x80: // i64.div_u
 			fn.binOpU64(token.QUO)
 		case 0x81: // i64.rem_s
@@ -947,15 +947,15 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x85: // i64.xor
 			fn.binOp(token.XOR)
 		case 0x86: // i64.shl
-			fn.shiftOp(token.SHL, "int64")
+			fn.binHelper("i64_shl")
 		case 0x87: // i64.shr_s
-			fn.shiftOp(token.SHR, "int64")
+			fn.binHelper("i64_shr_s")
 		case 0x88: // i64.shr_u
-			fn.shiftOp(token.SHR, "uint64")
+			fn.binHelper("i64_shr_u")
 		case 0x89: // i64.rotl
-			fn.rotOp("RotateLeft64", true)
+			fn.binHelper("i64_rotl", "bits")
 		case 0x8a: // i64.rotr
-			fn.rotOp("RotateLeft64", false)
+			fn.binHelper("i64_rotr", "bits")
 
 		case 0x8b: // f32.abs
 			fn.uniMath32("Abs")
@@ -972,13 +972,13 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x91: // f32.sqrt
 			fn.uniMath32("Sqrt")
 		case 0x92: // f32.add
-			fn.binOp(token.ADD)
+			fn.binOpF32(token.ADD)
 		case 0x93: // f32.sub
-			fn.binOp(token.SUB)
+			fn.binOpF32(token.SUB)
 		case 0x94: // f32.mul
-			fn.binOp(token.MUL)
+			fn.binOpF32(token.MUL)
 		case 0x95: // f32.div
-			fn.binOp(token.QUO)
+			fn.binOpF32(token.QUO) // go.dev/issue/43577
 		case 0x96: // f32.min
 			fn.binBuiltin("min")
 		case 0x97: // f32.max
@@ -987,90 +987,81 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.binMath32("Copysign")
 
 		case 0x99: // f64.abs
-			fn.uniMath("Abs")
+			fn.uniMath64("Abs")
 		case 0x9a: // f64.neg
 			fn.push(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
 		case 0x9b: // f64.ceil
-			fn.uniMath("Ceil")
+			fn.uniMath64("Ceil")
 		case 0x9c: // f64.floor
-			fn.uniMath("Floor")
+			fn.uniMath64("Floor")
 		case 0x9d: // f64.trunc
-			fn.uniMath("Trunc")
+			fn.uniMath64("Trunc")
 		case 0x9e: // f64.nearest
-			fn.uniMath("RoundToEven")
+			fn.uniMath64("RoundToEven")
 		case 0x9f: // f64.sqrt
-			fn.uniMath("Sqrt")
+			fn.uniMath64("Sqrt")
 		case 0xa0: // f64.add
-			fn.binOp(token.ADD)
+			fn.binOpF64(token.ADD)
 		case 0xa1: // f64.sub
-			fn.binOp(token.SUB)
+			fn.binOpF64(token.SUB)
 		case 0xa2: // f64.mul
-			fn.binOp(token.MUL)
+			fn.binOpF64(token.MUL)
 		case 0xa3: // f64.div
-			fn.binOp(token.QUO)
+			fn.binOpF64(token.QUO) // go.dev/issue/43577
 		case 0xa4: // f64.min
 			fn.binBuiltin("min")
 		case 0xa5: // f64.max
 			fn.binBuiltin("max")
 		case 0xa6: // f64.copysign
-			fn.binMath("Copysign")
+			fn.binMath64("Copysign")
+
 		case 0xa7: // i32.wrap_i64
-			fn.push(&ast.CallExpr{Fun: newID("int32"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("int32")
 
 		case 0xa8: // i32.trunc_f32_s
-			fn.floatTrunc("i32_trunc_f32_s")
+			fn.uniHelper("i32_trunc_f32_s")
 		case 0xa9: // i32.trunc_f32_u
-			fn.floatTrunc("i32_trunc_f32_u")
+			fn.uniHelper("i32_trunc_f32_u")
 		case 0xaa: // i32.trunc_f64_s
-			fn.floatTrunc("i32_trunc_f64_s")
+			fn.uniHelper("i32_trunc_f64_s")
 		case 0xab: // i32.trunc_f64_u
-			fn.floatTrunc("i32_trunc_f64_u")
+			fn.uniHelper("i32_trunc_f64_u")
 
 		case 0xac: // i64.extend_i32_s
-			fn.push(&ast.CallExpr{Fun: newID("int64"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("int64")
 		case 0xad: // i64.extend_i32_u
-			fn.push(&ast.CallExpr{Fun: newID("int64"), Args: []ast.Expr{
-				&ast.CallExpr{Fun: newID("uint32"), Args: []ast.Expr{fn.pop()}},
-			}})
+			fn.convert("uint32", "int64")
 
 		case 0xae: // i64.trunc_f32_s
-			fn.floatTrunc("i64_trunc_f32_s")
+			fn.uniHelper("i64_trunc_f32_s")
 		case 0xaf: // i64.trunc_f32_u
-			fn.floatTrunc("i64_trunc_f32_u")
+			fn.uniHelper("i64_trunc_f32_u")
 		case 0xb0: // i64.trunc_f64_s
-			fn.floatTrunc("i64_trunc_f64_s")
+			fn.uniHelper("i64_trunc_f64_s")
 		case 0xb1: // i64.trunc_f64_u
-			fn.floatTrunc("i64_trunc_f64_u")
+			fn.uniHelper("i64_trunc_f64_u")
 
 		case 0xb2: // f32.convert_i32_s
-			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("float32")
 		case 0xb3: // f32.convert_i32_u
-			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{
-				&ast.CallExpr{Fun: newID("uint32"), Args: []ast.Expr{fn.pop()}},
-			}})
+			fn.convert("uint32", "float32")
 		case 0xb4: // f32.convert_i64_s
-			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("float32")
 		case 0xb5: // f32.convert_i64_u
-			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{
-				&ast.CallExpr{Fun: newID("uint64"), Args: []ast.Expr{fn.pop()}},
-			}})
+			fn.convert("uint64", "float32")
 		case 0xb6: // f32.demote_f64
-			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("float32")
 
 		case 0xb7: // f64.convert_i32_s
-			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("float64")
 		case 0xb8: // f64.convert_i32_u
-			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{
-				&ast.CallExpr{Fun: newID("uint32"), Args: []ast.Expr{fn.pop()}},
-			}})
+			fn.convert("uint32", "float64")
 		case 0xb9: // f64.convert_i64_s
-			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("float64")
 		case 0xba: // f64.convert_i64_u
-			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{
-				&ast.CallExpr{Fun: newID("uint64"), Args: []ast.Expr{fn.pop()}},
-			}})
+			fn.convert("uint64", "float64")
 		case 0xbb: // f64.promote_f32
-			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{fn.pop()}})
+			fn.convert("float64")
 
 		case 0xbc: // i32.reinterpret_f32
 			fn.float32bits()
@@ -1088,21 +1079,21 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			}
 			switch code {
 			case 0x00: // i32.trunc_sat_f32_s
-				fn.floatTrunc("i32_trunc_sat_f32_s")
+				fn.uniHelper("i32_trunc_sat_f32_s")
 			case 0x01: // i32.trunc_sat_f32_u
-				fn.floatTrunc("i32_trunc_sat_f32_u")
+				fn.uniHelper("i32_trunc_sat_f32_u")
 			case 0x02: // i32.trunc_sat_f64_s
-				fn.floatTrunc("i32_trunc_sat_f64_s")
+				fn.uniHelper("i32_trunc_sat_f64_s")
 			case 0x03: // i32.trunc_sat_f64_u
-				fn.floatTrunc("i32_trunc_sat_f64_u")
+				fn.uniHelper("i32_trunc_sat_f64_u")
 			case 0x04: // i64.trunc_sat_f32_s
-				fn.floatTrunc("i64_trunc_sat_f32_s")
+				fn.uniHelper("i64_trunc_sat_f32_s")
 			case 0x05: // i64.trunc_sat_f32_u
-				fn.floatTrunc("i64_trunc_sat_f32_u")
+				fn.uniHelper("i64_trunc_sat_f32_u")
 			case 0x06: // i64.trunc_sat_f64_s
-				fn.floatTrunc("i64_trunc_sat_f64_s")
+				fn.uniHelper("i64_trunc_sat_f64_s")
 			case 0x07: // i64.trunc_sat_f64_u
-				fn.floatTrunc("i64_trunc_sat_f64_u")
+				fn.uniHelper("i64_trunc_sat_f64_u")
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
 			}
@@ -1138,6 +1129,16 @@ func (fn *funcRef) branch(n uint64) ast.Stmt {
 	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
 }
 
+// Pushes a type conversion, first to types[0], then to types[1] and so on.
+func (fn *funcRef) convert(types ...string) {
+	x := fn.pop()
+	for _, t := range types {
+		x = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{x}}
+	}
+	fn.push(x)
+}
+
+// Pushes a binary operator.
 func (fn *funcRef) binOp(op token.Token) {
 	fn.push(&ast.BinaryExpr{
 		Y:  fn.pop(),
@@ -1146,6 +1147,8 @@ func (fn *funcRef) binOp(op token.Token) {
 	})
 }
 
+// Pushes a binary uint32 operator.
+// Requires casts to unsigned and back.
 func (fn *funcRef) binOpU32(op token.Token) {
 	fn.push(&ast.CallExpr{
 		Fun: newID("int32"),
@@ -1162,6 +1165,8 @@ func (fn *funcRef) binOpU32(op token.Token) {
 		}}})
 }
 
+// Pushes a binary uint64 operator.
+// Requires casts to unsigned and back.
 func (fn *funcRef) binOpU64(op token.Token) {
 	fn.push(&ast.CallExpr{
 		Fun: newID("int64"),
@@ -1178,81 +1183,33 @@ func (fn *funcRef) binOpU64(op token.Token) {
 		}}})
 }
 
-func (fn *funcRef) intDiv(name string) {
-	fn.hlps.add(name)
-	y := fn.pop()
-	x := fn.pop()
+// Pushes a binary float64 operator.
+// Requires casting the result,
+// to avoid operations being combined against the Wasm spec.
+func (fn *funcRef) binOpF64(op token.Token) {
 	fn.push(&ast.CallExpr{
-		Fun:  newID(name),
-		Args: []ast.Expr{x, y},
-	})
+		Fun: newID("float64"),
+		Args: []ast.Expr{&ast.BinaryExpr{
+			Y:  fn.pop(),
+			X:  fn.pop(),
+			Op: op,
+		}}})
 }
 
-func (fn *funcRef) shiftOp(op token.Token, typ string) {
-	bits := typ[len(typ)-2:]
-	mask := "31"
-	if bits == "64" {
-		mask = "63"
-	}
-
-	y := fn.pop()
-	x := fn.pop()
-
-	y = &ast.BinaryExpr{
-		X:  y,
-		Op: token.AND,
-		Y:  &ast.BasicLit{Kind: token.INT, Value: mask},
-	}
-
-	if typ[0] == 'u' {
-		x = &ast.CallExpr{Fun: newID(typ), Args: []ast.Expr{x}}
-	}
-	var expr ast.Expr = &ast.BinaryExpr{X: x, Op: op, Y: y}
-	if typ[0] == 'u' {
-		expr = &ast.CallExpr{Fun: newID(typ[1:]), Args: []ast.Expr{expr}}
-	}
-	fn.push(expr)
-}
-
-func (fn *funcRef) rotOp(name string, rotl bool) {
-	bits := name[len(name)-2:]
-	mask := "31"
-	if bits == "64" {
-		mask = "63"
-	}
-
-	y := fn.pop()
-	x := fn.pop()
-
-	y = &ast.BinaryExpr{
-		X:  y,
-		Op: token.AND,
-		Y:  &ast.BasicLit{Kind: token.INT, Value: mask},
-	}
-
-	if !rotl {
-		y = &ast.UnaryExpr{Op: token.SUB, X: y}
-	}
-
-	fn.pkgs.add("math/bits")
+// Pushes a binary float32 operator.
+// Requires casting the result,
+// to avoid operations being combined against the Wasm spec.
+func (fn *funcRef) binOpF32(op token.Token) {
 	fn.push(&ast.CallExpr{
-		Fun: newID("int" + bits),
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("bits"),
-				Sel: newID(name),
-			},
-			Args: []ast.Expr{
-				&ast.CallExpr{
-					Fun:  newID("uint" + bits),
-					Args: []ast.Expr{x},
-				},
-				y,
-			},
-		}},
-	})
+		Fun: newID("float32"),
+		Args: []ast.Expr{&ast.BinaryExpr{
+			Y:  fn.pop(),
+			X:  fn.pop(),
+			Op: op,
+		}}})
 }
 
+// Pushes a unary bitwise call.
 func (fn *funcRef) bitOp(name string) {
 	bits := name[len(name)-2:]
 
@@ -1272,7 +1229,8 @@ func (fn *funcRef) bitOp(name string) {
 	})
 }
 
-func (fn *funcRef) uniMath(name string) {
+// Pushes a unary float64 math call.
+func (fn *funcRef) uniMath64(name string) {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
@@ -1283,7 +1241,8 @@ func (fn *funcRef) uniMath(name string) {
 	})
 }
 
-func (fn *funcRef) binMath(name string) {
+// Pushes a binary float64 math call.
+func (fn *funcRef) binMath64(name string) {
 	fn.pkgs.add("math")
 	y := fn.pop()
 	x := fn.pop()
@@ -1296,6 +1255,7 @@ func (fn *funcRef) binMath(name string) {
 	})
 }
 
+// Pushes a unary float32 math call.
 func (fn *funcRef) uniMath32(name string) {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
@@ -1313,6 +1273,7 @@ func (fn *funcRef) uniMath32(name string) {
 	})
 }
 
+// Pushes a binary float32 math call.
 func (fn *funcRef) binMath32(name string) {
 	fn.pkgs.add("math")
 	y := fn.pop()
@@ -1332,15 +1293,7 @@ func (fn *funcRef) binMath32(name string) {
 	})
 }
 
-func (fn *funcRef) binBuiltin(name string) {
-	y := fn.pop()
-	x := fn.pop()
-	fn.push(&ast.CallExpr{
-		Fun:  newID(name),
-		Args: []ast.Expr{x, y},
-	})
-}
-
+// Pushes a Float32bits call.
 func (fn *funcRef) float32bits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
@@ -1355,6 +1308,7 @@ func (fn *funcRef) float32bits() {
 	})
 }
 
+// Pushes a Float64bits call.
 func (fn *funcRef) float64bits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
@@ -1369,6 +1323,7 @@ func (fn *funcRef) float64bits() {
 	})
 }
 
+// Pushes a Float32frombits call.
 func (fn *funcRef) float32frombits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
@@ -1383,6 +1338,7 @@ func (fn *funcRef) float32frombits() {
 	})
 }
 
+// Pushes a Float64frombits call.
 func (fn *funcRef) float64frombits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
@@ -1397,15 +1353,45 @@ func (fn *funcRef) float64frombits() {
 	})
 }
 
-func (fn *funcRef) floatTrunc(name string) {
-	fn.pkgs.add("math")
+// Pushes a unary helper call.
+func (fn *funcRef) uniHelper(name string, pkgs ...string) {
 	fn.hlps.add(name)
+	for _, p := range pkgs {
+		fn.pkgs.add(p)
+	}
+
 	fn.push(&ast.CallExpr{
 		Fun:  newID(name),
 		Args: []ast.Expr{fn.pop()},
 	})
 }
 
+// Pushes a binary helper call.
+func (fn *funcRef) binHelper(name string, pkgs ...string) {
+	fn.hlps.add(name)
+	for _, p := range pkgs {
+		fn.pkgs.add(p)
+	}
+
+	y := fn.pop()
+	x := fn.pop()
+	fn.push(&ast.CallExpr{
+		Fun:  newID(name),
+		Args: []ast.Expr{x, y},
+	})
+}
+
+// Pushes a binary builtin call.
+func (fn *funcRef) binBuiltin(name string) {
+	y := fn.pop()
+	x := fn.pop()
+	fn.push(&ast.CallExpr{
+		Fun:  newID(name),
+		Args: []ast.Expr{x, y},
+	})
+}
+
+// Pushes a zero equality comparison operator.
 func (fn *funcRef) eqzOp() {
 	fn.pushCond(&ast.BinaryExpr{
 		X:  fn.pop(),
@@ -1414,31 +1400,38 @@ func (fn *funcRef) eqzOp() {
 	})
 }
 
+// Pushes a comparision operation.
 func (fn *funcRef) cmpOp(op token.Token) {
 	fn.pushCond(&ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op})
 }
 
+// Pushes a uint32 comparision operation.
+// Requires casting to unsigned.
 func (fn *funcRef) cmpOpU32(op token.Token) {
+	id := newID("uint32")
 	fn.pushCond(&ast.BinaryExpr{
 		Y: &ast.CallExpr{
-			Fun:  newID("uint32"),
+			Fun:  id,
 			Args: []ast.Expr{fn.pop()},
 		},
 		X: &ast.CallExpr{
-			Fun:  newID("uint32"),
+			Fun:  id,
 			Args: []ast.Expr{fn.pop()},
 		},
 		Op: op})
 }
 
+// Pushes a uint64 comparision operation.
+// Requires casting to unsigned.
 func (fn *funcRef) cmpOpU64(op token.Token) {
+	id := newID("uint64")
 	fn.pushCond(&ast.BinaryExpr{
 		Y: &ast.CallExpr{
-			Fun:  newID("uint64"),
+			Fun:  id,
 			Args: []ast.Expr{fn.pop()},
 		},
 		X: &ast.CallExpr{
-			Fun:  newID("uint64"),
+			Fun:  id,
 			Args: []ast.Expr{fn.pop()},
 		},
 		Op: op})

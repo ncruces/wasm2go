@@ -18,7 +18,7 @@ func Test_i32_div_s(t *testing.T) {
 		{math.MinInt32, -1, 0, true},
 	}
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("%d/%d", tt.x, tt.y), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
 			if tt.p {
 				defer func() {
 					if r := recover(); r == nil {
@@ -46,7 +46,7 @@ func Test_i64_div_s(t *testing.T) {
 		{math.MinInt64, -1, 0, true},
 	}
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("%d/%d", tt.x, tt.y), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
 			if tt.p {
 				defer func() {
 					if r := recover(); r == nil {
@@ -57,6 +57,200 @@ func Test_i64_div_s(t *testing.T) {
 			got := i64_div_s(tt.x, tt.y)
 			if got != tt.r {
 				t.Errorf("i64_div_s(%d, %d) = %v, want %v", tt.x, tt.y, got, tt.r)
+			}
+		})
+	}
+}
+
+func Test_i32_shl(t *testing.T) {
+	tests := []struct {
+		x, y int32
+		want int32
+	}{
+		{1, 1, 2},
+		{1, 32, 1},
+		{1, 33, 2},
+		{-1, 1, -2},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i32_shl(tt.x, tt.y); got != tt.want {
+				t.Errorf("i32_shl(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i32_shr_s(t *testing.T) {
+	tests := []struct {
+		x, y int32
+		want int32
+	}{
+		{2, 1, 1},
+		{-2, 1, -1},
+		{-1, 31, -1},
+		{-1, 32, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i32_shr_s(tt.x, tt.y); got != tt.want {
+				t.Errorf("i32_shr_s(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i32_shr_u(t *testing.T) {
+	tests := []struct {
+		x, y int32
+		want int32
+	}{
+		{2, 1, 1},
+		{-2, 1, math.MaxInt32},
+		{-1, 31, 1},
+		{-1, 32, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i32_shr_u(tt.x, tt.y); got != tt.want {
+				t.Errorf("i32_shr_u(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i64_shl(t *testing.T) {
+	tests := []struct {
+		x, y int64
+		want int64
+	}{
+		{1, 1, 2},
+		{1, 64, 1},
+		{1, 65, 2},
+		{-1, 1, -2},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i64_shl(tt.x, tt.y); got != tt.want {
+				t.Errorf("i64_shl(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i64_shr_s(t *testing.T) {
+	tests := []struct {
+		x, y int64
+		want int64
+	}{
+		{2, 1, 1},
+		{-2, 1, -1},
+		{-1, 63, -1},
+		{-1, 64, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i64_shr_s(tt.x, tt.y); got != tt.want {
+				t.Errorf("i64_shr_s(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i64_shr_u(t *testing.T) {
+	tests := []struct {
+		x, y int64
+		want int64
+	}{
+		{2, 1, 1},
+		{-2, 1, math.MaxInt64},
+		{-1, 63, 1},
+		{-1, 64, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i64_shr_u(tt.x, tt.y); got != tt.want {
+				t.Errorf("i64_shr_u(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i32_rotl(t *testing.T) {
+	tests := []struct {
+		x, y int32
+		want int32
+	}{
+		{1, 1, 2},
+		{1, 31, math.MinInt32},
+		{1, 32, 1},
+		{1, 33, 2},
+		{-1, 1, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i32_rotl(tt.x, tt.y); got != tt.want {
+				t.Errorf("i32_rotl(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i32_rotr(t *testing.T) {
+	tests := []struct {
+		x, y int32
+		want int32
+	}{
+		{2, 1, 1},
+		{1, 1, math.MinInt32},
+		{1, 32, 1},
+		{1, 33, math.MinInt32},
+		{-1, 1, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i32_rotr(tt.x, tt.y); got != tt.want {
+				t.Errorf("i32_rotr(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i64_rotl(t *testing.T) {
+	tests := []struct {
+		x, y int64
+		want int64
+	}{
+		{1, 1, 2},
+		{1, 63, math.MinInt64},
+		{1, 64, 1},
+		{1, 65, 2},
+		{-1, 1, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i64_rotl(tt.x, tt.y); got != tt.want {
+				t.Errorf("i64_rotl(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_i64_rotr(t *testing.T) {
+	tests := []struct {
+		x, y int64
+		want int64
+	}{
+		{2, 1, 1},
+		{1, 1, math.MinInt64},
+		{1, 64, 1},
+		{1, 65, math.MinInt64},
+		{-1, 1, -1},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d,%d", tt.x, tt.y), func(t *testing.T) {
+			if got := i64_rotr(tt.x, tt.y); got != tt.want {
+				t.Errorf("i64_rotr(%d, %d) = %d, want %d", tt.x, tt.y, got, tt.want)
 			}
 		})
 	}
