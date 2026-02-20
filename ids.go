@@ -18,12 +18,12 @@ func newID(name string) *ast.Ident {
 	return id
 }
 
-func exportedID(name string) *ast.Ident {
-	return ast.NewIdent(identifier("X" + name))
+func exported(name string) string {
+	return identifier("X" + name)
 }
 
-func internalID(name string) *ast.Ident {
-	return ast.NewIdent(identifier("_" + name))
+func internal(name string) string {
+	return identifier("_" + name)
 }
 
 func identifier(s string) string {

@@ -23,6 +23,7 @@ The goal is not to produce particularly readable Go code:
   we use a stack-to-register approach to translate Wasm to Go;
 - Wasm control flow is implemented with `goto` and labels;
 - Go's untyped numeric literals require explicit type conversions;
+- float operations require type conversions to avoid being combined;
 - float literals can't represent negative zero, infinities, or `NaN`;
 - the distinction between `bool` and `int32` also requires type conversions;
 
