@@ -14,21 +14,6 @@ import (
 	"strconv"
 )
 
-var (
-	int32Ident   = ast.NewIdent("int32")
-	int64Ident   = ast.NewIdent("int64")
-	uint32Ident  = ast.NewIdent("uint32")
-	uint64Ident  = ast.NewIdent("uint64")
-	float32Ident = ast.NewIdent("float32")
-	float64Ident = ast.NewIdent("float64")
-	modTypIdent  = ast.NewIdent("Module")
-	modVarIdent  = ast.NewIdent("m")
-	modRecvList  = &ast.FieldList{List: []*ast.Field{{
-		Names: []*ast.Ident{modVarIdent},
-		Type:  modTypIdent,
-	}}}
-)
-
 //go:embed helpers/helpers.go
 var helpersSrc string
 
@@ -52,7 +37,7 @@ func translate(name string, r io.Reader, w io.Writer) error {
 		return err
 	}
 
-	t.out.Name = ast.NewIdent(name)
+	t.out.Name = newID(name)
 	t.out.Decls = append(t.out.Decls, createModuleStruct())
 
 	t.packages = set[string]{}
@@ -147,16 +132,16 @@ const (
 	f64
 )
 
-func (t wasmType) String() string {
+func (t wasmType) Ident() *ast.Ident {
 	switch t {
 	case i32:
-		return "int32"
+		return newID("int32")
 	case i64:
-		return "int64"
+		return newID("int64")
 	case f32:
-		return "float32"
+		return newID("float32")
 	case f64:
-		return "float64"
+		return newID("float64")
 	}
 	panic(fmt.Sprintf("unsupported type: %x", byte(t)))
 }
@@ -236,7 +221,7 @@ func (fn *funcRef) pushConst(expr ast.Expr) {
 
 // Pushes the materialization of expr to the value stack.
 func (fn *funcRef) push(expr ast.Expr) {
-	tmp := fn.makeTempVar()
+	tmp := fn.newTempVar()
 	blk := &fn.blocks[len(fn.blocks)-1]
 	blk.append(&ast.AssignStmt{
 		Tok: token.DEFINE,
@@ -249,7 +234,7 @@ func (fn *funcRef) push(expr ast.Expr) {
 
 // Pushes the integer materialization of cond the value stack.
 func (fn *funcRef) pushCond(cond ast.Expr) {
-	tmp := fn.makeTempVar()
+	tmp := fn.newTempVar()
 	blk := &fn.blocks[len(fn.blocks)-1]
 	blk.append(&ast.DeclStmt{
 		Decl: &ast.GenDecl{
@@ -257,7 +242,7 @@ func (fn *funcRef) pushCond(cond ast.Expr) {
 			Specs: []ast.Spec{
 				&ast.ValueSpec{
 					Names: []*ast.Ident{tmp},
-					Type:  int32Ident,
+					Type:  newID("int32"),
 				},
 			},
 		},
@@ -382,8 +367,8 @@ func makeParamsList(types string) *ast.FieldList {
 	list := make([]*ast.Field, len(types))
 	for i, t := range []byte(types) {
 		list[i] = &ast.Field{
-			Names: []*ast.Ident{ast.NewIdent(local(i))},
-			Type:  ast.NewIdent(wasmType(t).String()),
+			Names: []*ast.Ident{localVar(i)},
+			Type:  wasmType(t).Ident(),
 		}
 	}
 	return &ast.FieldList{List: list}
@@ -395,7 +380,7 @@ func makeResultsList(types string) *ast.FieldList {
 	}
 	list := make([]*ast.Field, len(types))
 	for i, t := range []byte(types) {
-		list[i] = &ast.Field{Type: ast.NewIdent(wasmType(t).String())}
+		list[i] = &ast.Field{Type: wasmType(t).Ident()}
 	}
 	return &ast.FieldList{List: list}
 }
@@ -452,7 +437,7 @@ func (t *translator) readExportSection() error {
 		switch exportKind(kind) {
 		case functionExport:
 			if decl := t.functions[index].decl; decl.Name == nil {
-				decl.Name = ast.NewIdent(exported(name))
+				decl.Name = exportedID(name)
 			}
 		}
 	}
@@ -504,7 +489,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 
 		names := make([]*ast.Ident, int(n))
 		for i := range int(n) {
-			names[i] = ast.NewIdent(local(numLocals))
+			names[i] = localVar(numLocals)
 			numLocals++
 		}
 		body.List = append(body.List, &ast.DeclStmt{
@@ -513,7 +498,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 				Specs: []ast.Spec{
 					&ast.ValueSpec{
 						Names: names,
-						Type:  ast.NewIdent(wasmType(typ).String()),
+						Type:  wasmType(typ).Ident(),
 					},
 				},
 			},
@@ -532,7 +517,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x00: // unreachable
 			blk.append(&ast.ExprStmt{
 				X: &ast.CallExpr{
-					Fun:  ast.NewIdent("panic"),
+					Fun:  newID("panic"),
 					Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: `"unreachable"`}},
 				},
 			})
@@ -554,14 +539,14 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			// Declare block results outside the block.
 			results := make([]*ast.Ident, len(bt.results))
 			for i, t := range []byte(bt.results) {
-				results[i] = fn.makeTempVar()
+				results[i] = fn.newTempVar()
 				blk.append(&ast.DeclStmt{
 					Decl: &ast.GenDecl{
 						Tok: token.VAR,
 						Specs: []ast.Spec{
 							&ast.ValueSpec{
 								Names: []*ast.Ident{results[i]},
-								Type:  ast.NewIdent(wasmType(t).String()),
+								Type:  wasmType(t).Ident(),
 							},
 						},
 					},
@@ -716,7 +701,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 
 		case 0x1b: // select
 			cond := fn.popCond()
-			val := fn.makeTempVar()
+			val := fn.newTempVar()
 			blk.append(&ast.AssignStmt{
 				Tok: token.DEFINE,
 				Lhs: []ast.Expr{val},
@@ -740,7 +725,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			if err != nil {
 				return err
 			}
-			fn.push(ast.NewIdent(local(i)))
+			fn.push(localVar(i))
 
 		case 0x21: // local.set
 			i, err := readLEB128(t.in)
@@ -748,7 +733,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 				return err
 			}
 			blk.append(&ast.AssignStmt{
-				Lhs: []ast.Expr{ast.NewIdent(local(i))},
+				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{fn.pop()},
 				Tok: token.ASSIGN,
 			})
@@ -760,7 +745,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			}
 			val := fn.popCopy() // will reuse
 			blk.append(&ast.AssignStmt{
-				Lhs: []ast.Expr{ast.NewIdent(local(i))},
+				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{val},
 				Tok: token.ASSIGN,
 			})
@@ -772,7 +757,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 				return err
 			}
 			fn.pushConst(&ast.CallExpr{
-				Fun: int32Ident,
+				Fun: newID("int32"),
 				Args: []ast.Expr{&ast.BasicLit{
 					Value: strconv.FormatInt(i, 10),
 					Kind:  token.INT,
@@ -785,7 +770,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 				return err
 			}
 			fn.pushConst(&ast.CallExpr{
-				Fun: int64Ident,
+				Fun: newID("int64"),
 				Args: []ast.Expr{&ast.BasicLit{
 					Value: strconv.FormatInt(i, 10),
 					Kind:  token.INT,
@@ -800,8 +785,8 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.pkgs.add("math")
 			fn.pushConst(&ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   ast.NewIdent("math"),
-					Sel: ast.NewIdent("Float32frombits"),
+					X:   newID("math"),
+					Sel: newID("Float32frombits"),
 				},
 				Args: []ast.Expr{&ast.BasicLit{
 					Value: strconv.FormatUint(uint64(i), 10),
@@ -817,8 +802,8 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.pkgs.add("math")
 			fn.pushConst(&ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   ast.NewIdent("math"),
-					Sel: ast.NewIdent("Float64frombits"),
+					X:   newID("math"),
+					Sel: newID("Float64frombits"),
 				},
 				Args: []ast.Expr{&ast.BasicLit{
 					Value: strconv.FormatUint(i, 10),
@@ -899,11 +884,11 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.cmpOp(token.GEQ)
 
 		case 0x67: // i32.clz
-			fn.bitOp("LeadingZeros32", int32Ident, uint32Ident)
+			fn.bitOp("LeadingZeros32")
 		case 0x68: // i32.ctz
-			fn.bitOp("TrailingZeros32", int32Ident, uint32Ident)
+			fn.bitOp("TrailingZeros32")
 		case 0x69: // i32.popcnt
-			fn.bitOp("OnesCount32", int32Ident, uint32Ident)
+			fn.bitOp("OnesCount32")
 		case 0x6a: // i32.add
 			fn.binOp(token.ADD)
 		case 0x6b: // i32.sub
@@ -925,20 +910,22 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x73: // i32.xor
 			fn.binOp(token.XOR)
 		case 0x74: // i32.shl
-			fn.shiftOp(token.SHL, 32, nil, nil)
+			fn.shiftOp(token.SHL, "int32")
 		case 0x75: // i32.shr_s
-			fn.shiftOp(token.SHR, 32, nil, nil)
+			fn.shiftOp(token.SHR, "int32")
 		case 0x76: // i32.shr_u
-			fn.shiftOp(token.SHR, 32, uint32Ident, int32Ident)
-		case 0x77, 0x78: // i32.rotl, i32.rotr
-			fn.rotOp("RotateLeft32", opcode == 0x77, int32Ident, uint32Ident)
+			fn.shiftOp(token.SHR, "uint32")
+		case 0x77: // i32.rotl
+			fn.rotOp("RotateLeft32", true)
+		case 0x78: // i32.rotr
+			fn.rotOp("RotateLeft32", false)
 
 		case 0x79: // i64.clz
-			fn.bitOp("LeadingZeros64", int64Ident, uint64Ident)
+			fn.bitOp("LeadingZeros64")
 		case 0x7a: // i64.ctz
-			fn.bitOp("TrailingZeros64", int64Ident, uint64Ident)
+			fn.bitOp("TrailingZeros64")
 		case 0x7b: // i64.popcnt
-			fn.bitOp("OnesCount64", int64Ident, uint64Ident)
+			fn.bitOp("OnesCount64")
 		case 0x7c: // i64.add
 			fn.binOp(token.ADD)
 		case 0x7d: // i64.sub
@@ -960,13 +947,15 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x85: // i64.xor
 			fn.binOp(token.XOR)
 		case 0x86: // i64.shl
-			fn.shiftOp(token.SHL, 64, nil, nil)
+			fn.shiftOp(token.SHL, "int64")
 		case 0x87: // i64.shr_s
-			fn.shiftOp(token.SHR, 64, nil, nil)
+			fn.shiftOp(token.SHR, "int64")
 		case 0x88: // i64.shr_u
-			fn.shiftOp(token.SHR, 64, uint64Ident, int64Ident)
-		case 0x89, 0x8a: // i64.rotl, i64.rotr
-			fn.rotOp("RotateLeft64", opcode == 0x89, int64Ident, uint64Ident)
+			fn.shiftOp(token.SHR, "uint64")
+		case 0x89: // i64.rotl
+			fn.rotOp("RotateLeft64", true)
+		case 0x8a: // i64.rotr
+			fn.rotOp("RotateLeft64", false)
 
 		case 0x8b: // f32.abs
 			fn.uniMath32("Abs")
@@ -1026,7 +1015,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0xa6: // f64.copysign
 			fn.binMath("Copysign")
 		case 0xa7: // i32.wrap_i64
-			fn.push(&ast.CallExpr{Fun: int32Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("int32"), Args: []ast.Expr{fn.pop()}})
 
 		case 0xa8: // i32.trunc_f32_s
 			fn.floatTrunc("i32_trunc_f32_s")
@@ -1038,10 +1027,10 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.floatTrunc("i32_trunc_f64_u")
 
 		case 0xac: // i64.extend_i32_s
-			fn.push(&ast.CallExpr{Fun: int64Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("int64"), Args: []ast.Expr{fn.pop()}})
 		case 0xad: // i64.extend_i32_u
-			fn.push(&ast.CallExpr{Fun: int64Ident, Args: []ast.Expr{
-				&ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{fn.pop()}},
+			fn.push(&ast.CallExpr{Fun: newID("int64"), Args: []ast.Expr{
+				&ast.CallExpr{Fun: newID("uint32"), Args: []ast.Expr{fn.pop()}},
 			}})
 
 		case 0xae: // i64.trunc_f32_s
@@ -1054,34 +1043,34 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.floatTrunc("i64_trunc_f64_u")
 
 		case 0xb2: // f32.convert_i32_s
-			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{fn.pop()}})
 		case 0xb3: // f32.convert_i32_u
-			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{
-				&ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{fn.pop()}},
+			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{
+				&ast.CallExpr{Fun: newID("uint32"), Args: []ast.Expr{fn.pop()}},
 			}})
 		case 0xb4: // f32.convert_i64_s
-			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{fn.pop()}})
 		case 0xb5: // f32.convert_i64_u
-			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{
-				&ast.CallExpr{Fun: uint64Ident, Args: []ast.Expr{fn.pop()}},
+			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{
+				&ast.CallExpr{Fun: newID("uint64"), Args: []ast.Expr{fn.pop()}},
 			}})
 		case 0xb6: // f32.demote_f64
-			fn.push(&ast.CallExpr{Fun: float32Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("float32"), Args: []ast.Expr{fn.pop()}})
 
 		case 0xb7: // f64.convert_i32_s
-			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{fn.pop()}})
 		case 0xb8: // f64.convert_i32_u
-			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{
-				&ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{fn.pop()}},
+			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{
+				&ast.CallExpr{Fun: newID("uint32"), Args: []ast.Expr{fn.pop()}},
 			}})
 		case 0xb9: // f64.convert_i64_s
-			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{fn.pop()}})
 		case 0xba: // f64.convert_i64_u
-			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{
-				&ast.CallExpr{Fun: uint64Ident, Args: []ast.Expr{fn.pop()}},
+			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{
+				&ast.CallExpr{Fun: newID("uint64"), Args: []ast.Expr{fn.pop()}},
 			}})
 		case 0xbb: // f64.promote_f32
-			fn.push(&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{fn.pop()}})
+			fn.push(&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{fn.pop()}})
 
 		case 0xbc: // i32.reinterpret_f32
 			fn.float32bits()
@@ -1140,7 +1129,7 @@ func (fn *funcRef) branch(n uint64) ast.Stmt {
 	// Create a label for the block we're jumping to.
 	targetBlk := &fn.blocks[n]
 	if targetBlk.label == nil {
-		targetBlk.label = fn.makeLabel()
+		targetBlk.label = fn.newLabel()
 	}
 	// If it's not a loop, set results.
 	if targetBlk.loopPos == 0 {
@@ -1159,14 +1148,14 @@ func (fn *funcRef) binOp(op token.Token) {
 
 func (fn *funcRef) binOpU32(op token.Token) {
 	fn.push(&ast.CallExpr{
-		Fun: int32Ident,
+		Fun: newID("int32"),
 		Args: []ast.Expr{&ast.BinaryExpr{
 			Y: &ast.CallExpr{
-				Fun:  uint32Ident,
+				Fun:  newID("uint32"),
 				Args: []ast.Expr{fn.pop()},
 			},
 			X: &ast.CallExpr{
-				Fun:  uint32Ident,
+				Fun:  newID("uint32"),
 				Args: []ast.Expr{fn.pop()},
 			},
 			Op: op,
@@ -1175,14 +1164,14 @@ func (fn *funcRef) binOpU32(op token.Token) {
 
 func (fn *funcRef) binOpU64(op token.Token) {
 	fn.push(&ast.CallExpr{
-		Fun: int64Ident,
+		Fun: newID("int64"),
 		Args: []ast.Expr{&ast.BinaryExpr{
 			Y: &ast.CallExpr{
-				Fun:  uint64Ident,
+				Fun:  newID("uint64"),
 				Args: []ast.Expr{fn.pop()},
 			},
 			X: &ast.CallExpr{
-				Fun:  uint64Ident,
+				Fun:  newID("uint64"),
 				Args: []ast.Expr{fn.pop()},
 			},
 			Op: op,
@@ -1194,78 +1183,91 @@ func (fn *funcRef) intDiv(name string) {
 	y := fn.pop()
 	x := fn.pop()
 	fn.push(&ast.CallExpr{
-		Fun:  ast.NewIdent(name),
+		Fun:  newID(name),
 		Args: []ast.Expr{x, y},
 	})
 }
 
-func (fn *funcRef) shiftOp(op token.Token, bits int, xType, retType *ast.Ident) {
+func (fn *funcRef) shiftOp(op token.Token, typ string) {
+	bits := typ[len(typ)-2:]
+	mask := "31"
+	if bits == "64" {
+		mask = "63"
+	}
+
 	y := fn.pop()
 	x := fn.pop()
 
-	var count ast.Expr
-	if bits == 64 {
-		count = &ast.CallExpr{Fun: uint64Ident, Args: []ast.Expr{y}}
-	} else {
-		count = &ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{y}}
-	}
-	count = &ast.BinaryExpr{
-		X:  count,
+	y = &ast.BinaryExpr{
+		X:  y,
 		Op: token.AND,
-		Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(bits - 1)},
+		Y:  &ast.BasicLit{Kind: token.INT, Value: mask},
 	}
 
-	if xType != nil {
-		x = &ast.CallExpr{Fun: xType, Args: []ast.Expr{x}}
+	if typ[0] == 'u' {
+		x = &ast.CallExpr{Fun: newID(typ), Args: []ast.Expr{x}}
 	}
-	var expr ast.Expr = &ast.BinaryExpr{X: x, Op: op, Y: count}
-	if retType != nil {
-		expr = &ast.CallExpr{Fun: retType, Args: []ast.Expr{expr}}
+	var expr ast.Expr = &ast.BinaryExpr{X: x, Op: op, Y: y}
+	if typ[0] == 'u' {
+		expr = &ast.CallExpr{Fun: newID(typ[1:]), Args: []ast.Expr{expr}}
 	}
 	fn.push(expr)
 }
 
-func (fn *funcRef) bitOp(name string, intIndent, uintIndent *ast.Ident) {
+func (fn *funcRef) rotOp(name string, rotl bool) {
+	bits := name[len(name)-2:]
+	mask := "31"
+	if bits == "64" {
+		mask = "63"
+	}
+
+	y := fn.pop()
+	x := fn.pop()
+
+	y = &ast.BinaryExpr{
+		X:  y,
+		Op: token.AND,
+		Y:  &ast.BasicLit{Kind: token.INT, Value: mask},
+	}
+
+	if !rotl {
+		y = &ast.UnaryExpr{Op: token.SUB, X: y}
+	}
+
 	fn.pkgs.add("math/bits")
 	fn.push(&ast.CallExpr{
-		Fun: intIndent,
+		Fun: newID("int" + bits),
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
-				X:   ast.NewIdent("bits"),
-				Sel: ast.NewIdent(name),
+				X:   newID("bits"),
+				Sel: newID(name),
 			},
-			Args: []ast.Expr{&ast.CallExpr{
-				Fun:  uintIndent,
-				Args: []ast.Expr{fn.pop()},
-			}},
+			Args: []ast.Expr{
+				&ast.CallExpr{
+					Fun:  newID("uint" + bits),
+					Args: []ast.Expr{x},
+				},
+				y,
+			},
 		}},
 	})
 }
 
-func (fn *funcRef) rotOp(name string, rotl bool, intIndent, uintIndent *ast.Ident) {
-	var count ast.Expr = &ast.CallExpr{
-		Fun:  ast.NewIdent("int"),
-		Args: []ast.Expr{fn.pop()},
-	}
-	if !rotl {
-		count = &ast.UnaryExpr{Op: token.SUB, X: count}
-	}
+func (fn *funcRef) bitOp(name string) {
+	bits := name[len(name)-2:]
 
 	fn.pkgs.add("math/bits")
 	fn.push(&ast.CallExpr{
-		Fun: intIndent,
+		Fun: newID("int" + bits),
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
-				X:   ast.NewIdent("bits"),
-				Sel: ast.NewIdent(name),
+				X:   newID("bits"),
+				Sel: newID(name),
 			},
-			Args: []ast.Expr{
-				&ast.CallExpr{
-					Fun:  uintIndent,
-					Args: []ast.Expr{fn.pop()},
-				},
-				count,
-			},
+			Args: []ast.Expr{&ast.CallExpr{
+				Fun:  newID("uint" + bits),
+				Args: []ast.Expr{fn.pop()},
+			}},
 		}},
 	})
 }
@@ -1274,8 +1276,8 @@ func (fn *funcRef) uniMath(name string) {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
-			X:   ast.NewIdent("math"),
-			Sel: ast.NewIdent(name),
+			X:   newID("math"),
+			Sel: newID(name),
 		},
 		Args: []ast.Expr{fn.pop()},
 	})
@@ -1287,8 +1289,8 @@ func (fn *funcRef) binMath(name string) {
 	x := fn.pop()
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
-			X:   ast.NewIdent("math"),
-			Sel: ast.NewIdent(name),
+			X:   newID("math"),
+			Sel: newID(name),
 		},
 		Args: []ast.Expr{x, y},
 	})
@@ -1297,14 +1299,14 @@ func (fn *funcRef) binMath(name string) {
 func (fn *funcRef) uniMath32(name string) {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
-		Fun: float32Ident,
+		Fun: newID("float32"),
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
-				X:   ast.NewIdent("math"),
-				Sel: ast.NewIdent(name),
+				X:   newID("math"),
+				Sel: newID(name),
 			},
 			Args: []ast.Expr{&ast.CallExpr{
-				Fun:  float64Ident,
+				Fun:  newID("float64"),
 				Args: []ast.Expr{fn.pop()},
 			}},
 		}},
@@ -1316,15 +1318,15 @@ func (fn *funcRef) binMath32(name string) {
 	y := fn.pop()
 	x := fn.pop()
 	fn.push(&ast.CallExpr{
-		Fun: float32Ident,
+		Fun: newID("float32"),
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
-				X:   ast.NewIdent("math"),
-				Sel: ast.NewIdent(name),
+				X:   newID("math"),
+				Sel: newID(name),
 			},
 			Args: []ast.Expr{
-				&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{x}},
-				&ast.CallExpr{Fun: float64Ident, Args: []ast.Expr{y}},
+				&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{x}},
+				&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{y}},
 			},
 		}},
 	})
@@ -1334,7 +1336,7 @@ func (fn *funcRef) binBuiltin(name string) {
 	y := fn.pop()
 	x := fn.pop()
 	fn.push(&ast.CallExpr{
-		Fun:  ast.NewIdent(name),
+		Fun:  newID(name),
 		Args: []ast.Expr{x, y},
 	})
 }
@@ -1342,11 +1344,11 @@ func (fn *funcRef) binBuiltin(name string) {
 func (fn *funcRef) float32bits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
-		Fun: int32Ident,
+		Fun: newID("int32"),
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
-				X:   ast.NewIdent("math"),
-				Sel: ast.NewIdent("Float32bits"),
+				X:   newID("math"),
+				Sel: newID("Float32bits"),
 			},
 			Args: []ast.Expr{fn.pop()},
 		}},
@@ -1356,11 +1358,11 @@ func (fn *funcRef) float32bits() {
 func (fn *funcRef) float64bits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
-		Fun: int64Ident,
+		Fun: newID("int64"),
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
-				X:   ast.NewIdent("math"),
-				Sel: ast.NewIdent("Float64bits"),
+				X:   newID("math"),
+				Sel: newID("Float64bits"),
 			},
 			Args: []ast.Expr{fn.pop()},
 		}},
@@ -1371,11 +1373,11 @@ func (fn *funcRef) float32frombits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
-			X:   ast.NewIdent("math"),
-			Sel: ast.NewIdent("Float32frombits"),
+			X:   newID("math"),
+			Sel: newID("Float32frombits"),
 		},
 		Args: []ast.Expr{&ast.CallExpr{
-			Fun:  uint32Ident,
+			Fun:  newID("uint32"),
 			Args: []ast.Expr{fn.pop()},
 		}},
 	})
@@ -1385,11 +1387,11 @@ func (fn *funcRef) float64frombits() {
 	fn.pkgs.add("math")
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
-			X:   ast.NewIdent("math"),
-			Sel: ast.NewIdent("Float64frombits"),
+			X:   newID("math"),
+			Sel: newID("Float64frombits"),
 		},
 		Args: []ast.Expr{&ast.CallExpr{
-			Fun:  uint64Ident,
+			Fun:  newID("uint64"),
 			Args: []ast.Expr{fn.pop()},
 		}},
 	})
@@ -1399,7 +1401,7 @@ func (fn *funcRef) floatTrunc(name string) {
 	fn.pkgs.add("math")
 	fn.hlps.add(name)
 	fn.push(&ast.CallExpr{
-		Fun:  ast.NewIdent(name),
+		Fun:  newID(name),
 		Args: []ast.Expr{fn.pop()},
 	})
 }
@@ -1419,11 +1421,11 @@ func (fn *funcRef) cmpOp(op token.Token) {
 func (fn *funcRef) cmpOpU32(op token.Token) {
 	fn.pushCond(&ast.BinaryExpr{
 		Y: &ast.CallExpr{
-			Fun:  uint32Ident,
+			Fun:  newID("uint32"),
 			Args: []ast.Expr{fn.pop()},
 		},
 		X: &ast.CallExpr{
-			Fun:  uint32Ident,
+			Fun:  newID("uint32"),
 			Args: []ast.Expr{fn.pop()},
 		},
 		Op: op})
@@ -1432,26 +1434,14 @@ func (fn *funcRef) cmpOpU32(op token.Token) {
 func (fn *funcRef) cmpOpU64(op token.Token) {
 	fn.pushCond(&ast.BinaryExpr{
 		Y: &ast.CallExpr{
-			Fun:  uint64Ident,
+			Fun:  newID("uint64"),
 			Args: []ast.Expr{fn.pop()},
 		},
 		X: &ast.CallExpr{
-			Fun:  uint64Ident,
+			Fun:  newID("uint64"),
 			Args: []ast.Expr{fn.pop()},
 		},
 		Op: op})
-}
-
-func (fn *funcRef) makeTempVar() *ast.Ident {
-	id := ast.NewIdent("t" + strconv.Itoa(fn.temps))
-	fn.temps++
-	return id
-}
-
-func (fn *funcRef) makeLabel() *ast.Ident {
-	lbl := ast.NewIdent("l" + strconv.Itoa(fn.labels))
-	fn.labels++
-	return lbl
 }
 
 func (t *translator) readBlockType() (typ funcType, err error) {
@@ -1484,19 +1474,24 @@ func readHeader(r io.Reader) error {
 	return nil
 }
 
+var modRecvList = &ast.FieldList{List: []*ast.Field{{
+	Names: []*ast.Ident{newID("m")},
+	Type:  newID("Module"),
+}}}
+
 func createModuleStruct() ast.Decl {
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
 			&ast.TypeSpec{
-				Name: ast.NewIdent("Module"),
+				Name: newID("Module"),
 				Type: &ast.StructType{
 					Fields: &ast.FieldList{
 						List: []*ast.Field{
 							{
-								Names: []*ast.Ident{ast.NewIdent("memory")},
+								Names: []*ast.Ident{newID("memory")},
 								Type: &ast.ArrayType{
-									Elt: ast.NewIdent("byte"),
+									Elt: newID("byte"),
 								},
 							},
 						},
