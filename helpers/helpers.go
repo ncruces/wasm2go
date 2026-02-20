@@ -2,6 +2,20 @@ package helpers
 
 import "math"
 
+func i32_div_s(x, y int32) int32 {
+	if x == math.MinInt32 && y == -1 {
+		panic("integer overflow")
+	}
+	return x / y
+}
+
+func i64_div_s(x, y int64) int64 {
+	if x == math.MinInt64 && y == -1 {
+		panic("integer overflow")
+	}
+	return x / y
+}
+
 func i32_trunc_f64_s(f float64) int32 {
 	x := math.Trunc(f)
 	if math.IsNaN(x) ||

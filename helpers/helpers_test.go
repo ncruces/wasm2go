@@ -6,6 +6,62 @@ import (
 	"testing"
 )
 
+func Test_i32_div_s(t *testing.T) {
+	tests := []struct {
+		x, y int32
+		r    int32
+		p    bool
+	}{
+		{10, 2, 5, false},
+		{-10, 2, -5, false},
+		{math.MinInt32, 1, math.MinInt32, false},
+		{math.MinInt32, -1, 0, true},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d/%d", tt.x, tt.y), func(t *testing.T) {
+			if tt.p {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("i32_div_s(%d, %d) did not panic", tt.x, tt.y)
+					}
+				}()
+			}
+			got := i32_div_s(tt.x, tt.y)
+			if got != tt.r {
+				t.Errorf("i32_div_s(%d, %d) = %v, want %v", tt.x, tt.y, got, tt.r)
+			}
+		})
+	}
+}
+
+func Test_i64_div_s(t *testing.T) {
+	tests := []struct {
+		x, y int64
+		r    int64
+		p    bool
+	}{
+		{10, 2, 5, false},
+		{-10, 2, -5, false},
+		{math.MinInt64, 1, math.MinInt64, false},
+		{math.MinInt64, -1, 0, true},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d/%d", tt.x, tt.y), func(t *testing.T) {
+			if tt.p {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("i64_div_s(%d, %d) did not panic", tt.x, tt.y)
+					}
+				}()
+			}
+			got := i64_div_s(tt.x, tt.y)
+			if got != tt.r {
+				t.Errorf("i64_div_s(%d, %d) = %v, want %v", tt.x, tt.y, got, tt.r)
+			}
+		})
+	}
+}
+
 func Test_i32_trunc_f64_s(t *testing.T) {
 	tests := []struct {
 		f float64

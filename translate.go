@@ -529,6 +529,17 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		blk := &fn.blocks[len(fn.blocks)-1]
 
 		switch opcode {
+		case 0x00: // unreachable
+			blk.append(&ast.ExprStmt{
+				X: &ast.CallExpr{
+					Fun:  ast.NewIdent("panic"),
+					Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: `"unreachable"`}},
+				},
+			})
+			blk.unreachable = true
+
+		case 0x01: // nop
+
 		case 0x02, 0x03, 0x04: // block, loop, if
 			bt, err := t.readBlockType()
 			if err != nil {
@@ -700,6 +711,9 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			blk.append(ret)
 			blk.unreachable = true // After an uncoditional return.
 
+		case 0x1a: // drop
+			fn.popCopy() // must eval
+
 		case 0x1b: // select
 			cond := fn.popCond()
 			val := fn.makeTempVar()
@@ -744,7 +758,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			if err != nil {
 				return err
 			}
-			val := fn.popCopy() // will be reused
+			val := fn.popCopy() // will reuse
 			blk.append(&ast.AssignStmt{
 				Lhs: []ast.Expr{ast.NewIdent(local(i))},
 				Rhs: []ast.Expr{val},
@@ -897,7 +911,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x6c: // i32.mul
 			fn.binOp(token.MUL)
 		case 0x6d: // i32.div_s
-			fn.binOp(token.QUO)
+			fn.intDiv("i32_div_s")
 		case 0x6e: // i32.div_u
 			fn.binOpU32(token.QUO)
 		case 0x6f: // i32.rem_s
@@ -911,11 +925,11 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x73: // i32.xor
 			fn.binOp(token.XOR)
 		case 0x74: // i32.shl
-			fn.binOp(token.SHL)
+			fn.shiftOp(token.SHL, 32, nil, nil)
 		case 0x75: // i32.shr_s
-			fn.binOp(token.SHR)
+			fn.shiftOp(token.SHR, 32, nil, nil)
 		case 0x76: // i32.shr_u
-			fn.binOpU32(token.SHR)
+			fn.shiftOp(token.SHR, 32, uint32Ident, int32Ident)
 		case 0x77, 0x78: // i32.rotl, i32.rotr
 			fn.rotOp("RotateLeft32", opcode == 0x77, int32Ident, uint32Ident)
 
@@ -932,7 +946,7 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x7e: // i64.mul
 			fn.binOp(token.MUL)
 		case 0x7f: // i64.div_s
-			fn.binOp(token.QUO)
+			fn.intDiv("i64_div_s")
 		case 0x80: // i64.div_u
 			fn.binOpU64(token.QUO)
 		case 0x81: // i64.rem_s
@@ -946,11 +960,11 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 		case 0x85: // i64.xor
 			fn.binOp(token.XOR)
 		case 0x86: // i64.shl
-			fn.binOp(token.SHL)
+			fn.shiftOp(token.SHL, 64, nil, nil)
 		case 0x87: // i64.shr_s
-			fn.binOp(token.SHR)
+			fn.shiftOp(token.SHR, 64, nil, nil)
 		case 0x88: // i64.shr_u
-			fn.binOpU64(token.SHR)
+			fn.shiftOp(token.SHR, 64, uint64Ident, int64Ident)
 		case 0x89, 0x8a: // i64.rotl, i64.rotr
 			fn.rotOp("RotateLeft64", opcode == 0x89, int64Ident, uint64Ident)
 
@@ -1022,6 +1036,13 @@ func (t *translator) readCodeForFunction(fn *funcRef) error {
 			fn.floatTrunc("i32_trunc_f64_s")
 		case 0xab: // i32.trunc_f64_u
 			fn.floatTrunc("i32_trunc_f64_u")
+
+		case 0xac: // i64.extend_i32_s
+			fn.push(&ast.CallExpr{Fun: int64Ident, Args: []ast.Expr{fn.pop()}})
+		case 0xad: // i64.extend_i32_u
+			fn.push(&ast.CallExpr{Fun: int64Ident, Args: []ast.Expr{
+				&ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{fn.pop()}},
+			}})
 
 		case 0xae: // i64.trunc_f32_s
 			fn.floatTrunc("i64_trunc_f32_s")
@@ -1166,6 +1187,42 @@ func (fn *funcRef) binOpU64(op token.Token) {
 			},
 			Op: op,
 		}}})
+}
+
+func (fn *funcRef) intDiv(name string) {
+	fn.hlps.add(name)
+	y := fn.pop()
+	x := fn.pop()
+	fn.push(&ast.CallExpr{
+		Fun:  ast.NewIdent(name),
+		Args: []ast.Expr{x, y},
+	})
+}
+
+func (fn *funcRef) shiftOp(op token.Token, bits int, xType, retType *ast.Ident) {
+	y := fn.pop()
+	x := fn.pop()
+
+	var count ast.Expr
+	if bits == 64 {
+		count = &ast.CallExpr{Fun: uint64Ident, Args: []ast.Expr{y}}
+	} else {
+		count = &ast.CallExpr{Fun: uint32Ident, Args: []ast.Expr{y}}
+	}
+	count = &ast.BinaryExpr{
+		X:  count,
+		Op: token.AND,
+		Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(bits - 1)},
+	}
+
+	if xType != nil {
+		x = &ast.CallExpr{Fun: xType, Args: []ast.Expr{x}}
+	}
+	var expr ast.Expr = &ast.BinaryExpr{X: x, Op: op, Y: count}
+	if retType != nil {
+		expr = &ast.CallExpr{Fun: retType, Args: []ast.Expr{expr}}
+	}
+	fn.push(expr)
 }
 
 func (fn *funcRef) bitOp(name string, intIndent, uintIndent *ast.Ident) {
