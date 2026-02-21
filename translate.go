@@ -601,6 +601,129 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			})
 			fn.pushConst(val)
 
+		case 0x2c, 0x2d, 0x30, 0x31: // load8
+			_, err := readLEB128(t.in) // align
+			if err != nil {
+				return err
+			}
+			offset, err := readLEB128(t.in)
+			if err != nil { // offset
+				return err
+			}
+
+			idx := fn.memory8(offset)
+			switch opcode {
+			case 0x2c: // i32.load8_s
+				fn.push(convert(idx, "int8", "int32"))
+			case 0x2d: // i32.load8_u
+				fn.push(convert(idx, "int32"))
+			case 0x30: // i64.load8_s
+				fn.push(convert(idx, "int8", "int64"))
+			case 0x31: // i64.load8_u
+				fn.push(convert(idx, "int64"))
+			}
+
+		case 0x28, 0x29, 0x2a, 0x2b, 0x2e, 0x2f, 0x32, 0x33, 0x34, 0x35: // load
+			_, err := readLEB128(t.in) // align
+			if err != nil {
+				return err
+			}
+			offset, err := readLEB128(t.in)
+			if err != nil { // offset
+				return err
+			}
+
+			fn.packages.add("encoding/binary")
+			idx := fn.memoryN(offset)
+
+			switch opcode {
+			case 0x28: // i32.load
+				fn.push(convert(load("32", idx), "int32"))
+			case 0x29: // i64.load
+				fn.push(convert(load("64", idx), "int64"))
+			case 0x2a: // f32.load
+				fn.packages.add("math")
+				fn.push(&ast.CallExpr{
+					Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32frombits")},
+					Args: []ast.Expr{load("32", idx)},
+				})
+			case 0x2b: // f64.load
+				fn.packages.add("math")
+				fn.push(&ast.CallExpr{
+					Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64frombits")},
+					Args: []ast.Expr{load("64", idx)},
+				})
+			case 0x2e: // i32.load16_s
+				fn.push(convert(load("16", idx), "int16", "int32"))
+			case 0x2f: // i32.load16_u
+				fn.push(convert(load("16", idx), "int32"))
+			case 0x32: // i64.load16_s
+				fn.push(convert(load("16", idx), "int16", "int64"))
+			case 0x33: // i64.load16_u
+				fn.push(convert(load("16", idx), "int64"))
+			case 0x34: // i64.load32_s
+				fn.push(convert(load("32", idx), "int32", "int64"))
+			case 0x35: // i64.load32_u
+				fn.push(convert(load("32", idx), "int64"))
+			}
+
+		case 0x3a, 0x3c: // store8
+			_, err := readLEB128(t.in) // align
+			if err != nil {
+				return err
+			}
+			offset, err := readLEB128(t.in)
+			if err != nil { // offset
+				return err
+			}
+
+			val := fn.pop()
+			idx := fn.memory8(offset)
+			blk.append(&ast.AssignStmt{
+				Lhs: []ast.Expr{idx},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{convert(val, "byte")},
+			})
+
+		case 0x36, 0x37, 0x38, 0x39, 0x3b, 0x3d, 0x3e: // store
+			_, err := readLEB128(t.in) // align
+			if err != nil {
+				return err
+			}
+			offset, err := readLEB128(t.in)
+			if err != nil { // offset
+				return err
+			}
+
+			fn.packages.add("encoding/binary")
+			val := fn.pop()
+			idx := fn.memoryN(offset)
+
+			switch opcode {
+			case 0x36: // i32.store
+				blk.append(store("32", idx, convert(val, "uint32")))
+			case 0x37: // i64.store
+				blk.append(store("64", idx, convert(val, "uint64")))
+			case 0x38: // f32.store
+				fn.packages.add("math")
+				blk.append(store("32", idx, &ast.CallExpr{
+					Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32bits")},
+					Args: []ast.Expr{val},
+				}))
+			case 0x39: // f64.store
+				fn.packages.add("math")
+				blk.append(store("64", idx, &ast.CallExpr{
+					Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64bits")},
+					Args: []ast.Expr{val},
+				}))
+			case 0x3b: // i32.store16
+				blk.append(store("16", idx, convert(val, "uint16")))
+			case 0x3d: // i64.store16
+				blk.append(store("16", idx, convert(val, "uint16")))
+			case 0x3e: // i64.store32
+				blk.append(store("32", idx, convert(val, "uint32")))
+			}
+
 		case 0x41: // i32.const
 			i, err := readSignedLEB128(t.in)
 			if err != nil {

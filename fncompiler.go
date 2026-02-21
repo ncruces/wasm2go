@@ -3,6 +3,7 @@ package main
 import (
 	"go/ast"
 	"go/token"
+	"strconv"
 )
 
 type funcCompiler struct {
@@ -43,6 +44,54 @@ func (fn *funcCompiler) branch(n uint64) ast.Stmt {
 		targetBlk.setResults(fn)
 	}
 	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
+}
+
+// Returns a memory byte instruction: m.memory[start+offset]
+func (fn *funcCompiler) memory8(offset uint64) ast.Expr {
+	return &ast.IndexExpr{
+		X: &ast.SelectorExpr{
+			X:   newID("m"),
+			Sel: newID("memory"),
+		},
+		Index: &ast.BinaryExpr{
+			X: &ast.CallExpr{
+				Fun:  newID("int"),
+				Args: []ast.Expr{fn.pop()},
+			},
+			Op: token.ADD,
+			Y: &ast.CallExpr{
+				Fun: newID("int"),
+				Args: []ast.Expr{&ast.BasicLit{
+					Kind:  token.INT,
+					Value: strconv.FormatUint(offset, 10),
+				}},
+			},
+		},
+	}
+}
+
+// Returns a memory index instruction: m.memory[start+offset:]
+func (fn *funcCompiler) memoryN(offset uint64) ast.Expr {
+	return &ast.SliceExpr{
+		X: &ast.SelectorExpr{
+			X:   newID("m"),
+			Sel: newID("memory"),
+		},
+		Low: &ast.BinaryExpr{
+			X: &ast.CallExpr{
+				Fun:  newID("int"),
+				Args: []ast.Expr{fn.pop()},
+			},
+			Op: token.ADD,
+			Y: &ast.CallExpr{
+				Fun: newID("int"),
+				Args: []ast.Expr{&ast.BasicLit{
+					Kind:  token.INT,
+					Value: strconv.FormatUint(offset, 10),
+				}},
+			},
+		},
+	}
 }
 
 // Pushes expr (a literal, constant or materialized temporary) to the value stack.
@@ -139,11 +188,7 @@ func (fn *funcCompiler) popCond() ast.Expr {
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.
 func (fn *funcCompiler) convert(types ...string) {
-	x := fn.pop()
-	for _, t := range types {
-		x = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{x}}
-	}
-	fn.push(x)
+	fn.push(convert(fn.pop(), types...))
 }
 
 // Executes a binary operator.
@@ -482,4 +527,40 @@ func (b *funcBlock) setResults(fn *funcCompiler) {
 			})
 		}
 	}
+}
+
+// Constructs a type conversion, first to types[0], then to types[1] and so on.
+func convert(x ast.Expr, types ...string) ast.Expr {
+	for _, t := range types {
+		x = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{x}}
+	}
+	return x
+}
+
+// Constructs a n bit memory load at an index.
+func load(bits string, idx ast.Expr) ast.Expr {
+	return &ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X: &ast.SelectorExpr{
+				X:   newID("binary"),
+				Sel: newID("LittleEndian"),
+			},
+			Sel: newID("Uint" + bits),
+		},
+		Args: []ast.Expr{idx},
+	}
+}
+
+// Constructs a n bit memory store at an index.
+func store(bits string, idx ast.Expr, val ast.Expr) ast.Stmt {
+	return &ast.ExprStmt{X: &ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X: &ast.SelectorExpr{
+				X:   newID("binary"),
+				Sel: newID("LittleEndian"),
+			},
+			Sel: newID("PutUint" + bits),
+		},
+		Args: []ast.Expr{idx, val},
+	}}
 }
