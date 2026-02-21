@@ -40,6 +40,10 @@ func (t funcType) toAST() *ast.FuncType {
 	}
 }
 
+type memType struct {
+	min, max int
+}
+
 func paramsToAST(types string) *ast.FieldList {
 	list := make([]*ast.Field, len(types))
 	for i, t := range []byte(types) {

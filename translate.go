@@ -23,6 +23,7 @@ type translator struct {
 
 	types     []funcType
 	functions []funcCompiler
+	memory    memType
 	exports   map[string]export
 	packages  set[string]
 	helpers   set[string]
@@ -125,6 +126,8 @@ func (t *translator) readSection() error {
 		return t.readTypeSection()
 	case sectionFunction:
 		return t.readFunctionSection()
+	case sectionMemory:
+		return t.readMemorySection()
 	case sectionExport:
 		return t.readExportSection()
 	case sectionCode:
@@ -202,6 +205,32 @@ func (t *translator) readFunctionSection() error {
 		t.out.Decls = append(t.out.Decls, fn.decl)
 	}
 	return nil
+}
+
+func (t *translator) readMemorySection() error {
+	numMems, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+	if numMems > 1 {
+		return fmt.Errorf("multiple memories not supported")
+	}
+
+	flags, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+	min, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+	max := uint64(65536) // 4GB
+	if flags&1 == 1 {
+		max, err = readLEB128(t.in)
+	}
+	t.memory.min = int(min)
+	t.memory.max = int(max)
+	return err
 }
 
 func (t *translator) readExportSection() error {
@@ -723,6 +752,42 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			case 0x3e: // i64.store32
 				blk.append(store("32", idx, convert(val, "uint32")))
 			}
+
+		case 0x3f: // memory.size
+			_, _ = t.in.ReadByte() // reserved
+			fn.push(&ast.CallExpr{
+				Fun: newID("int32"),
+				Args: []ast.Expr{
+					&ast.BinaryExpr{
+						X: &ast.CallExpr{
+							Fun: newID("len"),
+							Args: []ast.Expr{&ast.SelectorExpr{
+								X:   newID("m"),
+								Sel: newID("memory"),
+							}},
+						},
+						Op: token.SHR,
+						Y:  &ast.BasicLit{Kind: token.INT, Value: "16"},
+					},
+				},
+			})
+
+		case 0x40: // memory.grow
+			_, err := t.in.ReadByte() // reserved
+			if err != nil {
+				return err
+			}
+			fn.helpers.add("memoryGrow")
+			fn.push(&ast.CallExpr{
+				Fun: newID("memoryGrow"),
+				Args: []ast.Expr{
+					&ast.UnaryExpr{
+						Op: token.AND,
+						X:  &ast.SelectorExpr{X: newID("m"), Sel: newID("memory")},
+					},
+					fn.pop(),
+				},
+			})
 
 		case 0x41: // i32.const
 			i, err := readSignedLEB128(t.in)
