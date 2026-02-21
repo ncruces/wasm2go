@@ -256,3 +256,28 @@ func memoryGrow(mem *[]byte, delta int32) int32 {
 	*mem = append(*mem, make([]byte, uint(delta)<<16)...)
 	return oldLen
 }
+
+func memoryCopy(mem []byte, n, src, dest int32) {
+	x := uint(uint32(dest))
+	z := uint(uint32(src))
+	y := x + uint(uint32(n))
+	w := z + uint(uint32(n))
+	copy(mem[x:y], mem[z:w])
+}
+
+func memoryFill(mem []byte, n, val, dest int32) {
+	x := uint(uint32(dest))
+	y := x + uint(uint32(n))
+
+	buf := mem[x:y]
+	if byte(val) == 0 {
+		clear(buf)
+		return
+	}
+
+	buf[0] = byte(val)
+	for i := 1; i < len(buf); {
+		chunk := min(i, 8192)
+		i += copy(buf[i:], buf[:chunk])
+	}
+}

@@ -1132,6 +1132,43 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.uniHelper("i64_trunc_sat_f64_s")
 			case 0x07: // i64.trunc_sat_f64_u
 				fn.uniHelper("i64_trunc_sat_f64_u")
+
+			case 0x0a: // memory.copy
+				_, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				_, err = readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				fn.helpers.add("memoryCopy")
+				blk.append(&ast.ExprStmt{
+					X: &ast.CallExpr{
+						Fun: newID("memoryCopy"),
+						Args: []ast.Expr{
+							&ast.SelectorExpr{X: newID("m"), Sel: newID("memory")},
+							fn.pop(), fn.pop(), fn.pop(),
+						},
+					},
+				})
+
+			case 0x0b: // memory.fill
+				_, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				fn.helpers.add("memoryFill")
+				blk.append(&ast.ExprStmt{
+					X: &ast.CallExpr{
+						Fun: newID("memoryFill"),
+						Args: []ast.Expr{
+							&ast.SelectorExpr{X: newID("m"), Sel: newID("memory")},
+							fn.pop(), fn.pop(), fn.pop(),
+						},
+					},
+				})
+
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
 			}
