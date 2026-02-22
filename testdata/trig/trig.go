@@ -5,20 +5,21 @@ package trig
 import "math"
 
 type Module struct {
-	Memory	[]byte
-	g0	int32
+	Memory           []byte
+	___stack_pointer int32
 }
 
 func New() *Module {
 	m := &Module{}
 	m.Memory = make([]byte, 65536)
-	m.g0 = int32(65536)
+	m.___stack_pointer = int32(65536)
 	return m
 }
 func (m Module) Xsin(v0 float64) float64 {
-	var v1, v2 float64
-	var v3 int64
-	var v4 int32
+	var v1 float64
+	var v2 int64
+	var v3 int32
+	var v4 float64
 	{
 		t0 := v0
 		if t0 != math.Float64frombits(0) {
@@ -49,19 +50,19 @@ l0:
 				if t13 == 0 {
 					goto l2
 				}
-				v3 = i64_trunc_f64_s(v1)
+				v2 = i64_trunc_f64_s(v1)
 				goto l3
 			}
 		l2:
 			;
-			v3 = int64(-9223372036854775808)
+			v2 = int64(-9223372036854775808)
 		}
 	l3:
 		;
 		t17 := v0
-		t19 := float64(v3)
+		t19 := float64(v2)
 		v1 = float64(t17 + float64(t19*math.Float64frombits(13833125093779451160)))
-		v4 = int32(0)
+		v3 = int32(0)
 	l10:
 		{
 			{
@@ -69,18 +70,18 @@ l0:
 				if t23 > math.Float64frombits(4485585228861014016) {
 					goto l4
 				}
-				v2 = math.Float64frombits(4607182418800017408)
+				v4 = math.Float64frombits(4607182418800017408)
 				{
 					{
 						{
 						l9:
 							{
 								{
-									t25 := v4
+									t25 := v3
 									if t25 != 0 {
 										goto l5
 									}
-									t27 := int32(v3)
+									t27 := int32(v2)
 									switch t27 & int32(3) {
 									default:
 										goto l1
@@ -96,23 +97,22 @@ l0:
 								}
 							l5:
 								;
-								t29 := v4
-								v4 = t29 + int32(-1)
+								t29 := v3
+								v3 = t29 + int32(-1)
 								t31 := v1
 								v0 = float64(t31 * v1)
-								t34 := v2
+								t34 := v4
 								t36 := float64(t34 * v1)
 								v1 = t36
 								v1 = float64(t36 + v1)
 								t39 := v0
-								v2 = float64(math.Float64frombits(4607182418800017408) - float64(t39+v0))
+								v4 = float64(math.Float64frombits(4607182418800017408) - float64(t39+v0))
 								goto l9
 							}
-							panic("unreachable")
 						}
 					l6:
 						;
-						return v2
+						return v4
 					}
 				l7:
 					;
@@ -120,18 +120,17 @@ l0:
 				}
 			l8:
 				;
-				v1 = -v2
+				v1 = -v4
 				goto l1
 			}
 		l4:
 			;
-			t48 := v4
-			v4 = t48 + int32(1)
+			t48 := v3
+			v3 = t48 + int32(1)
 			t50 := v1
 			v1 = float64(t50 * math.Float64frombits(4602678819172646912))
 			goto l10
 		}
-		panic("unreachable")
 	}
 l1:
 	;

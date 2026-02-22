@@ -182,5 +182,7 @@
   )
   (local.get $1)
  )
+ ;; custom section "producers", size 117
+ ;; features section: mutable-globals, bulk-memory, sign-ext, reference-types, multivalue, bulk-memory-opt, call-indirect-overlong
 )
 
