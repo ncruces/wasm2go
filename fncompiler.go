@@ -46,12 +46,12 @@ func (fn *funcCompiler) branch(n uint64) ast.Stmt {
 	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
 }
 
-// Returns a memory byte instruction: m.memory[start+offset]
+// Returns a memory byte instruction: m.Memory[start+offset]
 func (fn *funcCompiler) memory8(offset uint64) ast.Expr {
 	return &ast.IndexExpr{
 		X: &ast.SelectorExpr{
 			X:   newID("m"),
-			Sel: newID("memory"),
+			Sel: fn.memory.id,
 		},
 		Index: &ast.BinaryExpr{
 			X: &ast.CallExpr{
@@ -70,12 +70,12 @@ func (fn *funcCompiler) memory8(offset uint64) ast.Expr {
 	}
 }
 
-// Returns a memory index instruction: m.memory[start+offset:]
+// Returns a memory index instruction: m.Memory[start+offset:]
 func (fn *funcCompiler) memoryN(offset uint64) ast.Expr {
 	return &ast.SliceExpr{
 		X: &ast.SelectorExpr{
 			X:   newID("m"),
-			Sel: newID("memory"),
+			Sel: fn.memory.id,
 		},
 		Low: &ast.BinaryExpr{
 			X: &ast.CallExpr{

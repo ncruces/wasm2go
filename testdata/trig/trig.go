@@ -5,10 +5,10 @@ package trig
 import "math"
 
 type Module struct {
-	memory []byte
+	Memory []byte
 }
 
-func (m Module) Xsin(v0 float64) float64 {
+func (m Module) Sin(v0 float64) float64 {
 	var v1, v2 float64
 	var v3 int32
 	var v4 int64
@@ -24,88 +24,97 @@ func (m Module) Xsin(v0 float64) float64 {
 			goto l0
 		}
 		t7 := v0
-		t8 := v0
-		t9 := float64(t8 * math.Float64frombits(4603909380684499075))
-		t13 := i64_trunc_sat_f64_s(float64(t9 + math.Copysign(math.Float64frombits(4602678819172646912), v0)))
-		v4 = t13
-		t14 := float64(t13)
-		v1 = float64(t7 + float64(t14*math.Float64frombits(13833125093779451160)))
-		var t17 float64
-	l1:
+		var t8 int64
 		{
-			t19 := math.Abs(v1)
-			var t21 float64
-			if t19 > math.Float64frombits(4485585228861014016) {
-				t22 := v3
-				v3 = t22 + int32(1)
-				t24 := v1
-				v1 = float64(t24 * math.Float64frombits(4602678819172646912))
+			t9 := v0
+			t10 := float64(t9 * math.Float64frombits(4603909380684499075))
+			t13 := float64(t10 + math.Copysign(math.Float64frombits(4602678819172646912), v0))
+			v0 = t13
+			t14 := math.Abs(t13)
+			if t14 < math.Float64frombits(4890909195324358656) {
 				goto l1
+			}
+			t8 = i64_trunc_f64_s(v0)
+			t8 = int64(-9223372036854775808)
+		}
+	l1:
+		;
+		v4 = t8
+		t18 := float64(t8)
+		v1 = float64(t7 + float64(t18*math.Float64frombits(13833125093779451160)))
+		var t21 float64
+	l2:
+		{
+			t23 := math.Abs(v1)
+			var t25 float64
+			if t23 > math.Float64frombits(4485585228861014016) {
+				t26 := v3
+				v3 = t26 + int32(1)
+				t28 := v1
+				v1 = float64(t28 * math.Float64frombits(4602678819172646912))
+				goto l2
 			} else {
 				v0 = math.Float64frombits(4607182418800017408)
 				{
 					{
-					l2:
+					l3:
 						{
-							t26 := v3
-							if t26 != 0 {
-								t27 := v3
-								v3 = t27 - int32(1)
-								t29 := v1
-								v2 = float64(t29 * v1)
-								t32 := v0
-								t34 := float64(t32 * v1)
-								v0 = t34
-								v1 = float64(t34 + v0)
-								t37 := v2
-								v0 = float64(math.Float64frombits(4607182418800017408) - float64(t37+v2))
-								goto l2
+							t30 := v3
+							if t30 != 0 {
+								t31 := v3
+								v3 = t31 - int32(1)
+								t33 := v1
+								v2 = float64(t33 * v1)
+								t36 := v0
+								t38 := float64(t36 * v1)
+								v0 = t38
+								v1 = float64(t38 + v0)
+								t41 := v2
+								v0 = float64(math.Float64frombits(4607182418800017408) - float64(t41+v2))
+								goto l3
 							} else {
 								{
-									t42 := int32(v4)
-									t43 := t42 & int32(3)
-									switch t43 - int32(1) {
+									t46 := int32(v4)
+									t47 := t46 & int32(3)
+									switch t47 - int32(1) {
 									default:
 										goto l0
 									case 0:
-										goto l3
-									case 1:
 										goto l4
-									case 2:
+									case 1:
 										goto l5
+									case 2:
+										goto l6
 									}
 								}
-							l3:
+							l4:
 							}
 						}
 						return v0
 					}
-				l4:
+				l5:
 					;
 					return -v1
 				}
-			l5:
+			l6:
 				;
-				t21 = -v0
+				t25 = -v0
 			}
-			t17 = t21
+			t21 = t25
 		}
-		v1 = t17
+		v1 = t21
 	}
 l0:
 	;
 	return v1
 }
 
-func i64_trunc_sat_f64_s(f float64) int64 {
+func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
-	switch {
-	case x < math.MinInt64:
-		return math.MinInt64
-	case x >= math.MaxInt64:
-		return math.MaxInt64
-	case math.IsNaN(x):
-		return 0
+	if math.IsNaN(x) ||
+		x < math.MinInt64 ||
+		x >= math.MaxInt64 {
+		panic("invalid conversion to integer")
 	}
 	return int64(x)
 }

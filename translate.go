@@ -23,7 +23,7 @@ type translator struct {
 
 	types     []funcType
 	functions []funcCompiler
-	memory    memType
+	memory    *memDefinition
 	exports   map[string]export
 	packages  set[string]
 	helpers   set[string]
@@ -39,7 +39,6 @@ func translate(name string, r io.Reader, w io.Writer) error {
 	}
 
 	t.out.Name = newID(name)
-	t.out.Decls = append(t.out.Decls, createModuleStruct())
 
 	t.packages = set[string]{}
 	t.helpers = set[string]{}
@@ -54,11 +53,16 @@ func translate(name string, r io.Reader, w io.Writer) error {
 		}
 	}
 
-	// Late binding of function names.
+	t.out.Decls = append([]ast.Decl{t.createModuleStruct()}, t.out.Decls...)
+
+	// Late binding of names.
 	for i, fn := range t.functions {
 		if fn.decl != nil && fn.decl.Name.Name == "" {
 			fn.decl.Name.Name = "f" + strconv.Itoa(i)
 		}
+	}
+	if t.memory != nil && t.memory.id.Name == "" {
+		t.memory.id.Name = "memory"
 	}
 
 	// Set imports.
@@ -199,6 +203,7 @@ func (t *translator) readFunctionSection() error {
 		fn := &t.functions[i]
 		fn.typ = t.types[index]
 		fn.decl = &ast.FuncDecl{
+			Name: &ast.Ident{},
 			Recv: modRecvList,
 			Type: fn.typ.toAST(),
 		}
@@ -211,6 +216,9 @@ func (t *translator) readMemorySection() error {
 	numMems, err := readLEB128(t.in)
 	if err != nil {
 		return err
+	}
+	if numMems == 0 {
+		return nil
 	}
 	if numMems > 1 {
 		return fmt.Errorf("multiple memories not supported")
@@ -228,8 +236,10 @@ func (t *translator) readMemorySection() error {
 	if flags&1 == 1 {
 		max, err = readLEB128(t.in)
 	}
-	t.memory.min = int(min)
-	t.memory.max = int(max)
+	t.memory = &memDefinition{
+		min: int(min),
+		max: int(max),
+	}
 	return err
 }
 
@@ -271,10 +281,9 @@ func (t *translator) readExportSection() error {
 		switch exportKind(kind) {
 		case functionExport:
 			decl := t.functions[index].decl
-			if decl.Name == nil {
-				decl.Name = &ast.Ident{}
-			}
-			decl.Name.Name = exported(name)
+			decl.Name = ast.NewIdent(exported(name))
+		case memoryExport:
+			t.memory.id = ast.NewIdent(exported(name))
 		}
 	}
 	return nil
@@ -529,9 +538,6 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 			target := &t.functions[index]
-			if target.decl.Name == nil {
-				target.decl.Name = &ast.Ident{}
-			}
 
 			args := make([]ast.Expr, len(target.typ.params))
 			for i := len(args) - 1; i >= 0; i-- {
@@ -763,7 +769,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							Fun: newID("len"),
 							Args: []ast.Expr{&ast.SelectorExpr{
 								X:   newID("m"),
-								Sel: newID("memory"),
+								Sel: fn.memory.id,
 							}},
 						},
 						Op: token.SHR,
@@ -783,7 +789,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Args: []ast.Expr{
 					&ast.UnaryExpr{
 						Op: token.AND,
-						X:  &ast.SelectorExpr{X: newID("m"), Sel: newID("memory")},
+						X:  &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
 					},
 					fn.pop(),
 				},
@@ -1147,7 +1153,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					X: &ast.CallExpr{
 						Fun: newID("memoryCopy"),
 						Args: []ast.Expr{
-							&ast.SelectorExpr{X: newID("m"), Sel: newID("memory")},
+							&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
 							fn.pop(), fn.pop(), fn.pop(),
 						},
 					},
@@ -1163,7 +1169,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					X: &ast.CallExpr{
 						Fun: newID("memoryFill"),
 						Args: []ast.Expr{
-							&ast.SelectorExpr{X: newID("m"), Sel: newID("memory")},
+							&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
 							fn.pop(), fn.pop(), fn.pop(),
 						},
 					},
@@ -1214,23 +1220,23 @@ var modRecvList = &ast.FieldList{List: []*ast.Field{{
 	Type:  newID("Module"),
 }}}
 
-func createModuleStruct() ast.Decl {
+func (t *translator) createModuleStruct() ast.Decl {
+	var fields []*ast.Field
+	if t.memory != nil {
+		fields = append(fields, &ast.Field{
+			Names: []*ast.Ident{t.memory.id},
+			Type: &ast.ArrayType{
+				Elt: newID("byte"),
+			},
+		})
+	}
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
 			&ast.TypeSpec{
 				Name: newID("Module"),
 				Type: &ast.StructType{
-					Fields: &ast.FieldList{
-						List: []*ast.Field{
-							{
-								Names: []*ast.Ident{newID("memory")},
-								Type: &ast.ArrayType{
-									Elt: newID("byte"),
-								},
-							},
-						},
-					},
+					Fields: &ast.FieldList{List: fields},
 				},
 			},
 		},

@@ -19,20 +19,35 @@ func newID(name string) *ast.Ident {
 }
 
 func exported(name string) string {
-	return identifier("X" + name)
+	var buf strings.Builder
+	for i, r := range name {
+		if i == 0 {
+			if u := unicode.ToUpper(r); unicode.IsUpper(u) {
+				buf.WriteRune(u)
+				continue
+			}
+			buf.WriteByte('X')
+		}
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			r = '_'
+		}
+		buf.WriteRune(r)
+	}
+	return buf.String()
 }
 
 func internal(name string) string {
-	return identifier("_" + name)
-}
-
-func identifier(s string) string {
-	return strings.Map(func(r rune) rune {
-		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
-			return r
+	var buf strings.Builder
+	for i, r := range name {
+		if i == 0 && unicode.IsUpper(r) {
+			buf.WriteByte('_')
 		}
-		return '_'
-	}, s)
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			r = '_'
+		}
+		buf.WriteRune(r)
+	}
+	return buf.String()
 }
 
 func localVar[T interface{ int | uint64 }](i T) *ast.Ident {

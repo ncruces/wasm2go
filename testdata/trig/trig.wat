@@ -1,5 +1,7 @@
 (module
  (type $0 (func (param f64) (result f64)))
+ (memory $0 1)
+ (export "memory" (memory $0))
  (export "sin" (func $0))
  (func $0 (param $0 f64) (result f64)
   (local $1 f64)
@@ -38,17 +40,34 @@
      (f64.mul
       (f64.convert_i64_s
        (local.tee $4
-        (i64.trunc_sat_f64_s
-         (f64.add
-          (f64.mul
-           (local.get $0)
-           (f64.const 0.6366197723675814)
+        (block $block1 (result i64)
+         (if
+          (f64.lt
+           (f64.abs
+            (local.tee $0
+             (f64.add
+              (f64.mul
+               (local.get $0)
+               (f64.const 0.6366197723675814)
+              )
+              (f64.copysign
+               (f64.const 0.5)
+               (local.get $0)
+              )
+             )
+            )
+           )
+           (f64.const 9223372036854775808)
           )
-          (f64.copysign
-           (f64.const 0.5)
-           (local.get $0)
+          (then
+           (br $block1
+            (i64.trunc_f64_s
+             (local.get $0)
+            )
+           )
           )
          )
+         (i64.const -9223372036854775808)
         )
        )
       )
@@ -84,8 +103,8 @@
        (local.set $0
         (f64.const 1)
        )
-       (block $block3
-        (block $block2
+       (block $block4
+        (block $block3
          (loop $label1
           (if
            (local.get $3)
@@ -125,8 +144,8 @@
             (br $label1)
            )
            (else
-            (block $block1
-             (br_table $block1 $block2 $block3 $block
+            (block $block2
+             (br_table $block2 $block3 $block4 $block
               (i32.sub
                (i32.and
                 (i32.wrap_i64

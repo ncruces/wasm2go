@@ -40,7 +40,8 @@ func (t funcType) toAST() *ast.FuncType {
 	}
 }
 
-type memType struct {
+type memDefinition struct {
+	id       *ast.Ident
 	min, max int
 }
 
