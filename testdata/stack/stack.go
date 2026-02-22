@@ -5,6 +5,10 @@ package stack
 type Module struct {
 }
 
+func New() *Module {
+	m := &Module{}
+	return m
+}
 func (m Module) f0(v0 int32, v1 int32) int32 {
 	t0 := v0
 	return t0 - v1

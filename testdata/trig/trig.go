@@ -8,6 +8,11 @@ type Module struct {
 	Memory []byte
 }
 
+func New() *Module {
+	m := &Module{}
+	m.Memory = make([]byte, 65536)
+	return m
+}
 func (m Module) Sin(v0 float64) float64 {
 	var v1, v2 float64
 	var v3 int32

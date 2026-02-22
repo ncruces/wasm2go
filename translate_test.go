@@ -16,7 +16,7 @@ import (
 )
 
 func Test_generate(t *testing.T) {
-	tests := []string{"fib", "primes", "recursion", "stack", "trig"}
+	tests := []string{"fib", "memory", "primes", "recursion", "stack", "trig"}
 
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {

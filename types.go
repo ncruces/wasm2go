@@ -80,3 +80,8 @@ type export struct {
 	kind  exportKind
 	index int
 }
+
+type dataSegment struct {
+	offset int32
+	init   []byte
+}

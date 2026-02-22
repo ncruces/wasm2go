@@ -21,12 +21,15 @@ type translator struct {
 	in  *bufio.Reader
 	out ast.File
 
+	packages set[string]
+	helpers  set[string]
+
 	types     []funcType
 	functions []funcCompiler
 	memory    *memDefinition
 	exports   map[string]export
-	packages  set[string]
-	helpers   set[string]
+	start     uint64
+	data      []dataSegment
 }
 
 func translate(name string, r io.Reader, w io.Writer) error {
@@ -53,7 +56,10 @@ func translate(name string, r io.Reader, w io.Writer) error {
 		}
 	}
 
-	t.out.Decls = append([]ast.Decl{t.createModuleStruct()}, t.out.Decls...)
+	t.out.Decls = append([]ast.Decl{
+		t.createModuleStruct(),
+		t.createNewFunc()},
+		t.out.Decls...)
 
 	// Late binding of names.
 	for i, fn := range t.functions {
@@ -114,6 +120,20 @@ const (
 	sectionDataCount
 )
 
+func readHeader(r io.Reader) error {
+	var header [8]byte
+	if _, err := io.ReadFull(r, header[:]); err != nil {
+		return err
+	}
+	if magic := string(header[:4]); magic != "\x00asm" {
+		return fmt.Errorf("invalid magic number: %q", magic)
+	}
+	if version := binary.LittleEndian.Uint32(header[4:]); version != 1 {
+		return fmt.Errorf("invalid version: %d", version)
+	}
+	return nil
+}
+
 func (t *translator) readSection() error {
 	id, err := t.in.ReadByte()
 	if err != nil {
@@ -134,8 +154,12 @@ func (t *translator) readSection() error {
 		return t.readMemorySection()
 	case sectionExport:
 		return t.readExportSection()
+	case sectionStart:
+		return t.readStartSection()
 	case sectionCode:
 		return t.readCodeSection()
+	case sectionData:
+		return t.readDataSection()
 	default:
 		return fmt.Errorf("skipped section: %d", id)
 	}
@@ -286,6 +310,16 @@ func (t *translator) readExportSection() error {
 			t.memory.id = ast.NewIdent(exported(name))
 		}
 	}
+	return nil
+}
+
+func (t *translator) readStartSection() error {
+	index, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+	// Bitwise not makes the zero value useful (no start function).
+	t.start = ^index
 	return nil
 }
 
@@ -1201,16 +1235,52 @@ func (t *translator) readBlockType() (typ funcType, err error) {
 	return
 }
 
-func readHeader(r io.Reader) error {
-	var header [8]byte
-	if _, err := io.ReadFull(r, header[:]); err != nil {
+func (t *translator) readDataSection() error {
+	count, err := readLEB128(t.in)
+	if err != nil {
 		return err
 	}
-	if magic := string(header[:4]); magic != "\x00asm" {
-		return fmt.Errorf("invalid magic number: %q", magic)
-	}
-	if version := binary.LittleEndian.Uint32(header[4:]); version != 1 {
-		return fmt.Errorf("invalid version: %d", version)
+
+	for range count {
+		index, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		if index != 0 {
+			return fmt.Errorf("unsupported data segment index: %d", index)
+		}
+
+		opcode, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+		if opcode != 0x41 { // i32.const
+			return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
+		}
+
+		offset, err := readSignedLEB128(t.in)
+		if err != nil {
+			return err
+		}
+
+		end, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+		if end != 0x0b {
+			return fmt.Errorf("expected end of expression, got %x", end)
+		}
+
+		size, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+
+		data := make([]byte, size)
+		if _, err := io.ReadFull(t.in, data); err != nil {
+			return err
+		}
+		t.data = append(t.data, dataSegment{offset: int32(offset), init: data})
 	}
 	return nil
 }
@@ -1240,5 +1310,76 @@ func (t *translator) createModuleStruct() ast.Decl {
 				},
 			},
 		},
+	}
+}
+
+func (t *translator) createNewFunc() ast.Decl {
+	body := &ast.BlockStmt{
+		List: []ast.Stmt{
+			&ast.AssignStmt{
+				Lhs: []ast.Expr{newID("m")},
+				Tok: token.DEFINE,
+				Rhs: []ast.Expr{&ast.UnaryExpr{
+					Op: token.AND,
+					X:  &ast.CompositeLit{Type: newID("Module")},
+				}},
+			},
+		},
+	}
+
+	if t.memory != nil {
+		body.List = append(body.List, &ast.AssignStmt{
+			Lhs: []ast.Expr{&ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: t.memory.id,
+			}},
+			Tok: token.ASSIGN,
+			Rhs: []ast.Expr{&ast.CallExpr{
+				Fun: newID("make"),
+				Args: []ast.Expr{
+					&ast.ArrayType{Elt: newID("byte")},
+					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.memory.min * 65536)},
+				},
+			}},
+		})
+	}
+
+	for _, seg := range t.data {
+		body.List = append(body.List, &ast.ExprStmt{
+			X: &ast.CallExpr{
+				Fun: newID("copy"),
+				Args: []ast.Expr{
+					&ast.SliceExpr{
+						X: &ast.SelectorExpr{
+							X:   newID("m"),
+							Sel: t.memory.id,
+						},
+						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(seg.offset))},
+					},
+					&ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(string(seg.init))},
+				},
+			},
+		})
+	}
+
+	if t.start != 0 {
+		body.List = append(body.List, &ast.ExprStmt{
+			X: &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: t.functions[^t.start].decl.Name,
+				},
+			},
+		})
+	}
+
+	body.List = append(body.List, &ast.ReturnStmt{Results: []ast.Expr{newID("m")}})
+
+	return &ast.FuncDecl{
+		Name: newID("New"),
+		Type: &ast.FuncType{
+			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}},
+		},
+		Body: body,
 	}
 }

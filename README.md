@@ -6,7 +6,8 @@ The input is a Wasm module, and the output is a single Go source file,
 with no dependencies beyond the standard library.
 
 That file forms a self contained package,
-that exports a single structure called `Module`.
+that exports a single structure called `Module`,
+and a `New` function to initialize it.
 
 The methods of this structure will be the Wasm module's exported functions.
 
