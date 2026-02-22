@@ -12,6 +12,7 @@ import (
 	"io"
 	"slices"
 	"strconv"
+	"strings"
 )
 
 //go:embed helpers/helpers.go
@@ -26,7 +27,8 @@ type translator struct {
 
 	types     []funcType
 	functions []funcCompiler
-	memory    *memDefinition
+	memory    *memoryDef
+	globals   []globalDef
 	exports   map[string]export
 	start     uint64
 	data      []dataSegment
@@ -69,6 +71,11 @@ func translate(name string, r io.Reader, w io.Writer) error {
 	}
 	if t.memory != nil && t.memory.id.Name == "" {
 		t.memory.id.Name = "memory"
+	}
+	for i := range t.globals {
+		if t.globals[i].id.Name == "" {
+			t.globals[i].id.Name = "g" + strconv.Itoa(i)
+		}
 	}
 
 	// Set imports.
@@ -152,6 +159,8 @@ func (t *translator) readSection() error {
 		return t.readFunctionSection()
 	case sectionMemory:
 		return t.readMemorySection()
+	case sectionGlobal:
+		return t.readGlobalSection()
 	case sectionExport:
 		return t.readExportSection()
 	case sectionStart:
@@ -260,11 +269,91 @@ func (t *translator) readMemorySection() error {
 	if flags&1 == 1 {
 		max, err = readLEB128(t.in)
 	}
-	t.memory = &memDefinition{
+	t.memory = &memoryDef{
 		min: int(min),
 		max: int(max),
 	}
 	return err
+}
+
+func (t *translator) readGlobalSection() error {
+	numGlobals, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	t.globals = make([]globalDef, numGlobals)
+	for i := range t.globals {
+		g := &t.globals[i]
+		g.id = &ast.Ident{}
+
+		typ, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+		g.typ = wasmType(typ)
+
+		mut, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+		g.mut = mut == 1
+
+		opcode, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+
+		switch opcode {
+		case 0x41: // i32.const
+			v, err := readSignedLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			g.init = &ast.CallExpr{
+				Fun:  newID("int32"),
+				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}},
+			}
+		case 0x42: // i64.const
+			v, err := readSignedLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			g.init = &ast.CallExpr{
+				Fun:  newID("int64"),
+				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}},
+			}
+		case 0x43: // f32.const
+			var v uint32
+			if err := binary.Read(t.in, binary.LittleEndian, &v); err != nil {
+				return err
+			}
+			t.packages.add("math")
+			g.init = &ast.CallExpr{
+				Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32frombits")},
+				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(v), 10)}},
+			}
+		case 0x44: // f64.const
+			var v uint64
+			if err := binary.Read(t.in, binary.LittleEndian, &v); err != nil {
+				return err
+			}
+			t.packages.add("math")
+			g.init = &ast.CallExpr{
+				Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64frombits")},
+				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(v, 10)}},
+			}
+		default:
+			return fmt.Errorf("unsupported global init opcode: %x", opcode)
+		}
+
+		if end, err := t.in.ReadByte(); err != nil {
+			return err
+		} else if end != 0x0b { // end
+			return fmt.Errorf("expected end of init expr, got %x", end)
+		}
+	}
+	return nil
 }
 
 func (t *translator) readExportSection() error {
@@ -307,7 +396,13 @@ func (t *translator) readExportSection() error {
 			decl := t.functions[index].decl
 			decl.Name = ast.NewIdent(exported(name))
 		case memoryExport:
-			t.memory.id = ast.NewIdent(exported(name))
+			id := "Memory"
+			if !strings.EqualFold(name, id) {
+				id = exported(name)
+			}
+			t.memory.id = ast.NewIdent(id)
+		case globalExport:
+			t.globals[index].id = ast.NewIdent(exported(name))
 		}
 	}
 	return nil
@@ -669,6 +764,30 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Tok: token.ASSIGN,
 			})
 			fn.pushConst(val)
+
+		case 0x23: // global.get
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			fn.push(&ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: t.globals[i].id,
+			})
+
+		case 0x24: // global.set
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			blk.append(&ast.AssignStmt{
+				Lhs: []ast.Expr{&ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: t.globals[i].id,
+				}},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{fn.pop()},
+			})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
 			_, err := readLEB128(t.in) // align
@@ -1300,6 +1419,12 @@ func (t *translator) createModuleStruct() ast.Decl {
 			},
 		})
 	}
+	for _, g := range t.globals {
+		fields = append(fields, &ast.Field{
+			Names: []*ast.Ident{g.id},
+			Type:  g.typ.Ident(),
+		})
+	}
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
@@ -1341,6 +1466,17 @@ func (t *translator) createNewFunc() ast.Decl {
 					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.memory.min * 65536)},
 				},
 			}},
+		})
+	}
+
+	for _, g := range t.globals {
+		body.List = append(body.List, &ast.AssignStmt{
+			Lhs: []ast.Expr{&ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: g.id,
+			}},
+			Tok: token.ASSIGN,
+			Rhs: []ast.Expr{g.init},
 		})
 	}
 

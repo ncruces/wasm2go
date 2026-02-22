@@ -20,14 +20,8 @@ func newID(name string) *ast.Ident {
 
 func exported(name string) string {
 	var buf strings.Builder
-	for i, r := range name {
-		if i == 0 {
-			if u := unicode.ToUpper(r); unicode.IsUpper(u) {
-				buf.WriteRune(u)
-				continue
-			}
-			buf.WriteByte('X')
-		}
+	buf.WriteByte('X')
+	for _, r := range name {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
 			r = '_'
 		}
@@ -38,10 +32,8 @@ func exported(name string) string {
 
 func internal(name string) string {
 	var buf strings.Builder
-	for i, r := range name {
-		if i == 0 && unicode.IsUpper(r) {
-			buf.WriteByte('_')
-		}
+	buf.WriteByte('_')
+	for _, r := range name {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
 			r = '_'
 		}

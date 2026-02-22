@@ -15,21 +15,21 @@ func New() *Module {
 	copy(m.Memory[32:], "\x01\x03\x05\a\t\v\r\x0f")
 	return m
 }
-func (m Module) Wasm_grow(v0 int32) int32 {
+func (m Module) Xwasm_grow(v0 int32) int32 {
 	return memoryGrow(&m.Memory, v0)
 }
-func (m Module) Wasm_size() int32 {
+func (m Module) Xwasm_size() int32 {
 	return int32(len(m.Memory) >> 16)
 }
-func (m Module) Wasm_fill(v0 int32, v1 int32, v2 int32) {
+func (m Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
 	t0 := v0
 	t1 := v1
 	memoryFill(m.Memory, v2, t1, t0)
 }
-func (m Module) Read_as_i32(v0 int32) int32 {
+func (m Module) Xread_as_i32(v0 int32) int32 {
 	return int32(binary.LittleEndian.Uint32(m.Memory[int(v0)+int(0):]))
 }
-func (m Module) Read_as_i8u(v0 int32) int32 {
+func (m Module) Xread_as_i8u(v0 int32) int32 {
 	return int32(m.Memory[int(v0)+int(0)])
 }
 

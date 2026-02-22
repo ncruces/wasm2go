@@ -40,11 +40,6 @@ func (t funcType) toAST() *ast.FuncType {
 	}
 }
 
-type memDefinition struct {
-	id       *ast.Ident
-	min, max int
-}
-
 func paramsToAST(types string) *ast.FieldList {
 	list := make([]*ast.Field, len(types))
 	for i, t := range []byte(types) {
@@ -65,6 +60,18 @@ func resultsToAST(types string) *ast.FieldList {
 		list[i] = &ast.Field{Type: wasmType(t).Ident()}
 	}
 	return &ast.FieldList{List: list}
+}
+
+type memoryDef struct {
+	id       *ast.Ident
+	min, max int
+}
+
+type globalDef struct {
+	typ  wasmType
+	mut  bool
+	init ast.Expr
+	id   *ast.Ident
 }
 
 type exportKind byte

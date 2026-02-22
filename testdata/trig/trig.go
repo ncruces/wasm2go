@@ -5,111 +5,135 @@ package trig
 import "math"
 
 type Module struct {
-	Memory []byte
+	Memory	[]byte
+	g0	int32
 }
 
 func New() *Module {
 	m := &Module{}
 	m.Memory = make([]byte, 65536)
+	m.g0 = int32(65536)
 	return m
 }
-func (m Module) Sin(v0 float64) float64 {
+func (m Module) Xsin(v0 float64) float64 {
 	var v1, v2 float64
-	var v3 int32
-	var v4 int64
-	t0 := v0
-	if t0 == math.Float64frombits(0) {
+	var v3 int64
+	var v4 int32
+	{
+		t0 := v0
+		if t0 != math.Float64frombits(0) {
+			goto l0
+		}
 		return v0
 	}
+l0:
+	;
 	v1 = math.Float64frombits(9221120237041090560)
 	{
 		t4 := int64(math.Float64bits(v0))
 		t5 := t4 & int64(9223372036854775807)
-		if uint64(t5) > uint64(int64(9218868437227405311)) {
-			goto l0
+		if t5 > int64(9218868437227405311) {
+			goto l1
 		}
-		t7 := v0
-		var t8 int64
 		{
-			t9 := v0
-			t10 := float64(t9 * math.Float64frombits(4603909380684499075))
-			t13 := float64(t10 + math.Copysign(math.Float64frombits(4602678819172646912), v0))
-			v0 = t13
-			t14 := math.Abs(t13)
-			if t14 < math.Float64frombits(4890909195324358656) {
-				goto l1
+			{
+				t7 := v0
+				t8 := float64(t7 * math.Float64frombits(4603909380684499075))
+				t11 := float64(t8 + math.Copysign(math.Float64frombits(4602678819172646912), v0))
+				v1 = t11
+				t12 := math.Abs(t11)
+				var t13 int32
+				if t12 < math.Float64frombits(4890909195324358656) {
+					t13 = 1
+				}
+				if t13 == 0 {
+					goto l2
+				}
+				v3 = i64_trunc_f64_s(v1)
+				goto l3
 			}
-			t8 = i64_trunc_f64_s(v0)
-			t8 = int64(-9223372036854775808)
+		l2:
+			;
+			v3 = int64(-9223372036854775808)
 		}
-	l1:
+	l3:
 		;
-		v4 = t8
-		t18 := float64(t8)
-		v1 = float64(t7 + float64(t18*math.Float64frombits(13833125093779451160)))
-		var t21 float64
-	l2:
+		t17 := v0
+		t19 := float64(v3)
+		v1 = float64(t17 + float64(t19*math.Float64frombits(13833125093779451160)))
+		v4 = int32(0)
+	l10:
 		{
-			t23 := math.Abs(v1)
-			var t25 float64
-			if t23 > math.Float64frombits(4485585228861014016) {
-				t26 := v3
-				v3 = t26 + int32(1)
-				t28 := v1
-				v1 = float64(t28 * math.Float64frombits(4602678819172646912))
-				goto l2
-			} else {
-				v0 = math.Float64frombits(4607182418800017408)
+			{
+				t23 := math.Abs(v1)
+				if t23 > math.Float64frombits(4485585228861014016) {
+					goto l4
+				}
+				v2 = math.Float64frombits(4607182418800017408)
 				{
 					{
-					l3:
 						{
-							t30 := v3
-							if t30 != 0 {
-								t31 := v3
-								v3 = t31 - int32(1)
-								t33 := v1
-								v2 = float64(t33 * v1)
-								t36 := v0
-								t38 := float64(t36 * v1)
-								v0 = t38
-								v1 = float64(t38 + v0)
-								t41 := v2
-								v0 = float64(math.Float64frombits(4607182418800017408) - float64(t41+v2))
-								goto l3
-							} else {
+						l9:
+							{
 								{
-									t46 := int32(v4)
-									t47 := t46 & int32(3)
-									switch t47 - int32(1) {
-									default:
-										goto l0
-									case 0:
-										goto l4
-									case 1:
+									t25 := v4
+									if t25 != 0 {
 										goto l5
-									case 2:
+									}
+									t27 := int32(v3)
+									switch t27 & int32(3) {
+									default:
+										goto l1
+									case 0:
+										goto l1
+									case 1:
 										goto l6
+									case 2:
+										goto l7
+									case 3:
+										goto l8
 									}
 								}
-							l4:
+							l5:
+								;
+								t29 := v4
+								v4 = t29 + int32(-1)
+								t31 := v1
+								v0 = float64(t31 * v1)
+								t34 := v2
+								t36 := float64(t34 * v1)
+								v1 = t36
+								v1 = float64(t36 + v1)
+								t39 := v0
+								v2 = float64(math.Float64frombits(4607182418800017408) - float64(t39+v0))
+								goto l9
 							}
+							panic("unreachable")
 						}
-						return v0
+					l6:
+						;
+						return v2
 					}
-				l5:
+				l7:
 					;
 					return -v1
 				}
-			l6:
+			l8:
 				;
-				t25 = -v0
+				v1 = -v2
+				goto l1
 			}
-			t21 = t25
+		l4:
+			;
+			t48 := v4
+			v4 = t48 + int32(1)
+			t50 := v1
+			v1 = float64(t50 * math.Float64frombits(4602678819172646912))
+			goto l10
 		}
-		v1 = t21
+		panic("unreachable")
 	}
-l0:
+l1:
 	;
 	return v1
 }

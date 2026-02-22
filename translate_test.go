@@ -49,7 +49,7 @@ func Test_fib(t *testing.T) {
 
 	var got []int64
 	for i := range want {
-		got = append(got, m.Fibonacci(int64(i)))
+		got = append(got, m.Xfibonacci(int64(i)))
 	}
 
 	if !slices.Equal(got, want) {
@@ -85,7 +85,7 @@ func Test_primes(t *testing.T) {
 
 	var got []int32
 	for i := range want {
-		got = append(got, m.Is_prime(int32(i)))
+		got = append(got, m.Xis_prime(int32(i)))
 	}
 
 	if !slices.Equal(got, want) {
@@ -109,7 +109,7 @@ func Test_trig(t *testing.T) {
 
 	var got []float32
 	for i := range want {
-		got = append(got, float32(m.Sin(float64(i))))
+		got = append(got, float32(m.Xsin(float64(i))))
 	}
 
 	if !slices.Equal(got, want) {
@@ -120,11 +120,11 @@ func Test_trig(t *testing.T) {
 func Test_stack(t *testing.T) {
 	var m stack.Module
 
-	if got := m.Stack_func_call(); got != (91 - 23) {
+	if got := m.Xstack_func_call(); got != (91 - 23) {
 		t.Errorf("got %d, want %d", got, 91-23)
 	}
 
-	if got1, got2 := m.Tee_for_two(5, 3); got1 != 13 || got2 != 8 {
+	if got1, got2 := m.Xtee_for_two(5, 3); got1 != 13 || got2 != 8 {
 		t.Errorf("got %d, %d, want %d, %d", got1, got2, 13, 8)
 	}
 }
@@ -136,7 +136,7 @@ func Test_recursive_factorial(t *testing.T) {
 
 	var got []int32
 	for i := range want {
-		got = append(got, m.Factorial(int32(i)))
+		got = append(got, m.Xfactorial(int32(i)))
 	}
 
 	if !slices.Equal(got, want) {
@@ -148,8 +148,8 @@ func Test_recursive_evenodd(t *testing.T) {
 	var m recursion.Module
 
 	for i := range 100 {
-		even := m.Is_even(int32(i))
-		odd := m.Is_odd(int32(i))
+		even := m.Xis_even(int32(i))
+		odd := m.Xis_odd(int32(i))
 		if i%2 == 0 {
 			if even == 0 && odd != 0 {
 				t.Errorf("i: %d, even: %d, odd: %d", i, even, odd)

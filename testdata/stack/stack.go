@@ -13,11 +13,11 @@ func (m Module) f0(v0 int32, v1 int32) int32 {
 	t0 := v0
 	return t0 - v1
 }
-func (m Module) Stack_func_call() int32 {
+func (m Module) Xstack_func_call() int32 {
 	t0 := m.f0(int32(91), int32(23))
 	return t0
 }
-func (m Module) Greater(v0 int32, v1 int32) int32 {
+func (m Module) Xgreater(v0 int32, v1 int32) int32 {
 	t0 := v0
 	var t3 int32
 	if t0 > v1 {
@@ -27,7 +27,7 @@ func (m Module) Greater(v0 int32, v1 int32) int32 {
 	}
 	return t3
 }
-func (m Module) Two_a_plus_b(v0 int32, v1 int32) int32 {
+func (m Module) Xtwo_a_plus_b(v0 int32, v1 int32) int32 {
 	var v2 int32
 	t0 := v1
 	t1 := v0
@@ -35,7 +35,7 @@ func (m Module) Two_a_plus_b(v0 int32, v1 int32) int32 {
 	t2 := t0 + t1
 	return t2 + v2
 }
-func (m Module) Tee_for_two(v0 int32, v1 int32) (int32, int32) {
+func (m Module) Xtee_for_two(v0 int32, v1 int32) (int32, int32) {
 	var v2 int32
 	t0 := v0
 	t1 := v0

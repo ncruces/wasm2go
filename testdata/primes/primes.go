@@ -9,7 +9,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m Module) Is_prime(v0 int32) int32 {
+func (m Module) Xis_prime(v0 int32) int32 {
 	var v1 int32
 	t0 := v0
 	if uint32(t0) < uint32(int32(2)) {
