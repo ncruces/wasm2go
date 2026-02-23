@@ -12,28 +12,33 @@ type Module struct {
 func New() *Module {
 	m := &Module{}
 	m.Memory = make([]byte, 65536)
-	m.___stack_pointer = int32(65536)
+	m.___stack_pointer = i32_const(65536)
 	return m
 }
 func (m Module) Xsin(v0 float64) float64 {
 	var v1 float64
+	_ = v1
 	var v2 int64
+	_ = v2
 	var v3 int32
+	_ = v3
 	var v4 float64
+	_ = v4
 	{
 		t0 := v0
 		if t0 != math.Float64frombits(0) {
 			goto l0
 		}
-		return v0
+		t2 := v0
+		return t2
 	}
 l0:
 	;
 	v1 = math.Float64frombits(9221120237041090560)
 	{
 		t4 := int64(math.Float64bits(v0))
-		t5 := t4 & int64(9223372036854775807)
-		if t5 > int64(9218868437227405311) {
+		t5 := t4 & i64_const(9223372036854775807)
+		if t5 > i64_const(9218868437227405311) {
 			goto l1
 		}
 		{
@@ -55,14 +60,14 @@ l0:
 			}
 		l2:
 			;
-			v2 = int64(-9223372036854775808)
+			v2 = i64_const(-9223372036854775808)
 		}
 	l3:
 		;
 		t17 := v0
 		t19 := float64(v2)
 		v1 = float64(t17 + float64(t19*math.Float64frombits(13833125093779451160)))
-		v3 = int32(0)
+		v3 = i32_const(0)
 	l10:
 		{
 			{
@@ -82,7 +87,7 @@ l0:
 										goto l5
 									}
 									t27 := int32(v2)
-									switch t27 & int32(3) {
+									switch t27 & i32_const(3) {
 									default:
 										goto l1
 									case 0:
@@ -98,7 +103,7 @@ l0:
 							l5:
 								;
 								t29 := v3
-								v3 = t29 + int32(-1)
+								v3 = t29 + i32_const(-1)
 								t31 := v1
 								v0 = float64(t31 * v1)
 								t34 := v4
@@ -112,11 +117,13 @@ l0:
 						}
 					l6:
 						;
-						return v4
+						t43 := v4
+						return t43
 					}
 				l7:
 					;
-					return -v1
+					t45 := -v1
+					return t45
 				}
 			l8:
 				;
@@ -126,7 +133,7 @@ l0:
 		l4:
 			;
 			t48 := v3
-			v3 = t48 + int32(1)
+			v3 = t48 + i32_const(1)
 			t50 := v1
 			v1 = float64(t50 * math.Float64frombits(4602678819172646912))
 			goto l10
@@ -134,8 +141,13 @@ l0:
 	}
 l1:
 	;
-	return v1
+	t52 := v1
+	return t52
 }
+
+func i32_const(x int32) int32 { return x }
+
+func i64_const(x int64) int64 { return x }
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)

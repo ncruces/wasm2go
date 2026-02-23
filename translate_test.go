@@ -11,7 +11,7 @@ import (
 	"github.com/ncruces/wasm2go/testdata/fib"
 	"github.com/ncruces/wasm2go/testdata/primes"
 	"github.com/ncruces/wasm2go/testdata/recursion"
-	"github.com/ncruces/wasm2go/testdata/stack"
+	stack_test "github.com/ncruces/wasm2go/testdata/stack"
 	"github.com/ncruces/wasm2go/testdata/trig"
 )
 
@@ -118,7 +118,7 @@ func Test_trig(t *testing.T) {
 }
 
 func Test_stack(t *testing.T) {
-	var m stack.Module
+	var m stack_test.Module
 
 	if got := m.Xstack_func_call(); got != (91 - 23) {
 		t.Errorf("got %d, want %d", got, 91-23)

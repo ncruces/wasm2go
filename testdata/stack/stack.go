@@ -11,36 +11,43 @@ func New() *Module {
 }
 func (m Module) f0(v0 int32, v1 int32) int32 {
 	t0 := v0
-	return t0 - v1
+	t2 := t0 - v1
+	return t2
 }
 func (m Module) Xstack_func_call() int32 {
-	t0 := m.f0(int32(91), int32(23))
+	t0 := m.f0(i32_const(91), i32_const(23))
 	return t0
 }
 func (m Module) Xgreater(v0 int32, v1 int32) int32 {
 	t0 := v0
 	var t3 int32
 	if t0 > v1 {
-		t3 = int32(1)
+		t3 = i32_const(1)
 	} else {
-		t3 = int32(0)
+		t3 = i32_const(0)
 	}
 	return t3
 }
 func (m Module) Xtwo_a_plus_b(v0 int32, v1 int32) int32 {
 	var v2 int32
+	_ = v2
 	t0 := v1
 	t1 := v0
 	v2 = t1
 	t2 := t0 + t1
-	return t2 + v2
+	t4 := t2 + v2
+	return t4
 }
 func (m Module) Xtee_for_two(v0 int32, v1 int32) (int32, int32) {
 	var v2 int32
+	_ = v2
 	t0 := v0
 	t1 := v0
 	t3 := t1 + v1
 	v2 = t3
 	t4 := t0 + t3
-	return t4, v2
+	t5 := v2
+	return t4, t5
 }
+
+func i32_const(x int32) int32 { return x }

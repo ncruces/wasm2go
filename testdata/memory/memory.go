@@ -16,24 +16,28 @@ func New() *Module {
 	return m
 }
 func (m Module) Xwasm_grow(v0 int32) int32 {
-	return memoryGrow(&m.Memory, v0)
+	t1 := memory_grow(&m.Memory, v0)
+	return t1
 }
 func (m Module) Xwasm_size() int32 {
-	return int32(len(m.Memory) >> 16)
+	t0 := int32(len(m.Memory) >> 16)
+	return t0
 }
 func (m Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
 	t0 := v0
 	t1 := v1
-	memoryFill(m.Memory, v2, t1, t0)
+	memory_fill(m.Memory, v2, t1, t0)
 }
 func (m Module) Xread_as_i32(v0 int32) int32 {
-	return int32(binary.LittleEndian.Uint32(m.Memory[int(v0)+int(0):]))
+	t1 := int32(binary.LittleEndian.Uint32(m.Memory[uint32(v0):]))
+	return t1
 }
 func (m Module) Xread_as_i8u(v0 int32) int32 {
-	return int32(m.Memory[int(v0)+int(0)])
+	t1 := int32(m.Memory[uint32(v0)])
+	return t1
 }
 
-func memoryGrow(mem *[]byte, delta int32) int32 {
+func memory_grow(mem *[]byte, delta int32) int32 {
 	oldLen := int32(len(*mem) >> 16)
 	if delta == 0 {
 		return oldLen
@@ -42,7 +46,7 @@ func memoryGrow(mem *[]byte, delta int32) int32 {
 	return oldLen
 }
 
-func memoryFill(mem []byte, n, val, dest int32) {
+func memory_fill(mem []byte, n, val, dest int32) {
 	x := uint(uint32(dest))
 	y := x + uint(uint32(n))
 

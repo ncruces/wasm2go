@@ -11,23 +11,25 @@ func New() *Module {
 }
 func (m Module) Xfibonacci(v0 int64) int64 {
 	var v1, v2 int64
+	_, _ = v1, v2
 	t0 := v0
 	t1 := v0
-	t3 := int64(0)
-	if t1 > int64(0) {
+	t3 := i64_const(0)
+	if t1 > i64_const(0) {
 		t3 = t0
 	}
 	v0 = t3
-	v1 = int64(1)
+	v1 = i64_const(1)
 	var t4 int64
 l0:
 	{
 		var t7 int64
 		if v0 == 0 {
-			t7 = v2
+			t8 := v2
+			t7 = t8
 		} else {
 			t9 := v0
-			v0 = t9 - int64(1)
+			v0 = t9 - i64_const(1)
 			t11 := v2
 			t12 := v1
 			v2 = t12
@@ -38,3 +40,5 @@ l0:
 	}
 	return t4
 }
+
+func i64_const(x int64) int64 { return x }

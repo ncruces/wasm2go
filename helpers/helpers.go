@@ -5,6 +5,10 @@ import (
 	"math/bits"
 )
 
+func i32_const(x int32) int32 { return x }
+
+func i64_const(x int64) int64 { return x }
+
 func i32_div_s(x, y int32) int32 {
 	if x == math.MinInt32 && y == -1 {
 		panic("integer overflow")
@@ -248,7 +252,7 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 	return int64(i)
 }
 
-func memoryGrow(mem *[]byte, delta int32) int32 {
+func memory_grow(mem *[]byte, delta int32) int32 {
 	oldLen := int32(len(*mem) >> 16)
 	if delta == 0 {
 		return oldLen
@@ -257,7 +261,7 @@ func memoryGrow(mem *[]byte, delta int32) int32 {
 	return oldLen
 }
 
-func memoryCopy(mem []byte, n, src, dest int32) {
+func memory_copy(mem []byte, n, src, dest int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))
 	y := x + uint(uint32(n))
@@ -265,7 +269,7 @@ func memoryCopy(mem []byte, n, src, dest int32) {
 	copy(mem[x:y], mem[z:w])
 }
 
-func memoryFill(mem []byte, n, val, dest int32) {
+func memory_fill(mem []byte, n, val, dest int32) {
 	x := uint(uint32(dest))
 	y := x + uint(uint32(n))
 

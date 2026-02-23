@@ -14,89 +14,94 @@ type funcCompiler struct {
 
 	top    ast.Expr
 	cond   ast.Expr
-	stack  []ast.Expr
-	blocks []funcBlock
+	stack  stack[ast.Expr]
+	blocks stack[funcBlock]
 	labels int
 	temps  int
 }
 
-// Returns a branch to block n instrution.
+// Emits statements to the current function.
+func (fn *funcCompiler) emit(stmts ...ast.Stmt) {
+	lst := &fn.blocks.top().body.List
+	*lst = append(*lst, stmts...)
+}
+
+// Returns a statement to exit n blocks.
 func (fn *funcCompiler) branch(n uint64) ast.Stmt {
+	// Target block index.
+	i := uint64(len(fn.blocks)) - n - 1
+
 	// Returning from the function body.
-	if n == 0 {
+	if i == 0 {
 		ret := &ast.ReturnStmt{}
-		if len(fn.typ.results) > 0 {
-			ret.Results = make([]ast.Expr, len(fn.typ.results))
-			for i := len(ret.Results) - 1; i >= 0; i-- {
-				ret.Results[i] = fn.pop()
-			}
+		if n := len(fn.typ.results); n > 0 {
+			ret.Results = make([]ast.Expr, n)
+			copy(ret.Results, fn.stack.last(n))
 		}
+		fn.cond = nil
+		fn.top = nil
 		return ret
 	}
 
 	// Create a label for the block we're jumping to.
-	targetBlk := &fn.blocks[n]
+	targetBlk := &fn.blocks[i]
 	if targetBlk.label == nil {
 		targetBlk.label = fn.newLabel()
 	}
 	// If it's not a loop, set results.
 	if targetBlk.loopPos == 0 {
-		targetBlk.setResults(fn)
+		fn.emit(targetBlk.setResults(fn)...)
 	}
 	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
 }
 
-// Returns a memory byte instruction: m.Memory[start+offset]
+// Returns a memory index expression for a byte: m.Memory[start+offset]
 func (fn *funcCompiler) memory8(offset uint64) ast.Expr {
+	var x ast.Expr = fn.pop()
+	if offset != 0 {
+		x = &ast.BinaryExpr{
+			X:  x,
+			Op: token.ADD,
+			Y: &ast.BasicLit{
+				Kind:  token.INT,
+				Value: strconv.FormatUint(offset, 10),
+			},
+		}
+	}
 	return &ast.IndexExpr{
 		X: &ast.SelectorExpr{
 			X:   newID("m"),
 			Sel: fn.memory.id,
 		},
-		Index: &ast.BinaryExpr{
-			X: &ast.CallExpr{
-				Fun:  newID("int"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			Op: token.ADD,
-			Y: &ast.CallExpr{
-				Fun: newID("int"),
-				Args: []ast.Expr{&ast.BasicLit{
-					Kind:  token.INT,
-					Value: strconv.FormatUint(offset, 10),
-				}},
-			},
-		},
+		Index: convert(x, "uint32"),
 	}
 }
 
-// Returns a memory index instruction: m.Memory[start+offset:]
+// Returns a memory index expression for n bytes: m.Memory[start+offset:]
 func (fn *funcCompiler) memoryN(offset uint64) ast.Expr {
+	var x ast.Expr = fn.pop()
+	if offset != 0 {
+		x = &ast.BinaryExpr{
+			X:  x,
+			Op: token.ADD,
+			Y: &ast.BasicLit{
+				Kind:  token.INT,
+				Value: strconv.FormatUint(offset, 10),
+			},
+		}
+	}
 	return &ast.SliceExpr{
 		X: &ast.SelectorExpr{
 			X:   newID("m"),
 			Sel: fn.memory.id,
 		},
-		Low: &ast.BinaryExpr{
-			X: &ast.CallExpr{
-				Fun:  newID("int"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			Op: token.ADD,
-			Y: &ast.CallExpr{
-				Fun: newID("int"),
-				Args: []ast.Expr{&ast.BasicLit{
-					Kind:  token.INT,
-					Value: strconv.FormatUint(offset, 10),
-				}},
-			},
-		},
+		Low: convert(x, "uint32"),
 	}
 }
 
 // Pushes expr (a literal, constant or materialized temporary) to the value stack.
 func (fn *funcCompiler) pushConst(expr ast.Expr) {
-	fn.stack = append(fn.stack, expr)
+	fn.stack.append(expr)
 	fn.cond = nil
 	fn.top = nil
 }
@@ -104,8 +109,7 @@ func (fn *funcCompiler) pushConst(expr ast.Expr) {
 // Pushes the materialization of expr to the value stack.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	tmp := fn.newTempVar()
-	blk := &fn.blocks[len(fn.blocks)-1]
-	blk.append(&ast.AssignStmt{
+	fn.emit(&ast.AssignStmt{
 		Tok: token.DEFINE,
 		Lhs: []ast.Expr{tmp},
 		Rhs: []ast.Expr{expr},
@@ -117,8 +121,7 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 // Pushes the integer materialization of cond the value stack.
 func (fn *funcCompiler) pushCond(cond ast.Expr) {
 	tmp := fn.newTempVar()
-	blk := &fn.blocks[len(fn.blocks)-1]
-	blk.append(&ast.DeclStmt{
+	fn.emit(&ast.DeclStmt{
 		Decl: &ast.GenDecl{
 			Tok: token.VAR,
 			Specs: []ast.Spec{
@@ -146,7 +149,7 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 
 // Pops a materialized value from the value stack.
 func (fn *funcCompiler) popCopy() ast.Expr {
-	expr := pop(&fn.stack)
+	expr := fn.stack.pop()
 	fn.cond = nil
 	fn.top = nil
 	return expr
@@ -155,7 +158,7 @@ func (fn *funcCompiler) popCopy() ast.Expr {
 // Pops a (possibly unevaluated) value from the value stack.
 // The value must be immediately used once and only once.
 func (fn *funcCompiler) pop() ast.Expr {
-	expr := pop(&fn.stack)
+	expr := fn.stack.pop()
 	top := fn.top
 	fn.cond = nil
 	fn.top = nil
@@ -163,14 +166,15 @@ func (fn *funcCompiler) pop() ast.Expr {
 		return expr
 	}
 
-	pop(&fn.blocks[len(fn.blocks)-1].body.List)
+	lst := &fn.blocks.top().body.List
+	*lst = (*lst)[:len(*lst)-1]
 	return top
 }
 
 // Pops a (possibly unevaluated) condition from the value stack.
 // The condition must be immediately used once and only once.
 func (fn *funcCompiler) popCond() ast.Expr {
-	expr := pop(&fn.stack)
+	expr := fn.stack.pop()
 	cond := fn.cond
 	fn.cond = nil
 	fn.top = nil
@@ -181,8 +185,8 @@ func (fn *funcCompiler) popCond() ast.Expr {
 		}
 	}
 
-	pop(&fn.blocks[len(fn.blocks)-1].body.List)
-	pop(&fn.blocks[len(fn.blocks)-1].body.List)
+	lst := &fn.blocks.top().body.List
+	*lst = (*lst)[:len(*lst)-2]
 	return cond
 }
 
@@ -203,63 +207,47 @@ func (fn *funcCompiler) binOp(op token.Token) {
 // Executes a binary uint32 operator.
 // Requires casts to unsigned and back.
 func (fn *funcCompiler) binOpU32(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("int32"),
-		Args: []ast.Expr{&ast.BinaryExpr{
-			Y: &ast.CallExpr{
-				Fun:  newID("uint32"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			X: &ast.CallExpr{
-				Fun:  newID("uint32"),
-				Args: []ast.Expr{fn.pop()},
-			},
+	fn.push(convert(
+		&ast.BinaryExpr{
+			Y:  convert(fn.pop(), "uint32"),
+			X:  convert(fn.pop(), "uint32"),
 			Op: op,
-		}}})
+		}, "int32"))
 }
 
 // Executes a binary uint64 operator.
 // Requires casts to unsigned and back.
 func (fn *funcCompiler) binOpU64(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("int64"),
-		Args: []ast.Expr{&ast.BinaryExpr{
-			Y: &ast.CallExpr{
-				Fun:  newID("uint64"),
-				Args: []ast.Expr{fn.pop()},
-			},
-			X: &ast.CallExpr{
-				Fun:  newID("uint64"),
-				Args: []ast.Expr{fn.pop()},
-			},
+	fn.push(convert(
+		&ast.BinaryExpr{
+			Y:  convert(fn.pop(), "uint64"),
+			X:  convert(fn.pop(), "uint64"),
 			Op: op,
-		}}})
+		}, "int64"))
 }
 
 // Executes a binary float64 operator.
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF64(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("float64"),
-		Args: []ast.Expr{&ast.BinaryExpr{
+	fn.push(convert(
+		&ast.BinaryExpr{
 			Y:  fn.pop(),
 			X:  fn.pop(),
 			Op: op,
-		}}})
+		}, "float64"))
 }
 
 // Executes a binary float32 operator.
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF32(op token.Token) {
-	fn.push(&ast.CallExpr{
-		Fun: newID("float32"),
-		Args: []ast.Expr{&ast.BinaryExpr{
+	fn.push(convert(
+		&ast.BinaryExpr{
 			Y:  fn.pop(),
 			X:  fn.pop(),
 			Op: op,
-		}}})
+		}, "float32"))
 }
 
 // Executes a unary bitwise call.
@@ -267,19 +255,14 @@ func (fn *funcCompiler) bitOp(name string) {
 	bits := name[len(name)-2:]
 
 	fn.packages.add("math/bits")
-	fn.push(&ast.CallExpr{
-		Fun: newID("int" + bits),
-		Args: []ast.Expr{&ast.CallExpr{
+	fn.push(convert(
+		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("bits"),
 				Sel: newID(name),
 			},
-			Args: []ast.Expr{&ast.CallExpr{
-				Fun:  newID("uint" + bits),
-				Args: []ast.Expr{fn.pop()},
-			}},
-		}},
-	})
+			Args: []ast.Expr{convert(fn.pop(), "uint"+bits)},
+		}, "int"+bits))
 }
 
 // Executes a unary float64 math call.
@@ -311,19 +294,14 @@ func (fn *funcCompiler) binMath64(name string) {
 // Executes a unary float32 math call.
 func (fn *funcCompiler) uniMath32(name string) {
 	fn.packages.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: newID("float32"),
-		Args: []ast.Expr{&ast.CallExpr{
+	fn.push(convert(
+		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
 				Sel: newID(name),
 			},
-			Args: []ast.Expr{&ast.CallExpr{
-				Fun:  newID("float64"),
-				Args: []ast.Expr{fn.pop()},
-			}},
-		}},
-	})
+			Args: []ast.Expr{convert(fn.pop(), "float64")},
+		}, "float32"))
 }
 
 // Executes a binary float32 math call.
@@ -331,49 +309,42 @@ func (fn *funcCompiler) binMath32(name string) {
 	fn.packages.add("math")
 	y := fn.pop()
 	x := fn.pop()
-	fn.push(&ast.CallExpr{
-		Fun: newID("float32"),
-		Args: []ast.Expr{&ast.CallExpr{
+	fn.push(convert(
+		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
 				Sel: newID(name),
 			},
 			Args: []ast.Expr{
-				&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{x}},
-				&ast.CallExpr{Fun: newID("float64"), Args: []ast.Expr{y}},
-			},
-		}},
-	})
+				convert(x, "float64"),
+				convert(y, "float64")},
+		}, "float32"))
 }
 
 // Executes a Float32bits call.
 func (fn *funcCompiler) float32bits() {
 	fn.packages.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: newID("int32"),
-		Args: []ast.Expr{&ast.CallExpr{
+	fn.push(convert(
+		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
 				Sel: newID("Float32bits"),
 			},
 			Args: []ast.Expr{fn.pop()},
-		}},
-	})
+		}, "int32"))
 }
 
 // Executes a Float64bits call.
 func (fn *funcCompiler) float64bits() {
 	fn.packages.add("math")
-	fn.push(&ast.CallExpr{
-		Fun: newID("int64"),
-		Args: []ast.Expr{&ast.CallExpr{
+	fn.push(convert(
+		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
 				Sel: newID("Float64bits"),
 			},
 			Args: []ast.Expr{fn.pop()},
-		}},
-	})
+		}, "int64"))
 }
 
 // Executes a Float32frombits call.
@@ -384,10 +355,7 @@ func (fn *funcCompiler) float32frombits() {
 			X:   newID("math"),
 			Sel: newID("Float32frombits"),
 		},
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun:  newID("uint32"),
-			Args: []ast.Expr{fn.pop()},
-		}},
+		Args: []ast.Expr{convert(fn.pop(), "uint32")},
 	})
 }
 
@@ -399,10 +367,7 @@ func (fn *funcCompiler) float64frombits() {
 			X:   newID("math"),
 			Sel: newID("Float64frombits"),
 		},
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun:  newID("uint64"),
-			Args: []ast.Expr{fn.pop()},
-		}},
+		Args: []ast.Expr{convert(fn.pop(), "uint64")},
 	})
 }
 
@@ -461,32 +426,18 @@ func (fn *funcCompiler) cmpOp(op token.Token) {
 // Executes a uint32 comparision operation.
 // Requires casting to unsigned.
 func (fn *funcCompiler) cmpOpU32(op token.Token) {
-	id := newID("uint32")
 	fn.pushCond(&ast.BinaryExpr{
-		Y: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
-		X: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
+		Y:  convert(fn.pop(), "uint32"),
+		X:  convert(fn.pop(), "uint32"),
 		Op: op})
 }
 
 // Executes a uint64 comparision operation.
 // Requires casting to unsigned.
 func (fn *funcCompiler) cmpOpU64(op token.Token) {
-	id := newID("uint64")
 	fn.pushCond(&ast.BinaryExpr{
-		Y: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
-		X: &ast.CallExpr{
-			Fun:  id,
-			Args: []ast.Expr{fn.pop()},
-		},
+		Y:  convert(fn.pop(), "uint64"),
+		X:  convert(fn.pop(), "uint64"),
 		Op: op})
 }
 
@@ -505,28 +456,36 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 type funcBlock struct {
 	typ         funcType
 	body        *ast.BlockStmt
+	label       *ast.Ident
 	ifStmt      *ast.IfStmt
 	results     []*ast.Ident
-	label       *ast.Ident
 	loopPos     int
+	stackPos    int
 	unreachable bool
 }
 
-func (b *funcBlock) append(stmts ...ast.Stmt) {
-	lst := &b.body.List
-	*lst = append(*lst, stmts...)
-}
+func (b *funcBlock) setResults(fn *funcCompiler) []ast.Stmt {
+	if b.unreachable || len(b.results) == 0 {
+		return nil
+	}
 
-func (b *funcBlock) setResults(fn *funcCompiler) {
-	if !b.unreachable {
-		for i := len(b.results) - 1; i >= 0; i-- {
-			b.append(&ast.AssignStmt{
-				Lhs: []ast.Expr{b.results[i]},
-				Rhs: []ast.Expr{fn.pop()},
-				Tok: token.ASSIGN,
-			})
+	// Don't pop results from the stack.
+	// If the branch is conditional,
+	// the values are supposed to stay on the stack
+	// for the next instruction.
+
+	fn.top = nil
+	fn.cond = nil
+	stack := fn.stack.last(len(b.results))
+	stmts := make([]ast.Stmt, len(stack))
+	for i := range stmts {
+		stmts[i] = &ast.AssignStmt{
+			Tok: token.ASSIGN,
+			Lhs: []ast.Expr{b.results[i]},
+			Rhs: []ast.Expr{stack[i]},
 		}
 	}
+	return stmts
 }
 
 // Constructs a type conversion, first to types[0], then to types[1] and so on.
@@ -537,7 +496,7 @@ func convert(x ast.Expr, types ...string) ast.Expr {
 	return x
 }
 
-// Constructs a n bit memory load at an index.
+// Constructs an n-bit memory load expression at an index.
 func load(bits string, idx ast.Expr) ast.Expr {
 	return &ast.CallExpr{
 		Fun: &ast.SelectorExpr{
@@ -551,7 +510,7 @@ func load(bits string, idx ast.Expr) ast.Expr {
 	}
 }
 
-// Constructs a n bit memory store at an index.
+// Constructs an n-bit memory store statement at an index.
 func store(bits string, idx ast.Expr, val ast.Expr) ast.Stmt {
 	return &ast.ExprStmt{X: &ast.CallExpr{
 		Fun: &ast.SelectorExpr{
