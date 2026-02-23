@@ -62,6 +62,21 @@ func resultsToAST(types string) *ast.FieldList {
 	return &ast.FieldList{List: list}
 }
 
+type importKind byte
+
+const (
+	functionImport importKind = iota
+	tableImport
+	memoryImport
+	globalImport
+)
+
+type importDef struct {
+	module string
+	name   string
+	typ    funcType
+}
+
 type memoryDef struct {
 	id       *ast.Ident
 	min, max int
@@ -92,3 +107,18 @@ type dataSegment struct {
 	offset int32
 	init   []byte
 }
+
+type nameSubsection byte
+
+const (
+	nameModule nameSubsection = iota
+	nameFunction
+	nameLocal
+	nameLabel
+	nameType
+	nameTable
+	nameMemory
+	nameGlobal
+	nameElem
+	nameData
+)

@@ -27,6 +27,7 @@ type translator struct {
 	helpers  set[string]
 
 	types     []funcType
+	imports   []importDef
 	functions []funcCompiler
 	memory    *memoryDef
 	globals   []globalDef
@@ -57,6 +58,10 @@ func translate(name string, r io.Reader, w io.Writer) error {
 			}
 			return err
 		}
+	}
+
+	if len(t.imports) > 0 {
+		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
 	}
 
 	t.out.Decls = append([]ast.Decl{
@@ -159,6 +164,8 @@ func (t *translator) readSection() error {
 	switch sectionID(id) {
 	case sectionType:
 		return t.readTypeSection()
+	case sectionImport:
+		return t.readImportSection()
 	case sectionFunction:
 		return t.readFunctionSection()
 	case sectionMemory:
@@ -188,7 +195,7 @@ func (t *translator) readTypeSection() error {
 		return err
 	}
 
-	var types []byte
+	var buf strings.Builder
 	t.types = make([]funcType, numTypes)
 	for i := range t.types {
 		form, err := t.in.ReadByte()
@@ -206,12 +213,12 @@ func (t *translator) readTypeSection() error {
 			return err
 		}
 
-		types = slices.Grow(types[:0], int(n))[:n]
-		_, err = io.ReadFull(t.in, types)
+		_, err = io.CopyN(&buf, t.in, int64(n))
 		if err != nil {
 			return err
 		}
-		t.types[i].params = string(types)
+		t.types[i].params = buf.String()
+		buf.Reset()
 
 		// Parse result types.
 		n, err = readLEB128(t.in)
@@ -219,12 +226,102 @@ func (t *translator) readTypeSection() error {
 			return err
 		}
 
-		types = slices.Grow(types[:0], int(n))[:n]
-		_, err = io.ReadFull(t.in, types)
+		_, err = io.CopyN(&buf, t.in, int64(n))
 		if err != nil {
 			return err
 		}
-		t.types[i].results = string(types)
+		t.types[i].results = buf.String()
+		buf.Reset()
+	}
+	return nil
+}
+
+func (t *translator) readImportSection() error {
+	count, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	var buf strings.Builder
+	for range count {
+		n, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		_, err = io.CopyN(&buf, t.in, int64(n))
+		if err != nil {
+			return err
+		}
+		mod := buf.String()
+		buf.Reset()
+
+		n, err = readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		_, err = io.CopyN(&buf, t.in, int64(n))
+		if err != nil {
+			return err
+		}
+		name := buf.String()
+		buf.Reset()
+
+		kind, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+
+		switch importKind(kind) {
+		case functionImport:
+			index, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			typ := t.types[index]
+			t.imports = append(t.imports, importDef{
+				module: mod,
+				name:   name,
+				typ:    typ,
+			})
+
+			args := make([]ast.Expr, len(typ.params)+1)
+			args[0] = &ast.UnaryExpr{Op: token.AND, X: newID("m")}
+			for i := range typ.params {
+				args[i+1] = localVar(i)
+			}
+
+			call := &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   &ast.SelectorExpr{X: newID("m"), Sel: newID(internal(mod))},
+					Sel: newID(imported(name)),
+				},
+				Args: args,
+			}
+
+			var stmt ast.Stmt
+			if len(typ.results) == 0 {
+				stmt = &ast.ExprStmt{X: call}
+			} else {
+				stmt = &ast.ReturnStmt{Results: []ast.Expr{call}}
+			}
+
+			fn := funcCompiler{
+				typ: typ,
+				decl: &ast.FuncDecl{
+					Name: &ast.Ident{},
+					Recv: modRecvList,
+					Type: typ.toAST(),
+					Body: &ast.BlockStmt{
+						List: []ast.Stmt{stmt},
+					},
+				},
+			}
+			t.functions = append(t.functions, fn)
+			t.out.Decls = append(t.out.Decls, fn.decl)
+
+		default:
+			return fmt.Errorf("unsupported import kind: %x", kind)
+		}
 	}
 	return nil
 }
@@ -235,8 +332,10 @@ func (t *translator) readFunctionSection() error {
 		return err
 	}
 
-	t.functions = make([]funcCompiler, numFuncs)
-	for i := range t.functions {
+	start := len(t.functions)
+	t.functions = append(t.functions, make([]funcCompiler, numFuncs)...)
+	for i := range numFuncs {
+		i += uint64(start)
 		index, err := readLEB128(t.in)
 		if err != nil {
 			return err
@@ -265,23 +364,28 @@ func (t *translator) readMemorySection() error {
 		return fmt.Errorf("multiple memories not supported")
 	}
 
-	flags, err := readLEB128(t.in)
-	if err != nil {
-		return err
-	}
-	min, err := readLEB128(t.in)
-	if err != nil {
-		return err
-	}
-	max := uint64(65536) // 4GB
-	if flags&1 == 1 {
-		max, err = readLEB128(t.in)
-	}
+	min, max, err := t.readLimits(65536) // 4GB
 	t.memory = &memoryDef{
 		min: int(min),
 		max: int(max),
 	}
 	return err
+}
+
+func (t *translator) readLimits(def uint64) (min, max uint64, err error) {
+	flags, err := readLEB128(t.in)
+	if err != nil {
+		return
+	}
+	min, err = readLEB128(t.in)
+	if err != nil {
+		return
+	}
+	max = def
+	if flags&1 == 1 {
+		max, err = readLEB128(t.in)
+	}
+	return
 }
 
 func (t *translator) readGlobalSection() error {
@@ -372,7 +476,7 @@ func (t *translator) readExportSection() error {
 		return err
 	}
 
-	var names []byte
+	var buf strings.Builder
 	t.exports = make(map[string]export, numExports)
 	for range numExports {
 		n, err := readLEB128(t.in)
@@ -380,13 +484,13 @@ func (t *translator) readExportSection() error {
 			return err
 		}
 
-		names = slices.Grow(names[:0], int(n))[:n]
-		_, err = io.ReadFull(t.in, names)
+		_, err = io.CopyN(&buf, t.in, int64(n))
 		if err != nil {
 			return err
 		}
+		name := buf.String()
+		buf.Reset()
 
-		name := string(names)
 		kind, err := t.in.ReadByte()
 		if err != nil {
 			return err
@@ -435,6 +539,7 @@ func (t *translator) readCodeSection() error {
 	}
 
 	for i := range numFuncs {
+		i += uint64(len(t.imports))
 		_, err := readLEB128(t.in)
 		if err != nil {
 			return err
@@ -1457,8 +1562,8 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 			return err
 		}
 
-		switch kind {
-		case 1, 7: // functions, globals
+		switch nameSubsection(kind) {
+		case nameFunction, nameGlobal:
 			count, err := readLEB128(r)
 			if err != nil {
 				return err
@@ -1478,12 +1583,12 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 				}
 
 				var id *ast.Ident
-				switch kind {
-				case 1: // functions
+				switch nameSubsection(kind) {
+				case nameFunction:
 					if int(index) < len(t.functions) {
 						id = t.functions[index].decl.Name
 					}
-				case 7: // globals
+				case nameGlobal:
 					if int(index) < len(t.globals) {
 						id = t.globals[index].id
 					}
@@ -1524,6 +1629,16 @@ func (t *translator) createModuleStruct() ast.Decl {
 			Type:  g.typ.Ident(),
 		})
 	}
+	seen := set[string]{}
+	for _, imp := range t.imports {
+		if !seen.has(imp.module) {
+			seen.add(imp.module)
+			fields = append(fields, &ast.Field{
+				Names: []*ast.Ident{newID(internal(imp.module))},
+				Type:  newID(imported(imp.module)),
+			})
+		}
+	}
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
@@ -1537,7 +1652,37 @@ func (t *translator) createModuleStruct() ast.Decl {
 	}
 }
 
+func (t *translator) createHostInterfaces() []ast.Decl {
+	ifaces := map[string][]*ast.Field{}
+
+	for _, imp := range t.imports {
+		typ := imp.typ.toAST()
+		typ.Params.List = append([]*ast.Field{{
+			Names: []*ast.Ident{newID("m")},
+			Type:  &ast.StarExpr{X: newID("Module")},
+		}}, typ.Params.List...)
+
+		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
+			Names: []*ast.Ident{newID(imported(imp.name))},
+			Type:  typ,
+		})
+	}
+
+	decls := make([]ast.Decl, 0, len(ifaces))
+	for name, methods := range ifaces {
+		decls = append(decls, &ast.GenDecl{
+			Tok: token.TYPE,
+			Specs: []ast.Spec{&ast.TypeSpec{
+				Name: newID(imported(name)),
+				Type: &ast.InterfaceType{Methods: &ast.FieldList{List: methods}},
+			}},
+		})
+	}
+	return decls
+}
+
 func (t *translator) createNewFunc() ast.Decl {
+	var params []*ast.Field
 	body := &ast.BlockStmt{
 		List: []ast.Stmt{
 			&ast.AssignStmt{
@@ -1549,6 +1694,25 @@ func (t *translator) createNewFunc() ast.Decl {
 				}},
 			},
 		},
+	}
+
+	seen := set[string]{}
+	for i, imp := range t.imports {
+		if !seen.has(imp.module) {
+			seen.add(imp.module)
+			params = append(params, &ast.Field{
+				Names: []*ast.Ident{localVar(i)},
+				Type:  newID(imported(imp.module)),
+			})
+			body.List = append(body.List, &ast.AssignStmt{
+				Lhs: []ast.Expr{&ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: newID(internal(imp.module)),
+				}},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{localVar(i)},
+			})
+		}
 	}
 
 	if t.memory != nil {
@@ -1613,6 +1777,7 @@ func (t *translator) createNewFunc() ast.Decl {
 	return &ast.FuncDecl{
 		Name: newID("New"),
 		Type: &ast.FuncType{
+			Params:  &ast.FieldList{List: params},
 			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}},
 		},
 		Body: body,

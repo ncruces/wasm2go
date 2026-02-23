@@ -21,25 +21,31 @@ func newID(name string) *ast.Ident {
 func exported(name string) string {
 	var buf strings.Builder
 	buf.WriteByte('X')
-	for _, r := range name {
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-			r = '_'
-		}
-		buf.WriteRune(r)
-	}
+	mangle(&buf, name)
+	return buf.String()
+}
+
+func imported(name string) string {
+	var buf strings.Builder
+	buf.WriteByte('I')
+	mangle(&buf, name)
 	return buf.String()
 }
 
 func internal(name string) string {
 	var buf strings.Builder
 	buf.WriteByte('_')
+	mangle(&buf, name)
+	return buf.String()
+}
+
+func mangle(buf *strings.Builder, name string) {
 	for _, r := range name {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
 			r = '_'
 		}
 		buf.WriteRune(r)
 	}
-	return buf.String()
 }
 
 func localVar[T interface{ int | uint64 }](i T) *ast.Ident {
