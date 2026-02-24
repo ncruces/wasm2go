@@ -90,13 +90,16 @@ func translate(name string, r io.Reader, w io.Writer) error {
 	}
 
 	// Set imports.
-	for pkg := range t.packages {
-		t.out.Decls = append([]ast.Decl{&ast.GenDecl{
-			Tok: token.IMPORT,
-			Specs: []ast.Spec{&ast.ImportSpec{
+	if len(t.packages) > 0 {
+		specs := make([]ast.Spec, 0, len(t.data))
+		for pkg := range t.packages {
+			specs = append(specs, &ast.ImportSpec{
 				Path: &ast.BasicLit{Kind: token.STRING, Value: `"` + pkg + `"`},
-			}},
-		}}, t.out.Decls...)
+			})
+		}
+		t.out.Decls = append([]ast.Decl{
+			&ast.GenDecl{Tok: token.IMPORT, Specs: specs}},
+			t.out.Decls...)
 	}
 
 	// Add helpers.

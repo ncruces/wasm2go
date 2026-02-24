@@ -34,7 +34,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 			},
 			&ast.Field{
 				Names: []*ast.Ident{memoryMaxLenId(t.memory.id)},
-				Type:  newID("uint"),
+				Type:  newID("int"),
 			})
 	}
 	for _, g := range t.globals {
@@ -147,18 +147,8 @@ func (t *translator) createNewFunc() ast.Decl {
 	}
 
 	if t.memory != nil {
+		t.packages.add("math")
 		body.List = append(body.List,
-			&ast.AssignStmt{
-				Lhs: []ast.Expr{&ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: memoryMaxLenId(t.memory.id),
-				}},
-				Tok: token.ASSIGN,
-				Rhs: []ast.Expr{&ast.BasicLit{
-					Kind:  token.INT,
-					Value: strconv.FormatUint(uint64(t.memory.max)*65536, 10),
-				}},
-			},
 			&ast.AssignStmt{
 				Lhs: []ast.Expr{&ast.SelectorExpr{
 					X:   newID("m"),
@@ -173,6 +163,20 @@ func (t *translator) createNewFunc() ast.Decl {
 							Kind:  token.INT,
 							Value: strconv.FormatUint(uint64(t.memory.min)*65536, 10),
 						},
+					},
+				}},
+			},
+			&ast.AssignStmt{
+				Lhs: []ast.Expr{&ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: memoryMaxLenId(t.memory.id),
+				}},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: newID("min"),
+					Args: []ast.Expr{
+						&ast.SelectorExpr{X: newID("math"), Sel: newID("MaxInt")},
+						&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(t.memory.max)*65536, 10)},
 					},
 				}},
 			})

@@ -2,17 +2,20 @@
 
 package memory
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"math"
+)
 
 type Module struct {
 	Memory       []byte
-	MemoryMaxLen uint
+	MemoryMaxLen int
 }
 
 func New() *Module {
 	m := &Module{}
-	m.MemoryMaxLen = 6553600
 	m.Memory = make([]byte, 65536)
+	m.MemoryMaxLen = min(math.MaxInt, 6553600)
 	copy(m.Memory[0:], data0)
 	copy(m.Memory[32:], data1)
 	return m
@@ -43,18 +46,19 @@ func (m Module) Xread_as_i8u(v0 int32) int32 {
 	return t1
 }
 
-func memory_grow(mem *[]byte, delta int32, max uint) int32 {
+func memory_grow(mem *[]byte, delta int32, max int) int32 {
 	buf := *mem
 	old := int32(len(buf) >> 16)
 	if delta == 0 {
 		return old
 	}
-	dlt := uint(uint32(delta)) << 16
-	if dlt+uint(len(buf)) > max {
-		return -1
+	add := int(uint32(delta)) << 16
+	new := add + len(buf)
+	if 0 < new && new <= max {
+		*mem = append(buf, make([]byte, add)...)
+		return old
 	}
-	*mem = append(buf, make([]byte, dlt)...)
-	return old
+	return -1
 }
 
 func memory_fill(mem []byte, n, val, dest int32) {
