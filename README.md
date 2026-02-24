@@ -14,17 +14,37 @@ whereas imports are interfaces `New` consumes.
 
 Only a subset of the Wasm specification will be supported,
 as the goal is to translate specific Wasm modules to Go.
+
 For example, we don't need to implement SIMD,
-as we can ask (e.g.) LLVM to avoid emmiting it.
+as we can ask (e.g.) LLVM not to emit it.
+
+We also assume the input Wasm modules can be trusted.
+At a minimum, you should run Wasm modules through a verifier
+before attempting to convert an untrusted module.
+
+The current target is a useful subset of Wasm produced by `clang`.
+
+This includes most Wasm 1.0 features, with the following exceptions:
+- imports other than functions (tables, memories or globals);
+- export aliasing (exporting the same function/global under different names);
+
+It also supports a subset of Wasm 2.0 features:
+- nontrapping float-to-int conversions
+- sign-extension operators
+- multi-values
+- a subset of bulk memory operations
 
 The goal is not to produce particularly readable Go code:
 - because Go makes a distinction between statements and expresions,
   we use a stack-to-register approach to translate Wasm to Go;
 - Wasm control flow is implemented with `goto` and labels;
+- the distinction in Go between `bool` and `int32` requires
+  additional control flow and type conversions;
 - Go's untyped numeric literals require explicit type conversions;
 - float operations require type conversions to avoid being combined;
-- float literals can't represent negative zero, infinities, or `NaN`;
-- the distinction between `bool` and `int32` also requires type conversions;
+- float literals can't represent negative zero, infinities, or `NaN`s,
+  often requiring `Float64frombits`;
+- Go requires all variables/labels/etc to be used.
 
 Many of these often introduce unnecessary verbosity,
 but they're necessary for semantic correctness.

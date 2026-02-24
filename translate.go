@@ -476,53 +476,29 @@ func (t *translator) readGlobalSection() error {
 
 		switch opcode {
 		case 0x41: // i32.const
-			v, err := readSignedLEB128(t.in)
+			g.init, err = t.constI32()
 			if err != nil {
 				return err
-			}
-			t.helpers.add("i32_const")
-			g.init = &ast.CallExpr{
-				Fun:  newID("i32_const"),
-				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}},
 			}
 		case 0x42: // i64.const
-			v, err := readSignedLEB128(t.in)
+			g.init, err = t.constI64()
 			if err != nil {
 				return err
-			}
-			t.helpers.add("i64_const")
-			g.init = &ast.CallExpr{
-				Fun:  newID("i64_const"),
-				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}},
 			}
 		case 0x43: // f32.const
-			var v uint32
-			if err := binary.Read(t.in, binary.LittleEndian, &v); err != nil {
-				return err
-			}
-			t.packages.add("math")
-			g.init = &ast.CallExpr{
-				Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32frombits")},
-				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(v), 10)}},
-			}
-		case 0x44: // f64.const
-			var v uint64
-			if err := binary.Read(t.in, binary.LittleEndian, &v); err != nil {
-				return err
-			}
-			t.packages.add("math")
-			g.init = &ast.CallExpr{
-				Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64frombits")},
-				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(v, 10)}},
-			}
-		case 0x23: // global.get
-			idx, err := readLEB128(t.in)
+			g.init, err = t.constF32()
 			if err != nil {
 				return err
 			}
-			g.init = &ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.globals[idx].id,
+		case 0x44: // f64.const
+			g.init, err = t.constF64()
+			if err != nil {
+				return err
+			}
+		case 0x23: // global.get
+			g.init, err = t.globalGet()
+			if err != nil {
+				return err
 			}
 		default:
 			return fmt.Errorf("unsupported global init opcode: %x", opcode)
@@ -1073,14 +1049,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.pushConst(val)
 
 		case 0x23: // global.get
-			i, err := readLEB128(t.in)
+			e, err := t.globalGet()
 			if err != nil {
 				return err
 			}
-			fn.push(&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.globals[i].id,
-			})
+			fn.pushConst(e)
 
 		case 0x24: // global.set
 			i, err := readLEB128(t.in)
@@ -1256,66 +1229,32 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			})
 
 		case 0x41: // i32.const
-			i, err := readSignedLEB128(t.in)
+			e, err := t.constI32()
 			if err != nil {
 				return err
 			}
-			fn.helpers.add("i32_const")
-			fn.pushConst(&ast.CallExpr{
-				Fun: newID("i32_const"),
-				Args: []ast.Expr{&ast.BasicLit{
-					Value: strconv.FormatInt(i, 10),
-					Kind:  token.INT,
-				}},
-			})
+			fn.pushConst(e)
 
 		case 0x42: // i64.const
-			i, err := readSignedLEB128(t.in)
+			e, err := t.constI64()
 			if err != nil {
 				return err
 			}
-			fn.helpers.add("i64_const")
-			fn.pushConst(&ast.CallExpr{
-				Fun: newID("i64_const"),
-				Args: []ast.Expr{&ast.BasicLit{
-					Value: strconv.FormatInt(i, 10),
-					Kind:  token.INT,
-				}},
-			})
+			fn.pushConst(e)
 
 		case 0x43: // f32.const
-			var i uint32
-			if err := binary.Read(t.in, binary.LittleEndian, &i); err != nil {
+			e, err := t.constF32()
+			if err != nil {
 				return err
 			}
-			fn.packages.add("math")
-			fn.pushConst(&ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   newID("math"),
-					Sel: newID("Float32frombits"),
-				},
-				Args: []ast.Expr{&ast.BasicLit{
-					Value: strconv.FormatUint(uint64(i), 10),
-					Kind:  token.INT,
-				}},
-			})
+			fn.pushConst(e)
 
 		case 0x44: // f64.const
-			var i uint64
-			if err := binary.Read(t.in, binary.LittleEndian, &i); err != nil {
+			e, err := t.constF64()
+			if err != nil {
 				return err
 			}
-			fn.packages.add("math")
-			fn.pushConst(&ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   newID("math"),
-					Sel: newID("Float64frombits"),
-				},
-				Args: []ast.Expr{&ast.BasicLit{
-					Value: strconv.FormatUint(i, 10),
-					Kind:  token.INT,
-				}},
-			})
+			fn.pushConst(e)
 
 		case 0x45: // i32.eqz
 			fn.eqzOp()
