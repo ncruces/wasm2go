@@ -77,9 +77,16 @@ type importDef struct {
 	typ    funcType
 }
 
+type tableDef struct {
+	id  *ast.Ident
+	min int
+	max int
+}
+
 type memoryDef struct {
-	id       *ast.Ident
-	min, max int
+	id  *ast.Ident
+	min int
+	max int
 }
 
 type globalDef struct {
@@ -101,6 +108,12 @@ const (
 type export struct {
 	kind  exportKind
 	index int
+}
+
+type elemSegment struct {
+	init    []uint32
+	offset  uint32
+	passive bool
 }
 
 type dataSegment struct {

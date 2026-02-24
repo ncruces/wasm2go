@@ -38,12 +38,13 @@ func (m Module) Xread_as_i8u(v0 int32) int32 {
 }
 
 func memory_grow(mem *[]byte, delta int32) int32 {
-	oldLen := int32(len(*mem) >> 16)
+	buf := *mem
+	old := int32(len(buf) >> 16)
 	if delta == 0 {
-		return oldLen
+		return old
 	}
-	*mem = append(*mem, make([]byte, uint(delta)<<16)...)
-	return oldLen
+	*mem = append(buf, make([]byte, uint(delta)<<16)...)
+	return old
 }
 
 func memory_fill(mem []byte, n, val, dest int32) {

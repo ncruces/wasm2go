@@ -12,11 +12,12 @@ import (
 	"github.com/ncruces/wasm2go/testdata/primes"
 	"github.com/ncruces/wasm2go/testdata/recursion"
 	stack_test "github.com/ncruces/wasm2go/testdata/stack"
+	"github.com/ncruces/wasm2go/testdata/table"
 	"github.com/ncruces/wasm2go/testdata/trig"
 )
 
 func Test_generate(t *testing.T) {
-	tests := []string{"fib", "memory", "primes", "recursion", "stack", "trig"}
+	tests := []string{"fib", "memory", "primes", "recursion", "stack", "table", "trig"}
 
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -93,42 +94,6 @@ func Test_primes(t *testing.T) {
 	}
 }
 
-func Test_trig(t *testing.T) {
-	want := []float32{
-		float32(math.Sin(0)),
-		float32(math.Sin(1)),
-		float32(math.Sin(2)),
-		float32(math.Sin(3)),
-		float32(math.Sin(4)),
-		float32(math.Sin(5)),
-		float32(math.Sin(6)),
-		float32(math.Sin(7)),
-	}
-
-	var m trig.Module
-
-	var got []float32
-	for i := range want {
-		got = append(got, float32(m.Xsin(float64(i))))
-	}
-
-	if !slices.Equal(got, want) {
-		t.Errorf("got %v, want %v", got, want)
-	}
-}
-
-func Test_stack(t *testing.T) {
-	var m stack_test.Module
-
-	if got := m.Xstack_func_call(); got != (91 - 23) {
-		t.Errorf("got %d, want %d", got, 91-23)
-	}
-
-	if got1, got2 := m.Xtee_for_two(5, 3); got1 != 13 || got2 != 8 {
-		t.Errorf("got %d, %d, want %d, %d", got1, got2, 13, 8)
-	}
-}
-
 func Test_recursive_factorial(t *testing.T) {
 	want := []int32{1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800}
 
@@ -159,5 +124,59 @@ func Test_recursive_evenodd(t *testing.T) {
 				t.Errorf("i: %d, even: %d, odd: %d", i, even, odd)
 			}
 		}
+	}
+}
+
+func Test_stack(t *testing.T) {
+	var m stack_test.Module
+
+	if got := m.Xstack_func_call(); got != (91 - 23) {
+		t.Errorf("got %d, want %d", got, 91-23)
+	}
+
+	if got1, got2 := m.Xtee_for_two(5, 3); got1 != 13 || got2 != 8 {
+		t.Errorf("got %d, %d, want %d, %d", got1, got2, 13, 8)
+	}
+}
+
+func Test_table(t *testing.T) {
+	m := table.New(tableEnv{})
+
+	if got := m.Xtimes2(5); got != 2*5 {
+		t.Errorf("got %d, want %d", got, 2*5)
+	}
+
+	if got := m.Xtimes3(5); got != 3*5 {
+		t.Errorf("got %d, want %d", got, 3*5)
+	}
+}
+
+type tableEnv struct{}
+
+func (t tableEnv) Ijstimes3(m *table.Module, v0 int32) int32 {
+	return v0 * 3
+}
+
+func Test_trig(t *testing.T) {
+	want := []float32{
+		float32(math.Sin(0)),
+		float32(math.Sin(1)),
+		float32(math.Sin(2)),
+		float32(math.Sin(3)),
+		float32(math.Sin(4)),
+		float32(math.Sin(5)),
+		float32(math.Sin(6)),
+		float32(math.Sin(7)),
+	}
+
+	var m trig.Module
+
+	var got []float32
+	for i := range want {
+		got = append(got, float32(m.Xsin(float64(i))))
+	}
+
+	if !slices.Equal(got, want) {
+		t.Errorf("got %v, want %v", got, want)
 	}
 }

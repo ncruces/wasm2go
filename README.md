@@ -9,15 +9,13 @@ That file forms a self contained package,
 that exports a single structure called `Module`,
 and a `New` function to initialize it.
 
-The methods of this structure will be the Wasm module's exported functions.
+The methods of this structure will be the Wasm module's exported functions,
+whereas imports are interfaces `New` consumes.
 
 Only a subset of the Wasm specification will be supported,
 as the goal is to translate specific Wasm modules to Go.
 For example, we don't need to implement SIMD,
 as we can ask (e.g.) LLVM to avoid emmiting it.
-
-The current goal is to compile the Wasm modules in `testdata`,
-all of which export a single function.
 
 The goal is not to produce particularly readable Go code:
 - because Go makes a distinction between statements and expresions,

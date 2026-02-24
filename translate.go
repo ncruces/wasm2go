@@ -22,16 +22,18 @@ var helpersSrc string
 type translator struct {
 	in  *bufio.Reader
 	out ast.File
-
+	// Dependencies.
 	packages set[string]
 	helpers  set[string]
-
+	// Sections.
 	types     []funcType
 	imports   []importDef
 	functions []funcCompiler
 	memory    *memoryDef
+	table     *tableDef
 	globals   []globalDef
 	exports   map[string]export
+	elements  []elemSegment
 	start     uint64
 	data      []dataSegment
 }
@@ -77,6 +79,9 @@ func translate(name string, r io.Reader, w io.Writer) error {
 	}
 	if t.memory != nil && t.memory.id.Name == "" {
 		t.memory.id.Name = "memory"
+	}
+	if t.table != nil && t.table.id.Name == "" {
+		t.table.id.Name = "table"
 	}
 	for i := range t.globals {
 		if t.globals[i].id.Name == "" {
@@ -183,8 +188,12 @@ func (t *translator) readSection() error {
 		return t.readImportSection()
 	case sectionFunction:
 		return t.readFunctionSection()
+	case sectionTable:
+		return t.readTableSection()
 	case sectionMemory:
 		return t.readMemorySection()
+	case sectionElement:
+		return t.readElementSection()
 	case sectionGlobal:
 		return t.readGlobalSection()
 	case sectionExport:
@@ -367,6 +376,39 @@ func (t *translator) readFunctionSection() error {
 	return nil
 }
 
+func (t *translator) readTableSection() error {
+	numTabs, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+	if numTabs == 0 {
+		return nil
+	}
+	if numTabs > 1 {
+		return fmt.Errorf("multiple tables not supported")
+	}
+
+	typ, err := t.in.ReadByte()
+	if err != nil {
+		return err
+	}
+	if typ != 0x70 { // funcref
+		return fmt.Errorf("unsupported table type: %x", typ)
+	}
+
+	min, max, err := t.readLimits(65536) // 1 MiB
+	if err != nil {
+		return err
+	}
+
+	t.table = &tableDef{
+		id:  &ast.Ident{},
+		min: int(min),
+		max: int(max),
+	}
+	return nil
+}
+
 func (t *translator) readMemorySection() error {
 	numMems, err := readLEB128(t.in)
 	if err != nil {
@@ -379,8 +421,9 @@ func (t *translator) readMemorySection() error {
 		return fmt.Errorf("multiple memories not supported")
 	}
 
-	min, max, err := t.readLimits(65536) // 4GB
+	min, max, err := t.readLimits(65536) // 4 GiB
 	t.memory = &memoryDef{
+		id:  &ast.Ident{},
 		min: int(min),
 		max: int(max),
 	}
@@ -472,6 +515,15 @@ func (t *translator) readGlobalSection() error {
 				Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64frombits")},
 				Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(v, 10)}},
 			}
+		case 0x23: // global.get
+			idx, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			g.init = &ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: t.globals[idx].id,
+			}
 		default:
 			return fmt.Errorf("unsupported global init opcode: %x", opcode)
 		}
@@ -480,6 +532,56 @@ func (t *translator) readGlobalSection() error {
 			return err
 		} else if end != 0x0b { // end
 			return fmt.Errorf("expected end of init expr, got %x", end)
+		}
+	}
+	return nil
+}
+
+func (t *translator) readElementSection() error {
+	count, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	t.elements = make([]elemSegment, count)
+	for i := range t.elements {
+		if tag, err := readLEB128(t.in); err != nil {
+			return err
+		} else if tag == 1 {
+			t.elements[i].passive = true
+		} else if tag != 0 {
+			return fmt.Errorf("unsupported element segment tag: %d", tag)
+		}
+
+		if !t.elements[i].passive {
+			if opcode, err := t.in.ReadByte(); err != nil {
+				return err
+			} else if opcode != 0x41 { // i32.const
+				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
+			}
+			offset, err := readSignedLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			t.elements[i].offset = uint32(offset)
+			if end, err := t.in.ReadByte(); err != nil {
+				return err
+			} else if end != 0x0b {
+				return fmt.Errorf("expected end of expression, got %x", end)
+			}
+		}
+
+		numElems, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		t.elements[i].init = make([]uint32, numElems)
+		for j := range t.elements[i].init {
+			idx, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			t.elements[i].init[j] = uint32(idx)
 		}
 	}
 	return nil
@@ -524,6 +626,12 @@ func (t *translator) readExportSection() error {
 		case functionExport:
 			decl := t.functions[index].decl
 			decl.Name = ast.NewIdent(exported(name))
+		case tableExport:
+			id := "Table"
+			if !strings.EqualFold(name, id) {
+				id = exported(name)
+			}
+			t.table.id = ast.NewIdent(id)
 		case memoryExport:
 			id := "Memory"
 			if !strings.EqualFold(name, id) {
@@ -834,6 +942,55 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.pushConst(tmp)
 			}
 
+		case 0x11: // call_indirect
+			typeIdx, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			tableIdx, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			if tableIdx != 0 {
+				return fmt.Errorf("unsupported table index: %d", tableIdx)
+			}
+
+			idx := fn.pop()
+			typ := t.types[typeIdx]
+			args := make([]ast.Expr, len(typ.params))
+			for i := len(args) - 1; i >= 0; i-- {
+				args[i] = fn.pop()
+			}
+
+			call := &ast.CallExpr{
+				Fun: &ast.TypeAssertExpr{
+					X: &ast.IndexExpr{
+						X:     &ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
+						Index: convert(idx, "uint32"),
+					},
+					Type: typ.toAST(),
+				},
+				Args: args,
+			}
+
+			if len(typ.results) == 0 {
+				fn.emit(&ast.ExprStmt{X: call})
+				break
+			}
+
+			lhs := make([]ast.Expr, len(typ.results))
+			for i := range lhs {
+				lhs[i] = fn.newTempVar()
+			}
+			fn.emit(&ast.AssignStmt{
+				Tok: token.DEFINE,
+				Lhs: lhs,
+				Rhs: []ast.Expr{call},
+			})
+			for _, tmp := range lhs {
+				fn.pushConst(tmp)
+			}
+
 		case 0x0f: // return
 			ret := &ast.ReturnStmt{}
 			if n := len(fn.typ.results); n > 0 {
@@ -849,6 +1006,19 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Lhs: []ast.Expr{newID("_")},
 				Rhs: []ast.Expr{fn.pop()},
 			})
+
+		case 0x1c: // select (typed)
+			n, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			if n != 1 {
+				return fmt.Errorf("multi-value select not supported")
+			}
+			if _, err := t.in.ReadByte(); err != nil {
+				return err
+			}
+			fallthrough
 
 		case 0x1b: // select
 			cond := fn.popCond()
@@ -1459,6 +1629,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					},
 				})
 
+			case 0x09: // data.drop
+				// No-op since data segments are constants.
+				_, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+
 			case 0x0a: // memory.copy
 				_, err := readLEB128(t.in)
 				if err != nil {
@@ -1494,6 +1671,79 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						},
 					},
 				})
+
+			case 0x0c: // table.init
+				elemIdx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				tableIdx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				if tableIdx != 0 {
+					return fmt.Errorf("unsupported table index: %d", tableIdx)
+				}
+				fn.helpers.add("table_init")
+				fn.emit(&ast.ExprStmt{
+					X: &ast.CallExpr{
+						Fun: newID("table_init"),
+						Args: []ast.Expr{
+							&ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
+							&ast.IndexExpr{
+								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
+								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)},
+							},
+							fn.pop(), fn.pop(), fn.pop(),
+						},
+					},
+				})
+
+			case 0x0d: // elem.drop
+				// No-op since element segments are static.
+				_, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+
+			case 0x0e: // table.copy
+				dstIdx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				srcIdx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				if dstIdx != 0 || srcIdx != 0 {
+					return fmt.Errorf("unsupported table index")
+				}
+				fn.helpers.add("table_copy")
+				fn.emit(&ast.ExprStmt{
+					X: &ast.CallExpr{
+						Fun: newID("table_copy"),
+						Args: []ast.Expr{
+							&ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
+							fn.pop(), fn.pop(), fn.pop(),
+						},
+					},
+				})
+
+			case 0x10: // table.size
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				if idx != 0 {
+					return fmt.Errorf("unsupported table index")
+				}
+				fn.push(convert(&ast.CallExpr{
+					Fun: newID("len"),
+					Args: []ast.Expr{&ast.SelectorExpr{
+						X:   newID("m"),
+						Sel: t.table.id,
+					}},
+				}, "int32"))
 
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
@@ -1532,45 +1782,42 @@ func (t *translator) readDataSection() error {
 		return err
 	}
 
-	for range count {
-		var data dataSegment
-
+	t.data = make([]dataSegment, count)
+	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
 			return err
 		} else if tag == 1 {
-			data.passive = true
+			t.data[i].passive = true
 		} else if tag != 0 {
 			return fmt.Errorf("unsupported data segment tag: %d", tag)
 		}
 
-		if opcode, err := t.in.ReadByte(); err != nil {
-			return err
-		} else if opcode != 0x41 { // i32.const
-			return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
+		if !t.data[i].passive {
+			if opcode, err := t.in.ReadByte(); err != nil {
+				return err
+			} else if opcode != 0x41 { // i32.const
+				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
+			}
+			offset, err := readSignedLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			t.data[i].offset = uint32(offset)
+			if end, err := t.in.ReadByte(); err != nil {
+				return err
+			} else if end != 0x0b {
+				return fmt.Errorf("expected end of expression, got %x", end)
+			}
 		}
 
-		val, err := readSignedLEB128(t.in)
+		numElems, err := readLEB128(t.in)
 		if err != nil {
 			return err
 		}
-		data.offset = uint32(val)
-
-		if end, err := t.in.ReadByte(); err != nil {
-			return err
-		} else if end != 0x0b {
-			return fmt.Errorf("expected end of expression, got %x", end)
-		}
-
-		size, err := readLEB128(t.in)
-		if err != nil {
+		t.data[i].init = make([]byte, numElems)
+		if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
 			return err
 		}
-
-		data.init = make([]byte, size)
-		if _, err := io.ReadFull(t.in, data.init); err != nil {
-			return err
-		}
-		t.data = append(t.data, data)
 	}
 	return nil
 }
@@ -1652,183 +1899,4 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 		}
 	}
 	return nil
-}
-
-var modRecvList = &ast.FieldList{List: []*ast.Field{{
-	Names: []*ast.Ident{newID("m")},
-	Type:  newID("Module"),
-}}}
-
-func (t *translator) createModuleStruct() ast.Decl {
-	var fields []*ast.Field
-	if t.memory != nil {
-		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{t.memory.id},
-			Type: &ast.ArrayType{
-				Elt: newID("byte"),
-			},
-		})
-	}
-	for _, g := range t.globals {
-		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{g.id},
-			Type:  g.typ.Ident(),
-		})
-	}
-	seen := set[string]{}
-	for _, imp := range t.imports {
-		if !seen.has(imp.module) {
-			seen.add(imp.module)
-			fields = append(fields, &ast.Field{
-				Names: []*ast.Ident{newID(internal(imp.module))},
-				Type:  newID(imported(imp.module)),
-			})
-		}
-	}
-	return &ast.GenDecl{
-		Tok: token.TYPE,
-		Specs: []ast.Spec{
-			&ast.TypeSpec{
-				Name: newID("Module"),
-				Type: &ast.StructType{
-					Fields: &ast.FieldList{List: fields},
-				},
-			},
-		},
-	}
-}
-
-func (t *translator) createHostInterfaces() []ast.Decl {
-	ifaces := map[string][]*ast.Field{}
-
-	for _, imp := range t.imports {
-		typ := imp.typ.toAST()
-		typ.Params.List = append([]*ast.Field{{
-			Names: []*ast.Ident{newID("m")},
-			Type:  &ast.StarExpr{X: newID("Module")},
-		}}, typ.Params.List...)
-
-		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
-			Names: []*ast.Ident{newID(imported(imp.name))},
-			Type:  typ,
-		})
-	}
-
-	decls := make([]ast.Decl, 0, len(ifaces))
-	for name, methods := range ifaces {
-		decls = append(decls, &ast.GenDecl{
-			Tok: token.TYPE,
-			Specs: []ast.Spec{&ast.TypeSpec{
-				Name: newID(imported(name)),
-				Type: &ast.InterfaceType{Methods: &ast.FieldList{List: methods}},
-			}},
-		})
-	}
-	return decls
-}
-
-func (t *translator) createNewFunc() ast.Decl {
-	var params []*ast.Field
-	body := &ast.BlockStmt{
-		List: []ast.Stmt{
-			&ast.AssignStmt{
-				Lhs: []ast.Expr{newID("m")},
-				Tok: token.DEFINE,
-				Rhs: []ast.Expr{&ast.UnaryExpr{
-					Op: token.AND,
-					X:  &ast.CompositeLit{Type: newID("Module")},
-				}},
-			},
-		},
-	}
-
-	seen := set[string]{}
-	for i, imp := range t.imports {
-		if !seen.has(imp.module) {
-			seen.add(imp.module)
-			params = append(params, &ast.Field{
-				Names: []*ast.Ident{localVar(i)},
-				Type:  newID(imported(imp.module)),
-			})
-			body.List = append(body.List, &ast.AssignStmt{
-				Lhs: []ast.Expr{&ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: newID(internal(imp.module)),
-				}},
-				Tok: token.ASSIGN,
-				Rhs: []ast.Expr{localVar(i)},
-			})
-		}
-	}
-
-	if t.memory != nil {
-		body.List = append(body.List, &ast.AssignStmt{
-			Lhs: []ast.Expr{&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.memory.id,
-			}},
-			Tok: token.ASSIGN,
-			Rhs: []ast.Expr{&ast.CallExpr{
-				Fun: newID("make"),
-				Args: []ast.Expr{
-					&ast.ArrayType{Elt: newID("byte")},
-					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.memory.min * 65536)},
-				},
-			}},
-		})
-	}
-
-	for _, g := range t.globals {
-		body.List = append(body.List, &ast.AssignStmt{
-			Lhs: []ast.Expr{&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: g.id,
-			}},
-			Tok: token.ASSIGN,
-			Rhs: []ast.Expr{g.init},
-		})
-	}
-
-	for i, seg := range t.data {
-		if seg.passive {
-			continue
-		}
-		body.List = append(body.List, &ast.ExprStmt{
-			X: &ast.CallExpr{
-				Fun: newID("copy"),
-				Args: []ast.Expr{
-					&ast.SliceExpr{
-						X: &ast.SelectorExpr{
-							X:   newID("m"),
-							Sel: t.memory.id,
-						},
-						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(seg.offset))},
-					},
-					newID(fmt.Sprintf("data%d", i)),
-				},
-			},
-		})
-	}
-
-	if t.start != 0 {
-		body.List = append(body.List, &ast.ExprStmt{
-			X: &ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.functions[^t.start].decl.Name,
-				},
-			},
-		})
-	}
-
-	body.List = append(body.List, &ast.ReturnStmt{Results: []ast.Expr{newID("m")}})
-
-	return &ast.FuncDecl{
-		Name: newID("New"),
-		Type: &ast.FuncType{
-			Params:  &ast.FieldList{List: params},
-			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}},
-		},
-		Body: body,
-	}
 }

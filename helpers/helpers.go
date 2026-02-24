@@ -253,12 +253,13 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 }
 
 func memory_grow(mem *[]byte, delta int32) int32 {
-	oldLen := int32(len(*mem) >> 16)
+	buf := *mem
+	old := int32(len(buf) >> 16)
 	if delta == 0 {
-		return oldLen
+		return old
 	}
-	*mem = append(*mem, make([]byte, uint(delta)<<16)...)
-	return oldLen
+	*mem = append(buf, make([]byte, uint(delta)<<16)...)
+	return old
 }
 
 func memory_init(mem []byte, data string, n, src, dest int32) {
@@ -292,4 +293,20 @@ func memory_fill(mem []byte, n, val, dest int32) {
 		chunk := min(i, 8192)
 		i += copy(buf[i:], buf[:chunk])
 	}
+}
+
+func table_init(tab, elems []any, n, src, dest int32) {
+	x := uint(uint32(dest))
+	z := uint(uint32(src))
+	y := x + uint(uint32(n))
+	w := z + uint(uint32(n))
+	copy(tab[x:y], elems[z:w])
+}
+
+func table_copy(tab []any, n, src, dest int32) {
+	x := uint(uint32(dest))
+	z := uint(uint32(src))
+	y := x + uint(uint32(n))
+	w := z + uint(uint32(n))
+	copy(tab[x:y], tab[z:w])
 }
