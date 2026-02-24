@@ -261,6 +261,14 @@ func memory_grow(mem *[]byte, delta int32) int32 {
 	return oldLen
 }
 
+func memory_init(mem []byte, data string, n, src, dest int32) {
+	x := uint(uint32(dest))
+	z := uint(uint32(src))
+	y := x + uint(uint32(n))
+	w := z + uint(uint32(n))
+	copy(mem[x:y], data[z:w])
+}
+
 func memory_copy(mem []byte, n, src, dest int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))

@@ -11,8 +11,8 @@ type Module struct {
 func New() *Module {
 	m := &Module{}
 	m.Memory = make([]byte, 65536)
-	copy(m.Memory[0:], "ghip\xaa\xff\xdf\xcb\x12\xa12\xb3\xa5\x1f\x01\x02")
-	copy(m.Memory[32:], "\x01\x03\x05\a\t\v\r\x0f")
+	copy(m.Memory[0:], data0)
+	copy(m.Memory[32:], data1)
 	return m
 }
 func (m Module) Xwasm_grow(v0 int32) int32 {
@@ -62,3 +62,8 @@ func memory_fill(mem []byte, n, val, dest int32) {
 		i += copy(buf[i:], buf[:chunk])
 	}
 }
+
+const (
+	data0 = "ghip\xaa\xff\xdf\xcb\x12\xa12\xb3\xa5\x1f\x01\x02"
+	data1 = "\x01\x03\x05\a\t\v\r\x0f"
+)

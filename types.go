@@ -104,8 +104,9 @@ type export struct {
 }
 
 type dataSegment struct {
-	offset int32
-	init   []byte
+	init    []byte
+	offset  uint32
+	passive bool
 }
 
 type nameSubsection byte
