@@ -803,8 +803,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			// so they're available to the parent block.
 			fn.emit(blk.setResults(fn)...)
 			fn.stack = fn.stack[:blk.stackPos]
-			for _, val := range blk.results {
-				fn.pushConst(val)
+			for _, tmp := range blk.results {
+				fn.pushConst(tmp)
 			}
 
 			fn.blocks.pop()
@@ -983,39 +983,76 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Rhs: []ast.Expr{fn.pop()},
 			})
 
+		case 0x1b: // select
+			cond := fn.popCond()
+			tmp := fn.newTempVar()
+			fn.emit(&ast.AssignStmt{
+				Tok: token.DEFINE,
+				Lhs: []ast.Expr{tmp},
+				Rhs: []ast.Expr{fn.pop()},
+			}, &ast.IfStmt{
+				Cond: cond,
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{&ast.AssignStmt{
+						Tok: token.ASSIGN,
+						Lhs: []ast.Expr{tmp},
+						Rhs: []ast.Expr{fn.popCopy()}, // must eval
+					}}},
+			})
+			fn.pushConst(tmp)
+
 		case 0x1c: // select (typed)
 			n, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			if n != 1 {
-				return fmt.Errorf("multi-value select not supported")
+			for range n {
+				if _, err := t.in.ReadByte(); err != nil {
+					return err
+				}
 			}
-			if _, err := t.in.ReadByte(); err != nil {
-				return err
-			}
-			fallthrough
 
-		case 0x1b: // select
 			cond := fn.popCond()
-			val := fn.newTempVar()
+			if n == 0 {
+				fn.emit(&ast.IfStmt{
+					Cond: cond,
+					Body: &ast.BlockStmt{},
+				})
+				break
+			}
+
+			vf := make([]ast.Expr, n)
+			for i := int(n) - 1; i >= 0; i-- {
+				vf[i] = fn.popCopy() // must eval
+			}
+
+			vt := make([]ast.Expr, n)
+			for i := int(n) - 1; i >= 0; i-- {
+				vt[i] = fn.popCopy() // must eval
+			}
+
+			tmp := make([]ast.Expr, n)
+			for i := range tmp {
+				tmp[i] = fn.newTempVar()
+			}
+
 			fn.emit(&ast.AssignStmt{
 				Tok: token.DEFINE,
-				Lhs: []ast.Expr{val},
-				Rhs: []ast.Expr{fn.pop()},
+				Lhs: tmp,
+				Rhs: vf,
 			}, &ast.IfStmt{
 				Cond: cond,
 				Body: &ast.BlockStmt{
-					List: []ast.Stmt{
-						&ast.AssignStmt{
-							Tok: token.ASSIGN,
-							Lhs: []ast.Expr{val},
-							Rhs: []ast.Expr{fn.popCopy()}, // must eval
-						},
-					},
-				},
+					List: []ast.Stmt{&ast.AssignStmt{
+						Tok: token.ASSIGN,
+						Lhs: tmp,
+						Rhs: vt,
+					}}},
 			})
-			fn.pushConst(val)
+
+			for _, tmp := range tmp {
+				fn.pushConst(tmp)
+			}
 
 		case 0x20: // local.get
 			i, err := readLEB128(t.in)
@@ -1040,20 +1077,20 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			val := fn.popCopy() // will reuse
+			tmp := fn.popCopy() // will reuse
 			fn.emit(&ast.AssignStmt{
 				Lhs: []ast.Expr{localVar(i)},
-				Rhs: []ast.Expr{val},
+				Rhs: []ast.Expr{tmp},
 				Tok: token.ASSIGN,
 			})
-			fn.pushConst(val)
+			fn.pushConst(tmp)
 
 		case 0x23: // global.get
 			e, err := t.globalGet()
 			if err != nil {
 				return err
 			}
-			fn.pushConst(e)
+			fn.push(e)
 
 		case 0x24: // global.set
 			i, err := readLEB128(t.in)
