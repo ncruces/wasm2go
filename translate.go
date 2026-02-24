@@ -1389,6 +1389,17 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0xbf: // f64.reinterpret_i64
 			fn.float64frombits()
 
+		case 0xc0: // i32.extend8_s
+			fn.convert("int8", "int32")
+		case 0xc1: // i32.extend16_s
+			fn.convert("int16", "int32")
+		case 0xc2: // i64.extend8_s
+			fn.convert("int8", "int64")
+		case 0xc3: // i64.extend16_s
+			fn.convert("int16", "int64")
+		case 0xc4: // i64.extend32_s
+			fn.convert("int32", "int64")
+
 		case 0xfc:
 			code, err := readLEB128(t.in)
 			if err != nil {
