@@ -1248,6 +1248,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						X:  &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
 					},
 					fn.pop(),
+					&ast.SelectorExpr{
+						X:   newID("m"),
+						Sel: memoryMaxLenId(fn.memory.id),
+					},
 				},
 			})
 

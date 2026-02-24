@@ -6,11 +6,13 @@ import "math"
 
 type Module struct {
 	Memory           []byte
+	MemoryMaxLen     uint
 	___stack_pointer int32
 }
 
 func New() *Module {
 	m := &Module{}
+	m.MemoryMaxLen = 4294967296
 	m.Memory = make([]byte, 65536)
 	m.___stack_pointer = i32_const(65536)
 	return m

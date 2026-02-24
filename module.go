@@ -27,10 +27,15 @@ func (t *translator) createModuleStruct() ast.Decl {
 		})
 	}
 	if t.memory != nil {
-		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{t.memory.id},
-			Type:  &ast.ArrayType{Elt: newID("byte")},
-		})
+		fields = append(fields,
+			&ast.Field{
+				Names: []*ast.Ident{t.memory.id},
+				Type:  &ast.ArrayType{Elt: newID("byte")},
+			},
+			&ast.Field{
+				Names: []*ast.Ident{memoryMaxLenId(t.memory.id)},
+				Type:  newID("uint"),
+			})
 	}
 	for _, g := range t.globals {
 		fields = append(fields, &ast.Field{
@@ -142,20 +147,35 @@ func (t *translator) createNewFunc() ast.Decl {
 	}
 
 	if t.memory != nil {
-		body.List = append(body.List, &ast.AssignStmt{
-			Lhs: []ast.Expr{&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.memory.id,
-			}},
-			Tok: token.ASSIGN,
-			Rhs: []ast.Expr{&ast.CallExpr{
-				Fun: newID("make"),
-				Args: []ast.Expr{
-					&ast.ArrayType{Elt: newID("byte")},
-					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.memory.min * 65536)},
-				},
-			}},
-		})
+		body.List = append(body.List,
+			&ast.AssignStmt{
+				Lhs: []ast.Expr{&ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: memoryMaxLenId(t.memory.id),
+				}},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{&ast.BasicLit{
+					Kind:  token.INT,
+					Value: strconv.FormatUint(uint64(t.memory.max)*65536, 10),
+				}},
+			},
+			&ast.AssignStmt{
+				Lhs: []ast.Expr{&ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: t.memory.id,
+				}},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: newID("make"),
+					Args: []ast.Expr{
+						&ast.ArrayType{Elt: newID("byte")},
+						&ast.BasicLit{
+							Kind:  token.INT,
+							Value: strconv.FormatUint(uint64(t.memory.min)*65536, 10),
+						},
+					},
+				}},
+			})
 	}
 
 	if len(t.elements) > 0 {
