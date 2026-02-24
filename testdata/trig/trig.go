@@ -38,7 +38,8 @@ l0:
 	;
 	v1 = math.Float64frombits(9221120237041090560)
 	{
-		t4 := int64(math.Float64bits(v0))
+		t3 := v0
+		t4 := int64(math.Float64bits(t3))
 		t5 := t4 & i64_const(9223372036854775807)
 		if t5 > i64_const(9218868437227405311) {
 			goto l1
@@ -47,7 +48,9 @@ l0:
 			{
 				t7 := v0
 				t8 := float64(t7 * float64(0.6366197723675814))
-				t11 := float64(t8 + math.Copysign(float64(0.5), v0))
+				t9 := v0
+				t10 := math.Copysign(float64(0.5), t9)
+				t11 := float64(t8 + t10)
 				v1 = t11
 				t12 := math.Abs(t11)
 				var t13 int32
@@ -57,7 +60,9 @@ l0:
 				if t13 == 0 {
 					goto l2
 				}
-				v2 = i64_trunc_f64_s(v1)
+				t15 := v1
+				t16 := i64_trunc_f64_s(t15)
+				v2 = t16
 				goto l3
 			}
 		l2:
@@ -67,13 +72,17 @@ l0:
 	l3:
 		;
 		t17 := v0
-		t19 := float64(v2)
-		v1 = float64(t17 + float64(t19*float64(-1.5707963267948966)))
+		t18 := v2
+		t19 := float64(t18)
+		t20 := float64(t19 * float64(-1.5707963267948966))
+		t21 := float64(t17 + t20)
+		v1 = t21
 		v3 = i32_const(0)
 	l10:
 		{
 			{
-				t23 := math.Abs(v1)
+				t22 := v1
+				t23 := math.Abs(t22)
 				if t23 > float64(7.450580596923828e-09) {
 					goto l4
 				}
@@ -88,8 +97,10 @@ l0:
 									if t25 != 0 {
 										goto l5
 									}
-									t27 := int32(v2)
-									switch t27 & i32_const(3) {
+									t26 := v2
+									t27 := int32(t26)
+									t28 := t27 & i32_const(3)
+									switch t28 {
 									default:
 										goto l1
 									case 0:
@@ -105,15 +116,24 @@ l0:
 							l5:
 								;
 								t29 := v3
-								v3 = t29 + i32_const(-1)
+								t30 := t29 + i32_const(-1)
+								v3 = t30
 								t31 := v1
-								v0 = float64(t31 * v1)
+								t32 := v1
+								t33 := float64(t31 * t32)
+								v0 = t33
 								t34 := v4
-								t36 := float64(t34 * v1)
+								t35 := v1
+								t36 := float64(t34 * t35)
 								v1 = t36
-								v1 = float64(t36 + v1)
+								t37 := v1
+								t38 := float64(t36 + t37)
+								v1 = t38
 								t39 := v0
-								v4 = float64(float64(1) - float64(t39+v0))
+								t40 := v0
+								t41 := float64(t39 + t40)
+								t42 := float64(float64(1) - t41)
+								v4 = t42
 								goto l9
 							}
 						}
@@ -124,20 +144,25 @@ l0:
 					}
 				l7:
 					;
-					t45 := -v1
+					t44 := v1
+					t45 := -t44
 					return t45
 				}
 			l8:
 				;
-				v1 = -v4
+				t46 := v4
+				t47 := -t46
+				v1 = t47
 				goto l1
 			}
 		l4:
 			;
 			t48 := v3
-			v3 = t48 + i32_const(1)
+			t49 := t48 + i32_const(1)
+			v3 = t49
 			t50 := v1
-			v1 = float64(t50 * float64(0.5))
+			t51 := float64(t50 * float64(0.5))
+			v1 = t51
 			goto l10
 		}
 	}

@@ -17,30 +17,35 @@ func (m Module) Xfactorial(v0 int32) int32 {
 	} else {
 		t3 := v0
 		t4 := v0
-		t6 := m.Xfactorial(t4 - i32_const(1))
+		t5 := t4 - i32_const(1)
+		t6 := m.Xfactorial(t5)
 		t7 := t3 * t6
 		t2 = t7
 	}
 	return t2
 }
 func (m Module) Xis_even(v0 int32) int32 {
+	t0 := v0
 	var t2 int32
-	if v0 == 0 {
+	if t0 == 0 {
 		t2 = i32_const(1)
 	} else {
 		t3 := v0
-		t5 := m.Xis_odd(t3 - i32_const(1))
+		t4 := t3 - i32_const(1)
+		t5 := m.Xis_odd(t4)
 		t2 = t5
 	}
 	return t2
 }
 func (m Module) Xis_odd(v0 int32) int32 {
+	t0 := v0
 	var t2 int32
-	if v0 == 0 {
+	if t0 == 0 {
 		t2 = i32_const(0)
 	} else {
 		t3 := v0
-		t5 := m.Xis_even(t3 - i32_const(1))
+		t4 := t3 - i32_const(1)
+		t5 := m.Xis_even(t4)
 		t2 = t5
 	}
 	return t2

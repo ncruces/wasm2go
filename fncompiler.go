@@ -12,7 +12,6 @@ type funcCompiler struct {
 	typ  funcType
 	decl *ast.FuncDecl
 
-	top    ast.Expr
 	cond   ast.Expr
 	stack  stack[ast.Expr]
 	blocks stack[funcBlock]
@@ -39,7 +38,6 @@ func (fn *funcCompiler) branch(n uint64) ast.Stmt {
 			copy(ret.Results, fn.stack.last(n))
 		}
 		fn.cond = nil
-		fn.top = nil
 		return ret
 	}
 
@@ -103,7 +101,6 @@ func (fn *funcCompiler) memoryN(offset uint64) ast.Expr {
 func (fn *funcCompiler) pushConst(expr ast.Expr) {
 	fn.stack.append(expr)
 	fn.cond = nil
-	fn.top = nil
 }
 
 // Pushes the materialization of expr to the value stack.
@@ -115,7 +112,6 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 		Rhs: []ast.Expr{expr},
 	})
 	fn.pushConst(tmp)
-	fn.top = expr
 }
 
 // Pushes the integer materialization of cond the value stack.
@@ -147,37 +143,19 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 	fn.cond = cond
 }
 
-// Pops a materialized value from the value stack.
-func (fn *funcCompiler) popCopy() ast.Expr {
+// Pops a value from the value stack.
+func (fn *funcCompiler) pop() ast.Expr {
 	expr := fn.stack.pop()
 	fn.cond = nil
-	fn.top = nil
 	return expr
 }
 
-// Pops a (possibly unevaluated) value from the value stack.
-// The value must be immediately used once and only once.
-func (fn *funcCompiler) pop() ast.Expr {
-	expr := fn.stack.pop()
-	top := fn.top
-	fn.cond = nil
-	fn.top = nil
-	if top == nil {
-		return expr
-	}
-
-	lst := &fn.blocks.top().body.List
-	*lst = (*lst)[:len(*lst)-1]
-	return top
-}
-
-// Pops a (possibly unevaluated) condition from the value stack.
+// Pops a condition from the value stack.
 // The condition must be immediately used once and only once.
 func (fn *funcCompiler) popCond() ast.Expr {
 	expr := fn.stack.pop()
 	cond := fn.cond
 	fn.cond = nil
-	fn.top = nil
 	if cond == nil {
 		return &ast.BinaryExpr{
 			X: expr, Op: token.NEQ,
@@ -462,6 +440,7 @@ type funcBlock struct {
 	loopPos     int
 	stackPos    int
 	unreachable bool
+	ifreachable bool
 }
 
 func (b *funcBlock) setResults(fn *funcCompiler) []ast.Stmt {
@@ -474,7 +453,6 @@ func (b *funcBlock) setResults(fn *funcCompiler) []ast.Stmt {
 	// the values are supposed to stay on the stack
 	// for the next instruction.
 
-	fn.top = nil
 	fn.cond = nil
 	stack := fn.stack.last(len(b.results))
 	stmts := make([]ast.Stmt, len(stack))

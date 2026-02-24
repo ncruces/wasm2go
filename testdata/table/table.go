@@ -27,7 +27,8 @@ func (m Module) f0(v0 int32) int32 {
 }
 func (m Module) f1(v0 int32) int32 {
 	t0 := v0
-	t2 := t0 + v0
+	t1 := v0
+	t2 := t0 + t1
 	return t2
 }
 func (m Module) Xtimes2(v0 int32) int32 {

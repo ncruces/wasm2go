@@ -23,17 +23,20 @@ func (m Module) Xfibonacci(v0 int64) int64 {
 	var t4 int64
 l0:
 	{
+		t5 := v0
 		var t7 int64
-		if v0 == 0 {
+		if t5 == 0 {
 			t8 := v2
 			t7 = t8
 		} else {
 			t9 := v0
-			v0 = t9 - i64_const(1)
+			t10 := t9 - i64_const(1)
+			v0 = t10
 			t11 := v2
 			t12 := v1
 			v2 = t12
-			v1 = t11 + t12
+			t13 := t11 + t12
+			v1 = t13
 			goto l0
 		}
 		t4 = t7

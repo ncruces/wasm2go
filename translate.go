@@ -786,6 +786,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			// make it the else branch.
 			blk.body = &ast.BlockStmt{}
 			blk.ifStmt.Else = blk.body
+			blk.ifreachable = blk.unreachable
 			blk.unreachable = false
 
 		case 0x0b: // end
@@ -822,6 +823,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Label: blk.label,
 					})
 				}
+			}
+			if blk.ifreachable && blk.unreachable {
+				fn.blocks.top().unreachable = true
 			}
 
 		case 0x0c: // br
@@ -996,7 +1000,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					List: []ast.Stmt{&ast.AssignStmt{
 						Tok: token.ASSIGN,
 						Lhs: []ast.Expr{tmp},
-						Rhs: []ast.Expr{fn.popCopy()}, // must eval
+						Rhs: []ast.Expr{fn.pop()},
 					}}},
 			})
 			fn.pushConst(tmp)
@@ -1023,12 +1027,12 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			vf := make([]ast.Expr, n)
 			for i := int(n) - 1; i >= 0; i-- {
-				vf[i] = fn.popCopy() // must eval
+				vf[i] = fn.pop()
 			}
 
 			vt := make([]ast.Expr, n)
 			for i := int(n) - 1; i >= 0; i-- {
-				vt[i] = fn.popCopy() // must eval
+				vt[i] = fn.pop()
 			}
 
 			tmp := make([]ast.Expr, n)
@@ -1077,7 +1081,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			tmp := fn.popCopy() // will reuse
+			tmp := fn.pop()
 			fn.emit(&ast.AssignStmt{
 				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{tmp},
@@ -1398,9 +1402,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x76: // i32.shr_u
 			fn.binHelper("i32_shr_u")
 		case 0x77: // i32.rotl
-			fn.binHelper("i32_rotl", "bits")
+			fn.binHelper("i32_rotl", "math/bits")
 		case 0x78: // i32.rotr
-			fn.binHelper("i32_rotr", "bits")
+			fn.binHelper("i32_rotr", "math/bits")
 
 		case 0x79: // i64.clz
 			fn.bitOp("LeadingZeros64")
@@ -1435,9 +1439,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x88: // i64.shr_u
 			fn.binHelper("i64_shr_u")
 		case 0x89: // i64.rotl
-			fn.binHelper("i64_rotl", "bits")
+			fn.binHelper("i64_rotl", "math/bits")
 		case 0x8a: // i64.rotr
-			fn.binHelper("i64_rotr", "bits")
+			fn.binHelper("i64_rotr", "math/bits")
 
 		case 0x8b: // f32.abs
 			fn.uniMath32("Abs")

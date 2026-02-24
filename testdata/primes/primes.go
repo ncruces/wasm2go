@@ -30,16 +30,19 @@ l1:
 	{
 		{
 			t7 := v1
-			if uint32(t7) >= uint32(v0) {
+			t8 := v0
+			if uint32(t7) >= uint32(t8) {
 				goto l0
 			}
 			t10 := v0
-			t12 := int32(uint32(t10) % uint32(v1))
+			t11 := v1
+			t12 := int32(uint32(t10) % uint32(t11))
 			if t12 == i32_const(0) {
 				return i32_const(0)
 			}
 			t14 := v1
-			v1 = t14 + i32_const(2)
+			t15 := t14 + i32_const(2)
+			v1 = t15
 			goto l1
 		}
 	l0:

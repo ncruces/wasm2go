@@ -18,7 +18,8 @@ func New() *Module {
 	return m
 }
 func (m Module) Xwasm_grow(v0 int32) int32 {
-	t1 := memory_grow(&m.Memory, v0, m.MemoryMaxLen)
+	t0 := v0
+	t1 := memory_grow(&m.Memory, t0, m.MemoryMaxLen)
 	return t1
 }
 func (m Module) Xwasm_size() int32 {
@@ -28,14 +29,17 @@ func (m Module) Xwasm_size() int32 {
 func (m Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
 	t0 := v0
 	t1 := v1
-	memory_fill(m.Memory, v2, t1, t0)
+	t2 := v2
+	memory_fill(m.Memory, t2, t1, t0)
 }
 func (m Module) Xread_as_i32(v0 int32) int32 {
-	t1 := int32(binary.LittleEndian.Uint32(m.Memory[uint32(v0):]))
+	t0 := v0
+	t1 := int32(binary.LittleEndian.Uint32(m.Memory[uint32(t0):]))
 	return t1
 }
 func (m Module) Xread_as_i8u(v0 int32) int32 {
-	t1 := int32(m.Memory[uint32(v0)])
+	t0 := v0
+	t1 := int32(m.Memory[uint32(t0)])
 	return t1
 }
 

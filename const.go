@@ -39,7 +39,7 @@ func (t *translator) constF32() (ast.Expr, error) {
 	}
 
 	f := math.Float32frombits(v)
-	if -math.MaxFloat32 <= f && f <= +math.MaxFloat32 {
+	if -math.MaxFloat32 <= f && f <= +math.MaxFloat32 && (v == 0 || f != 0) {
 		return &ast.CallExpr{
 			Fun:  newID("float32"),
 			Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatFloat(float64(f), 'g', -1, 32)}},
@@ -60,7 +60,7 @@ func (t *translator) constF64() (ast.Expr, error) {
 	}
 
 	f := math.Float64frombits(v)
-	if -math.MaxFloat64 <= f && f <= +math.MaxFloat64 {
+	if -math.MaxFloat64 <= f && f <= +math.MaxFloat64 && (v == 0 || f != 0) {
 		return &ast.CallExpr{
 			Fun:  newID("float64"),
 			Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatFloat(f, 'g', -1, 64)}},
