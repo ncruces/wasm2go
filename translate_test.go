@@ -8,12 +8,12 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/ncruces/wasm2go/testdata/fib"
-	"github.com/ncruces/wasm2go/testdata/primes"
-	"github.com/ncruces/wasm2go/testdata/recursion"
+	fib_test "github.com/ncruces/wasm2go/testdata/fib"
+	primes_test "github.com/ncruces/wasm2go/testdata/primes"
+	recursion_test "github.com/ncruces/wasm2go/testdata/recursion"
 	stack_test "github.com/ncruces/wasm2go/testdata/stack"
-	"github.com/ncruces/wasm2go/testdata/table"
-	"github.com/ncruces/wasm2go/testdata/trig"
+	table_test "github.com/ncruces/wasm2go/testdata/table"
+	trig_test "github.com/ncruces/wasm2go/testdata/trig"
 )
 
 func Test_generate(t *testing.T) {
@@ -30,7 +30,7 @@ func Test_generate(t *testing.T) {
 			defer in.Close()
 
 			var out bytes.Buffer
-			err = translate(name, in, &out)
+			err = translate(in, &out)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -46,7 +46,7 @@ func Test_generate(t *testing.T) {
 func Test_fib(t *testing.T) {
 	want := []int64{0, 1, 1, 2, 3, 5, 8, 13, 21}
 
-	var m fib.Module
+	var m fib_test.Module
 
 	var got []int64
 	for i := range want {
@@ -82,7 +82,7 @@ func Test_primes(t *testing.T) {
 		1, // 19
 	}
 
-	var m primes.Module
+	var m primes_test.Module
 
 	var got []int32
 	for i := range want {
@@ -97,7 +97,7 @@ func Test_primes(t *testing.T) {
 func Test_recursive_factorial(t *testing.T) {
 	want := []int32{1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800}
 
-	var m recursion.Module
+	var m recursion_test.Module
 
 	var got []int32
 	for i := range want {
@@ -110,7 +110,7 @@ func Test_recursive_factorial(t *testing.T) {
 }
 
 func Test_recursive_evenodd(t *testing.T) {
-	var m recursion.Module
+	var m recursion_test.Module
 
 	for i := range 100 {
 		even := m.Xis_even(int32(i))
@@ -140,7 +140,7 @@ func Test_stack(t *testing.T) {
 }
 
 func Test_table(t *testing.T) {
-	m := table.New(tableEnv{})
+	m := table_test.New(tableEnv{})
 
 	if got := m.Xtimes2(5); got != 2*5 {
 		t.Errorf("got %d, want %d", got, 2*5)
@@ -169,7 +169,7 @@ func Test_trig(t *testing.T) {
 		float32(math.Sin(7)),
 	}
 
-	var m trig.Module
+	var m trig_test.Module
 
 	var got []float32
 	for i := range want {

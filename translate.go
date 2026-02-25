@@ -38,7 +38,7 @@ type translator struct {
 	data      []dataSegment
 }
 
-func translate(name string, r io.Reader, w io.Writer) error {
+func translate(r io.Reader, w io.Writer) error {
 	var t translator
 
 	t.in = bufio.NewReader(r)
@@ -46,8 +46,6 @@ func translate(name string, r io.Reader, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-
-	t.out.Name = newID(name)
 
 	t.packages = set[string]{}
 	t.helpers = set[string]{}
@@ -72,6 +70,10 @@ func translate(name string, r io.Reader, w io.Writer) error {
 		t.out.Decls...)
 
 	// Late binding of names.
+	if t.out.Name == nil {
+		t.out.Name = newID("wasm2go")
+	}
+
 	for i, fn := range t.functions {
 		if fn.decl != nil && fn.decl.Name.Name == "" {
 			fn.decl.Name.Name = "f" + strconv.Itoa(i)
@@ -1819,12 +1821,11 @@ func (t *translator) readCustomSection(size int) error {
 	if err != nil {
 		return err
 	}
-	name := make([]byte, n)
-	if _, err := io.ReadFull(r, name); err != nil {
+	var buf strings.Builder
+	if _, err := io.CopyN(&buf, r, int64(n)); err != nil {
 		return err
 	}
-
-	if string(name) == "name" {
+	if buf.String() == "name" {
 		return t.readNameSection(r)
 	}
 	return nil
@@ -1842,6 +1843,20 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 		}
 
 		switch nameSubsection(kind) {
+		case nameModule:
+			n, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			var buf strings.Builder
+			if _, err := io.CopyN(&buf, r, int64(n)); err != nil {
+				return err
+			}
+			name := buf.String()
+			buf.Reset()
+			mangle(&buf, string(name))
+			t.out.Name = ast.NewIdent(buf.String())
+
 		case nameFunction, nameGlobal:
 			count, err := readLEB128(r)
 			if err != nil {
@@ -1856,8 +1871,8 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 				if err != nil {
 					return err
 				}
-				name := make([]byte, n)
-				if _, err := io.ReadFull(r, name); err != nil {
+				var buf strings.Builder
+				if _, err := io.CopyN(&buf, r, int64(n)); err != nil {
 					return err
 				}
 
@@ -1873,7 +1888,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 					}
 				}
 				if id != nil && id.Name == "" {
-					id.Name = internal(string(name))
+					id.Name = internal(buf.String())
 				}
 			}
 
