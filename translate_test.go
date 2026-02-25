@@ -153,7 +153,7 @@ func Test_table(t *testing.T) {
 
 type tableEnv struct{}
 
-func (t tableEnv) Ijstimes3(m *table.Module, v0 int32) int32 {
+func (t tableEnv) Xjstimes3(v0 int32) int32 {
 	return v0 * 3
 }
 

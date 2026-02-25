@@ -9,7 +9,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m Module) Xfibonacci(v0 int64) int64 {
+func (m *Module) Xfibonacci(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	t0 := v0

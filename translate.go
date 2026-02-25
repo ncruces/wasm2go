@@ -311,16 +311,15 @@ func (t *translator) readImportSection() error {
 				typ:    typ,
 			})
 
-			args := make([]ast.Expr, len(typ.params)+1)
-			args[0] = &ast.UnaryExpr{Op: token.AND, X: newID("m")}
+			args := make([]ast.Expr, len(typ.params))
 			for i := range typ.params {
-				args[i+1] = localVar(i)
+				args[i] = localVar(i)
 			}
 
 			call := &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
 					X:   &ast.SelectorExpr{X: newID("m"), Sel: newID(internal(mod))},
-					Sel: newID(imported(name)),
+					Sel: newID(exported(name)),
 				},
 				Args: args,
 			}

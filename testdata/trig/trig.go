@@ -17,7 +17,7 @@ func New() *Module {
 	m.___stack_pointer = i32_const(65536)
 	return m
 }
-func (m Module) Xsin(v0 float64) float64 {
+func (m *Module) Xsin(v0 float64) float64 {
 	var v1 float64
 	_ = v1
 	var v2 int64

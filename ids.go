@@ -25,13 +25,6 @@ func exported(name string) string {
 	return buf.String()
 }
 
-func imported(name string) string {
-	var buf strings.Builder
-	buf.WriteByte('I')
-	mangle(&buf, name)
-	return buf.String()
-}
-
 func internal(name string) string {
 	var buf strings.Builder
 	buf.WriteByte('_')

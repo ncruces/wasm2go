@@ -5,38 +5,43 @@ package table
 type Module struct {
 	table    []any
 	elements [][]any
-	_env     Ienv
+	_env     Xenv
 }
 
-func New(v0 Ienv) *Module {
+func New(v0 Xenv) *Module {
 	m := &Module{}
-	m._env = v0
 	m.table = make([]any, 32)
 	m.elements = [][]any{[]any{m.f1}, []any{m.f0}}
 	copy(m.table[16:], m.elements[0])
 	copy(m.table[17:], m.elements[1])
+	if i, ok := v0.(interface {
+		Init(*Module)
+	}); ok {
+		i.Init(m)
+	}
+	m._env = v0
 	return m
 }
 
-type Ienv interface {
-	Ijstimes3(m *Module, v0 int32) int32
+type Xenv interface {
+	Xjstimes3(v0 int32) int32
 }
 
-func (m Module) f0(v0 int32) int32 {
-	return m._env.Ijstimes3(&m, v0)
+func (m *Module) f0(v0 int32) int32 {
+	return m._env.Xjstimes3(v0)
 }
-func (m Module) f1(v0 int32) int32 {
+func (m *Module) f1(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
 	t2 := t0 + t1
 	return t2
 }
-func (m Module) Xtimes2(v0 int32) int32 {
+func (m *Module) Xtimes2(v0 int32) int32 {
 	t0 := v0
 	t1 := m.table[uint32(i32_const(16))].(func(v0 int32) int32)(t0)
 	return t1
 }
-func (m Module) Xtimes3(v0 int32) int32 {
+func (m *Module) Xtimes3(v0 int32) int32 {
 	t0 := v0
 	t1 := m.table[uint32(i32_const(17))].(func(v0 int32) int32)(t0)
 	return t1

@@ -9,7 +9,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m Module) Xis_prime(v0 int32) int32 {
+func (m *Module) Xis_prime(v0 int32) int32 {
 	var v1 int32
 	_ = v1
 	t0 := v0

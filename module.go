@@ -9,7 +9,7 @@ import (
 
 var modRecvList = &ast.FieldList{List: []*ast.Field{{
 	Names: []*ast.Ident{newID("m")},
-	Type:  newID("Module"),
+	Type:  &ast.StarExpr{X: newID("Module")},
 }}}
 
 func (t *translator) createModuleStruct() ast.Decl {
@@ -49,7 +49,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 			seen.add(imp.module)
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{newID(internal(imp.module))},
-				Type:  newID(imported(imp.module)),
+				Type:  newID(exported(imp.module)),
 			})
 		}
 	}
@@ -71,13 +71,9 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 
 	for _, imp := range t.imports {
 		typ := imp.typ.toAST()
-		typ.Params.List = append([]*ast.Field{{
-			Names: []*ast.Ident{newID("m")},
-			Type:  &ast.StarExpr{X: newID("Module")},
-		}}, typ.Params.List...)
 
 		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
-			Names: []*ast.Ident{newID(imported(imp.name))},
+			Names: []*ast.Ident{newID(exported(imp.name))},
 			Type:  typ,
 		})
 	}
@@ -87,7 +83,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
-				Name: newID(imported(name)),
+				Name: newID(exported(name)),
 				Type: &ast.InterfaceType{Methods: &ast.FieldList{List: methods}},
 			}},
 		})
@@ -108,25 +104,6 @@ func (t *translator) createNewFunc() ast.Decl {
 				}},
 			},
 		},
-	}
-
-	seen := set[string]{}
-	for i, imp := range t.imports {
-		if !seen.has(imp.module) {
-			seen.add(imp.module)
-			params = append(params, &ast.Field{
-				Names: []*ast.Ident{localVar(i)},
-				Type:  newID(imported(imp.module)),
-			})
-			body.List = append(body.List, &ast.AssignStmt{
-				Lhs: []ast.Expr{&ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: newID(internal(imp.module)),
-				}},
-				Tok: token.ASSIGN,
-				Rhs: []ast.Expr{localVar(i)},
-			})
-		}
 	}
 
 	if t.table != nil {
@@ -252,6 +229,52 @@ func (t *translator) createNewFunc() ast.Decl {
 				},
 			},
 		})
+	}
+
+	seen := set[string]{}
+	for i, imp := range t.imports {
+		if !seen.has(imp.module) {
+			seen.add(imp.module)
+			params = append(params, &ast.Field{
+				Names: []*ast.Ident{localVar(i)},
+				Type:  newID(exported(imp.module)),
+			})
+			body.List = append(body.List, &ast.IfStmt{
+				Init: &ast.AssignStmt{
+					Lhs: []ast.Expr{newID("i"), newID("ok")},
+					Tok: token.DEFINE,
+					Rhs: []ast.Expr{&ast.TypeAssertExpr{
+						X: localVar(i),
+						Type: &ast.InterfaceType{
+							Methods: &ast.FieldList{List: []*ast.Field{{
+								Names: []*ast.Ident{newID("Init")},
+								Type: &ast.FuncType{
+									Params: &ast.FieldList{List: []*ast.Field{{
+										Type: &ast.StarExpr{X: newID("Module")},
+									}}},
+								},
+							}}},
+						},
+					}},
+				},
+				Cond: newID("ok"),
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{&ast.ExprStmt{
+						X: &ast.CallExpr{
+							Fun:  &ast.SelectorExpr{X: newID("i"), Sel: newID("Init")},
+							Args: []ast.Expr{newID("m")},
+						},
+					}},
+				},
+			}, &ast.AssignStmt{
+				Lhs: []ast.Expr{&ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: newID(internal(imp.module)),
+				}},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{localVar(i)},
+			})
+		}
 	}
 
 	if t.start != 0 {
