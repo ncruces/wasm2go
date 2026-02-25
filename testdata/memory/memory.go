@@ -2,27 +2,24 @@
 
 package wasm2go
 
-import (
-	"encoding/binary"
-	"math"
-)
+import "encoding/binary"
 
 type Module struct {
-	Memory       []byte
-	MemoryMaxLen int
+	Memory []byte
+	maxMem int32
 }
 
 func New() *Module {
 	m := &Module{}
+	m.maxMem = 100
 	m.Memory = make([]byte, 65536)
-	m.MemoryMaxLen = min(math.MaxInt, 6553600)
 	copy(m.Memory[0:], data0)
 	copy(m.Memory[32:], data1)
 	return m
 }
 func (m *Module) Xwasm_grow(v0 int32) int32 {
 	t0 := v0
-	t1 := memory_grow(&m.Memory, t0, m.MemoryMaxLen)
+	t1 := memory_grow(&m.Memory, t0, m.maxMem)
 	return t1
 }
 func (m *Module) Xwasm_size() int32 {
@@ -46,19 +43,20 @@ func (m *Module) Xread_as_i8u(v0 int32) int32 {
 	return t1
 }
 
-func memory_grow(mem *[]byte, delta int32, max int) int32 {
+func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem
-	old := int32(len(buf) >> 16)
+	len := len(buf)
+	old := int32(len >> 16)
 	if delta == 0 {
 		return old
 	}
-	add := int(uint32(delta)) << 16
-	new := add + len(buf)
-	if 0 < new && new <= max {
-		*mem = append(buf, make([]byte, add)...)
-		return old
+	new := old + delta
+	add := int(new)<<16 - len
+	if new > max || add < 0 {
+		return -1
 	}
-	return -1
+	*mem = append(buf, make([]byte, add)...)
+	return old
 }
 
 func memory_fill(mem []byte, n, val, dest int32) {

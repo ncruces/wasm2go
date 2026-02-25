@@ -252,19 +252,20 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 	return int64(i)
 }
 
-func memory_grow(mem *[]byte, delta int32, max int) int32 {
+func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem
-	old := int32(len(buf) >> 16)
+	len := len(buf)
+	old := int32(len >> 16)
 	if delta == 0 {
 		return old
 	}
-	add := int(uint32(delta)) << 16
-	new := add + len(buf)
-	if 0 < new && new <= max {
-		*mem = append(buf, make([]byte, add)...)
-		return old
+	new := old + delta
+	add := int(new)<<16 - len
+	if new > max || add < 0 {
+		return -1
 	}
-	return -1
+	*mem = append(buf, make([]byte, add)...)
+	return old
 }
 
 func memory_init(mem []byte, data string, n, src, dest int32) {

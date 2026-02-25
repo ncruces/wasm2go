@@ -84,9 +84,10 @@ type tableDef struct {
 }
 
 type memoryDef struct {
-	id  *ast.Ident
-	min int
-	max int
+	id       *ast.Ident
+	imported *ast.Ident
+	min      int
+	max      int
 }
 
 type globalDef struct {

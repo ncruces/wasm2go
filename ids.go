@@ -56,7 +56,3 @@ func labelId(i int) *ast.Ident {
 func dataId[T interface{ int | uint64 }](i T) *ast.Ident {
 	return newID("data" + strconv.Itoa(int(i)))
 }
-
-func memoryMaxLenId(id *ast.Ident) *ast.Ident {
-	return newID(id.Name + "MaxLen")
-}

@@ -60,6 +60,13 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
+	if t.memory != nil && t.memory.imported != nil {
+		if t.memory.imported.Name == "" {
+			t.memory.imported.Name = "Memory"
+		}
+		t.out.Decls = append([]ast.Decl{t.createMemoryStruct()}, t.out.Decls...)
+	}
+
 	if len(t.imports) > 0 {
 		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
 	}
@@ -320,8 +327,8 @@ func (t *translator) readImportSection() error {
 
 			call := &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.SelectorExpr{X: newID("m"), Sel: newID(internal(mod))},
-					Sel: newID(exported(name)),
+					X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(mod))},
+					Sel: ast.NewIdent(exported(name)),
 				},
 				Args: args,
 			}
@@ -347,6 +354,20 @@ func (t *translator) readImportSection() error {
 			t.functions = append(t.functions, fn)
 			t.out.Decls = append(t.out.Decls, fn.decl)
 
+		case memoryImport:
+			if t.memory != nil {
+				return fmt.Errorf("multiple memories not supported")
+			}
+			min, max, err := t.readLimits(65536)
+			if err != nil {
+				return err
+			}
+			t.memory = &memoryDef{
+				id:       newID("Data"),
+				imported: &ast.Ident{},
+				min:      int(min),
+				max:      int(max),
+			}
 		default:
 			return fmt.Errorf("unsupported import kind: %x", kind)
 		}
@@ -617,7 +638,11 @@ func (t *translator) readExportSection() error {
 			if !strings.EqualFold(name, id) {
 				id = exported(name)
 			}
-			t.memory.id = ast.NewIdent(id)
+			if t.memory.imported != nil {
+				t.memory.imported.Name = id
+			} else {
+				t.memory.id = ast.NewIdent(id)
+			}
 		case globalExport:
 			t.globals[index].id = ast.NewIdent(exported(name))
 		}
@@ -1257,9 +1282,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.helpers.add("memory_grow")
-			fn.push(&ast.CallExpr{
-				Fun: newID("memory_grow"),
+			call := &ast.CallExpr{
 				Args: []ast.Expr{
 					&ast.UnaryExpr{
 						Op: token.AND,
@@ -1268,10 +1291,17 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					fn.pop(),
 					&ast.SelectorExpr{
 						X:   newID("m"),
-						Sel: memoryMaxLenId(fn.memory.id),
+						Sel: newID("maxMem"),
 					},
 				},
-			})
+			}
+			if fn.memory.imported != nil {
+				call.Fun = &ast.SelectorExpr{X: newID("m"), Sel: newID("Grow")}
+			} else {
+				fn.helpers.add("memory_grow")
+				call.Fun = newID("memory_grow")
+			}
+			fn.push(call)
 
 		case 0x41: // i32.const
 			e, err := t.constI32()
