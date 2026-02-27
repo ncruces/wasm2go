@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"strconv"
+	"strings"
 )
 
 type funcCompiler struct {
@@ -53,48 +54,101 @@ func (fn *funcCompiler) branch(n uint64) ast.Stmt {
 	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
 }
 
-// Returns a memory index expression for a byte: m.Memory[start+offset]
-func (fn *funcCompiler) memory8(offset uint64) ast.Expr {
-	var x ast.Expr = fn.pop()
-	if offset != 0 {
-		x = &ast.BinaryExpr{
-			X:  x,
-			Op: token.ADD,
-			Y: &ast.BasicLit{
-				Kind:  token.INT,
-				Value: strconv.FormatUint(offset, 10),
-			},
-		}
-	}
+func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 	return &ast.IndexExpr{
-		X: &ast.SelectorExpr{
-			X:   newID("m"),
-			Sel: fn.memory.id,
-		},
-		Index: convert(x, "uint32"),
-	}
+		X:     &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+		Index: fn.popAddr(offset)}
 }
 
-// Returns a memory index expression for n bytes: m.Memory[start+offset:]
-func (fn *funcCompiler) memoryN(offset uint64) ast.Expr {
-	var x ast.Expr = fn.pop()
-	if offset != 0 {
-		x = &ast.BinaryExpr{
-			X:  x,
-			Op: token.ADD,
-			Y: &ast.BasicLit{
-				Kind:  token.INT,
-				Value: strconv.FormatUint(offset, 10),
-			},
+func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
+	fn.packages.add("encoding/binary")
+	bits := typ[len(typ)-2:]
+
+	expr = &ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X: &ast.SelectorExpr{
+				X:   newID("binary"),
+				Sel: newID("LittleEndian")},
+			Sel: newID("Uint" + bits)},
+		Args: []ast.Expr{&ast.SliceExpr{
+			X:   &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+			Low: addr}}}
+
+	if strings.HasPrefix(typ, "float") {
+		fn.packages.add("math")
+		expr = &ast.CallExpr{
+			Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float" + bits + "frombits")},
+			Args: []ast.Expr{expr},
 		}
+	} else if !strings.HasPrefix(typ, "u") {
+		expr = convert(expr, typ)
 	}
-	return &ast.SliceExpr{
-		X: &ast.SelectorExpr{
-			X:   newID("m"),
-			Sel: fn.memory.id,
-		},
-		Low: convert(x, "uint32"),
+	return expr
+}
+
+func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
+	fn.packages.add("encoding/binary")
+	bits := typ[len(typ)-2:]
+
+	if strings.HasPrefix(typ, "float") {
+		fn.packages.add("math")
+		val = &ast.CallExpr{
+			Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float" + bits + "bits")},
+			Args: []ast.Expr{val}}
+	} else {
+		val = convert(val, "uint"+bits)
 	}
+
+	return &ast.ExprStmt{X: &ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X: &ast.SelectorExpr{
+				X:   newID("binary"),
+				Sel: newID("LittleEndian")},
+			Sel: newID("PutUint" + bits)},
+		Args: []ast.Expr{
+			&ast.SliceExpr{
+				X:   &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+				Low: addr},
+			val}}}
+}
+
+func (fn *funcCompiler) loadUnsafe(addr ast.Expr, typ string) ast.Expr {
+	fn.packages.add("unsafe")
+
+	var bytes string
+	switch typ[len(typ)-2:] {
+	case "16":
+		bytes = "2"
+	case "32":
+		bytes = "4"
+	case "64":
+		bytes = "8"
+	}
+
+	return &ast.StarExpr{X: &ast.CallExpr{
+		Fun: &ast.ParenExpr{X: &ast.StarExpr{X: newID(typ)}},
+		Args: []ast.Expr{&ast.CallExpr{
+			Fun: &ast.SelectorExpr{X: newID("unsafe"), Sel: newID("Pointer")},
+			Args: []ast.Expr{&ast.CallExpr{
+				Fun: &ast.StarExpr{X: &ast.ArrayType{
+					Len: &ast.BasicLit{Kind: token.INT, Value: bytes},
+					Elt: newID("byte")}},
+				Args: []ast.Expr{&ast.SliceExpr{
+					X:   &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+					Low: addr}}}}}}}}
+}
+
+func (fn *funcCompiler) storeUnsafe(addr, val ast.Expr, typ string) ast.Stmt {
+	idx := fn.loadUnsafe(addr, typ) // an l-value
+
+	if !strings.HasPrefix(typ, "float") {
+		val = convert(val, typ)
+	}
+
+	return &ast.AssignStmt{
+		Lhs: []ast.Expr{idx},
+		Tok: token.ASSIGN,
+		Rhs: []ast.Expr{val}}
 }
 
 // Pushes expr (a literal, constant or materialized temporary) to the value stack.
@@ -166,6 +220,19 @@ func (fn *funcCompiler) popCond() ast.Expr {
 	lst := &fn.blocks.top().body.List
 	*lst = (*lst)[:len(*lst)-2]
 	return cond
+}
+
+// Pops an address from the stack, adds an offset, and returns it as a uint32.
+func (fn *funcCompiler) popAddr(offset uint64) ast.Expr {
+	var x ast.Expr = fn.pop()
+	if offset != 0 {
+		x = &ast.BinaryExpr{
+			X:  x,
+			Op: token.ADD,
+			Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)},
+		}
+	}
+	return convert(x, "uint32")
 }
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.
@@ -474,30 +541,14 @@ func convert(x ast.Expr, types ...string) ast.Expr {
 	return x
 }
 
-// Constructs an n-bit memory load expression at an index.
-func load(bits string, idx ast.Expr) ast.Expr {
-	return &ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X: &ast.SelectorExpr{
-				X:   newID("binary"),
-				Sel: newID("LittleEndian"),
-			},
-			Sel: newID("Uint" + bits),
-		},
-		Args: []ast.Expr{idx},
+func iszero(x ast.Expr) bool {
+	if call, ok := x.(*ast.CallExpr); ok {
+		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "i32_const" {
+			if len(call.Args) == 1 {
+				lit, ok := call.Args[0].(*ast.BasicLit)
+				return ok && lit.Kind == token.INT && lit.Value == "0"
+			}
+		}
 	}
-}
-
-// Constructs an n-bit memory store statement at an index.
-func store(bits string, idx ast.Expr, val ast.Expr) ast.Stmt {
-	return &ast.ExprStmt{X: &ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X: &ast.SelectorExpr{
-				X:   newID("binary"),
-				Sel: newID("LittleEndian"),
-			},
-			Sel: newID("PutUint" + bits),
-		},
-		Args: []ast.Expr{idx, val},
-	}}
+	return false
 }

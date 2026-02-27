@@ -64,11 +64,6 @@ func memory_fill(mem []byte, n, val, dest int32) {
 	y := x + uint(uint32(n))
 
 	buf := mem[x:y]
-	if byte(val) == 0 {
-		clear(buf)
-		return
-	}
-
 	buf[0] = byte(val)
 	for i := 1; i < len(buf); {
 		chunk := min(i, 8192)

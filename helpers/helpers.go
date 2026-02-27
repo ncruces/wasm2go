@@ -289,16 +289,17 @@ func memory_fill(mem []byte, n, val, dest int32) {
 	y := x + uint(uint32(n))
 
 	buf := mem[x:y]
-	if byte(val) == 0 {
-		clear(buf)
-		return
-	}
-
 	buf[0] = byte(val)
 	for i := 1; i < len(buf); {
 		chunk := min(i, 8192)
 		i += copy(buf[i:], buf[:chunk])
 	}
+}
+
+func memory_zero(mem []byte, n, dest int32) {
+	x := uint(uint32(dest))
+	y := x + uint(uint32(n))
+	clear(mem[x:y])
 }
 
 func table_init(tab, elems []any, n, src, dest int32) {
