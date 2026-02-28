@@ -44,7 +44,7 @@ func (m *Module) Xis_odd(v0 int32) int32 {
 	var t2 int32
 	_ = t2
 	if t0 == 0 {
-		t2 = int32(0)
+		t2 = i32_const(0)
 	} else {
 		t3 := v0
 		t4 := t3 - int32(1)
@@ -53,3 +53,5 @@ func (m *Module) Xis_odd(v0 int32) int32 {
 	}
 	return t2
 }
+
+func i32_const(x int32) int32 { return x }

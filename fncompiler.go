@@ -222,16 +222,16 @@ func (fn *funcCompiler) popCond() ast.Expr {
 }
 
 // Pops an address from the stack, adds an offset, and returns it as a uint32.
-func (fn *funcCompiler) popAddr(offset uint64) ast.Expr {
-	var x ast.Expr = fn.pop()
-	if offset != 0 {
-		x = &ast.BinaryExpr{
-			X:  x,
-			Op: token.ADD,
-			Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)},
-		}
+func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
+	expr = convert(fn.pop(), "uint32")
+	if offset == 0 {
+		return expr
 	}
-	return convert(x, "uint32")
+	return &ast.BinaryExpr{
+		X:  expr,
+		Op: token.ADD,
+		Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)},
+	}
 }
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.
@@ -540,15 +540,15 @@ func (b *funcBlock) setResults(fn *funcCompiler) []ast.Stmt {
 }
 
 // Constructs a type conversion, first to types[0], then to types[1] and so on.
-func convert(x ast.Expr, types ...string) ast.Expr {
+func convert(expr ast.Expr, types ...string) ast.Expr {
 	for _, t := range types {
-		x = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{x}}
+		expr = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{expr}}
 	}
-	return x
+	return expr
 }
 
-func iszero(x ast.Expr) bool {
-	if call, ok := x.(*ast.CallExpr); ok {
+func iszero(expr ast.Expr) bool {
+	if call, ok := expr.(*ast.CallExpr); ok {
 		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "i32_const" {
 			if len(call.Args) == 1 {
 				lit, ok := call.Args[0].(*ast.BasicLit)

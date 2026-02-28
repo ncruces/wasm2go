@@ -11,12 +11,13 @@ import (
 	"unicode"
 )
 
-func Test(t *testing.T, mod reflect.Value, data []byte) {
+func Test(t *testing.T, modptr any, data []byte, name ...string) {
 	var test struct {
 		Commands []struct {
-			Type   string `json:"type"`
-			Line   int    `json:"line"`
-			Action struct {
+			Type     string `json:"type"`
+			Line     int    `json:"line"`
+			Filename string `json:"filename"`
+			Action   struct {
 				Field string `json:"field"`
 				Args  []struct {
 					Type  string `json:"type"`
@@ -31,12 +32,20 @@ func Test(t *testing.T, mod reflect.Value, data []byte) {
 		} `json:"commands"`
 	}
 
+	mod := reflect.ValueOf(modptr)
+
 	if err := json.Unmarshal(data, &test); err != nil {
 		t.Fatal(err)
 	}
 
+	var file string
 	for _, cmd := range test.Commands {
+		if len(name) > 0 && name[0] != file {
+			continue
+		}
 		switch cmd.Type {
+		case "module":
+			file = cmd.Filename
 		case "assert_return", "assert_trap":
 			t.Run(fmt.Sprintf("line_%d", cmd.Line), func(t *testing.T) {
 				if cmd.Type == "assert_trap" {

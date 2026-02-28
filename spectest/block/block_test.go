@@ -1,18 +1,15 @@
-package wasm2go_test
+package wasm2go
 
 import (
 	_ "embed"
-	"reflect"
 	"testing"
 
 	"github.com/ncruces/wasm2go/spectest"
-	wasm2go "github.com/ncruces/wasm2go/spectest/block"
 )
 
 //go:embed block.json
 var data []byte
 
 func Test(t *testing.T) {
-	mod := wasm2go.New()
-	spectest.Test(t, reflect.ValueOf(mod), data)
+	spectest.Test(t, New(), data, "block.0.wasm")
 }

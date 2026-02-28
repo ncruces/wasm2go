@@ -27,7 +27,7 @@ func (m *Module) Xgreater(v0 int32, v1 int32) int32 {
 	if t0 > t1 {
 		t3 = int32(1)
 	} else {
-		t3 = int32(0)
+		t3 = i32_const(0)
 	}
 	return t3
 }
@@ -54,3 +54,5 @@ func (m *Module) Xtee_for_two(v0 int32, v1 int32) (int32, int32) {
 	t5 := v2
 	return t4, t5
 }
+
+func i32_const(x int32) int32 { return x }

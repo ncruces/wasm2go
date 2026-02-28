@@ -15,7 +15,7 @@ func (t *translator) constI32() (ast.Expr, error) {
 	}
 
 	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}}
-	if 0 <= v && v <= 127 {
+	if 0 < v && v < 128 {
 		// These are safe for all conversions.
 		return &ast.CallExpr{Fun: newID("int32"), Args: a}, nil
 	}
@@ -31,7 +31,7 @@ func (t *translator) constI64() (ast.Expr, error) {
 	}
 
 	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}}
-	if 0 <= v && v <= 127 {
+	if 0 < v && v < 128 {
 		// These are safe for all conversions.
 		return &ast.CallExpr{Fun: newID("int64"), Args: a}, nil
 	}

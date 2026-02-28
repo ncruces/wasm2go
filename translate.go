@@ -1543,13 +1543,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.convert("int32")
 
 		case 0xa8: // i32.trunc_f32_s
-			fn.uniHelper("i32_trunc_f32_s")
+			fn.uniHelper("i32_trunc_f32_s", "math")
 		case 0xa9: // i32.trunc_f32_u
-			fn.uniHelper("i32_trunc_f32_u")
+			fn.uniHelper("i32_trunc_f32_u", "math")
 		case 0xaa: // i32.trunc_f64_s
-			fn.uniHelper("i32_trunc_f64_s")
+			fn.uniHelper("i32_trunc_f64_s", "math")
 		case 0xab: // i32.trunc_f64_u
-			fn.uniHelper("i32_trunc_f64_u")
+			fn.uniHelper("i32_trunc_f64_u", "math")
 
 		case 0xac: // i64.extend_i32_s
 			fn.convert("int64")
@@ -1557,13 +1557,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.convert("uint32", "int64")
 
 		case 0xae: // i64.trunc_f32_s
-			fn.uniHelper("i64_trunc_f32_s")
+			fn.uniHelper("i64_trunc_f32_s", "math")
 		case 0xaf: // i64.trunc_f32_u
-			fn.uniHelper("i64_trunc_f32_u")
+			fn.uniHelper("i64_trunc_f32_u", "math")
 		case 0xb0: // i64.trunc_f64_s
-			fn.uniHelper("i64_trunc_f64_s")
+			fn.uniHelper("i64_trunc_f64_s", "math")
 		case 0xb1: // i64.trunc_f64_u
-			fn.uniHelper("i64_trunc_f64_u")
+			fn.uniHelper("i64_trunc_f64_u", "math")
 
 		case 0xb2: // f32.convert_i32_s
 			fn.convert("float32")
@@ -1614,21 +1614,21 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			switch code {
 			case 0x00: // i32.trunc_sat_f32_s
-				fn.uniHelper("i32_trunc_sat_f32_s")
+				fn.uniHelper("i32_trunc_sat_f32_s", "math")
 			case 0x01: // i32.trunc_sat_f32_u
-				fn.uniHelper("i32_trunc_sat_f32_u")
+				fn.uniHelper("i32_trunc_sat_f32_u", "math")
 			case 0x02: // i32.trunc_sat_f64_s
-				fn.uniHelper("i32_trunc_sat_f64_s")
+				fn.uniHelper("i32_trunc_sat_f64_s", "math")
 			case 0x03: // i32.trunc_sat_f64_u
-				fn.uniHelper("i32_trunc_sat_f64_u")
+				fn.uniHelper("i32_trunc_sat_f64_u", "math")
 			case 0x04: // i64.trunc_sat_f32_s
-				fn.uniHelper("i64_trunc_sat_f32_s")
+				fn.uniHelper("i64_trunc_sat_f32_s", "math")
 			case 0x05: // i64.trunc_sat_f32_u
-				fn.uniHelper("i64_trunc_sat_f32_u")
+				fn.uniHelper("i64_trunc_sat_f32_u", "math")
 			case 0x06: // i64.trunc_sat_f64_s
-				fn.uniHelper("i64_trunc_sat_f64_s")
+				fn.uniHelper("i64_trunc_sat_f64_s", "math")
 			case 0x07: // i64.trunc_sat_f64_u
-				fn.uniHelper("i64_trunc_sat_f64_u")
+				fn.uniHelper("i64_trunc_sat_f64_u", "math")
 
 			case 0x08: // memory.init
 				i, err := readLEB128(t.in)
