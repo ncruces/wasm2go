@@ -77,7 +77,7 @@ l0:
 		t20 := float64(t19 * float64(-1.5707963267948966))
 		t21 := float64(t17 + t20)
 		v1 = t21
-		v3 = i32_const(0)
+		v3 = int32(0)
 	l10:
 		{
 			{
@@ -99,7 +99,7 @@ l0:
 									}
 									t26 := v2
 									t27 := int32(t26)
-									t28 := t27 & i32_const(3)
+									t28 := t27 & int32(3)
 									switch t28 {
 									default:
 										goto l1
@@ -158,7 +158,7 @@ l0:
 		l4:
 			;
 			t48 := v3
-			t49 := t48 + i32_const(1)
+			t49 := t48 + int32(1)
 			v3 = t49
 			t50 := v1
 			t51 := float64(t50 * float64(0.5))
