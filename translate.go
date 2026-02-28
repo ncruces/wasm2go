@@ -11,6 +11,7 @@ import (
 	"go/parser"
 	"go/token"
 	"io"
+	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -101,7 +102,7 @@ func translate(r io.Reader, w io.Writer) error {
 	// Set imports.
 	if len(t.packages) > 0 {
 		specs := make([]ast.Spec, 0, len(t.data))
-		for pkg := range t.packages {
+		for _, pkg := range slices.Sorted(maps.Keys(t.packages)) {
 			specs = append(specs, &ast.ImportSpec{
 				Path: &ast.BasicLit{Kind: token.STRING, Value: `"` + pkg + `"`},
 			})
@@ -778,11 +779,12 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Specs: []ast.Spec{
 							&ast.ValueSpec{
 								Names: []*ast.Ident{results[i]},
-								Type:  wasmType(t).Ident(),
-							},
-						},
-					},
-				})
+								Type:  wasmType(t).Ident()}}}},
+					&ast.AssignStmt{
+						Lhs: []ast.Expr{newID("_")},
+						Tok: token.ASSIGN,
+						Rhs: []ast.Expr{results[i]},
+					})
 			}
 
 			childBlk := funcBlock{
@@ -844,10 +846,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 			fn.blocks.pop()
+			parent := fn.blocks.top()
 			if blk.label != nil { // Add the label if requested.
 				if blk.loopPos != 0 { // At the start for loops.
-					parent := fn.blocks.top()
-					parent.unreachable = blk.unreachable
 					parent.body.List[^blk.loopPos] = &ast.LabeledStmt{
 						Stmt:  parent.body.List[^blk.loopPos],
 						Label: blk.label,
@@ -859,8 +860,15 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					})
 				}
 			}
-			if blk.ifreachable && blk.unreachable {
-				fn.blocks.top().unreachable = true
+			if blk.unreachable {
+				switch {
+				default: // A block.
+					parent.unreachable = blk.label == nil
+				case blk.ifStmt != nil: // An if.
+					parent.unreachable = blk.ifreachable
+				case blk.loopPos != 0: // A loop.
+					parent.unreachable = true
+				}
 			}
 
 		case 0x0c: // br

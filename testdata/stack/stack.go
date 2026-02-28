@@ -23,6 +23,7 @@ func (m *Module) Xgreater(v0 int32, v1 int32) int32 {
 	t0 := v0
 	t1 := v1
 	var t3 int32
+	_ = t3
 	if t0 > t1 {
 		t3 = int32(1)
 	} else {

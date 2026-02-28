@@ -12,6 +12,7 @@ func New() *Module {
 func (m *Module) Xfactorial(v0 int32) int32 {
 	t0 := v0
 	var t2 int32
+	_ = t2
 	if t0 <= int32(1) {
 		t2 = int32(1)
 	} else {
@@ -27,6 +28,7 @@ func (m *Module) Xfactorial(v0 int32) int32 {
 func (m *Module) Xis_even(v0 int32) int32 {
 	t0 := v0
 	var t2 int32
+	_ = t2
 	if t0 == 0 {
 		t2 = int32(1)
 	} else {
@@ -40,6 +42,7 @@ func (m *Module) Xis_even(v0 int32) int32 {
 func (m *Module) Xis_odd(v0 int32) int32 {
 	t0 := v0
 	var t2 int32
+	_ = t2
 	if t0 == 0 {
 		t2 = int32(0)
 	} else {

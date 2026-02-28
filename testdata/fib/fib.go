@@ -21,10 +21,12 @@ func (m *Module) Xfibonacci(v0 int64) int64 {
 	v0 = t3
 	v1 = int64(1)
 	var t4 int64
+	_ = t4
 l0:
 	{
 		t5 := v0
 		var t7 int64
+		_ = t7
 		if t5 == 0 {
 			t8 := v2
 			t7 = t8

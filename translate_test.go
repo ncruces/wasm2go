@@ -43,6 +43,36 @@ func Test_generate(t *testing.T) {
 	}
 }
 
+func Test_spec(t *testing.T) {
+	tests := []string{
+		"i32", "i64", "f32", "f64",
+		"block", "stack",
+	}
+
+	for _, name := range tests {
+		t.Run(name, func(t *testing.T) {
+			path := "spectest/" + name + "/" + name
+
+			in, err := os.Open(path + ".wasm")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer in.Close()
+
+			var out bytes.Buffer
+			err = translate(in, &out)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = os.WriteFile(path+".go", out.Bytes(), 0644)
+			if err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
 func Test_fib(t *testing.T) {
 	want := []int64{0, 1, 1, 2, 3, 5, 8, 13, 21}
 

@@ -22,8 +22,7 @@ type funcCompiler struct {
 
 // Emits statements to the current function.
 func (fn *funcCompiler) emit(stmts ...ast.Stmt) {
-	lst := &fn.blocks.top().body.List
-	*lst = append(*lst, stmts...)
+	fn.blocks.top().emit(stmts...)
 }
 
 // Returns a statement to exit n blocks.
@@ -508,6 +507,13 @@ type funcBlock struct {
 	stackPos    int
 	unreachable bool
 	ifreachable bool
+}
+
+func (b *funcBlock) emit(stmts ...ast.Stmt) {
+	if !b.unreachable {
+		lst := &b.body.List
+		*lst = append(*lst, stmts...)
+	}
 }
 
 func (b *funcBlock) setResults(fn *funcCompiler) []ast.Stmt {
