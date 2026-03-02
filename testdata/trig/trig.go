@@ -28,7 +28,7 @@ func (m *Module) Xsin(v0 float64) float64 {
 	_ = v4
 	{
 		t0 := v0
-		if t0 != float64(0) {
+		if t0 != f64_const(0) {
 			goto l0
 		}
 		t2 := v0
@@ -86,7 +86,7 @@ l0:
 				if t23 > float64(7.450580596923828e-09) {
 					goto l4
 				}
-				v4 = float64(1)
+				v4 = f64_const(1)
 				{
 					{
 						{
@@ -132,7 +132,7 @@ l0:
 								t39 := v0
 								t40 := v0
 								t41 := float64(t39 + t40)
-								t42 := float64(float64(1) - t41)
+								t42 := float64(f64_const(1) - t41)
 								v4 = t42
 								goto l9
 							}
@@ -175,6 +175,9 @@ l1:
 func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)

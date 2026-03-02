@@ -13,7 +13,7 @@ func New() *Module {
 }
 func (m *Module) Xabs(v0 float32) float32 {
 	t0 := v0
-	t1 := float32(math.Abs(float64(t0)))
+	t1 := f32_abs(t0)
 	return t1
 }
 func (m *Module) Xneg(v0 float32) float32 {
@@ -24,6 +24,14 @@ func (m *Module) Xneg(v0 float32) float32 {
 func (m *Module) Xcopysign(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	t2 := float32(math.Copysign(float64(t0), float64(t1)))
+	t2 := f32_copysign(t0, t1)
 	return t2
+}
+
+func f32_abs(x float32) float32 {
+	return math.Float32frombits(math.Float32bits(x) &^ (1 << 31))
+}
+
+func f32_copysign(x, y float32) float32 {
+	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }

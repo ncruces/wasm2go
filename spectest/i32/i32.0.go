@@ -119,6 +119,16 @@ func (m *Module) Xpopcnt(v0 int32) int32 {
 	t1 := int32(bits.OnesCount32(uint32(t0)))
 	return t1
 }
+func (m *Module) Xextend8_s(v0 int32) int32 {
+	t0 := v0
+	t1 := int32(int8(t0))
+	return t1
+}
+func (m *Module) Xextend16_s(v0 int32) int32 {
+	t0 := v0
+	t1 := int32(int16(t0))
+	return t1
+}
 func (m *Module) Xeqz(v0 int32) int32 {
 	t0 := v0
 	var t1 int32

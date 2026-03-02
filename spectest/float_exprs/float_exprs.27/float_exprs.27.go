@@ -14,12 +14,18 @@ func New() *Module {
 func (m *Module) Xf32_no_approximate_reciprocal_sqrt(v0 float32) float32 {
 	t0 := v0
 	t1 := float32(math.Sqrt(float64(t0)))
-	t2 := float32(float32(1) / t1)
+	t2 := float32(f32_const(1) / t1)
 	return t2
 }
 func (m *Module) Xf64_no_fuse_reciprocal_sqrt(v0 float64) float64 {
 	t0 := v0
 	t1 := math.Sqrt(t0)
-	t2 := float64(float64(1) / t1)
+	t2 := float64(f64_const(1) / t1)
 	return t2
 }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

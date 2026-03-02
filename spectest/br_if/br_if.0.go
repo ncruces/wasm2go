@@ -52,7 +52,7 @@ func (m *Module) Xtype_f32() {
 		if int32(1) != 0 {
 			goto l0
 		}
-		t0 := -float32(0)
+		t0 := -f32_const(0)
 		_ = t0
 	}
 l0:
@@ -62,7 +62,7 @@ func (m *Module) Xtype_f64() {
 		if int32(1) != 0 {
 			goto l0
 		}
-		t0 := -float64(0)
+		t0 := -f64_const(0)
 		_ = t0
 	}
 l0:
@@ -753,11 +753,11 @@ func (m *Module) Xas_unary_operand() float64 {
 	var t0 float64
 	_ = t0
 	{
-		t0 = float64(1)
+		t0 = f64_const(1)
 		if int32(1) != 0 {
 			goto l0
 		}
-		t1 := -float64(1)
+		t1 := -f64_const(1)
 		t0 = t1
 	}
 l0:
@@ -1025,6 +1025,12 @@ l0:
 func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem

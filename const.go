@@ -16,11 +16,11 @@ func (t *translator) constI32() (ast.Expr, error) {
 
 	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}}
 	if 0 < v && v < 128 {
-		// These are safe for all conversions.
 		return &ast.CallExpr{Fun: newID("int32"), Args: a}, nil
 	}
 
 	t.helpers.add("i32_const")
+	// This prevents constant folding/propagation.
 	return &ast.CallExpr{Fun: newID("i32_const"), Args: a}, nil
 }
 
@@ -32,11 +32,11 @@ func (t *translator) constI64() (ast.Expr, error) {
 
 	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}}
 	if 0 < v && v < 128 {
-		// These are safe for all conversions.
 		return &ast.CallExpr{Fun: newID("int64"), Args: a}, nil
 	}
 
 	t.helpers.add("i64_const")
+	// This prevents constant folding/propagation.
 	return &ast.CallExpr{Fun: newID("i64_const"), Args: a}, nil
 }
 
@@ -48,13 +48,16 @@ func (t *translator) constF32() (ast.Expr, error) {
 
 	f := math.Float32frombits(v)
 	if -math.MaxFloat32 <= f && f <= +math.MaxFloat32 && (v == 0 || f != 0) {
-		// These are safe as decimal numbers.
-		return &ast.CallExpr{
-			Fun:  newID("float32"),
-			Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatFloat(float64(f), 'g', -1, 32)}},
-		}, nil
+		a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatFloat(float64(f), 'g', -1, 32)}}
+		if f == 0 || f == 1 || f == -1 {
+			t.helpers.add("f32_const")
+			// This prevents constant folding/propagation.
+			return &ast.CallExpr{Fun: newID("f32_const"), Args: a}, nil
+		}
+		return &ast.CallExpr{Fun: newID("float32"), Args: a}, nil
 	}
 
+	// Infinities, NaN, negative zero.
 	t.packages.add("math")
 	return &ast.CallExpr{
 		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32frombits")},
@@ -70,13 +73,16 @@ func (t *translator) constF64() (ast.Expr, error) {
 
 	f := math.Float64frombits(v)
 	if -math.MaxFloat64 <= f && f <= +math.MaxFloat64 && (v == 0 || f != 0) {
-		// These are safe as decimal numbers.
-		return &ast.CallExpr{
-			Fun:  newID("float64"),
-			Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatFloat(f, 'g', -1, 64)}},
-		}, nil
+		a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatFloat(f, 'g', -1, 64)}}
+		if f == 0 || f == 1 || f == -1 {
+			t.helpers.add("f64_const")
+			// This prevents constant folding/propagation.
+			return &ast.CallExpr{Fun: newID("f64_const"), Args: a}, nil
+		}
+		return &ast.CallExpr{Fun: newID("float64"), Args: a}, nil
 	}
 
+	// Infinities, NaN, negative zero.
 	t.packages.add("math")
 	return &ast.CallExpr{
 		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64frombits")},

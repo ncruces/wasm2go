@@ -60,11 +60,11 @@ func (m *Module) Xf32_negative_infinity() int32 {
 	return t0
 }
 func (m *Module) Xf32_zero() int32 {
-	t0 := int32(math.Float32bits(float32(0)))
+	t0 := int32(math.Float32bits(f32_const(0)))
 	return t0
 }
 func (m *Module) Xf32_positive_zero() int32 {
-	t0 := int32(math.Float32bits(float32(0)))
+	t0 := int32(math.Float32bits(f32_const(0)))
 	return t0
 }
 func (m *Module) Xf32_negative_zero() int32 {
@@ -96,11 +96,11 @@ func (m *Module) Xf32_trailing_dot() int32 {
 	return t0
 }
 func (m *Module) Xf32_dec_zero() int32 {
-	t0 := int32(math.Float32bits(float32(0)))
+	t0 := int32(math.Float32bits(f32_const(0)))
 	return t0
 }
 func (m *Module) Xf32_dec_positive_zero() int32 {
-	t0 := int32(math.Float32bits(float32(0)))
+	t0 := int32(math.Float32bits(f32_const(0)))
 	return t0
 }
 func (m *Module) Xf32_dec_negative_zero() int32 {
@@ -184,11 +184,11 @@ func (m *Module) Xf64_negative_infinity() int64 {
 	return t0
 }
 func (m *Module) Xf64_zero() int64 {
-	t0 := int64(math.Float64bits(float64(0)))
+	t0 := int64(math.Float64bits(f64_const(0)))
 	return t0
 }
 func (m *Module) Xf64_positive_zero() int64 {
-	t0 := int64(math.Float64bits(float64(0)))
+	t0 := int64(math.Float64bits(f64_const(0)))
 	return t0
 }
 func (m *Module) Xf64_negative_zero() int64 {
@@ -220,11 +220,11 @@ func (m *Module) Xf64_trailing_dot() int64 {
 	return t0
 }
 func (m *Module) Xf64_dec_zero() int64 {
-	t0 := int64(math.Float64bits(float64(0)))
+	t0 := int64(math.Float64bits(f64_const(0)))
 	return t0
 }
 func (m *Module) Xf64_dec_positive_zero() int64 {
-	t0 := int64(math.Float64bits(float64(0)))
+	t0 := int64(math.Float64bits(f64_const(0)))
 	return t0
 }
 func (m *Module) Xf64_dec_negative_zero() int64 {
@@ -319,3 +319,9 @@ func (m *Module) Xf64_hex_sep4() float64 {
 func (m *Module) Xf64_hex_sep5() float64 {
 	return float64(2.3605225168752e+13)
 }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

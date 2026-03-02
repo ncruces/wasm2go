@@ -15,7 +15,7 @@ func (m *Module) Xf32_no_fold_lt_if_to_abs(v0 float32) float32 {
 	t0 := v0
 	var t2 float32
 	_ = t2
-	if t0 < float32(0) {
+	if t0 < f32_const(0) {
 		t3 := v0
 		t4 := -t3
 		t2 = t4
@@ -57,7 +57,7 @@ func (m *Module) Xf32_no_fold_ge_if_to_abs(v0 float32) float32 {
 	t0 := v0
 	var t2 float32
 	_ = t2
-	if t0 >= float32(0) {
+	if t0 >= f32_const(0) {
 		t3 := v0
 		t2 = t3
 	} else {
@@ -71,7 +71,7 @@ func (m *Module) Xf64_no_fold_lt_if_to_abs(v0 float64) float64 {
 	t0 := v0
 	var t2 float64
 	_ = t2
-	if t0 < float64(0) {
+	if t0 < f64_const(0) {
 		t3 := v0
 		t4 := -t3
 		t2 = t4
@@ -113,7 +113,7 @@ func (m *Module) Xf64_no_fold_ge_if_to_abs(v0 float64) float64 {
 	t0 := v0
 	var t2 float64
 	_ = t2
-	if t0 >= float64(0) {
+	if t0 >= f64_const(0) {
 		t3 := v0
 		t2 = t3
 	} else {
@@ -123,3 +123,9 @@ func (m *Module) Xf64_no_fold_ge_if_to_abs(v0 float64) float64 {
 	}
 	return t2
 }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

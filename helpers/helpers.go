@@ -9,6 +9,12 @@ func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
 
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
+
 func i32_div_s(x, y int32) int32 {
 	if x == math.MinInt32 && y == -1 {
 		panic("integer overflow")
@@ -61,6 +67,14 @@ func i64_rotl(x, y int64) int64 {
 
 func i64_rotr(x, y int64) int64 {
 	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
+}
+
+func f32_abs(x float32) float32 {
+	return math.Float32frombits(math.Float32bits(x) &^ (1 << 31))
+}
+
+func f32_copysign(x, y float32) float32 {
+	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }
 
 // go.dev/issues/76264 can speed these up

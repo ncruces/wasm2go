@@ -24,12 +24,12 @@ func (m *Module) Xtype_local_i64() {
 func (m *Module) Xtype_local_f32() {
 	var v0 float32
 	_ = v0
-	v0 = float32(0)
+	v0 = f32_const(0)
 }
 func (m *Module) Xtype_local_f64() {
 	var v0 float64
 	_ = v0
-	v0 = float64(0)
+	v0 = f64_const(0)
 }
 func (m *Module) Xtype_param_i32(v0 int32) {
 	v0 = int32(10)
@@ -51,14 +51,14 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 	var v8 float64
 	_ = v8
 	v0 = i64_const(0)
-	v1 = float32(0)
-	v2 = float64(0)
+	v1 = f32_const(0)
+	v2 = f64_const(0)
 	v3 = i32_const(0)
 	v4 = i32_const(0)
-	v5 = float32(0)
+	v5 = f32_const(0)
 	v6 = i64_const(0)
 	v7 = i64_const(0)
-	v8 = float64(0)
+	v8 = f64_const(0)
 }
 func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) int64 {
 	var v5 float32
@@ -166,6 +166,12 @@ func (m *Module) Xas_if_else(v0 int32) {
 func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)

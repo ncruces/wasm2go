@@ -228,7 +228,7 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 		return expr
 	}
 	return &ast.BinaryExpr{
-		X:  expr,
+		X:  convert(expr, "int64"),
 		Op: token.ADD,
 		Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)},
 	}

@@ -12,14 +12,14 @@ func New() *Module {
 func (m *Module) Xtau(v0 int32) float64 {
 	var v1, v2, v3, v4 float64
 	_, _, _, _ = v1, v2, v3, v4
-	v1 = float64(0)
+	v1 = f64_const(0)
 	{
 		t0 := v0
 		if t0 < int32(1) {
 			goto l0
 		}
-		v2 = float64(1)
-		v3 = float64(0)
+		v2 = f64_const(1)
+		v3 = f64_const(0)
 	l1:
 		{
 			t2 := v1
@@ -27,7 +27,7 @@ func (m *Module) Xtau(v0 int32) float64 {
 			t4 := v3
 			t5 := float64(t4 * float64(8))
 			v4 = t5
-			t6 := float64(t5 + float64(1))
+			t6 := float64(t5 + f64_const(1))
 			t7 := float64(float64(8) / t6)
 			t8 := v4
 			t9 := float64(t8 + float64(4))
@@ -45,7 +45,7 @@ func (m *Module) Xtau(v0 int32) float64 {
 			t21 := float64(t2 + t20)
 			v1 = t21
 			t22 := v3
-			t23 := float64(t22 + float64(1))
+			t23 := float64(t22 + f64_const(1))
 			v3 = t23
 			t24 := v2
 			t25 := float64(t24 * float64(0.0625))
@@ -65,3 +65,6 @@ l0:
 }
 
 func i32_const(x int32) int32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

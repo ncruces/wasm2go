@@ -66,6 +66,46 @@ func (m *Module) Xi64_trunc_f64_u(v0 float64) int64 {
 	t1 := i64_trunc_f64_u(t0)
 	return t1
 }
+func (m *Module) Xi32_trunc_sat_f32_s(v0 float32) int32 {
+	t0 := v0
+	t1 := i32_trunc_sat_f32_s(t0)
+	return t1
+}
+func (m *Module) Xi32_trunc_sat_f32_u(v0 float32) int32 {
+	t0 := v0
+	t1 := i32_trunc_sat_f32_u(t0)
+	return t1
+}
+func (m *Module) Xi32_trunc_sat_f64_s(v0 float64) int32 {
+	t0 := v0
+	t1 := i32_trunc_sat_f64_s(t0)
+	return t1
+}
+func (m *Module) Xi32_trunc_sat_f64_u(v0 float64) int32 {
+	t0 := v0
+	t1 := i32_trunc_sat_f64_u(t0)
+	return t1
+}
+func (m *Module) Xi64_trunc_sat_f32_s(v0 float32) int64 {
+	t0 := v0
+	t1 := i64_trunc_sat_f32_s(t0)
+	return t1
+}
+func (m *Module) Xi64_trunc_sat_f32_u(v0 float32) int64 {
+	t0 := v0
+	t1 := i64_trunc_sat_f32_u(t0)
+	return t1
+}
+func (m *Module) Xi64_trunc_sat_f64_s(v0 float64) int64 {
+	t0 := v0
+	t1 := i64_trunc_sat_f64_s(t0)
+	return t1
+}
+func (m *Module) Xi64_trunc_sat_f64_u(v0 float64) int64 {
+	t0 := v0
+	t1 := i64_trunc_sat_f64_u(t0)
+	return t1
+}
 func (m *Module) Xf32_convert_i32_s(v0 int32) float32 {
 	t0 := v0
 	t1 := float32(t0)
@@ -214,4 +254,112 @@ func i64_trunc_f32_u(f float32) int64 {
 		panic("invalid conversion to integer")
 	}
 	return int64(uint64(x))
+}
+
+func i32_trunc_sat_f64_s(f float64) int32 {
+	x := math.Trunc(f)
+	switch {
+	case x < math.MinInt32:
+		return math.MinInt32
+	case x > math.MaxInt32:
+		return math.MaxInt32
+	case math.IsNaN(x):
+		return 0
+	}
+	return int32(x)
+}
+
+func i32_trunc_sat_f32_s(f float32) int32 {
+	x := math.Trunc(float64(f))
+	switch {
+	case x < math.MinInt32:
+		return math.MinInt32
+	case x > math.MaxInt32:
+		return math.MaxInt32
+	case math.IsNaN(x):
+		return 0
+	}
+	return int32(x)
+}
+
+func i32_trunc_sat_f64_u(f float64) int32 {
+	x := math.Trunc(f)
+	var i uint32
+	switch {
+	case x < 0 || math.IsNaN(x):
+
+	case x > math.MaxUint32:
+		i = math.MaxUint32
+	default:
+		i = uint32(x)
+	}
+	return int32(i)
+}
+
+func i32_trunc_sat_f32_u(f float32) int32 {
+	x := math.Trunc(float64(f))
+	var i uint32
+	switch {
+	case x < 0 || math.IsNaN(x):
+
+	case x > math.MaxUint32:
+		i = math.MaxUint32
+	default:
+		i = uint32(x)
+	}
+	return int32(i)
+}
+
+func i64_trunc_sat_f64_s(f float64) int64 {
+	x := math.Trunc(f)
+	switch {
+	case x < math.MinInt64:
+		return math.MinInt64
+	case x >= math.MaxInt64:
+		return math.MaxInt64
+	case math.IsNaN(x):
+		return 0
+	}
+	return int64(x)
+}
+
+func i64_trunc_sat_f32_s(f float32) int64 {
+	x := math.Trunc(float64(f))
+	switch {
+	case x < math.MinInt64:
+		return math.MinInt64
+	case x >= math.MaxInt64:
+		return math.MaxInt64
+	case math.IsNaN(x):
+		return 0
+	}
+	return int64(x)
+}
+
+func i64_trunc_sat_f64_u(f float64) int64 {
+	x := math.Trunc(f)
+	var i uint64
+	switch {
+	case x < 0 || math.IsNaN(x):
+
+	case x >= math.MaxUint64:
+		i = math.MaxUint64
+	default:
+		i = uint64(x)
+	}
+	return int64(i)
+}
+
+func i64_trunc_sat_f32_u(f float32) int64 {
+	x := math.Trunc(float64(f))
+	var i uint64
+	switch {
+	case x < 0 || math.IsNaN(x):
+
+	case x >= math.MaxUint64:
+		i = math.MaxUint64
+	default:
+		i = uint64(x)
+	}
+	return int64(i)
 }

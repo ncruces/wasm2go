@@ -28,17 +28,17 @@ func (m *Module) X8u_good2(v0 int32) int64 {
 }
 func (m *Module) X8u_good3(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(m.memory[uint32(t0)+1])
+	t1 := int64(m.memory[int64(uint32(t0))+1])
 	return t1
 }
 func (m *Module) X8u_good4(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(m.memory[uint32(t0)+2])
+	t1 := int64(m.memory[int64(uint32(t0))+2])
 	return t1
 }
 func (m *Module) X8u_good5(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(m.memory[uint32(t0)+25])
+	t1 := int64(m.memory[int64(uint32(t0))+25])
 	return t1
 }
 func (m *Module) X8s_good1(v0 int32) int64 {
@@ -53,17 +53,17 @@ func (m *Module) X8s_good2(v0 int32) int64 {
 }
 func (m *Module) X8s_good3(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int8(m.memory[uint32(t0)+1]))
+	t1 := int64(int8(m.memory[int64(uint32(t0))+1]))
 	return t1
 }
 func (m *Module) X8s_good4(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int8(m.memory[uint32(t0)+2]))
+	t1 := int64(int8(m.memory[int64(uint32(t0))+2]))
 	return t1
 }
 func (m *Module) X8s_good5(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int8(m.memory[uint32(t0)+25]))
+	t1 := int64(int8(m.memory[int64(uint32(t0))+25]))
 	return t1
 }
 func (m *Module) X16u_good1(v0 int32) int64 {
@@ -78,17 +78,17 @@ func (m *Module) X16u_good2(v0 int32) int64 {
 }
 func (m *Module) X16u_good3(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint16(m.memory[uint32(t0)+1:]))
+	t1 := int64(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+1:]))
 	return t1
 }
 func (m *Module) X16u_good4(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint16(m.memory[uint32(t0)+2:]))
+	t1 := int64(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+2:]))
 	return t1
 }
 func (m *Module) X16u_good5(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint16(m.memory[uint32(t0)+25:]))
+	t1 := int64(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+25:]))
 	return t1
 }
 func (m *Module) X16s_good1(v0 int32) int64 {
@@ -103,17 +103,17 @@ func (m *Module) X16s_good2(v0 int32) int64 {
 }
 func (m *Module) X16s_good3(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(t0)+1:])))
+	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+1:])))
 	return t1
 }
 func (m *Module) X16s_good4(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(t0)+2:])))
+	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+2:])))
 	return t1
 }
 func (m *Module) X16s_good5(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(t0)+25:])))
+	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+25:])))
 	return t1
 }
 func (m *Module) X32u_good1(v0 int32) int64 {
@@ -128,17 +128,17 @@ func (m *Module) X32u_good2(v0 int32) int64 {
 }
 func (m *Module) X32u_good3(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint32(m.memory[uint32(t0)+1:]))
+	t1 := int64(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+1:]))
 	return t1
 }
 func (m *Module) X32u_good4(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint32(m.memory[uint32(t0)+2:]))
+	t1 := int64(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+2:]))
 	return t1
 }
 func (m *Module) X32u_good5(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint32(m.memory[uint32(t0)+25:]))
+	t1 := int64(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+25:]))
 	return t1
 }
 func (m *Module) X32s_good1(v0 int32) int64 {
@@ -153,17 +153,17 @@ func (m *Module) X32s_good2(v0 int32) int64 {
 }
 func (m *Module) X32s_good3(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(t0)+1:])))
+	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+1:])))
 	return t1
 }
 func (m *Module) X32s_good4(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(t0)+2:])))
+	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+2:])))
 	return t1
 }
 func (m *Module) X32s_good5(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(t0)+25:])))
+	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+25:])))
 	return t1
 }
 func (m *Module) X64_good1(v0 int32) int64 {
@@ -178,52 +178,52 @@ func (m *Module) X64_good2(v0 int32) int64 {
 }
 func (m *Module) X64_good3(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint64(m.memory[uint32(t0)+1:]))
+	t1 := int64(binary.LittleEndian.Uint64(m.memory[int64(uint32(t0))+1:]))
 	return t1
 }
 func (m *Module) X64_good4(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint64(m.memory[uint32(t0)+2:]))
+	t1 := int64(binary.LittleEndian.Uint64(m.memory[int64(uint32(t0))+2:]))
 	return t1
 }
 func (m *Module) X64_good5(v0 int32) int64 {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint64(m.memory[uint32(t0)+25:]))
+	t1 := int64(binary.LittleEndian.Uint64(m.memory[int64(uint32(t0))+25:]))
 	return t1
 }
 func (m *Module) X8u_bad(v0 int32) {
 	t0 := v0
-	t1 := int64(m.memory[uint32(t0)+4294967295])
+	t1 := int64(m.memory[int64(uint32(t0))+4294967295])
 	_ = t1
 }
 func (m *Module) X8s_bad(v0 int32) {
 	t0 := v0
-	t1 := int64(int8(m.memory[uint32(t0)+4294967295]))
+	t1 := int64(int8(m.memory[int64(uint32(t0))+4294967295]))
 	_ = t1
 }
 func (m *Module) X16u_bad(v0 int32) {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint16(m.memory[uint32(t0)+4294967295:]))
+	t1 := int64(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+4294967295:]))
 	_ = t1
 }
 func (m *Module) X16s_bad(v0 int32) {
 	t0 := v0
-	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(t0)+4294967295:])))
+	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[int64(uint32(t0))+4294967295:])))
 	_ = t1
 }
 func (m *Module) X32u_bad(v0 int32) {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint32(m.memory[uint32(t0)+4294967295:]))
+	t1 := int64(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+4294967295:]))
 	_ = t1
 }
 func (m *Module) X32s_bad(v0 int32) {
 	t0 := v0
-	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(t0)+4294967295:])))
+	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[int64(uint32(t0))+4294967295:])))
 	_ = t1
 }
 func (m *Module) X64_bad(v0 int32) {
 	t0 := v0
-	t1 := int64(binary.LittleEndian.Uint64(m.memory[uint32(t0)+4294967295:]))
+	t1 := int64(binary.LittleEndian.Uint64(m.memory[int64(uint32(t0))+4294967295:]))
 	_ = t1
 }
 

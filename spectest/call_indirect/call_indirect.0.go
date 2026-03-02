@@ -17,10 +17,10 @@ type Module struct {
 
 func New() *Module {
 	m := &Module{}
-	m.table = make([]any, 29)
+	m.table = make([]any, 32)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m._const_i32, m._const_i64, m._const_f32, m._const_f64, m._id_i32, m._id_i64, m._id_f32, m._id_f64, m._f32_i32, m._i32_i64, m._f64_f32, m._i64_f64, m.Xfac_i64, m.Xfib_i64, m.Xeven, m.Xodd, m.Xrunaway, m.Xmutual_runaway, m._mutual_runaway2, m._over_i32_duplicate, m._over_i64_duplicate, m._over_f32_duplicate, m._over_f64_duplicate, m.Xfac_i32, m.Xfac_f32, m.Xfac_f64, m.Xfib_i32, m.Xfib_f32, m.Xfib_f64}}
+	m.elements = [][]any{[]any{m._const_i32, m._const_i64, m._const_f32, m._const_f64, m._id_i32, m._id_i64, m._id_f32, m._id_f64, m._f32_i32, m._i32_i64, m._f64_f32, m._i64_f64, m.Xfac_i64, m.Xfib_i64, m.Xeven, m.Xodd, m.Xrunaway, m.Xmutual_runaway, m._mutual_runaway2, m._over_i32_duplicate, m._over_i64_duplicate, m._over_f32_duplicate, m._over_f64_duplicate, m.Xfac_i32, m.Xfac_f32, m.Xfac_f64, m.Xfib_i32, m.Xfib_f32, m.Xfib_f64, m._const_f64_i32, m._id_i32_f64, m._swap_i32_i64}}
 	copy(m.table[0:], m.elements[0])
 	m._a = float64(10)
 	return m
@@ -37,6 +37,9 @@ func (m *Module) _const_f32() float32 {
 func (m *Module) _const_f64() float64 {
 	return float64(3940)
 }
+func (m *Module) _const_f64_i32() (float64, int32) {
+	return float64(3940), int32(32)
+}
 func (m *Module) _id_i32(v0 int32) int32 {
 	t0 := v0
 	return t0
@@ -52,6 +55,16 @@ func (m *Module) _id_f32(v0 float32) float32 {
 func (m *Module) _id_f64(v0 float64) float64 {
 	t0 := v0
 	return t0
+}
+func (m *Module) _id_i32_f64(v0 int32, v1 float64) (int32, float64) {
+	t0 := v0
+	t1 := v1
+	return t0, t1
+}
+func (m *Module) _swap_i32_i64(v0 int32, v1 int64) (int64, int32) {
+	t0 := v1
+	t1 := v0
+	return t0, t1
 }
 func (m *Module) _i32_i64(v0 int32, v1 int64) int64 {
 	t0 := v1
@@ -85,10 +98,10 @@ func (m *Module) _over_f64_duplicate(v0 float64) float64 {
 	t0 := v0
 	return t0
 }
-func (m *Module) f16() {
+func (m *Module) f19() {
 	m.table[uint32(i32_const(0))].(func())()
 	m.table[uint32(i32_const(0))].(func(v0 int64))(i64_const(0))
-	m.table[uint32(i32_const(0))].(func(v0 int64, v1 float64, v2 int32, v3 int64))(i64_const(0), float64(0), i32_const(0), i64_const(0))
+	m.table[uint32(i32_const(0))].(func(v0 int64, v1 float64, v2 int32, v3 int64))(i64_const(0), f64_const(0), i32_const(0), i64_const(0))
 	m.table[uint32(i32_const(0))].(func())()
 	t0 := m.table[uint32(i32_const(0))].(func() int32)()
 	var t1 int32
@@ -108,7 +121,7 @@ func (m *Module) f16() {
 		t5 = 1
 	}
 	_ = t5
-	t6 := m.table[uint32(i32_const(0))].(func(v0 int64, v1 float64, v2 int32, v3 int64) int32)(i64_const(0), float64(0), i32_const(0), i64_const(0))
+	t6 := m.table[uint32(i32_const(0))].(func(v0 int64, v1 float64, v2 int32, v3 int64) int32)(i64_const(0), f64_const(0), i32_const(0), i64_const(0))
 	var t7 int32
 	if t6 == 0 {
 		t7 = 1
@@ -136,6 +149,10 @@ func (m *Module) Xtype_f32() float32 {
 func (m *Module) Xtype_f64() float64 {
 	t0 := m.table[uint32(int32(3))].(func() float64)()
 	return t0
+}
+func (m *Module) Xtype_f64_i32() (float64, int32) {
+	t0, t1 := m.table[uint32(int32(29))].(func() (float64, int32))()
+	return t0, t1
 }
 func (m *Module) Xtype_index() int64 {
 	t0 := m.table[uint32(int32(5))].(func(v0 int64) int64)(int64(100))
@@ -172,6 +189,18 @@ func (m *Module) Xtype_second_f32() float32 {
 func (m *Module) Xtype_second_f64() float64 {
 	t0 := m.table[uint32(int32(11))].(func(v0 int64, v1 float64) float64)(int64(64), float64(64.1))
 	return t0
+}
+func (m *Module) Xtype_all_f64_i32() (float64, int32) {
+	t0, t1 := m.table[uint32(int32(29))].(func() (float64, int32))()
+	return t0, t1
+}
+func (m *Module) Xtype_all_i32_f64() (int32, float64) {
+	t0, t1 := m.table[uint32(int32(30))].(func(v0 int32, v1 float64) (int32, float64))(int32(1), float64(2))
+	return t0, t1
+}
+func (m *Module) Xtype_all_i32_i64() (int64, int32) {
+	t0, t1 := m.table[uint32(int32(31))].(func(v0 int32, v1 int64) (int64, int32))(int32(1), int64(2))
+	return t0, t1
 }
 func (m *Module) Xdispatch(v0 int32, v1 int64) int64 {
 	t0 := v1
@@ -253,12 +282,12 @@ func (m *Module) Xfac_f32(v0 float32) float32 {
 	t0 := v0
 	var t2 float32
 	_ = t2
-	if t0 == float32(0) {
-		t2 = float32(1)
+	if t0 == f32_const(0) {
+		t2 = f32_const(1)
 	} else {
 		t3 := v0
 		t4 := v0
-		t5 := float32(t4 - float32(1))
+		t5 := float32(t4 - f32_const(1))
 		t6 := m.table[uint32(int32(24))].(func(v0 float32) float32)(t5)
 		t7 := float32(t3 * t6)
 		t2 = t7
@@ -269,12 +298,12 @@ func (m *Module) Xfac_f64(v0 float64) float64 {
 	t0 := v0
 	var t2 float64
 	_ = t2
-	if t0 == float64(0) {
-		t2 = float64(1)
+	if t0 == f64_const(0) {
+		t2 = f64_const(1)
 	} else {
 		t3 := v0
 		t4 := v0
-		t5 := float64(t4 - float64(1))
+		t5 := float64(t4 - f64_const(1))
 		t6 := m.table[uint32(int32(25))].(func(v0 float64) float64)(t5)
 		t7 := float64(t3 * t6)
 		t2 = t7
@@ -303,14 +332,14 @@ func (m *Module) Xfib_f32(v0 float32) float32 {
 	t0 := v0
 	var t2 float32
 	_ = t2
-	if t0 <= float32(1) {
-		t2 = float32(1)
+	if t0 <= f32_const(1) {
+		t2 = f32_const(1)
 	} else {
 		t3 := v0
 		t4 := float32(t3 - float32(2))
 		t5 := m.table[uint32(int32(27))].(func(v0 float32) float32)(t4)
 		t6 := v0
-		t7 := float32(t6 - float32(1))
+		t7 := float32(t6 - f32_const(1))
 		t8 := m.table[uint32(int32(27))].(func(v0 float32) float32)(t7)
 		t9 := float32(t5 + t8)
 		t2 = t9
@@ -321,14 +350,14 @@ func (m *Module) Xfib_f64(v0 float64) float64 {
 	t0 := v0
 	var t2 float64
 	_ = t2
-	if t0 <= float64(1) {
-		t2 = float64(1)
+	if t0 <= f64_const(1) {
+		t2 = f64_const(1)
 	} else {
 		t3 := v0
 		t4 := float64(t3 - float64(2))
 		t5 := m.table[uint32(int32(28))].(func(v0 float64) float64)(t4)
 		t6 := v0
-		t7 := float64(t6 - float64(1))
+		t7 := float64(t6 - f64_const(1))
 		t8 := m.table[uint32(int32(28))].(func(v0 float64) float64)(t7)
 		t9 := float64(t5 + t8)
 		t2 = t9
@@ -498,7 +527,7 @@ func (m *Module) Xas_br_value() float32 {
 	var t0 float32
 	_ = t0
 	{
-		t1 := m.table[uint32(int32(6))].(func(v0 float32) float32)(float32(1))
+		t1 := m.table[uint32(int32(6))].(func(v0 float32) float32)(f32_const(1))
 		t0 = t1
 		goto l0
 	}
@@ -509,7 +538,7 @@ l0:
 func (m *Module) Xas_local_set_value() float64 {
 	var v0 float64
 	_ = v0
-	t0 := m.table[uint32(int32(7))].(func(v0 float64) float64)(float64(1))
+	t0 := m.table[uint32(int32(7))].(func(v0 float64) float64)(f64_const(1))
 	v0 = t0
 	t1 := v0
 	return t1
@@ -517,12 +546,12 @@ func (m *Module) Xas_local_set_value() float64 {
 func (m *Module) Xas_local_tee_value() float64 {
 	var v0 float64
 	_ = v0
-	t0 := m.table[uint32(int32(7))].(func(v0 float64) float64)(float64(1))
+	t0 := m.table[uint32(int32(7))].(func(v0 float64) float64)(f64_const(1))
 	v0 = t0
 	return t0
 }
 func (m *Module) Xas_global_set_value() float64 {
-	t0 := m.table[uint32(int32(7))].(func(v0 float64) float64)(float64(1))
+	t0 := m.table[uint32(int32(7))].(func(v0 float64) float64)(f64_const(1))
 	m._a = t0
 	t1 := m._a
 	return t1
@@ -536,7 +565,7 @@ func (m *Module) Xas_unary_operand() float32 {
 	var t0 float32
 	_ = t0
 	{
-		t1 := m.table[uint32(int32(6))].(func(v0 float32) float32)(float32(0))
+		t1 := m.table[uint32(int32(6))].(func(v0 float32) float32)(f32_const(0))
 		t2 := float32(math.Sqrt(float64(t1)))
 		t0 = t2
 	}
@@ -615,6 +644,12 @@ func (m *Module) Xas_convert_operand() int64 {
 func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem

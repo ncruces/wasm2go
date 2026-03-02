@@ -40,14 +40,14 @@ func (m *Module) Xtype_local_i64() int64 {
 func (m *Module) Xtype_local_f32() float32 {
 	var v0 float32
 	_ = v0
-	v0 = float32(0)
-	return float32(0)
+	v0 = f32_const(0)
+	return f32_const(0)
 }
 func (m *Module) Xtype_local_f64() float64 {
 	var v0 float64
 	_ = v0
-	v0 = float64(0)
-	return float64(0)
+	v0 = f64_const(0)
+	return f64_const(0)
 }
 func (m *Module) Xtype_param_i32(v0 int32) int32 {
 	v0 = int32(10)
@@ -78,11 +78,11 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 		t0 = 1
 	}
 	_ = t0
-	v1 = float32(0)
-	t1 := -float32(0)
+	v1 = f32_const(0)
+	t1 := -f32_const(0)
 	_ = t1
-	v2 = float64(0)
-	t2 := -float64(0)
+	v2 = f64_const(0)
+	t2 := -f64_const(0)
 	_ = t2
 	v3 = i32_const(0)
 	var t3 int32
@@ -96,8 +96,8 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 		t4 = 1
 	}
 	_ = t4
-	v5 = float32(0)
-	t5 := -float32(0)
+	v5 = f32_const(0)
+	t5 := -f32_const(0)
 	_ = t5
 	v6 = i64_const(0)
 	var t6 int32
@@ -111,8 +111,8 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 		t7 = 1
 	}
 	_ = t7
-	v8 = float64(0)
-	t8 := -float64(0)
+	v8 = f64_const(0)
+	t8 := -f64_const(0)
 	_ = t8
 }
 func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) int64 {
@@ -569,6 +569,12 @@ func (m *Module) Xas_memory_grow_size(v0 int32) int32 {
 func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)

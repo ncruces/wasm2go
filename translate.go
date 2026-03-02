@@ -115,7 +115,7 @@ func translate(r io.Reader, w io.Writer) error {
 	// Add helpers.
 	fset := token.NewFileSet()
 	if len(t.helpers) > 0 {
-		f, err := parser.ParseFile(fset, "helpers.go", helpersSrc, 0)
+		f, err := parser.ParseFile(fset, "helpers.go", helpersSrc, parser.ParseComments)
 		if err != nil {
 			return err
 		}
@@ -1482,7 +1482,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.binHelper("i64_rotr", "math/bits")
 
 		case 0x8b: // f32.abs
-			fn.uniMath32("Abs")
+			fn.uniHelper("f32_abs", "math")
 		case 0x8c: // f32.neg
 			fn.push(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
 		case 0x8d: // f32.ceil
@@ -1508,7 +1508,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x97: // f32.max
 			fn.binBuiltin("max")
 		case 0x98: // f32.copysign
-			fn.binMath32("Copysign")
+			fn.binHelper("f32_copysign", "math")
 
 		case 0x99: // f64.abs
 			fn.uniMath64("Abs")

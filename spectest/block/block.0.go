@@ -56,9 +56,36 @@ func (m *Module) Xmulti() int32 {
 		m._dummy()
 		m._dummy()
 		m._dummy()
-		t0 = int32(8)
+		m._dummy()
+		t0 = int32(7)
 	}
-	return t0
+	_ = t0
+	var t1 int32
+	_ = t1
+	var t2 int64
+	_ = t2
+	var t3 int32
+	_ = t3
+	{
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		m._dummy()
+		t1 = int32(8)
+		t2 = int64(7)
+		t3 = int32(9)
+	}
+	_ = t3
+	_ = t2
+	return t1
 }
 func (m *Module) Xnested() int32 {
 	var t0 int32
@@ -692,6 +719,52 @@ func (m *Module) Xas_compare_operand() int32 {
 	}
 	return t2
 }
+func (m *Module) Xas_binary_operands() int32 {
+	var t0 int32
+	_ = t0
+	var t1 int32
+	_ = t1
+	{
+		m._dummy()
+		m._dummy()
+		t0 = int32(3)
+		t1 = int32(4)
+	}
+	t2 := t0 * t1
+	return t2
+}
+func (m *Module) Xas_compare_operands() int32 {
+	var t0 float32
+	_ = t0
+	var t1 float32
+	_ = t1
+	{
+		m._dummy()
+		m._dummy()
+		t0 = float32(3)
+		t1 = float32(3)
+	}
+	var t2 int32
+	if t0 > t1 {
+		t2 = 1
+	}
+	return t2
+}
+func (m *Module) Xas_mixed_operands() int32 {
+	var t0 int32
+	_ = t0
+	var t1 int32
+	_ = t1
+	{
+		m._dummy()
+		m._dummy()
+		t0 = int32(3)
+		t1 = int32(4)
+	}
+	t2 := t1 + int32(5)
+	t3 := t0 * t2
+	return t3
+}
 func (m *Module) Xbreak_bare() int32 {
 	{
 		goto l0
@@ -737,6 +810,23 @@ func (m *Module) Xbreak_value() int32 {
 l0:
 	;
 	return t0
+}
+func (m *Module) Xbreak_multi_value() (int32, int32, int64) {
+	var t0 int32
+	_ = t0
+	var t1 int32
+	_ = t1
+	var t2 int64
+	_ = t2
+	{
+		t0 = int32(18)
+		t1 = i32_const(-18)
+		t2 = int64(18)
+		goto l0
+	}
+l0:
+	;
+	return t0, t1, t2
 }
 func (m *Module) Xbreak_repeated() int32 {
 	var t0 int32
@@ -810,6 +900,75 @@ l3:
 	t16 := v0
 	return t16
 }
+func (m *Module) Xparam() int32 {
+	var t0 int32
+	_ = t0
+	{
+		t1 := int32(1) + int32(2)
+		t0 = t1
+	}
+	return t0
+}
+func (m *Module) Xparams() int32 {
+	var t0 int32
+	_ = t0
+	{
+		t1 := int32(1) + int32(2)
+		t0 = t1
+	}
+	return t0
+}
+func (m *Module) Xparams_id() int32 {
+	var t0 int32
+	_ = t0
+	var t1 int32
+	_ = t1
+	{
+		t0 = int32(1)
+		t1 = int32(2)
+	}
+	t2 := t0 + t1
+	return t2
+}
+func (m *Module) Xparam_break() int32 {
+	var t0 int32
+	_ = t0
+	{
+		t1 := int32(1) + int32(2)
+		t0 = t1
+		goto l0
+	}
+l0:
+	;
+	return t0
+}
+func (m *Module) Xparams_break() int32 {
+	var t0 int32
+	_ = t0
+	{
+		t1 := int32(1) + int32(2)
+		t0 = t1
+		goto l0
+	}
+l0:
+	;
+	return t0
+}
+func (m *Module) Xparams_id_break() int32 {
+	var t0 int32
+	_ = t0
+	var t1 int32
+	_ = t1
+	{
+		t0 = int32(1)
+		t1 = int32(2)
+		goto l0
+	}
+l0:
+	;
+	t2 := t0 + t1
+	return t2
+}
 func (m *Module) Xeffects() int32 {
 	var v0 int32
 	_ = v0
@@ -835,8 +994,59 @@ l0:
 	}
 	return t9
 }
+func (m *Module) Xtype_use() {
+	{
+	}
+	var t0 int32
+	_ = t0
+	{
+		t0 = i32_const(0)
+	}
+	{
+		_ = t0
+	}
+	var t1 int32
+	_ = t1
+	var t2 float64
+	_ = t2
+	var t3 int32
+	_ = t3
+	{
+		t1 = i32_const(0)
+		t2 = f64_const(0)
+		t3 = i32_const(0)
+	}
+	_ = t3
+	_ = t2
+	_ = t1
+	var t4 int32
+	_ = t4
+	{
+		t4 = i32_const(0)
+	}
+	{
+		_ = t4
+	}
+	var t5 int32
+	_ = t5
+	var t6 float64
+	_ = t6
+	var t7 int32
+	_ = t7
+	{
+		t5 = i32_const(0)
+		t6 = f64_const(0)
+		t7 = i32_const(0)
+	}
+	_ = t7
+	_ = t6
+	_ = t5
+}
 
 func i32_const(x int32) int32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem

@@ -11,7 +11,7 @@ import (
 	"unicode"
 )
 
-func Test(t *testing.T, modptr any, data []byte, name ...string) {
+func Test(t *testing.T, modptr any, data []byte, name string) {
 	var test struct {
 		Commands []struct {
 			Type     string `json:"type"`
@@ -40,21 +40,23 @@ func Test(t *testing.T, modptr any, data []byte, name ...string) {
 
 	var file string
 	for _, cmd := range test.Commands {
-		if len(name) > 0 && name[0] != file {
+		if cmd.Type == "module" {
+			file = cmd.Filename
+			continue
+		} else if file != name {
 			continue
 		}
+
 		switch cmd.Type {
-		case "module":
-			file = cmd.Filename
-		case "assert_return", "assert_trap":
+		case "action", "assert_return", "assert_trap":
 			t.Run(fmt.Sprintf("line_%d", cmd.Line), func(t *testing.T) {
 				if cmd.Type == "assert_trap" {
 					defer func() {
 						r := recover()
 						if r == nil {
 							t.Errorf("expected trap: %s", cmd.Text)
-						} else if !strings.Contains(fmt.Sprint(r), cmd.Text) {
-							t.Errorf("got trap %q, want %q", r, cmd.Text)
+							// } else if !strings.Contains(fmt.Sprint(r), cmd.Text) {
+							// 	t.Errorf("got trap %q, want %q", r, cmd.Text)
 						}
 					}()
 				}

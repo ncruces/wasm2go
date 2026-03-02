@@ -116,17 +116,17 @@ func (m *Module) _i64_bool() int32 {
 func (m *Module) _f32_left() float32 {
 	m._bump()
 	m.memory[uint32(int32(8))] = byte(int32(1))
-	return float32(0)
+	return f32_const(0)
 }
 func (m *Module) _f32_right() float32 {
 	m._bump()
 	m.memory[uint32(int32(8))] = byte(int32(2))
-	return float32(1)
+	return f32_const(1)
 }
 func (m *Module) _f32_another() float32 {
 	m._bump()
 	m.memory[uint32(int32(8))] = byte(int32(3))
-	return float32(1)
+	return f32_const(1)
 }
 func (m *Module) _f32_callee() int32 {
 	m._bump()
@@ -141,17 +141,17 @@ func (m *Module) _f32_bool() int32 {
 func (m *Module) _f64_left() float64 {
 	m._bump()
 	m.memory[uint32(int32(8))] = byte(int32(1))
-	return float64(0)
+	return f64_const(0)
 }
 func (m *Module) _f64_right() float64 {
 	m._bump()
 	m.memory[uint32(int32(8))] = byte(int32(2))
-	return float64(1)
+	return f64_const(1)
 }
 func (m *Module) _f64_another() float64 {
 	m._bump()
 	m.memory[uint32(int32(8))] = byte(int32(3))
-	return float64(1)
+	return f64_const(1)
 }
 func (m *Module) _f64_callee() int32 {
 	m._bump()
@@ -803,7 +803,7 @@ func (m *Module) Xf32_copysign() int32 {
 	m._reset()
 	t0 := m._f32_left()
 	t1 := m._f32_right()
-	t2 := float32(math.Copysign(float64(t0), float64(t1)))
+	t2 := f32_copysign(t0, t1)
 	_ = t2
 	t3 := m._get()
 	return t3
@@ -1165,6 +1165,12 @@ func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
 
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
+
 func i32_div_s(x, y int32) int32 {
 	if x == math.MinInt32 && y == -1 {
 		panic("integer overflow")
@@ -1201,4 +1207,8 @@ func i64_shr_s(x, y int64) int64 {
 
 func i64_shr_u(x, y int64) int64 {
 	return int64(uint64(x) >> (y & 63))
+}
+
+func f32_copysign(x, y float32) float32 {
+	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }

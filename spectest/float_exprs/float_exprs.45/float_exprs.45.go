@@ -17,7 +17,7 @@ func (m *Module) Xf32_no_fold_lt_select_to_abs(v0 float32) float32 {
 	t2 := v0
 	t3 := v0
 	t5 := t2
-	if t3 < float32(0) {
+	if t3 < f32_const(0) {
 		t5 = t1
 	}
 	return t5
@@ -50,7 +50,7 @@ func (m *Module) Xf32_no_fold_ge_select_to_abs(v0 float32) float32 {
 	t2 := -t1
 	t3 := v0
 	t5 := t2
-	if t3 >= float32(0) {
+	if t3 >= f32_const(0) {
 		t5 = t0
 	}
 	return t5
@@ -61,7 +61,7 @@ func (m *Module) Xf64_no_fold_lt_select_to_abs(v0 float64) float64 {
 	t2 := v0
 	t3 := v0
 	t5 := t2
-	if t3 < float64(0) {
+	if t3 < f64_const(0) {
 		t5 = t1
 	}
 	return t5
@@ -94,8 +94,14 @@ func (m *Module) Xf64_no_fold_ge_select_to_abs(v0 float64) float64 {
 	t2 := -t1
 	t3 := v0
 	t5 := t2
-	if t3 >= float64(0) {
+	if t3 >= f64_const(0) {
 		t5 = t0
 	}
 	return t5
 }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

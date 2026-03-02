@@ -37,6 +37,9 @@ func (m *Module) _const_f32() float32 {
 func (m *Module) _const_f64() float64 {
 	return float64(3940)
 }
+func (m *Module) _const_i32_i64() (int32, int64) {
+	return i32_const(306), i64_const(356)
+}
 func (m *Module) _id_i32(v0 int32) int32 {
 	t0 := v0
 	return t0
@@ -52,6 +55,26 @@ func (m *Module) _id_f32(v0 float32) float32 {
 func (m *Module) _id_f64(v0 float64) float64 {
 	t0 := v0
 	return t0
+}
+func (m *Module) _id_i32_f64(v0 int32, v1 float64) (int32, float64) {
+	t0 := v0
+	t1 := v1
+	return t0, t1
+}
+func (m *Module) _swap_i32_i32(v0 int32, v1 int32) (int32, int32) {
+	t0 := v1
+	t1 := v0
+	return t0, t1
+}
+func (m *Module) _swap_f32_f64(v0 float32, v1 float64) (float64, float32) {
+	t0 := v1
+	t1 := v0
+	return t0, t1
+}
+func (m *Module) _swap_f64_i32(v0 float64, v1 int32) (int32, float64) {
+	t0 := v1
+	t1 := v0
+	return t0, t1
 }
 func (m *Module) _f32_i32(v0 float32, v1 int32) int32 {
 	t0 := v1
@@ -85,6 +108,10 @@ func (m *Module) Xtype_f64() float64 {
 	t0 := m._const_f64()
 	return t0
 }
+func (m *Module) Xtype_i32_i64() (int32, int64) {
+	t0, t1 := m._const_i32_i64()
+	return t0, t1
+}
 func (m *Module) Xtype_first_i32() int32 {
 	t0 := m._id_i32(int32(32))
 	return t0
@@ -116,6 +143,38 @@ func (m *Module) Xtype_second_f32() float32 {
 func (m *Module) Xtype_second_f64() float64 {
 	t0 := m._i64_f64(int64(64), float64(64.1))
 	return t0
+}
+func (m *Module) Xtype_all_i32_f64() (int32, float64) {
+	t0, t1 := m._id_i32_f64(int32(32), float64(1.64))
+	return t0, t1
+}
+func (m *Module) Xtype_all_i32_i32() (int32, int32) {
+	t0, t1 := m._swap_i32_i32(int32(1), int32(2))
+	return t0, t1
+}
+func (m *Module) Xtype_all_f32_f64() (float64, float32) {
+	t0, t1 := m._swap_f32_f64(f32_const(1), float64(2))
+	return t0, t1
+}
+func (m *Module) Xtype_all_f64_i32() (int32, float64) {
+	t0, t1 := m._swap_f64_i32(f64_const(1), int32(2))
+	return t0, t1
+}
+func (m *Module) Xas_binary_all_operands() int32 {
+	t0, t1 := m._swap_i32_i32(int32(3), int32(4))
+	t2 := t0 + t1
+	return t2
+}
+func (m *Module) Xas_mixed_operands() int32 {
+	t0, t1 := m._swap_i32_i32(int32(3), int32(4))
+	t2 := t1 + int32(5)
+	t3 := t0 * t2
+	return t3
+}
+func (m *Module) Xas_call_all_operands() (int32, int32) {
+	t0, t1 := m._swap_i32_i32(int32(3), int32(4))
+	t2, t3 := m._swap_i32_i32(t0, t1)
+	return t2, t3
 }
 func (m *Module) Xfac(v0 int64) int64 {
 	t0 := v0
@@ -412,7 +471,7 @@ func (m *Module) Xas_unary_operand() float32 {
 	var t0 float32
 	_ = t0
 	{
-		t1 := m._du(float32(0))
+		t1 := m._du(f32_const(0))
 		t2 := float32(math.Sqrt(float64(t1)))
 		t0 = t2
 	}
@@ -487,10 +546,25 @@ func (m *Module) Xas_convert_operand() int64 {
 	}
 	return t0
 }
+func (m *Module) _return_from_long_argument_list_helper(v0 float32, v1 int32, v2 int32, v3 float64, v4 float32, v5 float32, v6 float32, v7 float64, v8 float32, v9 int32, v10 int32, v11 float32, v12 float64, v13 int64, v14 int64, v15 int32, v16 int64, v17 int64, v18 float32, v19 int64, v20 int64, v21 int64, v22 int32, v23 float32, v24 float32, v25 float32, v26 float64, v27 float32, v28 int32, v29 int64, v30 float32, v31 float64, v32 float64, v33 float32, v34 int32, v35 float32, v36 float32, v37 float64, v38 int64, v39 float64, v40 int32, v41 int64, v42 float32, v43 float64, v44 int32, v45 int32, v46 int32, v47 int64, v48 float64, v49 int32, v50 int64, v51 int64, v52 float64, v53 float64, v54 float64, v55 float64, v56 float64, v57 float64, v58 int32, v59 float32, v60 float64, v61 float64, v62 int32, v63 int64, v64 float32, v65 float32, v66 float32, v67 int32, v68 float64, v69 float64, v70 float64, v71 float64, v72 float64, v73 float32, v74 int64, v75 int64, v76 int32, v77 int32, v78 int32, v79 float32, v80 float64, v81 int32, v82 int64, v83 float32, v84 float32, v85 float32, v86 int32, v87 int32, v88 float32, v89 float64, v90 int64, v91 float32, v92 float64, v93 float32, v94 float32, v95 float32, v96 int32, v97 float32, v98 int64, v99 int32) int32 {
+	t0 := v99
+	return t0
+}
+func (m *Module) Xreturn_from_long_argument_list(v0 int32) int32 {
+	t0 := v0
+	t1 := m._return_from_long_argument_list_helper(f32_const(0), i32_const(0), i32_const(0), f64_const(0), f32_const(0), f32_const(0), f32_const(0), f64_const(0), f32_const(0), i32_const(0), i32_const(0), f32_const(0), f64_const(0), i64_const(0), i64_const(0), i32_const(0), i64_const(0), i64_const(0), f32_const(0), i64_const(0), i64_const(0), i64_const(0), i32_const(0), f32_const(0), f32_const(0), f32_const(0), f64_const(0), f32_const(0), i32_const(0), i64_const(0), f32_const(0), f64_const(0), f64_const(0), f32_const(0), i32_const(0), f32_const(0), f32_const(0), f64_const(0), i64_const(0), f64_const(0), i32_const(0), i64_const(0), f32_const(0), f64_const(0), i32_const(0), i32_const(0), i32_const(0), i64_const(0), f64_const(0), i32_const(0), i64_const(0), i64_const(0), f64_const(0), f64_const(0), f64_const(0), f64_const(0), f64_const(0), f64_const(0), i32_const(0), f32_const(0), f64_const(0), f64_const(0), i32_const(0), i64_const(0), f32_const(0), f32_const(0), f32_const(0), i32_const(0), f64_const(0), f64_const(0), f64_const(0), f64_const(0), f64_const(0), f32_const(0), i64_const(0), i64_const(0), i32_const(0), i32_const(0), i32_const(0), f32_const(0), f64_const(0), i32_const(0), i64_const(0), f32_const(0), f32_const(0), f32_const(0), i32_const(0), i32_const(0), f32_const(0), f64_const(0), i64_const(0), f32_const(0), f64_const(0), f32_const(0), f32_const(0), f32_const(0), i32_const(0), f32_const(0), i64_const(0), t0)
+	return t1
+}
 
 func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem

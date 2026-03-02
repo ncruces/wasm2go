@@ -11,7 +11,7 @@ func New() *Module {
 }
 func (m *Module) Xf32_no_fold_sub1_mul_add(v0 float32, v1 float32) float32 {
 	t0 := v0
-	t1 := float32(t0 - float32(1))
+	t1 := float32(t0 - f32_const(1))
 	t2 := v1
 	t3 := float32(t1 * t2)
 	t4 := v1
@@ -20,10 +20,16 @@ func (m *Module) Xf32_no_fold_sub1_mul_add(v0 float32, v1 float32) float32 {
 }
 func (m *Module) Xf64_no_fold_sub1_mul_add(v0 float64, v1 float64) float64 {
 	t0 := v0
-	t1 := float64(t0 - float64(1))
+	t1 := float64(t0 - f64_const(1))
 	t2 := v1
 	t3 := float64(t1 * t2)
 	t4 := v1
 	t5 := float64(t3 + t4)
 	return t5
 }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

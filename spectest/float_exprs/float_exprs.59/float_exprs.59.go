@@ -26,25 +26,25 @@ func (m *Module) Xf32_simple_x4_sum(v0 int32, v1 int32, v2 int32) {
 	t1 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t0):]))
 	v3 = t1
 	t2 := v0
-	t3 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t2)+4:]))
+	t3 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[int64(uint32(t2))+4:]))
 	v4 = t3
 	t4 := v0
-	t5 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t4)+8:]))
+	t5 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[int64(uint32(t4))+8:]))
 	v5 = t5
 	t6 := v0
-	t7 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t6)+12:]))
+	t7 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[int64(uint32(t6))+12:]))
 	v6 = t7
 	t8 := v1
 	t9 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t8):]))
 	v7 = t9
 	t10 := v1
-	t11 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t10)+4:]))
+	t11 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[int64(uint32(t10))+4:]))
 	v8 = t11
 	t12 := v1
-	t13 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t12)+8:]))
+	t13 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[int64(uint32(t12))+8:]))
 	v9 = t13
 	t14 := v1
-	t15 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t14)+12:]))
+	t15 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[int64(uint32(t14))+12:]))
 	v10 = t15
 	t16 := v2
 	t17 := v3
@@ -55,17 +55,17 @@ func (m *Module) Xf32_simple_x4_sum(v0 int32, v1 int32, v2 int32) {
 	t21 := v4
 	t22 := v8
 	t23 := float32(t21 + t22)
-	binary.LittleEndian.PutUint32(m.memory[uint32(t20)+4:], math.Float32bits(t23))
+	binary.LittleEndian.PutUint32(m.memory[int64(uint32(t20))+4:], math.Float32bits(t23))
 	t24 := v2
 	t25 := v5
 	t26 := v9
 	t27 := float32(t25 + t26)
-	binary.LittleEndian.PutUint32(m.memory[uint32(t24)+8:], math.Float32bits(t27))
+	binary.LittleEndian.PutUint32(m.memory[int64(uint32(t24))+8:], math.Float32bits(t27))
 	t28 := v2
 	t29 := v6
 	t30 := v10
 	t31 := float32(t29 + t30)
-	binary.LittleEndian.PutUint32(m.memory[uint32(t28)+12:], math.Float32bits(t31))
+	binary.LittleEndian.PutUint32(m.memory[int64(uint32(t28))+12:], math.Float32bits(t31))
 }
 func (m *Module) Xf32_load(v0 int32) float32 {
 	t0 := v0
