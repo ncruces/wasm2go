@@ -2,8 +2,6 @@
 
 package wasm2go
 
-import "math"
-
 type Module struct {
 }
 
@@ -11,12 +9,43 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xllvm_pr26746(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(math.Float32frombits(2147483648) - t0)
-	t2 := float32(f32_const(0) - t1)
-	return t2
+func (m *Module) Xcalculate() float32 {
+	var v0, v1, v2, v3, v4 float32
+	_, _, _, _, _ = v0, v1, v2, v3, v4
+	v0 = float32(156.25)
+	v1 = float32(208.33333)
+	v2 = float32(1.779513)
+	t0 := v1
+	t1 := -t0
+	t2 := v0
+	t3 := float32(t1 * t2)
+	t4 := v0
+	t5 := v2
+	t6 := float32(t4 * t5)
+	t7 := v1
+	t8 := float32(t6 - t7)
+	t9 := float32(t3 / t8)
+	v3 = t9
+	t10 := v1
+	t11 := -t10
+	t12 := v0
+	t13 := float32(t11 * t12)
+	t14 := v0
+	t15 := v2
+	t16 := float32(t14 * t15)
+	t17 := v1
+	t18 := float32(t16 - t17)
+	t19 := float32(t13 / t18)
+	v4 = t19
+	{
+		t20 := v3
+		t21 := v4
+		if t20 == t21 {
+			goto l0
+		}
+	}
+l0:
+	;
+	t23 := v4
+	return t23
 }
-
-//go:noinline
-func f32_const(x float32) float32 { return x }

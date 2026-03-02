@@ -9,31 +9,13 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_conditional_inc(v0 float32, v1 float32) float32 {
+func (m *Module) Xpoint_four(v0 float64, v1 float64) int32 {
 	t0 := v0
-	t1 := v0
-	t2 := float32(t1 + f32_const(1))
-	t3 := v1
-	t5 := t2
-	if t3 < f32_const(0) {
-		t5 = t0
+	t1 := v1
+	t2 := float64(t0 / t1)
+	var t3 int32
+	if t2 < float64(0.4) {
+		t3 = 1
 	}
-	return t5
+	return t3
 }
-func (m *Module) Xf64_no_fold_conditional_inc(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v0
-	t2 := float64(t1 + f64_const(1))
-	t3 := v1
-	t5 := t2
-	if t3 < f64_const(0) {
-		t5 = t0
-	}
-	return t5
-}
-
-//go:noinline
-func f32_const(x float32) float32 { return x }
-
-//go:noinline
-func f64_const(x float64) float64 { return x }

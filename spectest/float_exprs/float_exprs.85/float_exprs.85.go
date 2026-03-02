@@ -9,45 +9,107 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_epsilon() float32 {
-	var v0, v1 float32
-	_, _ = v0, v1
-	v0 = f32_const(1)
-l0:
-	{
-		t0 := v0
-		v1 = t0
-		t1 := float32(t0 * float32(0.5))
-		v0 = t1
-		t2 := float32(t1 + f32_const(1))
-		if t2 > f32_const(1) {
-			goto l0
-		}
+func (m *Module) Xf32_not_lt(v0 float32, v1 float32) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 < t1 {
+		t2 = 1
 	}
-	t4 := v1
-	return t4
-}
-func (m *Module) Xf64_epsilon() float64 {
-	var v0, v1 float64
-	_, _ = v0, v1
-	v0 = f64_const(1)
-l0:
-	{
-		t0 := v0
-		v1 = t0
-		t1 := float64(t0 * float64(0.5))
-		v0 = t1
-		t2 := float64(t1 + f64_const(1))
-		if t2 > f64_const(1) {
-			goto l0
-		}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
 	}
-	t4 := v1
-	return t4
+	return t3
 }
-
-//go:noinline
-func f32_const(x float32) float32 { return x }
-
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func (m *Module) Xf32_not_le(v0 float32, v1 float32) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 <= t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf32_not_gt(v0 float32, v1 float32) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 > t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf32_not_ge(v0 float32, v1 float32) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 >= t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_not_lt(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 < t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_not_le(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 <= t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_not_gt(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 > t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_not_ge(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 >= t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}

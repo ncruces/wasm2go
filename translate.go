@@ -878,16 +878,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					})
 				}
 			}
-			if blk.unreachable {
-				switch {
-				default: // A block.
-					parent.unreachable = blk.label == nil
-				case blk.ifStmt != nil: // An if.
-					parent.unreachable = blk.ifreachable
-				case blk.loopPos != 0: // A loop.
-					parent.unreachable = true
-				}
-			}
+
+			// A parent block is unreachable at this point
+			// if the end of this block is unreachable,
+			// and the block is a loop (loops jump to the start),
+			// or it has no end label to jump to,
+			// and the block is not an if statement,
+			// or both branches were unreachable.
+			parent.unreachable = blk.unreachable &&
+				(blk.loopPos != 0 || blk.label == nil &&
+					(blk.ifStmt == nil || blk.ifreachable))
 
 		case 0x0c: // br
 			n, err := readLEB128(t.in)

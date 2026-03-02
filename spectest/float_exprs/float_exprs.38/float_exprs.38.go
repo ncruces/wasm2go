@@ -17,3 +17,11 @@ func (m *Module) Xno_demote_mixed_sub(v0 float64, v1 float32) float32 {
 	t4 := float32(t3)
 	return t4
 }
+func (m *Module) Xno_demote_mixed_sub_commuted(v0 float32, v1 float64) float32 {
+	t0 := v0
+	t1 := float64(t0)
+	t2 := v1
+	t3 := float64(t1 - t2)
+	t4 := float32(t3)
+	return t4
+}

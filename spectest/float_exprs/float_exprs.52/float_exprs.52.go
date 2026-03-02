@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 }
 
@@ -9,15 +11,12 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xllvm_pr27036(v0 int32, v1 int32) float32 {
+func (m *Module) Xllvm_pr26746(v0 float32) float32 {
 	t0 := v0
-	t1 := t0 | i32_const(-25034805)
-	t2 := float32(t1)
-	t3 := v1
-	t4 := t3 & i32_const(14942208)
-	t5 := float32(t4)
-	t6 := float32(t2 + t5)
-	return t6
+	t1 := float32(math.Float32frombits(2147483648) - t0)
+	t2 := float32(f32_const(0) - t1)
+	return t2
 }
 
-func i32_const(x int32) int32 { return x }
+//go:noinline
+func f32_const(x float32) float32 { return x }

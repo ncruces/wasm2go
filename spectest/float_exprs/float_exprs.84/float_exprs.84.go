@@ -9,23 +9,55 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_epsilon() float32 {
-	t0 := float32(float32(4) / float32(3))
-	t1 := float32(t0 - f32_const(1))
-	t2 := float32(float32(3) * t1)
-	t3 := float32(f32_const(1) - t2)
-	return t3
+func (m *Module) Xf32_no_fold_add_le_monotonicity(v0 float32, v1 float32, v2 float32) int32 {
+	t0 := v0
+	t1 := v2
+	t2 := float32(t0 + t1)
+	t3 := v1
+	t4 := v2
+	t5 := float32(t3 + t4)
+	var t6 int32
+	if t2 <= t5 {
+		t6 = 1
+	}
+	return t6
 }
-func (m *Module) Xf64_epsilon() float64 {
-	t0 := float64(float64(4) / float64(3))
-	t1 := float64(t0 - f64_const(1))
-	t2 := float64(float64(3) * t1)
-	t3 := float64(f64_const(1) - t2)
-	return t3
+func (m *Module) Xf32_no_fold_add_ge_monotonicity(v0 float32, v1 float32, v2 float32) int32 {
+	t0 := v0
+	t1 := v2
+	t2 := float32(t0 + t1)
+	t3 := v1
+	t4 := v2
+	t5 := float32(t3 + t4)
+	var t6 int32
+	if t2 >= t5 {
+		t6 = 1
+	}
+	return t6
 }
-
-//go:noinline
-func f32_const(x float32) float32 { return x }
-
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func (m *Module) Xf64_no_fold_add_le_monotonicity(v0 float64, v1 float64, v2 float64) int32 {
+	t0 := v0
+	t1 := v2
+	t2 := float64(t0 + t1)
+	t3 := v1
+	t4 := v2
+	t5 := float64(t3 + t4)
+	var t6 int32
+	if t2 <= t5 {
+		t6 = 1
+	}
+	return t6
+}
+func (m *Module) Xf64_no_fold_add_ge_monotonicity(v0 float64, v1 float64, v2 float64) int32 {
+	t0 := v0
+	t1 := v2
+	t2 := float64(t0 + t1)
+	t3 := v1
+	t4 := v2
+	t5 := float64(t3 + t4)
+	var t6 int32
+	if t2 >= t5 {
+		t6 = 1
+	}
+	return t6
+}

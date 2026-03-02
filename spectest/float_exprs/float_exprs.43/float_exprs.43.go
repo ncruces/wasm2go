@@ -2,98 +2,52 @@
 
 package wasm2go
 
+import (
+	"encoding/binary"
+	"math"
+)
+
 type Module struct {
+	memory []byte
+	maxMem int32
 }
 
 func New() *Module {
 	m := &Module{}
+	m.maxMem = 1
+	m.memory = make([]byte, 65536)
 	return m
 }
-func (m *Module) Xf32_no_fold_lt_select(v0 float32, v1 float32) float32 {
+func (m *Module) Xinit(v0 int32, v1 float64) {
 	t0 := v0
 	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 < t3 {
-		t5 = t0
-	}
-	return t5
+	binary.LittleEndian.PutUint64(m.memory[uint32(t0):], math.Float64bits(t1))
 }
-func (m *Module) Xf32_no_fold_le_select(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 <= t3 {
-		t5 = t0
+func (m *Module) Xrun(v0 int32, v1 float64) {
+	var v2 int32
+	_ = v2
+	{
+	l0:
+		{
+			t0 := v2
+			t1 := v2
+			t2 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(t1):]))
+			t3 := v1
+			t4 := float64(t2 / t3)
+			binary.LittleEndian.PutUint64(m.memory[uint32(t0):], math.Float64bits(t4))
+			t5 := v2
+			t6 := t5 + int32(8)
+			v2 = t6
+			t7 := v2
+			t8 := v0
+			if uint32(t7) < uint32(t8) {
+				goto l0
+			}
+		}
 	}
-	return t5
 }
-func (m *Module) Xf32_no_fold_gt_select(v0 float32, v1 float32) float32 {
+func (m *Module) Xcheck(v0 int32) float64 {
 	t0 := v0
-	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 > t3 {
-		t5 = t0
-	}
-	return t5
-}
-func (m *Module) Xf32_no_fold_ge_select(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 >= t3 {
-		t5 = t0
-	}
-	return t5
-}
-func (m *Module) Xf64_no_fold_lt_select(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 < t3 {
-		t5 = t0
-	}
-	return t5
-}
-func (m *Module) Xf64_no_fold_le_select(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 <= t3 {
-		t5 = t0
-	}
-	return t5
-}
-func (m *Module) Xf64_no_fold_gt_select(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 > t3 {
-		t5 = t0
-	}
-	return t5
-}
-func (m *Module) Xf64_no_fold_ge_select(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := v0
-	t3 := v1
-	t5 := t1
-	if t2 >= t3 {
-		t5 = t0
-	}
-	return t5
+	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(t0):]))
+	return t1
 }

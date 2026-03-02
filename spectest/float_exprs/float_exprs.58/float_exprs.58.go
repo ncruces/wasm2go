@@ -9,23 +9,21 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_algebraic_factoring(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_recip_recip(v0 float32) float32 {
 	t0 := v0
-	t1 := v0
-	t2 := float32(t0 * t1)
-	t3 := v1
-	t4 := v1
-	t5 := float32(t3 * t4)
-	t6 := float32(t2 - t5)
-	return t6
+	t1 := float32(f32_const(1) / t0)
+	t2 := float32(f32_const(1) / t1)
+	return t2
 }
-func (m *Module) Xf64_no_algebraic_factoring(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_recip_recip(v0 float64) float64 {
 	t0 := v0
-	t1 := v0
-	t2 := float64(t0 * t1)
-	t3 := v1
-	t4 := v1
-	t5 := float64(t3 * t4)
-	t6 := float64(t2 - t5)
-	return t6
+	t1 := float64(f64_const(1) / t0)
+	t2 := float64(f64_const(1) / t1)
+	return t2
 }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

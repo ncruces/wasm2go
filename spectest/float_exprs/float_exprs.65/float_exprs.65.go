@@ -9,19 +9,17 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_add_neg_neg(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_neg_sub(v0 float32, v1 float32) float32 {
 	t0 := v0
-	t1 := -t0
-	t2 := v1
+	t1 := v1
+	t2 := float32(t0 - t1)
 	t3 := -t2
-	t4 := float32(t1 + t3)
-	return t4
+	return t3
 }
-func (m *Module) Xf64_no_fold_add_neg_neg(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_neg_sub(v0 float64, v1 float64) float64 {
 	t0 := v0
-	t1 := -t0
-	t2 := v1
+	t1 := v1
+	t2 := float64(t0 - t1)
 	t3 := -t2
-	t4 := float64(t1 + t3)
-	return t4
+	return t3
 }

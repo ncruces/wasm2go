@@ -9,39 +9,131 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xdot_product_example(v0 float64, v1 float64, v2 float64, v3 float64, v4 float64, v5 float64, v6 float64, v7 float64) float64 {
+func (m *Module) Xf32_no_trichotomy_lt(v0 float32, v1 float32) int32 {
 	t0 := v0
-	t1 := v4
-	t2 := float64(t0 * t1)
-	t3 := v1
-	t4 := v5
-	t5 := float64(t3 * t4)
-	t6 := float64(t2 + t5)
-	t7 := v2
-	t8 := v6
-	t9 := float64(t7 * t8)
-	t10 := float64(t6 + t9)
-	t11 := v3
-	t12 := v7
-	t13 := float64(t11 * t12)
-	t14 := float64(t10 + t13)
-	return t14
+	t1 := v1
+	var t2 int32
+	if t0 < t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 >= t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
 }
-func (m *Module) Xwith_binary_sum_collapse(v0 float64, v1 float64, v2 float64, v3 float64, v4 float64, v5 float64, v6 float64, v7 float64) float64 {
+func (m *Module) Xf32_no_trichotomy_le(v0 float32, v1 float32) int32 {
 	t0 := v0
-	t1 := v4
-	t2 := float64(t0 * t1)
-	t3 := v1
-	t4 := v5
-	t5 := float64(t3 * t4)
-	t6 := float64(t2 + t5)
-	t7 := v2
-	t8 := v6
-	t9 := float64(t7 * t8)
-	t10 := v3
-	t11 := v7
-	t12 := float64(t10 * t11)
-	t13 := float64(t9 + t12)
-	t14 := float64(t6 + t13)
-	return t14
+	t1 := v1
+	var t2 int32
+	if t0 <= t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 > t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
+}
+func (m *Module) Xf32_no_trichotomy_gt(v0 float32, v1 float32) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 > t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 <= t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
+}
+func (m *Module) Xf32_no_trichotomy_ge(v0 float32, v1 float32) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 >= t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 < t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
+}
+func (m *Module) Xf64_no_trichotomy_lt(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 < t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 >= t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
+}
+func (m *Module) Xf64_no_trichotomy_le(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 <= t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 > t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
+}
+func (m *Module) Xf64_no_trichotomy_gt(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 > t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 <= t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
+}
+func (m *Module) Xf64_no_trichotomy_ge(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 >= t1 {
+		t2 = 1
+	}
+	t3 := v0
+	t4 := v1
+	var t5 int32
+	if t3 < t4 {
+		t5 = 1
+	}
+	t6 := t2 | t5
+	return t6
 }

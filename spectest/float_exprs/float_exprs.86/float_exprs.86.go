@@ -9,131 +9,23 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_trichotomy_lt(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 < t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 >= t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
+func (m *Module) Xf32_epsilon() float32 {
+	t0 := float32(float32(4) / float32(3))
+	t1 := float32(t0 - f32_const(1))
+	t2 := float32(float32(3) * t1)
+	t3 := float32(f32_const(1) - t2)
+	return t3
 }
-func (m *Module) Xf32_no_trichotomy_le(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 <= t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 > t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
+func (m *Module) Xf64_epsilon() float64 {
+	t0 := float64(float64(4) / float64(3))
+	t1 := float64(t0 - f64_const(1))
+	t2 := float64(float64(3) * t1)
+	t3 := float64(f64_const(1) - t2)
+	return t3
 }
-func (m *Module) Xf32_no_trichotomy_gt(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 > t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 <= t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
-}
-func (m *Module) Xf32_no_trichotomy_ge(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 >= t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 < t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
-}
-func (m *Module) Xf64_no_trichotomy_lt(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 < t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 >= t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
-}
-func (m *Module) Xf64_no_trichotomy_le(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 <= t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 > t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
-}
-func (m *Module) Xf64_no_trichotomy_gt(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 > t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 <= t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
-}
-func (m *Module) Xf64_no_trichotomy_ge(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var t2 int32
-	if t0 >= t1 {
-		t2 = 1
-	}
-	t3 := v0
-	t4 := v1
-	var t5 int32
-	if t3 < t4 {
-		t5 = 1
-	}
-	t6 := t2 | t5
-	return t6
-}
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

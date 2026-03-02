@@ -2,8 +2,6 @@
 
 package wasm2go
 
-import "math"
-
 type Module struct {
 }
 
@@ -11,97 +9,91 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_lt_select_to_abs(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_lt_select(v0 float32, v1 float32) float32 {
 	t0 := v0
-	t1 := -t0
+	t1 := v1
 	t2 := v0
-	t3 := v0
-	t5 := t2
-	if t3 < f32_const(0) {
-		t5 = t1
-	}
-	return t5
-}
-func (m *Module) Xf32_no_fold_le_select_to_abs(v0 float32) float32 {
-	t0 := v0
-	t1 := -t0
-	t2 := v0
-	t3 := v0
-	t5 := t2
-	if t3 <= math.Float32frombits(2147483648) {
-		t5 = t1
-	}
-	return t5
-}
-func (m *Module) Xf32_no_fold_gt_select_to_abs(v0 float32) float32 {
-	t0 := v0
-	t1 := v0
-	t2 := -t1
-	t3 := v0
-	t5 := t2
-	if t3 > math.Float32frombits(2147483648) {
+	t3 := v1
+	t5 := t1
+	if t2 < t3 {
 		t5 = t0
 	}
 	return t5
 }
-func (m *Module) Xf32_no_fold_ge_select_to_abs(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_le_select(v0 float32, v1 float32) float32 {
 	t0 := v0
-	t1 := v0
-	t2 := -t1
-	t3 := v0
-	t5 := t2
-	if t3 >= f32_const(0) {
-		t5 = t0
-	}
-	return t5
-}
-func (m *Module) Xf64_no_fold_lt_select_to_abs(v0 float64) float64 {
-	t0 := v0
-	t1 := -t0
+	t1 := v1
 	t2 := v0
-	t3 := v0
-	t5 := t2
-	if t3 < f64_const(0) {
-		t5 = t1
+	t3 := v1
+	t5 := t1
+	if t2 <= t3 {
+		t5 = t0
 	}
 	return t5
 }
-func (m *Module) Xf64_no_fold_le_select_to_abs(v0 float64) float64 {
+func (m *Module) Xf32_no_fold_gt_select(v0 float32, v1 float32) float32 {
 	t0 := v0
-	t1 := -t0
+	t1 := v1
 	t2 := v0
-	t3 := v0
-	t5 := t2
-	if t3 <= math.Float64frombits(9223372036854775808) {
-		t5 = t1
-	}
-	return t5
-}
-func (m *Module) Xf64_no_fold_gt_select_to_abs(v0 float64) float64 {
-	t0 := v0
-	t1 := v0
-	t2 := -t1
-	t3 := v0
-	t5 := t2
-	if t3 > math.Float64frombits(9223372036854775808) {
+	t3 := v1
+	t5 := t1
+	if t2 > t3 {
 		t5 = t0
 	}
 	return t5
 }
-func (m *Module) Xf64_no_fold_ge_select_to_abs(v0 float64) float64 {
+func (m *Module) Xf32_no_fold_ge_select(v0 float32, v1 float32) float32 {
 	t0 := v0
-	t1 := v0
-	t2 := -t1
-	t3 := v0
-	t5 := t2
-	if t3 >= f64_const(0) {
+	t1 := v1
+	t2 := v0
+	t3 := v1
+	t5 := t1
+	if t2 >= t3 {
 		t5 = t0
 	}
 	return t5
 }
-
-//go:noinline
-func f32_const(x float32) float32 { return x }
-
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func (m *Module) Xf64_no_fold_lt_select(v0 float64, v1 float64) float64 {
+	t0 := v0
+	t1 := v1
+	t2 := v0
+	t3 := v1
+	t5 := t1
+	if t2 < t3 {
+		t5 = t0
+	}
+	return t5
+}
+func (m *Module) Xf64_no_fold_le_select(v0 float64, v1 float64) float64 {
+	t0 := v0
+	t1 := v1
+	t2 := v0
+	t3 := v1
+	t5 := t1
+	if t2 <= t3 {
+		t5 = t0
+	}
+	return t5
+}
+func (m *Module) Xf64_no_fold_gt_select(v0 float64, v1 float64) float64 {
+	t0 := v0
+	t1 := v1
+	t2 := v0
+	t3 := v1
+	t5 := t1
+	if t2 > t3 {
+		t5 = t0
+	}
+	return t5
+}
+func (m *Module) Xf64_no_fold_ge_select(v0 float64, v1 float64) float64 {
+	t0 := v0
+	t1 := v1
+	t2 := v0
+	t3 := v1
+	t5 := t1
+	if t2 >= t3 {
+		t5 = t0
+	}
+	return t5
+}

@@ -9,115 +9,107 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_lt_if(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_ult(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t3 float32
-	_ = t3
-	if t0 < t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
-	}
-	return t3
-}
-func (m *Module) Xf32_no_fold_le_if(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	var t3 float32
-	_ = t3
-	if t0 <= t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
-	}
-	return t3
-}
-func (m *Module) Xf32_no_fold_gt_if(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	var t3 float32
-	_ = t3
-	if t0 > t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
-	}
-	return t3
-}
-func (m *Module) Xf32_no_fold_ge_if(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	var t3 float32
-	_ = t3
+	var t2 int32
 	if t0 >= t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
 	}
 	return t3
 }
-func (m *Module) Xf64_no_fold_lt_if(v0 float64, v1 float64) float64 {
+func (m *Module) Xf32_ule(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t3 float64
-	_ = t3
-	if t0 < t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
-	}
-	return t3
-}
-func (m *Module) Xf64_no_fold_le_if(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	var t3 float64
-	_ = t3
-	if t0 <= t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
-	}
-	return t3
-}
-func (m *Module) Xf64_no_fold_gt_if(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	var t3 float64
-	_ = t3
+	var t2 int32
 	if t0 > t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
 	}
 	return t3
 }
-func (m *Module) Xf64_no_fold_ge_if(v0 float64, v1 float64) float64 {
+func (m *Module) Xf32_ugt(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t3 float64
-	_ = t3
+	var t2 int32
+	if t0 <= t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf32_uge(v0 float32, v1 float32) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 < t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_ult(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
 	if t0 >= t1 {
-		t4 := v0
-		t3 = t4
-	} else {
-		t5 := v1
-		t3 = t5
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_ule(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 > t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_ugt(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 <= t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
+	}
+	return t3
+}
+func (m *Module) Xf64_uge(v0 float64, v1 float64) int32 {
+	t0 := v0
+	t1 := v1
+	var t2 int32
+	if t0 < t1 {
+		t2 = 1
+	}
+	var t3 int32
+	if t2 == 0 {
+		t3 = 1
 	}
 	return t3
 }

@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 }
 
@@ -9,23 +11,15 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_algebraic_factoring(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_sqrt_minus_2(v0 float32) float32 {
 	t0 := v0
-	t1 := v1
-	t2 := float32(t0 + t1)
-	t3 := v0
-	t4 := v1
-	t5 := float32(t3 - t4)
-	t6 := float32(t2 * t5)
-	return t6
+	t1 := float32(math.Sqrt(float64(t0)))
+	t2 := float32(t1 - float32(2))
+	return t2
 }
-func (m *Module) Xf64_no_algebraic_factoring(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_sqrt_minus_2(v0 float64) float64 {
 	t0 := v0
-	t1 := v1
-	t2 := float64(t0 + t1)
-	t3 := v0
-	t4 := v1
-	t5 := float64(t3 - t4)
-	t6 := float64(t2 * t5)
-	return t6
+	t1 := math.Sqrt(t0)
+	t2 := float64(t1 - float64(2))
+	return t2
 }

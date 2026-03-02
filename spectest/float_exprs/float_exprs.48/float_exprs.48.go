@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 }
 
@@ -9,43 +11,121 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xcalculate() float32 {
-	var v0, v1, v2, v3, v4 float32
-	_, _, _, _, _ = v0, v1, v2, v3, v4
-	v0 = float32(156.25)
-	v1 = float32(208.33333)
-	v2 = float32(1.779513)
-	t0 := v1
-	t1 := -t0
-	t2 := v0
-	t3 := float32(t1 * t2)
-	t4 := v0
-	t5 := v2
-	t6 := float32(t4 * t5)
-	t7 := v1
-	t8 := float32(t6 - t7)
-	t9 := float32(t3 / t8)
-	v3 = t9
-	t10 := v1
-	t11 := -t10
-	t12 := v0
-	t13 := float32(t11 * t12)
-	t14 := v0
-	t15 := v2
-	t16 := float32(t14 * t15)
-	t17 := v1
-	t18 := float32(t16 - t17)
-	t19 := float32(t13 / t18)
-	v4 = t19
-	{
-		t20 := v3
-		t21 := v4
-		if t20 == t21 {
-			goto l0
-		}
+func (m *Module) Xf32_no_fold_lt_if_to_abs(v0 float32) float32 {
+	t0 := v0
+	var t2 float32
+	_ = t2
+	if t0 < f32_const(0) {
+		t3 := v0
+		t4 := -t3
+		t2 = t4
+	} else {
+		t5 := v0
+		t2 = t5
 	}
-l0:
-	;
-	t23 := v4
-	return t23
+	return t2
 }
+func (m *Module) Xf32_no_fold_le_if_to_abs(v0 float32) float32 {
+	t0 := v0
+	var t2 float32
+	_ = t2
+	if t0 <= math.Float32frombits(2147483648) {
+		t3 := v0
+		t4 := -t3
+		t2 = t4
+	} else {
+		t5 := v0
+		t2 = t5
+	}
+	return t2
+}
+func (m *Module) Xf32_no_fold_gt_if_to_abs(v0 float32) float32 {
+	t0 := v0
+	var t2 float32
+	_ = t2
+	if t0 > math.Float32frombits(2147483648) {
+		t3 := v0
+		t2 = t3
+	} else {
+		t4 := v0
+		t5 := -t4
+		t2 = t5
+	}
+	return t2
+}
+func (m *Module) Xf32_no_fold_ge_if_to_abs(v0 float32) float32 {
+	t0 := v0
+	var t2 float32
+	_ = t2
+	if t0 >= f32_const(0) {
+		t3 := v0
+		t2 = t3
+	} else {
+		t4 := v0
+		t5 := -t4
+		t2 = t5
+	}
+	return t2
+}
+func (m *Module) Xf64_no_fold_lt_if_to_abs(v0 float64) float64 {
+	t0 := v0
+	var t2 float64
+	_ = t2
+	if t0 < f64_const(0) {
+		t3 := v0
+		t4 := -t3
+		t2 = t4
+	} else {
+		t5 := v0
+		t2 = t5
+	}
+	return t2
+}
+func (m *Module) Xf64_no_fold_le_if_to_abs(v0 float64) float64 {
+	t0 := v0
+	var t2 float64
+	_ = t2
+	if t0 <= math.Float64frombits(9223372036854775808) {
+		t3 := v0
+		t4 := -t3
+		t2 = t4
+	} else {
+		t5 := v0
+		t2 = t5
+	}
+	return t2
+}
+func (m *Module) Xf64_no_fold_gt_if_to_abs(v0 float64) float64 {
+	t0 := v0
+	var t2 float64
+	_ = t2
+	if t0 > math.Float64frombits(9223372036854775808) {
+		t3 := v0
+		t2 = t3
+	} else {
+		t4 := v0
+		t5 := -t4
+		t2 = t5
+	}
+	return t2
+}
+func (m *Module) Xf64_no_fold_ge_if_to_abs(v0 float64) float64 {
+	t0 := v0
+	var t2 float64
+	_ = t2
+	if t0 >= f64_const(0) {
+		t3 := v0
+		t2 = t3
+	} else {
+		t4 := v0
+		t5 := -t4
+		t2 = t5
+	}
+	return t2
+}
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

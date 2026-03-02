@@ -7,9 +7,9 @@ import (
 	"github.com/ncruces/wasm2go/spectest"
 )
 
-//go:embed globals.json
+//go:embed global.json
 var data []byte
 
 func Test(t *testing.T) {
-	spectest.Test(t, New(), data, "globals.0.wasm")
+	spectest.Test(t, New(), data, "global.0.wasm")
 }

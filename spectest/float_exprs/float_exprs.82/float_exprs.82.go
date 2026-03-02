@@ -9,55 +9,75 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_add_le_monotonicity(v0 float32, v1 float32, v2 float32) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float32(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float32(t3 + t4)
-	var t6 int32
-	if t2 <= t5 {
-		t6 = 1
+func (m *Module) Xf32_compute_radix(v0 float32, v1 float32) float32 {
+l0:
+	{
+		t0 := v0
+		t1 := v0
+		t2 := float32(t0 + t1)
+		v0 = t2
+		t3 := float32(t2 + f32_const(1))
+		t4 := v0
+		t5 := float32(t3 - t4)
+		t6 := float32(t5 + f32_const(-1))
+		if t6 == f32_const(0) {
+			goto l0
+		}
 	}
-	return t6
-}
-func (m *Module) Xf32_no_fold_add_ge_monotonicity(v0 float32, v1 float32, v2 float32) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float32(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float32(t3 + t4)
-	var t6 int32
-	if t2 >= t5 {
-		t6 = 1
+l1:
+	{
+		t8 := v0
+		t9 := v1
+		t10 := float32(t9 + f32_const(1))
+		v1 = t10
+		t11 := float32(t8 + t10)
+		t12 := v0
+		t13 := float32(t11 - t12)
+		t14 := v1
+		t15 := float32(t13 - t14)
+		if t15 != f32_const(0) {
+			goto l1
+		}
 	}
-	return t6
+	t17 := v1
+	return t17
 }
-func (m *Module) Xf64_no_fold_add_le_monotonicity(v0 float64, v1 float64, v2 float64) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float64(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float64(t3 + t4)
-	var t6 int32
-	if t2 <= t5 {
-		t6 = 1
+func (m *Module) Xf64_compute_radix(v0 float64, v1 float64) float64 {
+l0:
+	{
+		t0 := v0
+		t1 := v0
+		t2 := float64(t0 + t1)
+		v0 = t2
+		t3 := float64(t2 + f64_const(1))
+		t4 := v0
+		t5 := float64(t3 - t4)
+		t6 := float64(t5 + f64_const(-1))
+		if t6 == f64_const(0) {
+			goto l0
+		}
 	}
-	return t6
-}
-func (m *Module) Xf64_no_fold_add_ge_monotonicity(v0 float64, v1 float64, v2 float64) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float64(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float64(t3 + t4)
-	var t6 int32
-	if t2 >= t5 {
-		t6 = 1
+l1:
+	{
+		t8 := v0
+		t9 := v1
+		t10 := float64(t9 + f64_const(1))
+		v1 = t10
+		t11 := float64(t8 + t10)
+		t12 := v0
+		t13 := float64(t11 - t12)
+		t14 := v1
+		t15 := float64(t13 - t14)
+		if t15 != f64_const(0) {
+			goto l1
+		}
 	}
-	return t6
+	t17 := v1
+	return t17
 }
+
+//go:noinline
+func f32_const(x float32) float32 { return x }
+
+//go:noinline
+func f64_const(x float64) float64 { return x }

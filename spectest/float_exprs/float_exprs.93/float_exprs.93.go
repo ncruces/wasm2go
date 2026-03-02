@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 }
 
@@ -9,13 +11,21 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xpoint_four(v0 float64, v1 float64) int32 {
+func (m *Module) Xf32_golden_ratio(v0 float32, v1 float32, v2 float32) float32 {
 	t0 := v0
 	t1 := v1
-	t2 := float64(t0 / t1)
-	var t3 int32
-	if t2 < float64(0.4) {
-		t3 = 1
-	}
-	return t3
+	t2 := v2
+	t3 := float32(math.Sqrt(float64(t2)))
+	t4 := float32(t1 + t3)
+	t5 := float32(t0 * t4)
+	return t5
+}
+func (m *Module) Xf64_golden_ratio(v0 float64, v1 float64, v2 float64) float64 {
+	t0 := v0
+	t1 := v1
+	t2 := v2
+	t3 := math.Sqrt(t2)
+	t4 := float64(t1 + t3)
+	t5 := float64(t0 * t4)
+	return t5
 }

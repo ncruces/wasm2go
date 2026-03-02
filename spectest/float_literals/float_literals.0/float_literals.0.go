@@ -95,6 +95,22 @@ func (m *Module) Xf32_trailing_dot() int32 {
 	t0 := int32(math.Float32bits(float32(1024)))
 	return t0
 }
+func (m *Module) Xf32_misc_int() int32 {
+	t0 := int32(math.Float32bits(float32(74565)))
+	return t0
+}
+func (m *Module) Xf32_large_int() int32 {
+	t0 := int32(math.Float32bits(float32(1.2089258e+24)))
+	return t0
+}
+func (m *Module) Xf32_min_int32() int32 {
+	t0 := int32(math.Float32bits(float32(-2.1474836e+09)))
+	return t0
+}
+func (m *Module) Xf32_min_int64() int32 {
+	t0 := int32(math.Float32bits(float32(-9.223372e+18)))
+	return t0
+}
 func (m *Module) Xf32_dec_zero() int32 {
 	t0 := int32(math.Float32bits(f32_const(0)))
 	return t0
@@ -129,6 +145,22 @@ func (m *Module) Xf32_dec_max_finite() int32 {
 }
 func (m *Module) Xf32_dec_trailing_dot() int32 {
 	t0 := int32(math.Float32bits(float32(1e+10)))
+	return t0
+}
+func (m *Module) Xf32_dec_misc_int() int32 {
+	t0 := int32(math.Float32bits(float32(12345)))
+	return t0
+}
+func (m *Module) Xf32_dec_large_int() int32 {
+	t0 := int32(math.Float32bits(float32(1e+20)))
+	return t0
+}
+func (m *Module) Xf32_dec_min_int32() int32 {
+	t0 := int32(math.Float32bits(float32(-2.1474836e+09)))
+	return t0
+}
+func (m *Module) Xf32_dec_min_int64() int32 {
+	t0 := int32(math.Float32bits(float32(-9.223372e+18)))
 	return t0
 }
 func (m *Module) Xf32_dec_root_beer_float() int32 {
@@ -219,6 +251,22 @@ func (m *Module) Xf64_trailing_dot() int64 {
 	t0 := int64(math.Float64bits(float64(1.2676506002282294e+30)))
 	return t0
 }
+func (m *Module) Xf64_misc_int() int64 {
+	t0 := int64(math.Float64bits(float64(74565)))
+	return t0
+}
+func (m *Module) Xf64_large_int() int64 {
+	t0 := int64(math.Float64bits(float64(1.2089258196146292e+24)))
+	return t0
+}
+func (m *Module) Xf64_min_int32() int64 {
+	t0 := int64(math.Float64bits(float64(-2.147483648e+09)))
+	return t0
+}
+func (m *Module) Xf64_min_int64() int64 {
+	t0 := int64(math.Float64bits(float64(-9.223372036854776e+18)))
+	return t0
+}
 func (m *Module) Xf64_dec_zero() int64 {
 	t0 := int64(math.Float64bits(f64_const(0)))
 	return t0
@@ -253,6 +301,22 @@ func (m *Module) Xf64_dec_max_finite() int64 {
 }
 func (m *Module) Xf64_dec_trailing_dot() int64 {
 	t0 := int64(math.Float64bits(float64(1e+100)))
+	return t0
+}
+func (m *Module) Xf64_dec_misc_int() int64 {
+	t0 := int64(math.Float64bits(float64(12345)))
+	return t0
+}
+func (m *Module) Xf64_dec_large_int() int64 {
+	t0 := int64(math.Float64bits(float64(1e+20)))
+	return t0
+}
+func (m *Module) Xf64_dec_min_int32() int64 {
+	t0 := int64(math.Float64bits(float64(-2.147483648e+09)))
+	return t0
+}
+func (m *Module) Xf64_dec_min_int64() int64 {
+	t0 := int64(math.Float64bits(float64(-9.223372036854776e+18)))
 	return t0
 }
 func (m *Module) Xf64_dec_root_beer_float() int64 {
