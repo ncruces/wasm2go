@@ -3,10 +3,12 @@
 package wasm2go
 
 type Module struct {
+	g0 int32
 }
 
 func New() *Module {
 	m := &Module{}
+	m.g0 = i32_const(0)
 	return m
 }
 func (m *Module) Xfac_expr(v0 int64) int64 {
@@ -154,5 +156,27 @@ l0:
 	t8 := v2
 	return t8
 }
+func (m *Module) f5() int32 {
+	var v0 int32
+	_ = v0
+	t0 := m.g0
+	t1 := int32(1) + t0
+	m.g0 = t1
+	t2 := m.g0
+	return t2
+}
+func (m *Module) f6() {
+	t0 := m.f5()
+	_ = t0
+}
+func (m *Module) Xnot_quite_a_tree() int32 {
+	t0 := m.f5()
+	t1 := m.f5()
+	m.f6()
+	t2 := t0 + t1
+	return t2
+}
+
+func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }

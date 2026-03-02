@@ -12,7 +12,7 @@ type Module struct {
 	elements [][]any
 	memory   []byte
 	maxMem   int32
-	_a       float64
+	g0       float64
 }
 
 func New() *Module {
@@ -20,81 +20,81 @@ func New() *Module {
 	m.table = make([]any, 32)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m._const_i32, m._const_i64, m._const_f32, m._const_f64, m._id_i32, m._id_i64, m._id_f32, m._id_f64, m._f32_i32, m._i32_i64, m._f64_f32, m._i64_f64, m.Xfac_i64, m.Xfib_i64, m.Xeven, m.Xodd, m.Xrunaway, m.Xmutual_runaway, m._mutual_runaway2, m._over_i32_duplicate, m._over_i64_duplicate, m._over_f32_duplicate, m._over_f64_duplicate, m.Xfac_i32, m.Xfac_f32, m.Xfac_f64, m.Xfib_i32, m.Xfib_f32, m.Xfib_f64, m._const_f64_i32, m._id_i32_f64, m._swap_i32_i64}}
+	m.elements = [][]any{[]any{m.f0, m.f1, m.f2, m.f3, m.f5, m.f6, m.f7, m.f8, m.f13, m.f11, m.f14, m.f12, m.Xfac_i64, m.Xfib_i64, m.Xeven, m.Xodd, m.Xrunaway, m.Xmutual_runaway, m.f54, m.f15, m.f16, m.f17, m.f18, m.Xfac_i32, m.Xfac_f32, m.Xfac_f64, m.Xfib_i32, m.Xfib_f32, m.Xfib_f64, m.f4, m.f9, m.f10}}
 	copy(m.table[0:], m.elements[0])
-	m._a = float64(10)
+	m.g0 = float64(10)
 	return m
 }
-func (m *Module) _const_i32() int32 {
+func (m *Module) f0() int32 {
 	return i32_const(306)
 }
-func (m *Module) _const_i64() int64 {
+func (m *Module) f1() int64 {
 	return i64_const(356)
 }
-func (m *Module) _const_f32() float32 {
+func (m *Module) f2() float32 {
 	return float32(3890)
 }
-func (m *Module) _const_f64() float64 {
+func (m *Module) f3() float64 {
 	return float64(3940)
 }
-func (m *Module) _const_f64_i32() (float64, int32) {
+func (m *Module) f4() (float64, int32) {
 	return float64(3940), int32(32)
 }
-func (m *Module) _id_i32(v0 int32) int32 {
+func (m *Module) f5(v0 int32) int32 {
 	t0 := v0
 	return t0
 }
-func (m *Module) _id_i64(v0 int64) int64 {
+func (m *Module) f6(v0 int64) int64 {
 	t0 := v0
 	return t0
 }
-func (m *Module) _id_f32(v0 float32) float32 {
+func (m *Module) f7(v0 float32) float32 {
 	t0 := v0
 	return t0
 }
-func (m *Module) _id_f64(v0 float64) float64 {
+func (m *Module) f8(v0 float64) float64 {
 	t0 := v0
 	return t0
 }
-func (m *Module) _id_i32_f64(v0 int32, v1 float64) (int32, float64) {
+func (m *Module) f9(v0 int32, v1 float64) (int32, float64) {
 	t0 := v0
 	t1 := v1
 	return t0, t1
 }
-func (m *Module) _swap_i32_i64(v0 int32, v1 int64) (int64, int32) {
+func (m *Module) f10(v0 int32, v1 int64) (int64, int32) {
 	t0 := v1
 	t1 := v0
 	return t0, t1
 }
-func (m *Module) _i32_i64(v0 int32, v1 int64) int64 {
+func (m *Module) f11(v0 int32, v1 int64) int64 {
 	t0 := v1
 	return t0
 }
-func (m *Module) _i64_f64(v0 int64, v1 float64) float64 {
+func (m *Module) f12(v0 int64, v1 float64) float64 {
 	t0 := v1
 	return t0
 }
-func (m *Module) _f32_i32(v0 float32, v1 int32) int32 {
+func (m *Module) f13(v0 float32, v1 int32) int32 {
 	t0 := v1
 	return t0
 }
-func (m *Module) _f64_f32(v0 float64, v1 float32) float32 {
+func (m *Module) f14(v0 float64, v1 float32) float32 {
 	t0 := v1
 	return t0
 }
-func (m *Module) _over_i32_duplicate(v0 int32) int32 {
+func (m *Module) f15(v0 int32) int32 {
 	t0 := v0
 	return t0
 }
-func (m *Module) _over_i64_duplicate(v0 int64) int64 {
+func (m *Module) f16(v0 int64) int64 {
 	t0 := v0
 	return t0
 }
-func (m *Module) _over_f32_duplicate(v0 float32) float32 {
+func (m *Module) f17(v0 float32) float32 {
 	t0 := v0
 	return t0
 }
-func (m *Module) _over_f64_duplicate(v0 float64) float64 {
+func (m *Module) f18(v0 float64) float64 {
 	t0 := v0
 	return t0
 }
@@ -398,7 +398,7 @@ func (m *Module) Xrunaway() {
 func (m *Module) Xmutual_runaway() {
 	m.table[uint32(int32(18))].(func())()
 }
-func (m *Module) _mutual_runaway2() {
+func (m *Module) f54() {
 	m.table[uint32(int32(17))].(func())()
 }
 func (m *Module) Xas_select_first() int32 {
@@ -552,8 +552,8 @@ func (m *Module) Xas_local_tee_value() float64 {
 }
 func (m *Module) Xas_global_set_value() float64 {
 	t0 := m.table[uint32(int32(7))].(func(v0 float64) float64)(f64_const(1))
-	m._a = t0
-	t1 := m._a
+	m.g0 = t0
+	t1 := m.g0
 	return t1
 }
 func (m *Module) Xas_load_operand() int32 {

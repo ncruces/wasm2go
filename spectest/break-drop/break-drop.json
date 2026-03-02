@@ -1,4 +1,4 @@
-{"source_filename": "./break-drop.wast",
+{"source_filename": "break-drop.wast",
  "commands": [
   {"type": "module", "line": 1, "filename": "break-drop.0.wasm"}, 
   {"type": "assert_return", "line": 7, "action": {"type": "invoke", "field": "br", "args": []}, "expected": []}, 

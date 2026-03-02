@@ -12,7 +12,7 @@ type Module struct {
 	elements [][]any
 	memory   []byte
 	maxMem   int32
-	_a       int32
+	g0       int32
 }
 
 func New() *Module {
@@ -20,14 +20,14 @@ func New() *Module {
 	m.table = make([]any, 1)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m._func}}
+	m.elements = [][]any{[]any{m.f61}}
 	copy(m.table[0:], m.elements[0])
-	m._a = i32_const(0)
+	m.g0 = i32_const(0)
 	return m
 }
-func (m *Module) _dummy() {
+func (m *Module) f0() {
 }
-func (m *Module) _3_ary(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) f1(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := v0
 	t1 := v1
 	t2 := v2
@@ -39,15 +39,15 @@ func (m *Module) Xas_func_first() int32 {
 	return int32(1)
 }
 func (m *Module) Xas_func_mid() int32 {
-	m._dummy()
+	m.f0()
 	return int32(2)
 }
 func (m *Module) Xas_func_last() int32 {
-	m._dummy()
+	m.f0()
 	return int32(3)
 }
 func (m *Module) Xas_func_everywhere() int32 {
-	m._dummy()
+	m.f0()
 	return int32(4)
 }
 func (m *Module) Xas_drop_first(v0 int32) {
@@ -124,7 +124,7 @@ func (m *Module) Xas_block_mid() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(2)
 	}
 	return t0
@@ -133,7 +133,7 @@ func (m *Module) Xas_block_last() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(3)
 	}
 	return t0
@@ -142,7 +142,7 @@ func (m *Module) Xas_block_everywhere() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(4)
 	}
 	return t0
@@ -159,7 +159,7 @@ func (m *Module) Xas_loop_mid() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(2)
 	}
 	return t0
@@ -168,7 +168,7 @@ func (m *Module) Xas_loop_last() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(3)
 	}
 	return t0
@@ -177,7 +177,7 @@ func (m *Module) Xas_loop_everywhere() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(4)
 	}
 	return t0
@@ -185,20 +185,20 @@ func (m *Module) Xas_loop_everywhere() int32 {
 func (m *Module) Xas_if_condition(v0 int32) {
 	t0 := v0
 	if t0 != 0 {
-		m._dummy()
+		m.f0()
 	}
 }
 func (m *Module) Xas_if_then(v0 int32) {
 	t0 := v0
 	if t0 != 0 {
 	} else {
-		m._dummy()
+		m.f0()
 	}
 }
 func (m *Module) Xas_if_else(v0 int32) {
 	t0 := v0
 	if t0 != 0 {
-		m._dummy()
+		m.f0()
 	} else {
 	}
 }
@@ -394,35 +394,35 @@ func (m *Module) Xas_call_first(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	t3 := m._3_ary(t0, t1, t2)
+	t3 := m.f1(t0, t1, t2)
 	return t3
 }
 func (m *Module) Xas_call_mid1(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	t3 := m._3_ary(t0, t1, t2)
+	t3 := m.f1(t0, t1, t2)
 	return t3
 }
 func (m *Module) Xas_call_mid2(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	t3 := m._3_ary(t0, t1, t2)
+	t3 := m.f1(t0, t1, t2)
 	return t3
 }
 func (m *Module) Xas_call_last(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	t3 := m._3_ary(t0, t1, t2)
+	t3 := m.f1(t0, t1, t2)
 	return t3
 }
 func (m *Module) Xas_call_everywhere(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	t3 := m._3_ary(t0, t1, t2)
+	t3 := m.f1(t0, t1, t2)
 	return t3
 }
 func (m *Module) Xas_unary_first(v0 int32) int32 {
@@ -539,7 +539,7 @@ func (m *Module) Xas_memory_grow_everywhere(v0 int32) int32 {
 	t1 := memory_grow(&m.memory, t0, m.maxMem)
 	return t1
 }
-func (m *Module) _func(v0 int32, v1 int32) int32 {
+func (m *Module) f61(v0 int32, v1 int32) int32 {
 	t0 := v0
 	return t0
 }
@@ -616,18 +616,18 @@ func (m *Module) Xas_local_tee_everywhere(v0 int32) int32 {
 	return int32(2)
 }
 func (m *Module) Xas_global_set_first() int32 {
-	m._a = int32(2)
-	t0 := m._a
+	m.g0 = int32(2)
+	t0 := m.g0
 	return t0
 }
 func (m *Module) Xas_global_set_last() int32 {
-	m._a = int32(2)
-	t0 := m._a
+	m.g0 = int32(2)
+	t0 := m.g0
 	return t0
 }
 func (m *Module) Xas_global_set_everywhere() int32 {
-	m._a = int32(2)
-	t0 := m._a
+	m.g0 = int32(2)
+	t0 := m.g0
 	return t0
 }
 func (m *Module) Xas_load_first(v0 int32) int32 {

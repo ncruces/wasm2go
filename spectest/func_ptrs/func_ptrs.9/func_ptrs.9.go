@@ -10,14 +10,14 @@ type Module struct {
 func New() *Module {
 	m := &Module{}
 	m.table = make([]any, 2)
-	m.elements = [][]any{[]any{m._t1, m._t2}}
+	m.elements = [][]any{[]any{m.f0, m.f1}}
 	copy(m.table[0:], m.elements[0])
 	return m
 }
-func (m *Module) _t1() int32 {
+func (m *Module) f0() int32 {
 	return int32(1)
 }
-func (m *Module) _t2() int32 {
+func (m *Module) f1() int32 {
 	return int32(2)
 }
 func (m *Module) Xcallt(v0 int32) int32 {

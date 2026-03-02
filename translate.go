@@ -725,15 +725,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Specs: []ast.Spec{
 					&ast.ValueSpec{
 						Names: ids,
-						Type:  wasmType(typ).Ident(),
-					},
-				},
-			},
+						Type:  wasmType(typ).Ident()}}},
 		}, &ast.AssignStmt{
 			Lhs: slices.Repeat([]ast.Expr{newID("_")}, int(n)),
 			Tok: token.ASSIGN,
-			Rhs: rhs,
-		})
+			Rhs: rhs})
 	}
 
 	for {
@@ -751,9 +747,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun:  newID("panic"),
-						Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: `"unreachable"`}},
-					},
-				})
+						Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: `"unreachable"`}}}})
 			}
 
 		case 0x01: // nop
@@ -770,21 +764,21 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 			// Declare block results outside the block.
-			results := make([]*ast.Ident, len(bt.results))
+			results := make([]ast.Expr, len(bt.results))
 			for i, t := range []byte(bt.results) {
-				results[i] = fn.newTempVar()
+				tmp := fn.newTempVar()
+				results[i] = tmp
 				fn.emit(&ast.DeclStmt{
 					Decl: &ast.GenDecl{
 						Tok: token.VAR,
 						Specs: []ast.Spec{
 							&ast.ValueSpec{
-								Names: []*ast.Ident{results[i]},
+								Names: []*ast.Ident{tmp},
 								Type:  wasmType(t).Ident()}}}},
 					&ast.AssignStmt{
-						Lhs: []ast.Expr{newID("_")},
 						Tok: token.ASSIGN,
-						Rhs: []ast.Expr{results[i]},
-					})
+						Lhs: []ast.Expr{newID("_")},
+						Rhs: []ast.Expr{tmp}})
 			}
 
 			childBlk := funcBlock{
@@ -808,8 +802,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.emit(&ast.AssignStmt{
 					Tok: token.DEFINE,
 					Lhs: lhs,
-					Rhs: rhs,
-				})
+					Rhs: rhs})
 			}
 
 			var stmt ast.Stmt
@@ -835,7 +828,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x05: // else
 			// Set the results of the if branch.
-			fn.emit(blk.setResults(fn)...)
+			blk.setResults(fn)
 			fn.stack = fn.stack[:blk.stackPos]
 			// Create a new block at the same level,
 			// make it the else branch.
@@ -848,8 +841,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if len(fn.blocks) == 1 { // End of the function body.
 				if n := len(fn.typ.results); n > 0 && !blk.unreachable {
 					ret := &ast.ReturnStmt{}
-					ret.Results = make([]ast.Expr, n)
-					copy(ret.Results, fn.stack.last(n))
+					ret.Results = append(ret.Results, fn.stack.last(n)...)
 					fn.emit(ret)
 				}
 				return nil
@@ -857,7 +849,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			// Set block results, but push them again
 			// so they're available to the parent block.
-			fn.emit(blk.setResults(fn)...)
+			blk.setResults(fn)
 			fn.stack = fn.stack[:blk.stackPos]
 			for _, tmp := range blk.results {
 				fn.pushConst(tmp)
@@ -865,17 +857,19 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			fn.blocks.pop()
 			parent := fn.blocks.top()
-			if blk.label != nil { // Add the label if requested.
-				if blk.loopPos != 0 { // At the start for loops.
+
+			// Add the label if requested.
+			if blk.label != nil {
+				if blk.loopPos != 0 {
+					// At the start for loops.
 					parent.body.List[^blk.loopPos] = &ast.LabeledStmt{
 						Stmt:  parent.body.List[^blk.loopPos],
-						Label: blk.label,
-					}
-				} else { // At the end for other block types.
+						Label: blk.label}
+				} else {
+					// At the end for other block types.
 					fn.emit(&ast.LabeledStmt{
 						Stmt:  &ast.EmptyStmt{},
-						Label: blk.label,
-					})
+						Label: blk.label})
 				}
 			}
 
@@ -908,9 +902,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(&ast.IfStmt{
 				Cond: fn.popCond(),
 				Body: &ast.BlockStmt{
-					List: []ast.Stmt{fn.branch(n)},
-				},
-			})
+					List: []ast.Stmt{fn.branch(n)}}})
 
 		case 0x0e: // br_table
 			numTargets, err := readLEB128(t.in)
@@ -932,14 +924,12 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			sw := &ast.SwitchStmt{Tag: fn.pop(), Body: &ast.BlockStmt{
 				List: []ast.Stmt{&ast.CaseClause{
-					Body: []ast.Stmt{fn.branch(defaultTarget)},
-				}},
+					Body: []ast.Stmt{fn.branch(defaultTarget)}}},
 			}}
 			for i, target := range targets {
 				sw.Body.List = append(sw.Body.List, &ast.CaseClause{
 					List: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}},
-					Body: []ast.Stmt{fn.branch(target)},
-				})
+					Body: []ast.Stmt{fn.branch(target)}})
 			}
 			fn.emit(sw)
 			blk.unreachable = true // After switch.
@@ -960,8 +950,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			call := &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
 					X:   newID("m"),
-					Sel: target.decl.Name,
-				},
+					Sel: target.decl.Name},
 				Args: args,
 			}
 
@@ -975,10 +964,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				lhs[i] = fn.newTempVar()
 			}
 			fn.emit(&ast.AssignStmt{
-				Tok: token.DEFINE,
 				Lhs: lhs,
-				Rhs: []ast.Expr{call},
-			})
+				Tok: token.DEFINE,
+				Rhs: []ast.Expr{call}})
 			for _, tmp := range lhs {
 				fn.pushConst(tmp)
 			}
@@ -1007,12 +995,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Fun: &ast.TypeAssertExpr{
 					X: &ast.IndexExpr{
 						X:     &ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
-						Index: convert(idx, "uint32"),
-					},
-					Type: typ.toAST(),
-				},
-				Args: args,
-			}
+						Index: convert(idx, "uint32")},
+					Type: typ.toAST()},
+				Args: args}
 
 			if len(typ.results) == 0 {
 				fn.emit(&ast.ExprStmt{X: call})
@@ -1024,10 +1009,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				lhs[i] = fn.newTempVar()
 			}
 			fn.emit(&ast.AssignStmt{
-				Tok: token.DEFINE,
 				Lhs: lhs,
-				Rhs: []ast.Expr{call},
-			})
+				Tok: token.DEFINE,
+				Rhs: []ast.Expr{call}})
 			for _, tmp := range lhs {
 				fn.pushConst(tmp)
 			}
@@ -1035,8 +1019,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x0f: // return
 			ret := &ast.ReturnStmt{}
 			if n := len(fn.typ.results); n > 0 {
-				ret.Results = make([]ast.Expr, n)
-				copy(ret.Results, fn.stack.last(n))
+				ret.Results = append(ret.Results, fn.stack.last(n)...)
 			}
 			fn.emit(ret)
 			blk.unreachable = true // After an uncoditional return.
@@ -1061,8 +1044,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					List: []ast.Stmt{&ast.AssignStmt{
 						Tok: token.ASSIGN,
 						Lhs: []ast.Expr{tmp},
-						Rhs: []ast.Expr{fn.pop()},
-					}}},
+						Rhs: []ast.Expr{fn.pop()}}}},
 			})
 			fn.pushConst(tmp)
 
@@ -1111,9 +1093,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					List: []ast.Stmt{&ast.AssignStmt{
 						Tok: token.ASSIGN,
 						Lhs: tmp,
-						Rhs: vt,
-					}}},
-			})
+						Rhs: vt}}}})
 
 			for _, tmp := range tmp {
 				fn.pushConst(tmp)
@@ -1134,8 +1114,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(&ast.AssignStmt{
 				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{fn.pop()},
-				Tok: token.ASSIGN,
-			})
+				Tok: token.ASSIGN})
 
 		case 0x22: // local.tee
 			i, err := readLEB128(t.in)
@@ -1146,8 +1125,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(&ast.AssignStmt{
 				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{tmp},
-				Tok: token.ASSIGN,
-			})
+				Tok: token.ASSIGN})
 			fn.pushConst(tmp)
 
 		case 0x23: // global.get
@@ -1165,11 +1143,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(&ast.AssignStmt{
 				Lhs: []ast.Expr{&ast.SelectorExpr{
 					X:   newID("m"),
-					Sel: t.globals[i].id,
-				}},
+					Sel: t.globals[i].id}},
 				Tok: token.ASSIGN,
-				Rhs: []ast.Expr{fn.pop()},
-			})
+				Rhs: []ast.Expr{fn.pop()}})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
 			_, err := readLEB128(t.in) // align
@@ -1247,8 +1223,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(&ast.AssignStmt{
 				Lhs: []ast.Expr{idx},
 				Tok: token.ASSIGN,
-				Rhs: []ast.Expr{convert(val, "byte")},
-			})
+				Rhs: []ast.Expr{convert(val, "byte")}})
 
 		case 0x36, 0x37, 0x38, 0x39, 0x3b, 0x3d, 0x3e: // store
 			_, err := readLEB128(t.in) // align
@@ -1292,8 +1267,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun: newID("len"),
 						Args: []ast.Expr{&ast.SelectorExpr{
 							X:   newID("m"),
-							Sel: fn.memory.id,
-						}},
+							Sel: fn.memory.id}},
 					},
 					Op: token.SHR,
 					Y:  &ast.BasicLit{Kind: token.INT, Value: "16"},
@@ -1308,14 +1282,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Args: []ast.Expr{
 					&ast.UnaryExpr{
 						Op: token.AND,
-						X:  &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-					},
+						X:  &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id}},
 					fn.pop(),
 					&ast.SelectorExpr{
 						X:   newID("m"),
-						Sel: newID("maxMem"),
-					},
-				},
+						Sel: newID("maxMem")}},
 			}
 			if fn.memory.imported != nil {
 				call.Fun = &ast.SelectorExpr{X: newID("m"), Sel: newID("Grow")}
@@ -1664,10 +1635,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun: newID("memory_init"),
 						Args: []ast.Expr{
 							&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-							dataId(i), fn.pop(), fn.pop(), fn.pop(),
-						},
-					},
-				})
+							dataId(i), fn.pop(), fn.pop(), fn.pop()}}})
 
 			case 0x09: // data.drop
 				// No-op since data segments are constants.
@@ -1691,10 +1659,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun: newID("memory_copy"),
 						Args: []ast.Expr{
 							&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-							fn.pop(), fn.pop(), fn.pop(),
-						},
-					},
-				})
+							fn.pop(), fn.pop(), fn.pop()}}})
 
 			case 0x0b: // memory.fill
 				_, err := readLEB128(t.in)
@@ -1711,10 +1676,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							Fun: newID("memory_zero"),
 							Args: []ast.Expr{
 								&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-								n, dest,
-							},
-						},
-					})
+								n, dest}}})
 				} else {
 					fn.helpers.add("memory_fill")
 					fn.emit(&ast.ExprStmt{
@@ -1722,10 +1684,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							Fun: newID("memory_fill"),
 							Args: []ast.Expr{
 								&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-								n, val, dest,
-							},
-						},
-					})
+								n, val, dest}}})
 				}
 
 			case 0x0c: // table.init
@@ -1748,12 +1707,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							&ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
 							&ast.IndexExpr{
 								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)},
-							},
-							fn.pop(), fn.pop(), fn.pop(),
-						},
-					},
-				})
+								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)}},
+							fn.pop(), fn.pop(), fn.pop()}}})
 
 			case 0x0d: // elem.drop
 				// No-op since element segments are static.
@@ -1780,10 +1735,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun: newID("table_copy"),
 						Args: []ast.Expr{
 							&ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
-							fn.pop(), fn.pop(), fn.pop(),
-						},
-					},
-				})
+							fn.pop(), fn.pop(), fn.pop()}}})
 
 			case 0x10: // table.size
 				idx, err := readLEB128(t.in)
@@ -1797,8 +1749,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					Fun: newID("len"),
 					Args: []ast.Expr{&ast.SelectorExpr{
 						X:   newID("m"),
-						Sel: t.table.id,
-					}},
+						Sel: t.table.id}},
 				}, "int32"))
 
 			default:

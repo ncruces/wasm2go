@@ -12,7 +12,7 @@ type Module struct {
 	elements [][]any
 	memory   []byte
 	maxMem   int32
-	_a       int32
+	g0       int32
 }
 
 func New() *Module {
@@ -20,12 +20,12 @@ func New() *Module {
 	m.table = make([]any, 1)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m._func}}
+	m.elements = [][]any{[]any{m.f19}}
 	copy(m.table[0:], m.elements[0])
-	m._a = int32(10)
+	m.g0 = int32(10)
 	return m
 }
-func (m *Module) _dummy() {
+func (m *Module) f0() {
 }
 func (m *Module) Xempty() {
 	{
@@ -45,18 +45,18 @@ func (m *Module) Xsingular() int32 {
 }
 func (m *Module) Xmulti() int32 {
 	{
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
 	}
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
 		t0 = int32(7)
 	}
 	_ = t0
@@ -67,21 +67,19 @@ func (m *Module) Xmulti() int32 {
 	var t3 int32
 	_ = t3
 	{
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		m._dummy()
-		t1 = int32(8)
-		t2 = int64(7)
-		t3 = int32(9)
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		m.f0()
+		t1, t2, t3 = int32(8), int64(7), int32(9)
 	}
 	_ = t3
 	_ = t2
@@ -92,14 +90,14 @@ func (m *Module) Xnested() int32 {
 	_ = t0
 	{
 		{
-			m._dummy()
+			m.f0()
 			{
 			}
 		}
 		var t1 int32
 		_ = t1
 		{
-			m._dummy()
+			m.f0()
 			t1 = int32(9)
 		}
 		t0 = t1
@@ -221,7 +219,7 @@ func (m *Module) Xdeep() int32 {
 																																						var t37 int32
 																																						_ = t37
 																																						{
-																																							m._dummy()
+																																							m.f0()
 																																							t37 = i32_const(150)
 																																						}
 																																						t36 = t37
@@ -345,8 +343,8 @@ func (m *Module) Xas_loop_first() int32 {
 		{
 			t1 = int32(1)
 		}
-		m._dummy()
-		m._dummy()
+		m.f0()
+		m.f0()
 		t0 = t1
 	}
 	return t0
@@ -355,13 +353,13 @@ func (m *Module) Xas_loop_mid() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		var t1 int32
 		_ = t1
 		{
 			t1 = int32(1)
 		}
-		m._dummy()
+		m.f0()
 		t0 = t1
 	}
 	return t0
@@ -370,8 +368,8 @@ func (m *Module) Xas_loop_last() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
-		m._dummy()
+		m.f0()
+		m.f0()
 		var t1 int32
 		_ = t1
 		{
@@ -388,7 +386,7 @@ func (m *Module) Xas_if_condition() {
 		t0 = int32(1)
 	}
 	if t0 != 0 {
-		m._dummy()
+		m.f0()
 	}
 }
 func (m *Module) Xas_if_then() int32 {
@@ -503,7 +501,7 @@ l0:
 	;
 	return t0
 }
-func (m *Module) _func(v0 int32, v1 int32) int32 {
+func (m *Module) f19(v0 int32, v1 int32) int32 {
 	t0 := v0
 	return t0
 }
@@ -574,7 +572,7 @@ func (m *Module) Xas_memory_grow_value() int32 {
 	t1 := memory_grow(&m.memory, t0, m.maxMem)
 	return t1
 }
-func (m *Module) _f(v0 int32) int32 {
+func (m *Module) f26(v0 int32) int32 {
 	t0 := v0
 	return t0
 }
@@ -584,7 +582,7 @@ func (m *Module) Xas_call_value() int32 {
 	{
 		t0 = int32(1)
 	}
-	t1 := m._f(t0)
+	t1 := m.f26(t0)
 	return t1
 }
 func (m *Module) Xas_return_value() int32 {
@@ -648,8 +646,8 @@ func (m *Module) Xas_global_set_value() int32 {
 	{
 		t0 = int32(1)
 	}
-	m._a = t0
-	t1 := m._a
+	m.g0 = t0
+	t1 := m.g0
 	return t1
 }
 func (m *Module) Xas_load_operand() int32 {
@@ -665,7 +663,7 @@ func (m *Module) Xas_unary_operand() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(13)
 	}
 	t1 := int32(bits.TrailingZeros32(uint32(t0)))
@@ -675,13 +673,13 @@ func (m *Module) Xas_binary_operand() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(3)
 	}
 	var t1 int32
 	_ = t1
 	{
-		m._dummy()
+		m.f0()
 		t1 = int32(4)
 	}
 	t2 := t0 * t1
@@ -691,7 +689,7 @@ func (m *Module) Xas_test_operand() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = int32(13)
 	}
 	var t1 int32
@@ -704,13 +702,13 @@ func (m *Module) Xas_compare_operand() int32 {
 	var t0 float32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t0 = float32(3)
 	}
 	var t1 float32
 	_ = t1
 	{
-		m._dummy()
+		m.f0()
 		t1 = float32(3)
 	}
 	var t2 int32
@@ -725,10 +723,9 @@ func (m *Module) Xas_binary_operands() int32 {
 	var t1 int32
 	_ = t1
 	{
-		m._dummy()
-		m._dummy()
-		t0 = int32(3)
-		t1 = int32(4)
+		m.f0()
+		m.f0()
+		t0, t1 = int32(3), int32(4)
 	}
 	t2 := t0 * t1
 	return t2
@@ -739,10 +736,9 @@ func (m *Module) Xas_compare_operands() int32 {
 	var t1 float32
 	_ = t1
 	{
-		m._dummy()
-		m._dummy()
-		t0 = float32(3)
-		t1 = float32(3)
+		m.f0()
+		m.f0()
+		t0, t1 = float32(3), float32(3)
 	}
 	var t2 int32
 	if t0 > t1 {
@@ -756,10 +752,9 @@ func (m *Module) Xas_mixed_operands() int32 {
 	var t1 int32
 	_ = t1
 	{
-		m._dummy()
-		m._dummy()
-		t0 = int32(3)
-		t1 = int32(4)
+		m.f0()
+		m.f0()
+		t0, t1 = int32(3), int32(4)
 	}
 	t2 := t1 + int32(5)
 	t3 := t0 * t2
@@ -819,9 +814,7 @@ func (m *Module) Xbreak_multi_value() (int32, int32, int64) {
 	var t2 int64
 	_ = t2
 	{
-		t0 = int32(18)
-		t1 = i32_const(-18)
-		t2 = int64(18)
+		t0, t1, t2 = int32(18), i32_const(-18), int64(18)
 		goto l0
 	}
 l0:
@@ -924,8 +917,7 @@ func (m *Module) Xparams_id() int32 {
 	var t1 int32
 	_ = t1
 	{
-		t0 = int32(1)
-		t1 = int32(2)
+		t0, t1 = int32(1), int32(2)
 	}
 	t2 := t0 + t1
 	return t2
@@ -960,8 +952,7 @@ func (m *Module) Xparams_id_break() int32 {
 	var t1 int32
 	_ = t1
 	{
-		t0 = int32(1)
-		t1 = int32(2)
+		t0, t1 = int32(1), int32(2)
 		goto l0
 	}
 l0:
@@ -1012,9 +1003,7 @@ func (m *Module) Xtype_use() {
 	var t3 int32
 	_ = t3
 	{
-		t1 = i32_const(0)
-		t2 = f64_const(0)
-		t3 = i32_const(0)
+		t1, t2, t3 = i32_const(0), f64_const(0), i32_const(0)
 	}
 	_ = t3
 	_ = t2
@@ -1034,9 +1023,7 @@ func (m *Module) Xtype_use() {
 	var t7 int32
 	_ = t7
 	{
-		t5 = i32_const(0)
-		t6 = f64_const(0)
-		t7 = i32_const(0)
+		t5, t6, t7 = i32_const(0), f64_const(0), i32_const(0)
 	}
 	_ = t7
 	_ = t6

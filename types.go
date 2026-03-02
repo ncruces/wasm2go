@@ -45,8 +45,7 @@ func paramsToAST(types string) *ast.FieldList {
 	for i, t := range []byte(types) {
 		list[i] = &ast.Field{
 			Names: []*ast.Ident{localVar(i)},
-			Type:  wasmType(t).Ident(),
-		}
+			Type:  wasmType(t).Ident()}
 	}
 	return &ast.FieldList{List: list}
 }

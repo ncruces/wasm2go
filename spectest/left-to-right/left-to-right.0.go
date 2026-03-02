@@ -19,38 +19,38 @@ func New() *Module {
 	m.table = make([]any, 8)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m._i32_t0, m._i32_t1, m._i64_t0, m._i64_t1, m._f32_t0, m._f32_t1, m._f64_t0, m._f64_t1}}
+	m.elements = [][]any{[]any{m.f0, m.f1, m.f2, m.f3, m.f4, m.f5, m.f6, m.f7}}
 	copy(m.table[0:], m.elements[0])
 	return m
 }
-func (m *Module) _i32_t0(v0 int32, v1 int32) int32 {
+func (m *Module) f0(v0 int32, v1 int32) int32 {
 	return i32_const(-1)
 }
-func (m *Module) _i32_t1(v0 int32, v1 int32) int32 {
+func (m *Module) f1(v0 int32, v1 int32) int32 {
 	return i32_const(-2)
 }
-func (m *Module) _i64_t0(v0 int64, v1 int64) int32 {
+func (m *Module) f2(v0 int64, v1 int64) int32 {
 	return i32_const(-1)
 }
-func (m *Module) _i64_t1(v0 int64, v1 int64) int32 {
+func (m *Module) f3(v0 int64, v1 int64) int32 {
 	return i32_const(-2)
 }
-func (m *Module) _f32_t0(v0 float32, v1 float32) int32 {
+func (m *Module) f4(v0 float32, v1 float32) int32 {
 	return i32_const(-1)
 }
-func (m *Module) _f32_t1(v0 float32, v1 float32) int32 {
+func (m *Module) f5(v0 float32, v1 float32) int32 {
 	return i32_const(-2)
 }
-func (m *Module) _f64_t0(v0 float64, v1 float64) int32 {
+func (m *Module) f6(v0 float64, v1 float64) int32 {
 	return i32_const(-1)
 }
-func (m *Module) _f64_t1(v0 float64, v1 float64) int32 {
+func (m *Module) f7(v0 float64, v1 float64) int32 {
 	return i32_const(-2)
 }
-func (m *Module) _reset() {
+func (m *Module) f8() {
 	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(i32_const(0)))
 }
-func (m *Module) _bump() {
+func (m *Module) f9() {
 	t0 := int32(m.memory[uint32(int32(10))])
 	m.memory[uint32(int32(11))] = byte(t0)
 	t1 := int32(m.memory[uint32(int32(9))])
@@ -59,1072 +59,1072 @@ func (m *Module) _bump() {
 	m.memory[uint32(int32(9))] = byte(t2)
 	m.memory[uint32(int32(8))] = byte(i32_const(-3))
 }
-func (m *Module) _get() int32 {
+func (m *Module) f10() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
 	return t0
 }
-func (m *Module) _i32_left() int32 {
-	m._bump()
+func (m *Module) f11() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(1))
 	return i32_const(0)
 }
-func (m *Module) _i32_right() int32 {
-	m._bump()
+func (m *Module) f12() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(2))
 	return int32(1)
 }
-func (m *Module) _i32_another() int32 {
-	m._bump()
+func (m *Module) f13() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(3))
 	return int32(1)
 }
-func (m *Module) _i32_callee() int32 {
-	m._bump()
+func (m *Module) f14() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(4))
 	return i32_const(0)
 }
-func (m *Module) _i32_bool() int32 {
-	m._bump()
+func (m *Module) f15() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(5))
 	return i32_const(0)
 }
-func (m *Module) _i64_left() int64 {
-	m._bump()
+func (m *Module) f16() int64 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(1))
 	return i64_const(0)
 }
-func (m *Module) _i64_right() int64 {
-	m._bump()
+func (m *Module) f17() int64 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(2))
 	return int64(1)
 }
-func (m *Module) _i64_another() int64 {
-	m._bump()
+func (m *Module) f18() int64 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(3))
 	return int64(1)
 }
-func (m *Module) _i64_callee() int32 {
-	m._bump()
+func (m *Module) f19() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(4))
 	return int32(2)
 }
-func (m *Module) _i64_bool() int32 {
-	m._bump()
+func (m *Module) f20() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(5))
 	return i32_const(0)
 }
-func (m *Module) _f32_left() float32 {
-	m._bump()
+func (m *Module) f21() float32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(1))
 	return f32_const(0)
 }
-func (m *Module) _f32_right() float32 {
-	m._bump()
+func (m *Module) f22() float32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(2))
 	return f32_const(1)
 }
-func (m *Module) _f32_another() float32 {
-	m._bump()
+func (m *Module) f23() float32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(3))
 	return f32_const(1)
 }
-func (m *Module) _f32_callee() int32 {
-	m._bump()
+func (m *Module) f24() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(4))
 	return int32(4)
 }
-func (m *Module) _f32_bool() int32 {
-	m._bump()
+func (m *Module) f25() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(5))
 	return i32_const(0)
 }
-func (m *Module) _f64_left() float64 {
-	m._bump()
+func (m *Module) f26() float64 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(1))
 	return f64_const(0)
 }
-func (m *Module) _f64_right() float64 {
-	m._bump()
+func (m *Module) f27() float64 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(2))
 	return f64_const(1)
 }
-func (m *Module) _f64_another() float64 {
-	m._bump()
+func (m *Module) f28() float64 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(3))
 	return f64_const(1)
 }
-func (m *Module) _f64_callee() int32 {
-	m._bump()
+func (m *Module) f29() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(4))
 	return int32(6)
 }
-func (m *Module) _f64_bool() int32 {
-	m._bump()
+func (m *Module) f30() int32 {
+	m.f9()
 	m.memory[uint32(int32(8))] = byte(int32(5))
 	return i32_const(0)
 }
-func (m *Module) _i32_dummy(v0 int32, v1 int32) {
+func (m *Module) f31(v0 int32, v1 int32) {
 }
-func (m *Module) _i64_dummy(v0 int64, v1 int64) {
+func (m *Module) f32(v0 int64, v1 int64) {
 }
-func (m *Module) _f32_dummy(v0 float32, v1 float32) {
+func (m *Module) f33(v0 float32, v1 float32) {
 }
-func (m *Module) _f64_dummy(v0 float64, v1 float64) {
+func (m *Module) f34(v0 float64, v1 float64) {
 }
 func (m *Module) Xi32_add() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := t0 + t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_sub() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := t0 - t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_mul() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := t0 * t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_div_s() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := i32_div_s(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_div_u() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := int32(uint32(t0) / uint32(t1))
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_rem_s() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := t0 % t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_rem_u() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := int32(uint32(t0) % uint32(t1))
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_and() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := t0 & t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_or() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := t0 | t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_xor() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := t0 ^ t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_shl() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := i32_shl(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_shr_u() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := i32_shr_u(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_shr_s() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	t2 := i32_shr_s(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_eq() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if t0 == t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_ne() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if t0 != t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_lt_s() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if t0 < t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_le_s() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if t0 <= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_lt_u() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if uint32(t0) < uint32(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_le_u() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if uint32(t0) <= uint32(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_gt_s() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if t0 > t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_ge_s() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if t0 >= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_gt_u() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if uint32(t0) > uint32(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_ge_u() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	var t2 int32
 	if uint32(t0) >= uint32(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi32_store() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], uint32(t1))
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi32_store8() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	m.memory[uint32(t0)] = byte(t1)
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi32_store16() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
 	binary.LittleEndian.PutUint16(m.memory[uint32(t0):], uint16(t1))
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi32_call() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
-	m._i32_dummy(t0, t1)
-	t2 := m._get()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
+	m.f31(t0, t1)
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi32_call_indirect() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
-	t2 := m._i32_callee()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
+	t2 := m.f14()
 	t3 := m.table[uint32(t2)].(func(v0 int32, v1 int32) int32)(t0, t1)
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xi32_select() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i32_right()
-	t2 := m._i32_bool()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f12()
+	t2 := m.f15()
 	t3 := t1
 	if t2 != 0 {
 		t3 = t0
 	}
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xi64_add() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := t0 + t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_sub() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := t0 - t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_mul() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := t0 * t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_div_s() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := i64_div_s(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_div_u() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := int64(uint64(t0) / uint64(t1))
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_rem_s() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := t0 % t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_rem_u() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := int64(uint64(t0) % uint64(t1))
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_and() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := t0 & t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_or() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := t0 | t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_xor() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := t0 ^ t1
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_shl() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := i64_shl(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_shr_u() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := i64_shr_u(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_shr_s() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	t2 := i64_shr_s(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_eq() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if t0 == t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_ne() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if t0 != t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_lt_s() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if t0 < t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_le_s() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if t0 <= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_lt_u() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if uint64(t0) < uint64(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_le_u() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if uint64(t0) <= uint64(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_gt_s() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if t0 > t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_ge_s() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if t0 >= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_gt_u() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if uint64(t0) > uint64(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_ge_u() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
 	var t2 int32
 	if uint64(t0) >= uint64(t1) {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xi64_store() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f17()
 	binary.LittleEndian.PutUint64(m.memory[uint32(t0):], uint64(t1))
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi64_store8() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f17()
 	m.memory[uint32(t0)] = byte(t1)
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi64_store16() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f17()
 	binary.LittleEndian.PutUint16(m.memory[uint32(t0):], uint16(t1))
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi64_store32() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._i64_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f17()
 	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], uint32(t1))
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi64_call() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
-	m._i64_dummy(t0, t1)
-	t2 := m._get()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
+	m.f32(t0, t1)
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xi64_call_indirect() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
-	t2 := m._i64_callee()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
+	t2 := m.f19()
 	t3 := m.table[uint32(t2)].(func(v0 int64, v1 int64) int32)(t0, t1)
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xi64_select() int32 {
-	m._reset()
-	t0 := m._i64_left()
-	t1 := m._i64_right()
-	t2 := m._i64_bool()
+	m.f8()
+	t0 := m.f16()
+	t1 := m.f17()
+	t2 := m.f20()
 	t3 := t1
 	if t2 != 0 {
 		t3 = t0
 	}
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xf32_add() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	t2 := float32(t0 + t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_sub() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	t2 := float32(t0 - t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_mul() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	t2 := float32(t0 * t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_div() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	t2 := float32(t0 / t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_copysign() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	t2 := f32_copysign(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_eq() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	var t2 int32
 	if t0 == t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_ne() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	var t2 int32
 	if t0 != t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_lt() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	var t2 int32
 	if t0 < t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_le() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	var t2 int32
 	if t0 <= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_gt() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	var t2 int32
 	if t0 > t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_ge() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	var t2 int32
 	if t0 >= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_min() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	t2 := min(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_max() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
 	t2 := max(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf32_store() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._f32_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f22()
 	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], math.Float32bits(t1))
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xf32_call() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
-	m._f32_dummy(t0, t1)
-	t2 := m._get()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
+	m.f33(t0, t1)
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xf32_call_indirect() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
-	t2 := m._f32_callee()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
+	t2 := m.f24()
 	t3 := m.table[uint32(t2)].(func(v0 float32, v1 float32) int32)(t0, t1)
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xf32_select() int32 {
-	m._reset()
-	t0 := m._f32_left()
-	t1 := m._f32_right()
-	t2 := m._f32_bool()
+	m.f8()
+	t0 := m.f21()
+	t1 := m.f22()
+	t2 := m.f25()
 	t3 := t1
 	if t2 != 0 {
 		t3 = t0
 	}
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xf64_add() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	t2 := float64(t0 + t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_sub() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	t2 := float64(t0 - t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_mul() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	t2 := float64(t0 * t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_div() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	t2 := float64(t0 / t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_copysign() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	t2 := math.Copysign(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_eq() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	var t2 int32
 	if t0 == t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_ne() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	var t2 int32
 	if t0 != t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_lt() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	var t2 int32
 	if t0 < t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_le() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	var t2 int32
 	if t0 <= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_gt() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	var t2 int32
 	if t0 > t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_ge() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	var t2 int32
 	if t0 >= t1 {
 		t2 = 1
 	}
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_min() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	t2 := min(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_max() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
 	t2 := max(t0, t1)
 	_ = t2
-	t3 := m._get()
+	t3 := m.f10()
 	return t3
 }
 func (m *Module) Xf64_store() int32 {
-	m._reset()
-	t0 := m._i32_left()
-	t1 := m._f64_right()
+	m.f8()
+	t0 := m.f11()
+	t1 := m.f27()
 	binary.LittleEndian.PutUint64(m.memory[uint32(t0):], math.Float64bits(t1))
-	t2 := m._get()
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xf64_call() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
-	m._f64_dummy(t0, t1)
-	t2 := m._get()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
+	m.f34(t0, t1)
+	t2 := m.f10()
 	return t2
 }
 func (m *Module) Xf64_call_indirect() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
-	t2 := m._f64_callee()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
+	t2 := m.f29()
 	t3 := m.table[uint32(t2)].(func(v0 float64, v1 float64) int32)(t0, t1)
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xf64_select() int32 {
-	m._reset()
-	t0 := m._f64_left()
-	t1 := m._f64_right()
-	t2 := m._f64_bool()
+	m.f8()
+	t0 := m.f26()
+	t1 := m.f27()
+	t2 := m.f30()
 	t3 := t1
 	if t2 != 0 {
 		t3 = t0
 	}
 	_ = t3
-	t4 := m._get()
+	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xbr_if() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._reset()
-		t1 := m._i32_left()
-		t2 := m._i32_right()
+		m.f8()
+		t1 := m.f11()
+		t2 := m.f12()
 		t3 := t2 & i32_const(0)
 		t0 = t1
 		if t3 != 0 {
 			goto l0
 		}
 		_ = t1
-		t4 := m._get()
+		t4 := m.f10()
 		t0 = t4
 	}
 l0:
@@ -1135,12 +1135,12 @@ func (m *Module) Xbr_table() int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._reset()
+		m.f8()
 		var t1 int32
 		_ = t1
 		{
-			t2 := m._i32_left()
-			t3 := m._i32_right()
+			t2 := m.f11()
+			t3 := m.f12()
 			t1 = t2
 			t0 = t2
 			switch t3 {
@@ -1153,7 +1153,7 @@ func (m *Module) Xbr_table() int32 {
 	l0:
 		;
 		_ = t1
-		t4 := m._get()
+		t4 := m.f10()
 		t0 = t4
 	}
 l1:

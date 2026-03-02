@@ -12,7 +12,7 @@ type Module struct {
 	elements [][]any
 	memory   []byte
 	maxMem   int32
-	_a       int32
+	g0       int32
 }
 
 func New() *Module {
@@ -20,12 +20,12 @@ func New() *Module {
 	m.table = make([]any, 1)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m._func}}
+	m.elements = [][]any{[]any{m.f36}}
 	copy(m.table[0:], m.elements[0])
-	m._a = int32(10)
+	m.g0 = int32(10)
 	return m
 }
-func (m *Module) _dummy() {
+func (m *Module) f0() {
 }
 func (m *Module) Xtype_i32() {
 	{
@@ -141,7 +141,7 @@ l0:
 }
 func (m *Module) Xas_block_mid(v0 int32) int32 {
 	{
-		m._dummy()
+		m.f0()
 		t0 := v0
 		if t0 != 0 {
 			goto l0
@@ -154,8 +154,8 @@ l0:
 }
 func (m *Module) Xas_block_last(v0 int32) {
 	{
-		m._dummy()
-		m._dummy()
+		m.f0()
+		m.f0()
 		t0 := v0
 		if t0 != 0 {
 			goto l0
@@ -183,7 +183,7 @@ func (m *Module) Xas_block_mid_value(v0 int32) int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
+		m.f0()
 		t1 := v0
 		t0 = int32(20)
 		if t1 != 0 {
@@ -200,8 +200,8 @@ func (m *Module) Xas_block_last_value(v0 int32) int32 {
 	var t0 int32
 	_ = t0
 	{
-		m._dummy()
-		m._dummy()
+		m.f0()
+		m.f0()
 		t1 := v0
 		t0 = int32(11)
 		if t1 != 0 {
@@ -230,7 +230,7 @@ l0:
 func (m *Module) Xas_loop_mid(v0 int32) int32 {
 	{
 		{
-			m._dummy()
+			m.f0()
 			t0 := v0
 			if t0 != 0 {
 				goto l0
@@ -244,7 +244,7 @@ l0:
 }
 func (m *Module) Xas_loop_last(v0 int32) {
 	{
-		m._dummy()
+		m.f0()
 		t0 := v0
 		if t0 != 0 {
 			return
@@ -422,7 +422,7 @@ func (m *Module) Xas_if_then(v0 int32, v1 int32) {
 				goto l0
 			}
 		} else {
-			m._dummy()
+			m.f0()
 		}
 	}
 l0:
@@ -431,7 +431,7 @@ func (m *Module) Xas_if_else(v0 int32, v1 int32) {
 	{
 		t0 := v0
 		if t0 != 0 {
-			m._dummy()
+			m.f0()
 		} else {
 			t1 := v1
 			if t1 != 0 {
@@ -497,7 +497,7 @@ l0:
 	;
 	return t0
 }
-func (m *Module) _f(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) f32(v0 int32, v1 int32, v2 int32) int32 {
 	return i32_const(-1)
 }
 func (m *Module) Xas_call_first() int32 {
@@ -508,7 +508,7 @@ func (m *Module) Xas_call_first() int32 {
 		if int32(1) != 0 {
 			goto l0
 		}
-		t1 := m._f(int32(12), int32(2), int32(3))
+		t1 := m.f32(int32(12), int32(2), int32(3))
 		t0 = t1
 	}
 l0:
@@ -523,7 +523,7 @@ func (m *Module) Xas_call_mid() int32 {
 		if int32(1) != 0 {
 			goto l0
 		}
-		t1 := m._f(int32(1), int32(13), int32(3))
+		t1 := m.f32(int32(1), int32(13), int32(3))
 		t0 = t1
 	}
 l0:
@@ -538,14 +538,14 @@ func (m *Module) Xas_call_last() int32 {
 		if int32(1) != 0 {
 			goto l0
 		}
-		t1 := m._f(int32(1), int32(2), int32(14))
+		t1 := m.f32(int32(1), int32(2), int32(14))
 		t0 = t1
 	}
 l0:
 	;
 	return t0
 }
-func (m *Module) _func(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) f36(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := v0
 	return t0
 }
@@ -652,7 +652,7 @@ func (m *Module) Xas_global_set_value(v0 int32) int32 {
 		if t1 != 0 {
 			goto l0
 		}
-		m._a = int32(1)
+		m.g0 = int32(1)
 		return i32_const(-1)
 	}
 l0:

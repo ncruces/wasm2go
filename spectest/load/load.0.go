@@ -12,7 +12,7 @@ type Module struct {
 	elements [][]any
 	memory   []byte
 	maxMem   int32
-	_g       int32
+	g0       int32
 }
 
 func New() *Module {
@@ -20,9 +20,9 @@ func New() *Module {
 	m.table = make([]any, 1)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m._f}}
+	m.elements = [][]any{[]any{m.f14}}
 	copy(m.table[0:], m.elements[0])
-	m._g = i32_const(0)
+	m.g0 = i32_const(0)
 	return m
 }
 func (m *Module) Xas_br_value() int32 {
@@ -196,22 +196,22 @@ func (m *Module) Xas_select_cond() int32 {
 	}
 	return t1
 }
-func (m *Module) _f(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) f14(v0 int32, v1 int32, v2 int32) int32 {
 	return i32_const(-1)
 }
 func (m *Module) Xas_call_first() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	t1 := m._f(t0, int32(2), int32(3))
+	t1 := m.f14(t0, int32(2), int32(3))
 	return t1
 }
 func (m *Module) Xas_call_mid() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	t1 := m._f(int32(1), t0, int32(3))
+	t1 := m.f14(int32(1), t0, int32(3))
 	return t1
 }
 func (m *Module) Xas_call_last() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	t1 := m._f(int32(1), int32(2), t0)
+	t1 := m.f14(int32(1), int32(2), t0)
 	return t1
 }
 func (m *Module) Xas_call_indirect_first() int32 {
@@ -251,7 +251,7 @@ func (m *Module) Xas_global_set_value() {
 	var v0 int32
 	_ = v0
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	m._g = t0
+	m.g0 = t0
 }
 func (m *Module) Xas_load_address() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
