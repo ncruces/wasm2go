@@ -46,10 +46,19 @@ func (fn *funcCompiler) branch(n uint64) ast.Stmt {
 	if targetBlk.label == nil {
 		targetBlk.label = fn.newLabel()
 	}
-	// If it's not a loop, set results.
+
 	if targetBlk.loopPos == 0 {
+		// Breaking out of a block, set its results.
 		fn.emit(targetBlk.setResults(fn)...)
+	} else if args := len(targetBlk.params); args > 0 {
+		// Breaking to the start of a loop, set its parameters.
+		stmt := &ast.AssignStmt{Tok: token.ASSIGN, Lhs: targetBlk.params}
+		stmt.Rhs = append(stmt.Rhs, fn.stack.last(args)...)
+		fn.cond = nil
+		fn.emit(stmt)
+		fn.stack = fn.stack[:targetBlk.stackPos]
 	}
+
 	return &ast.BranchStmt{Tok: token.GOTO, Label: targetBlk.label}
 }
 
@@ -502,6 +511,7 @@ type funcBlock struct {
 	body        *ast.BlockStmt
 	label       *ast.Ident
 	ifStmt      *ast.IfStmt
+	params      []ast.Expr
 	results     []*ast.Ident
 	loopPos     int
 	stackPos    int

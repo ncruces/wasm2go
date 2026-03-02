@@ -128,5 +128,37 @@ l0:
 	t9 := v1
 	return t9
 }
+func (m *Module) _pick0(v0 int64) (int64, int64) {
+	t0 := v0
+	t1 := v0
+	return t0, t1
+}
+func (m *Module) _pick1(v0 int64, v1 int64) (int64, int64, int64) {
+	t0 := v0
+	t1 := v1
+	t2 := v0
+	return t0, t1, t2
+}
+func (m *Module) Xfac_ssa(v0 int64) int64 {
+	t0 := v0
+	var t1 int64
+	_ = t1
+	t3, t2 := int64(1), t0
+l0:
+	{
+		t4, t5, t6 := m._pick1(t3, t2)
+		t7, t8, t9 := m._pick1(t5, t6)
+		t10 := t8 * t9
+		t11, t12, t13 := m._pick1(t7, t10)
+		t14 := t13 - int64(1)
+		t15, t16 := m._pick0(t14)
+		t3, t2 = t12, t15
+		if uint64(t16) > uint64(i64_const(0)) {
+			goto l0
+		}
+		_ = t11
+		return t4
+	}
+}
 
 func i64_const(x int64) int64 { return x }

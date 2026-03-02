@@ -794,6 +794,24 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				body:     &ast.BlockStmt{},
 			}
 
+			if opcode == 0x03 && len(bt.params) > 0 { // loop, with params
+				lhs := make([]ast.Expr, len(bt.params))
+				rhs := make([]ast.Expr, len(bt.params))
+				for i := len(bt.params) - 1; i >= 0; i-- {
+					lhs[i] = fn.newTempVar()
+					rhs[i] = fn.pop()
+				}
+				childBlk.params = lhs
+				for _, p := range lhs {
+					fn.pushConst(p)
+				}
+				fn.emit(&ast.AssignStmt{
+					Tok: token.DEFINE,
+					Lhs: lhs,
+					Rhs: rhs,
+				})
+			}
+
 			var stmt ast.Stmt
 			switch opcode {
 			case 0x02: // block

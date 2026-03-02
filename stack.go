@@ -20,7 +20,7 @@ func (s *stack[E]) pop() E {
 	return e
 }
 
-func (s *stack[E]) append(e E) {
+func (s *stack[E]) append(e ...E) {
 	a := *s
-	*s = append(a, e)
+	*s = append(a, e...)
 }
