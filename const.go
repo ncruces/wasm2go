@@ -58,7 +58,6 @@ func (t *translator) constF32() (ast.Expr, error) {
 	}
 
 	// Infinities, NaN, negative zero.
-	t.packages.add("math")
 	return &ast.CallExpr{
 		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32frombits")},
 		Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(v), 10)}},
@@ -83,7 +82,6 @@ func (t *translator) constF64() (ast.Expr, error) {
 	}
 
 	// Infinities, NaN, negative zero.
-	t.packages.add("math")
 	return &ast.CallExpr{
 		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64frombits")},
 		Args: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(v, 10)}},

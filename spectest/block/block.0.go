@@ -873,25 +873,25 @@ l0:
 	}
 l2:
 	;
-	t10 := t7 + t8
-	v0 = t10
-	t11 := v0
-	var t12 int32
-	_ = t12
+	t9 := t7 + t8
+	v0 = t9
+	t10 := v0
+	var t11 int32
+	_ = t11
 	{
-		var t13 int32
-		_ = t13
+		var t12 int32
+		_ = t12
 		{
-			t12 = int32(8)
+			t11 = int32(8)
 			goto l3
 		}
 	}
 l3:
 	;
-	t15 := t11 + t12
-	v0 = t15
-	t16 := v0
-	return t16
+	t13 := t10 + t11
+	v0 = t13
+	t14 := v0
+	return t14
 }
 func (m *Module) Xparam() int32 {
 	var t0 int32
@@ -978,12 +978,12 @@ func (m *Module) Xeffects() int32 {
 	}
 l0:
 	;
-	t8 := v0
-	var t9 int32
-	if t8 == i32_const(-14) {
-		t9 = 1
+	t6 := v0
+	var t7 int32
+	if t6 == i32_const(-14) {
+		t7 = 1
 	}
-	return t9
+	return t7
 }
 func (m *Module) Xtype_use() {
 	{

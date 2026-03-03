@@ -26,7 +26,7 @@ func (fn *funcCompiler) emit(stmts ...ast.Stmt) {
 }
 
 // Returns a statement to exit n blocks.
-func (fn *funcCompiler) branch(n uint64) ast.Stmt {
+func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
 	// Target block index.
 	i := uint64(len(fn.blocks)) - n - 1
 
@@ -36,15 +36,11 @@ func (fn *funcCompiler) branch(n uint64) ast.Stmt {
 		res := len(fn.typ.results)
 		ret.Results = append(ret.Results, fn.stack.last(res)...)
 		fn.cond = nil
-		return ret
+		return []ast.Stmt{ret}
 	}
 
 	// Create a label for the block we're jumping to.
 	blk := &fn.blocks[i]
-	if blk.label == nil {
-		blk.label = fn.newLabel()
-	}
-
 	if blk.loopPos == 0 {
 		// Breaking out of a block, set its results.
 		blk.setResults(fn)
@@ -57,7 +53,15 @@ func (fn *funcCompiler) branch(n uint64) ast.Stmt {
 		fn.emit(stmt)
 	}
 
-	return &ast.BranchStmt{Tok: token.GOTO, Label: blk.label}
+	if fn.blocks.top().unreachable {
+		return nil
+	}
+
+	if blk.label == nil {
+		blk.label = fn.newLabel()
+	}
+
+	return []ast.Stmt{&ast.BranchStmt{Tok: token.GOTO, Label: blk.label}}
 }
 
 // Returns an expression that loads a byte from memory (an l-value).
@@ -69,7 +73,6 @@ func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 
 // Returns an expression that loads bytes from memory.
 func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
-	fn.packages.add("encoding/binary")
 	bits := typ[len(typ)-2:]
 
 	// Load as unsigned, little-endian.
@@ -86,7 +89,6 @@ func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 	switch {
 	case strings.HasPrefix(typ, "float"):
 		// Convert to float.
-		fn.packages.add("math")
 		expr = &ast.CallExpr{
 			Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float" + bits + "frombits")},
 			Args: []ast.Expr{expr}}
@@ -99,12 +101,10 @@ func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 
 // Returns a statement that stores bytes to memory.
 func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
-	fn.packages.add("encoding/binary")
 	bits := typ[len(typ)-2:]
 
 	if strings.HasPrefix(typ, "float") {
 		// Convert to float.
-		fn.packages.add("math")
 		val = &ast.CallExpr{
 			Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float" + bits + "bits")},
 			Args: []ast.Expr{val}}
@@ -129,8 +129,6 @@ func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
 
 // Returns an expression that loads bytes from memory (an l-value).
 func (fn *funcCompiler) loadUnsafe(addr ast.Expr, typ string) ast.Expr {
-	fn.packages.add("unsafe")
-
 	var bytes string
 	switch typ[len(typ)-2:] {
 	case "16":
@@ -176,6 +174,11 @@ func (fn *funcCompiler) pushConst(expr ast.Expr) {
 
 // Pushes the materialization of expr to the value stack.
 func (fn *funcCompiler) push(expr ast.Expr) {
+	if fn.blocks.top().unreachable {
+		fn.pushConst(&ast.BasicLit{Kind: token.INT, Value: "0"})
+		return
+	}
+
 	tmp := fn.newTempVar()
 	fn.emit(&ast.AssignStmt{
 		Tok: token.DEFINE,
@@ -209,14 +212,21 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 
 // Pops a value from the value stack.
 func (fn *funcCompiler) pop() ast.Expr {
-	expr := fn.stack.pop()
+	if blk := fn.blocks.top(); len(fn.stack) == 0 && blk.unreachable {
+		return &ast.BasicLit{Kind: token.INT, Value: "0"}
+	}
+
 	fn.cond = nil
-	return expr
+	return fn.stack.pop()
 }
 
 // Pops a condition from the value stack.
 // The condition must be immediately used once and only once.
 func (fn *funcCompiler) popCond() ast.Expr {
+	if blk := fn.blocks.top(); len(fn.stack) == 0 && blk.unreachable {
+		return newID("false")
+	}
+
 	expr := fn.stack.pop()
 	cond := fn.cond
 	fn.cond = nil
@@ -307,7 +317,6 @@ func (fn *funcCompiler) binOpF32(op token.Token) {
 func (fn *funcCompiler) bitOp(name string) {
 	bits := name[len(name)-2:]
 
-	fn.packages.add("math/bits")
 	fn.push(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
@@ -319,7 +328,6 @@ func (fn *funcCompiler) bitOp(name string) {
 
 // Executes a unary float64 math call.
 func (fn *funcCompiler) uniMath64(name string) {
-	fn.packages.add("math")
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
@@ -331,7 +339,6 @@ func (fn *funcCompiler) uniMath64(name string) {
 
 // Executes a binary float64 math call.
 func (fn *funcCompiler) binMath64(name string) {
-	fn.packages.add("math")
 	y := fn.pop()
 	x := fn.pop()
 	fn.push(&ast.CallExpr{
@@ -344,7 +351,6 @@ func (fn *funcCompiler) binMath64(name string) {
 
 // Executes a unary float32 math call.
 func (fn *funcCompiler) uniMath32(name string) {
-	fn.packages.add("math")
 	fn.push(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
@@ -356,7 +362,6 @@ func (fn *funcCompiler) uniMath32(name string) {
 
 // Executes a Float32bits call.
 func (fn *funcCompiler) float32bits() {
-	fn.packages.add("math")
 	fn.push(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
@@ -368,7 +373,6 @@ func (fn *funcCompiler) float32bits() {
 
 // Executes a Float64bits call.
 func (fn *funcCompiler) float64bits() {
-	fn.packages.add("math")
 	fn.push(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
@@ -380,7 +384,6 @@ func (fn *funcCompiler) float64bits() {
 
 // Executes a Float32frombits call.
 func (fn *funcCompiler) float32frombits() {
-	fn.packages.add("math")
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
@@ -391,7 +394,6 @@ func (fn *funcCompiler) float32frombits() {
 
 // Executes a Float64frombits call.
 func (fn *funcCompiler) float64frombits() {
-	fn.packages.add("math")
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
@@ -401,24 +403,16 @@ func (fn *funcCompiler) float64frombits() {
 }
 
 // Executes a unary helper call.
-func (fn *funcCompiler) uniHelper(name string, pkgs ...string) {
+func (fn *funcCompiler) uniHelper(name string) {
 	fn.helpers.add(name)
-	for _, p := range pkgs {
-		fn.packages.add(p)
-	}
-
 	fn.push(&ast.CallExpr{
 		Fun:  newID(name),
 		Args: []ast.Expr{fn.pop()}})
 }
 
 // Executes a binary helper call.
-func (fn *funcCompiler) binHelper(name string, pkgs ...string) {
+func (fn *funcCompiler) binHelper(name string) {
 	fn.helpers.add(name)
-	for _, p := range pkgs {
-		fn.packages.add(p)
-	}
-
 	y := fn.pop()
 	x := fn.pop()
 	fn.push(&ast.CallExpr{
