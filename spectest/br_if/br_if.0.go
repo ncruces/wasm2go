@@ -79,7 +79,6 @@ func (m *Module) Xtype_i32_value() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xtype_i64_value() int64 {
@@ -94,7 +93,6 @@ func (m *Module) Xtype_i64_value() int64 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xtype_f32_value() float32 {
@@ -109,7 +107,6 @@ func (m *Module) Xtype_f32_value() float32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xtype_f64_value() float64 {
@@ -124,7 +121,6 @@ func (m *Module) Xtype_f64_value() float64 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_block_first(v0 int32) int32 {
@@ -136,7 +132,6 @@ func (m *Module) Xas_block_first(v0 int32) int32 {
 		return int32(2)
 	}
 l0:
-	;
 	return int32(3)
 }
 func (m *Module) Xas_block_mid(v0 int32) int32 {
@@ -149,7 +144,6 @@ func (m *Module) Xas_block_mid(v0 int32) int32 {
 		return int32(2)
 	}
 l0:
-	;
 	return int32(3)
 }
 func (m *Module) Xas_block_last(v0 int32) {
@@ -176,7 +170,6 @@ func (m *Module) Xas_block_first_value(v0 int32) int32 {
 		return int32(11)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_block_mid_value(v0 int32) int32 {
@@ -193,7 +186,6 @@ func (m *Module) Xas_block_mid_value(v0 int32) int32 {
 		return int32(21)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_block_last_value(v0 int32) int32 {
@@ -210,7 +202,6 @@ func (m *Module) Xas_block_last_value(v0 int32) int32 {
 		t0 = int32(11)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_loop_first(v0 int32) int32 {
@@ -224,7 +215,6 @@ func (m *Module) Xas_loop_first(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return int32(3)
 }
 func (m *Module) Xas_loop_mid(v0 int32) int32 {
@@ -239,7 +229,6 @@ func (m *Module) Xas_loop_mid(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return int32(4)
 }
 func (m *Module) Xas_loop_last(v0 int32) {
@@ -263,7 +252,6 @@ func (m *Module) Xas_br_value() int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_cond() {
@@ -293,7 +281,6 @@ func (m *Module) Xas_br_if_value() int32 {
 		t0 = int32(4)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
@@ -313,7 +300,6 @@ func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
 		t0 = int32(4)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_index() {
@@ -353,7 +339,6 @@ func (m *Module) Xas_br_table_value() int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_value_index() int32 {
@@ -374,7 +359,6 @@ func (m *Module) Xas_br_table_value_index() int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_return_value() int64 {
@@ -388,7 +372,6 @@ func (m *Module) Xas_return_value() int64 {
 		return int64(1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_if_cond(v0 int32) int32 {
@@ -410,7 +393,6 @@ func (m *Module) Xas_if_cond(v0 int32) int32 {
 		t0 = t2
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_if_then(v0 int32, v1 int32) {
@@ -457,7 +439,6 @@ func (m *Module) Xas_select_first(v0 int32) int32 {
 		t0 = t2
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_select_second(v0 int32) int32 {
@@ -476,7 +457,6 @@ func (m *Module) Xas_select_second(v0 int32) int32 {
 		t0 = t2
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_select_cond() int32 {
@@ -494,7 +474,6 @@ func (m *Module) Xas_select_cond() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) f32(v0 int32, v1 int32, v2 int32) int32 {
@@ -512,7 +491,6 @@ func (m *Module) Xas_call_first() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_call_mid() int32 {
@@ -527,7 +505,6 @@ func (m *Module) Xas_call_mid() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_call_last() int32 {
@@ -542,7 +519,6 @@ func (m *Module) Xas_call_last() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) f36(v0 int32, v1 int32, v2 int32) int32 {
@@ -561,7 +537,6 @@ func (m *Module) Xas_call_indirect_func() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_call_indirect_first() int32 {
@@ -576,7 +551,6 @@ func (m *Module) Xas_call_indirect_first() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_call_indirect_mid() int32 {
@@ -591,7 +565,6 @@ func (m *Module) Xas_call_indirect_mid() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_call_indirect_last() int32 {
@@ -606,7 +579,6 @@ func (m *Module) Xas_call_indirect_last() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_local_set_value(v0 int32) int32 {
@@ -624,7 +596,6 @@ func (m *Module) Xas_local_set_value(v0 int32) int32 {
 		t0 = i32_const(-1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_local_tee_value(v0 int32) int32 {
@@ -640,7 +611,6 @@ func (m *Module) Xas_local_tee_value(v0 int32) int32 {
 		return i32_const(-1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_global_set_value(v0 int32) int32 {
@@ -656,7 +626,6 @@ func (m *Module) Xas_global_set_value(v0 int32) int32 {
 		return i32_const(-1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_load_address() int32 {
@@ -671,7 +640,6 @@ func (m *Module) Xas_load_address() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_loadN_address() int32 {
@@ -686,7 +654,6 @@ func (m *Module) Xas_loadN_address() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_store_address() int32 {
@@ -701,7 +668,6 @@ func (m *Module) Xas_store_address() int32 {
 		t0 = i32_const(-1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_store_value() int32 {
@@ -716,7 +682,6 @@ func (m *Module) Xas_store_value() int32 {
 		t0 = i32_const(-1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_storeN_address() int32 {
@@ -731,7 +696,6 @@ func (m *Module) Xas_storeN_address() int32 {
 		t0 = i32_const(-1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_storeN_value() int32 {
@@ -746,7 +710,6 @@ func (m *Module) Xas_storeN_value() int32 {
 		t0 = i32_const(-1)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_unary_operand() float64 {
@@ -761,7 +724,6 @@ func (m *Module) Xas_unary_operand() float64 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_binary_left() int32 {
@@ -776,7 +738,6 @@ func (m *Module) Xas_binary_left() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_binary_right() int32 {
@@ -791,7 +752,6 @@ func (m *Module) Xas_binary_right() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_test_operand() int32 {
@@ -809,7 +769,6 @@ func (m *Module) Xas_test_operand() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_compare_left() int32 {
@@ -827,7 +786,6 @@ func (m *Module) Xas_compare_left() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_compare_right() int32 {
@@ -845,7 +803,6 @@ func (m *Module) Xas_compare_right() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_memory_grow_size() int32 {
@@ -860,7 +817,6 @@ func (m *Module) Xas_memory_grow_size() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xnested_block_value(v0 int32) int32 {
@@ -883,7 +839,6 @@ func (m *Module) Xnested_block_value(v0 int32) int32 {
 		t0 = t3
 	}
 l0:
-	;
 	t4 := int32(1) + t0
 	return t4
 }
@@ -907,7 +862,6 @@ func (m *Module) Xnested_br_value(v0 int32) int32 {
 		goto l0
 	}
 l0:
-	;
 	t3 := int32(1) + t0
 	return t3
 }
@@ -935,7 +889,6 @@ func (m *Module) Xnested_br_if_value(v0 int32) int32 {
 		t0 = int32(16)
 	}
 l0:
-	;
 	t3 := int32(1) + t0
 	return t3
 }
@@ -963,7 +916,6 @@ func (m *Module) Xnested_br_if_value_cond(v0 int32) int32 {
 		t0 = int32(16)
 	}
 l0:
-	;
 	t3 := int32(1) + t0
 	return t3
 }
@@ -990,7 +942,6 @@ func (m *Module) Xnested_br_table_value(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	t3 := int32(1) + t0
 	return t3
 }
@@ -1017,7 +968,6 @@ func (m *Module) Xnested_br_table_value_index(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	t3 := int32(1) + t0
 	return t3
 }

@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/tools/go/ast/astutil"
 	"golang.org/x/tools/imports"
 )
 
@@ -737,11 +738,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		switch opcode {
 		case 0x00: // unreachable
 			if !blk.unreachable {
-				blk.unreachable = true
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun:  newID("panic"),
 						Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: `"unreachable"`}}}})
+				blk.unreachable = true
 			}
 
 		case 0x01: // nop
@@ -776,13 +777,20 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 			childBlk := funcBlock{
-				typ:      bt,
-				results:  results,
-				stackPos: len(fn.stack),
-				body:     &ast.BlockStmt{},
+				typ:         bt,
+				results:     results,
+				body:        &ast.BlockStmt{},
+				stackPos:    len(fn.stack) - len(bt.params),
+				unreachable: blk.unreachable,
+				ifreachable: blk.unreachable,
+				elreachable: blk.unreachable,
 			}
 
-			if opcode == 0x03 && len(bt.params) > 0 { // loop, with params
+			// Blocks can naturally consume their arguments.
+			// Loops and ifs need to declare them outside the block so
+			// they persist across iterations and are available to
+			// both branches of the statement.
+			if len(bt.params) > 0 && opcode != 0x02 { // params, not a block
 				lhs := make([]ast.Expr, len(bt.params))
 				rhs := make([]ast.Expr, len(bt.params))
 				for i := len(bt.params) - 1; i >= 0; i-- {
@@ -824,12 +832,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			// Set the results of the if branch.
 			blk.setResults(fn)
 			fn.stack = fn.stack[:blk.stackPos]
+			// Push the if's arguments again.
+			for _, p := range blk.params {
+				fn.pushConst(p)
+			}
 			// Create a new block at the same level,
 			// make it the else branch.
 			blk.body = &ast.BlockStmt{}
 			blk.ifStmt.Else = blk.body
 			blk.ifreachable = blk.unreachable
-			blk.unreachable = false
+			blk.unreachable = blk.elreachable
 
 		case 0x0b: // end
 			if len(fn.blocks) == 1 { // End of the function body.
@@ -838,7 +850,22 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					ret.Results = append(ret.Results, fn.stack.last(n)...)
 					fn.emit(ret)
 				}
+				cleanupFunctionBody(body)
 				return nil
+			}
+
+			// If this is an if statement with results and no else block,
+			// we need an else statement that assigns the params to the results.
+			if blk.ifStmt != nil && blk.ifStmt.Else == nil && len(blk.results) > 0 {
+				blk.ifStmt.Else = &ast.BlockStmt{
+					List: []ast.Stmt{
+						&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: blk.results,
+							Rhs: blk.params,
+						},
+					},
+				}
 			}
 
 			// Set block results, but push them again
@@ -1137,8 +1164,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Lhs: []ast.Expr{&ast.SelectorExpr{
 					X:   newID("m"),
 					Sel: t.globals[i].id}},
-				Tok: token.ASSIGN,
-				Rhs: []ast.Expr{fn.pop()}})
+				Rhs: []ast.Expr{fn.pop()},
+				Tok: token.ASSIGN})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
 			_, err := readLEB128(t.in) // align
@@ -1214,8 +1241,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			val := fn.pop()
 			idx := fn.load8(offset) // an l-value
 			fn.emit(&ast.AssignStmt{
-				Lhs: []ast.Expr{idx},
 				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{idx},
 				Rhs: []ast.Expr{convert(val, "byte")}})
 
 		case 0x36, 0x37, 0x38, 0x39, 0x3b, 0x3d, 0x3e: // store
@@ -1820,6 +1847,59 @@ func (t *translator) readDataSection() error {
 		}
 	}
 	return nil
+}
+
+func cleanupFunctionBody(body *ast.BlockStmt) {
+	uses := make(map[string]int)
+	ast.Inspect(body, func(n ast.Node) bool {
+		if id, ok := n.(*ast.Ident); ok {
+			uses[id.Name]++
+		}
+		return true
+	})
+
+	astutil.Apply(body,
+		func(c *astutil.Cursor) bool {
+			if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.DEFINE {
+				allUnused := true
+				for i, lhs := range n.Lhs {
+					if id, ok := lhs.(*ast.Ident); ok && id.Name != "_" && uses[id.Name] == 1 {
+						n.Lhs[i] = newID("_")
+					}
+					if id, ok := n.Lhs[i].(*ast.Ident); !ok || id.Name != "_" {
+						allUnused = false
+					}
+				}
+				if allUnused {
+					n.Tok = token.ASSIGN
+				}
+			}
+			return true
+		},
+		func(c *astutil.Cursor) bool {
+			if block, ok := c.Node().(*ast.BlockStmt); ok && len(block.List) > 0 {
+				var newList []ast.Stmt
+				for i := len(block.List) - 1; i >= 0; i-- {
+					stmt := block.List[i]
+					if ls, ok := stmt.(*ast.LabeledStmt); ok {
+						if _, isEmpty := ls.Stmt.(*ast.EmptyStmt); isEmpty && len(newList) > 0 {
+							nextStmt := newList[len(newList)-1]
+							if _, isDecl := nextStmt.(*ast.DeclStmt); !isDecl {
+								ls.Stmt = nextStmt
+								newList[len(newList)-1] = ls
+								continue
+							}
+						}
+					}
+					newList = append(newList, stmt)
+				}
+				for i, j := 0, len(newList)-1; i < j; i, j = i+1, j-1 {
+					newList[i], newList[j] = newList[j], newList[i]
+				}
+				block.List = newList
+			}
+			return true
+		})
 }
 
 func (t *translator) readCustomSection(size int) error {

@@ -269,7 +269,6 @@ func (m *Module) Xas_br_value(v0 int32) int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_cond(v0 int32) {
@@ -294,7 +293,6 @@ func (m *Module) Xas_br_if_value(v0 int32) int32 {
 		t0 = int32(7)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
@@ -310,7 +308,6 @@ func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
 		t0 = int32(7)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_index(v0 int32) {
@@ -345,7 +342,6 @@ func (m *Module) Xas_br_table_value(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_value_index(v0 int32) int32 {
@@ -363,7 +359,6 @@ func (m *Module) Xas_br_table_value_index(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_return_value(v0 int32) int32 {
@@ -578,9 +573,10 @@ func f64_const(x float64) float64 { return x }
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
-	if math.IsNaN(x) ||
-		x < math.MinInt64 ||
-		x >= math.MaxInt64 {
+	if x < math.MinInt64 || x >= math.MaxInt64 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int64(x)

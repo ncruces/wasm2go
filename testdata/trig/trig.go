@@ -35,7 +35,6 @@ func (m *Module) Xsin(v0 float64) float64 {
 		return t2
 	}
 l0:
-	;
 	v1 = math.Float64frombits(9221120237041090560)
 	{
 		t3 := v0
@@ -66,11 +65,9 @@ l0:
 				goto l3
 			}
 		l2:
-			;
 			v2 = i64_const(-9223372036854775808)
 		}
 	l3:
-		;
 		t17 := v0
 		t18 := v2
 		t19 := float64(t18)
@@ -114,7 +111,6 @@ l0:
 									}
 								}
 							l5:
-								;
 								t29 := v3
 								t30 := t29 + i32_const(-1)
 								v3 = t30
@@ -138,25 +134,21 @@ l0:
 							}
 						}
 					l6:
-						;
 						t43 := v4
 						return t43
 					}
 				l7:
-					;
 					t44 := v1
 					t45 := -t44
 					return t45
 				}
 			l8:
-				;
 				t46 := v4
 				t47 := -t46
 				v1 = t47
 				goto l1
 			}
 		l4:
-			;
 			t48 := v3
 			t49 := t48 + int32(1)
 			v3 = t49
@@ -167,7 +159,6 @@ l0:
 		}
 	}
 l1:
-	;
 	t52 := v1
 	return t52
 }
@@ -181,9 +172,10 @@ func f64_const(x float64) float64 { return x }
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
-	if math.IsNaN(x) ||
-		x < math.MinInt64 ||
-		x >= math.MaxInt64 {
+	if x < math.MinInt64 || x >= math.MaxInt64 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int64(x)

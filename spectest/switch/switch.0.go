@@ -46,7 +46,6 @@ func (m *Module) Xstmt(v0 int32) int32 {
 											}
 										}
 									l1:
-										;
 										t1 := v0
 										return t1
 									}
@@ -55,33 +54,27 @@ func (m *Module) Xstmt(v0 int32) int32 {
 							l3:
 							}
 						l4:
-							;
 							t2 := v0
 							t3 := i32_const(0) - t2
 							v1 = t3
 							goto l9
 						}
 					l5:
-						;
 						goto l9
 					}
 				l6:
-					;
 					v1 = int32(101)
 					goto l9
 				}
 			l7:
-				;
 				v1 = int32(101)
 			}
 		l0:
-			;
 			v1 = int32(102)
 		}
 	l8:
 	}
 l9:
-	;
 	t4 := v1
 	return t4
 }
@@ -125,7 +118,6 @@ func (m *Module) Xexpr(v0 int64) int64 {
 											}
 										}
 									l1:
-										;
 										t3 := v0
 										return t3
 									}
@@ -134,14 +126,12 @@ func (m *Module) Xexpr(v0 int64) int64 {
 							l3:
 							}
 						l4:
-							;
 							t4 := v0
 							t5 := i64_const(0) - t4
 							t0 = t5
 							goto l9
 						}
 					l7:
-						;
 						v1 = int64(101)
 					}
 				l6:
@@ -149,17 +139,14 @@ func (m *Module) Xexpr(v0 int64) int64 {
 			l5:
 			}
 		l0:
-			;
 			t6 := v1
 			t0 = t6
 			goto l9
 		}
 	l8:
-		;
 		t0 = i64_const(-5)
 	}
 l9:
-	;
 	return t0
 }
 func (m *Module) Xarg(v0 int32) int32 {
@@ -195,22 +182,18 @@ func (m *Module) Xarg(v0 int32) int32 {
 					}
 				}
 			l0:
-				;
 				t8 := i32_const(1000) + t3
 				t2 = t8
 			}
 		l1:
-			;
 			t9 := int32(100) + t2
 			t1 = t9
 		}
 	l2:
-		;
 		t10 := int32(10) + t1
 		t0 = t10
 	}
 l3:
-	;
 	return t0
 }
 func (m *Module) Xcorner() int32 {
@@ -221,7 +204,6 @@ func (m *Module) Xcorner() int32 {
 		}
 	}
 l0:
-	;
 	return int32(1)
 }
 

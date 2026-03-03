@@ -66,7 +66,6 @@ func (m *Module) Xfac_iter(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t8 := v2
 	return t8
 }
@@ -95,7 +94,6 @@ func (m *Module) Xfac_iter_named(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t8 := v2
 	return t8
 }
@@ -124,7 +122,6 @@ func (m *Module) Xfac_opt(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t9 := v1
 	return t9
 }

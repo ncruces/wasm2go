@@ -32,10 +32,10 @@ func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
 
 	// Returning from the function body.
 	if i == 0 {
-		ret := &ast.ReturnStmt{}
-		res := len(fn.typ.results)
-		ret.Results = append(ret.Results, fn.stack.last(res)...)
 		fn.cond = nil
+		n := len(fn.typ.results)
+		ret := &ast.ReturnStmt{}
+		ret.Results = append(ret.Results, fn.stack.last(n)...)
 		return []ast.Stmt{ret}
 	}
 
@@ -44,11 +44,11 @@ func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
 	if blk.loopPos == 0 {
 		// Breaking out of a block, set its results.
 		blk.setResults(fn)
-	} else if args := len(blk.params); args > 0 {
+	} else if n := len(blk.params); n > 0 {
 		// Breaking to the start of a loop, set its parameters.
 		stmt := &ast.AssignStmt{Tok: token.ASSIGN, Lhs: blk.params}
-		stmt.Rhs = append(stmt.Rhs, fn.stack.last(args)...)
-		fn.stack = fn.stack[:blk.stackPos]
+		stmt.Rhs = append(stmt.Rhs, fn.stack.last(n)...)
+		fn.stack = fn.stack[:blk.stackPos+n]
 		fn.cond = nil
 		fn.emit(stmt)
 	}
@@ -212,7 +212,7 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 
 // Pops a value from the value stack.
 func (fn *funcCompiler) pop() ast.Expr {
-	if blk := fn.blocks.top(); len(fn.stack) == 0 && blk.unreachable {
+	if blk := fn.blocks.top(); blk.unreachable {
 		return &ast.BasicLit{Kind: token.INT, Value: "0"}
 	}
 
@@ -223,7 +223,7 @@ func (fn *funcCompiler) pop() ast.Expr {
 // Pops a condition from the value stack.
 // The condition must be immediately used once and only once.
 func (fn *funcCompiler) popCond() ast.Expr {
-	if blk := fn.blocks.top(); len(fn.stack) == 0 && blk.unreachable {
+	if blk := fn.blocks.top(); blk.unreachable {
 		return newID("false")
 	}
 
@@ -483,6 +483,7 @@ type funcBlock struct {
 	stackPos    int
 	unreachable bool
 	ifreachable bool
+	elreachable bool
 }
 
 func (b *funcBlock) emit(stmts ...ast.Stmt) {

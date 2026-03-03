@@ -211,7 +211,6 @@ func (m *Module) Xas_br_first(v0 int32) int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_last(v0 int32) int32 {
@@ -223,7 +222,6 @@ func (m *Module) Xas_br_last(v0 int32) int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_everywhere(v0 int32) int32 {
@@ -235,7 +233,6 @@ func (m *Module) Xas_br_everywhere(v0 int32) int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_first(v0 int32) int32 {
@@ -251,7 +248,6 @@ func (m *Module) Xas_br_if_first(v0 int32) int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_mid(v0 int32) int32 {
@@ -267,7 +263,6 @@ func (m *Module) Xas_br_if_mid(v0 int32) int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_last(v0 int32) int32 {
@@ -283,7 +278,6 @@ func (m *Module) Xas_br_if_last(v0 int32) int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_everywhere(v0 int32) int32 {
@@ -299,7 +293,6 @@ func (m *Module) Xas_br_if_everywhere(v0 int32) int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_first(v0 int32) int32 {
@@ -318,7 +311,6 @@ func (m *Module) Xas_br_table_first(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_mid(v0 int32) int32 {
@@ -337,7 +329,6 @@ func (m *Module) Xas_br_table_mid(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_last(v0 int32) int32 {
@@ -356,7 +347,6 @@ func (m *Module) Xas_br_table_last(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_everywhere(v0 int32) int32 {
@@ -375,7 +365,6 @@ func (m *Module) Xas_br_table_everywhere(v0 int32) int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_return_first(v0 int32) int32 {

@@ -52,11 +52,17 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 			t.Run(fmt.Sprintf("line_%d", cmd.Line), func(t *testing.T) {
 				if cmd.Type == "assert_trap" {
 					defer func() {
-						r := recover()
-						if r == nil {
+						want := cmd.Text
+						switch want {
+						case "out of bounds memory access", "undefined element":
+							want = "out of range"
+						case "indirect call type mismatch":
+							want = "interface conversion"
+						}
+						if r := recover(); r == nil {
 							t.Errorf("expected trap: %s", cmd.Text)
-							// } else if !strings.Contains(fmt.Sprint(r), cmd.Text) {
-							// 	t.Errorf("got trap %q, want %q", r, cmd.Text)
+						} else if !strings.Contains(fmt.Sprint(r), want) {
+							t.Errorf("got trap %q, want %q", r, cmd.Text)
 						}
 					}()
 				}

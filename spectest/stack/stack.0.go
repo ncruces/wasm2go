@@ -36,7 +36,6 @@ func (m *Module) Xfac_expr(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t8 := v2
 	return t8
 }
@@ -65,7 +64,6 @@ func (m *Module) Xfac_stack(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t8 := v2
 	return t8
 }
@@ -94,7 +92,6 @@ func (m *Module) Xfac_stack_raw(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t8 := v2
 	return t8
 }
@@ -123,7 +120,6 @@ func (m *Module) Xfac_mixed(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t8 := v2
 	return t8
 }
@@ -152,7 +148,6 @@ func (m *Module) Xfac_mixed_raw(v0 int64) int64 {
 		}
 	}
 l0:
-	;
 	t8 := v2
 	return t8
 }

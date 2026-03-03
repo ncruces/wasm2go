@@ -81,9 +81,10 @@ func f32_copysign(x, y float32) float32 {
 
 func i32_trunc_f64_s(f float64) int32 {
 	x := math.Trunc(f)
-	if math.IsNaN(x) ||
-		x < math.MinInt32 ||
-		x > math.MaxInt32 {
+	if x < math.MinInt32 || x > math.MaxInt32 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int32(x)
@@ -91,9 +92,10 @@ func i32_trunc_f64_s(f float64) int32 {
 
 func i32_trunc_f32_s(f float32) int32 {
 	x := math.Trunc(float64(f))
-	if math.IsNaN(x) ||
-		x < math.MinInt32 ||
-		x > math.MaxInt32 {
+	if x < math.MinInt32 || x > math.MaxInt32 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int32(x)
@@ -101,9 +103,10 @@ func i32_trunc_f32_s(f float32) int32 {
 
 func i32_trunc_f64_u(f float64) int32 {
 	x := math.Trunc(f)
-	if math.IsNaN(x) ||
-		x < 0 ||
-		x > math.MaxUint32 {
+	if x < 0 || x > math.MaxUint32 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int32(uint32(x))
@@ -111,9 +114,10 @@ func i32_trunc_f64_u(f float64) int32 {
 
 func i32_trunc_f32_u(f float32) int32 {
 	x := math.Trunc(float64(f))
-	if math.IsNaN(x) ||
-		x < 0 ||
-		x > math.MaxUint32 {
+	if x < 0 || x > math.MaxUint32 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int32(uint32(x))
@@ -121,9 +125,10 @@ func i32_trunc_f32_u(f float32) int32 {
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
-	if math.IsNaN(x) ||
-		x < math.MinInt64 ||
-		x >= math.MaxInt64 {
+	if x < math.MinInt64 || x >= math.MaxInt64 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int64(x)
@@ -131,9 +136,10 @@ func i64_trunc_f64_s(f float64) int64 {
 
 func i64_trunc_f32_s(f float32) int64 {
 	x := math.Trunc(float64(f))
-	if math.IsNaN(x) ||
-		x < math.MinInt64 ||
-		x >= math.MaxInt64 {
+	if x < math.MinInt64 || x >= math.MaxInt64 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int64(x)
@@ -141,9 +147,10 @@ func i64_trunc_f32_s(f float32) int64 {
 
 func i64_trunc_f64_u(f float64) int64 {
 	x := math.Trunc(f)
-	if math.IsNaN(x) ||
-		x < 0 ||
-		x >= math.MaxUint64 {
+	if x < 0 || x >= math.MaxUint64 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int64(uint64(x))
@@ -151,8 +158,10 @@ func i64_trunc_f64_u(f float64) int64 {
 
 func i64_trunc_f32_u(f float32) int64 {
 	x := math.Trunc(float64(f))
-	if math.IsNaN(x) || x < 0 ||
-		x >= math.MaxUint64 {
+	if x < 0 || x >= math.MaxUint64 {
+		panic("integer overflow")
+	}
+	if math.IsNaN(x) {
 		panic("invalid conversion to integer")
 	}
 	return int64(uint64(x))

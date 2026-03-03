@@ -1128,7 +1128,6 @@ func (m *Module) Xbr_if() int32 {
 		t0 = t4
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xbr_table() int32 {
@@ -1151,13 +1150,11 @@ func (m *Module) Xbr_table() int32 {
 			}
 		}
 	l0:
-		;
 		_ = t1
 		t4 := m.f10()
 		t0 = t4
 	}
 l1:
-	;
 	return t0
 }
 

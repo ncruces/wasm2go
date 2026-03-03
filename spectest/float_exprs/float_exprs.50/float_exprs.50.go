@@ -43,9 +43,9 @@ func (m *Module) Xcalculate() float32 {
 		if t20 == t21 {
 			goto l0
 		}
+		panic("unreachable")
 	}
 l0:
-	;
 	t23 := v4
 	return t23
 }

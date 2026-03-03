@@ -59,7 +59,6 @@ func (m *Module) Xtau(v0 int32) float64 {
 		}
 	}
 l0:
-	;
 	t28 := v1
 	return t28
 }

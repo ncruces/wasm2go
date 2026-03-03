@@ -224,8 +224,8 @@ func (t *translator) createNewFunc() ast.Decl {
 				Type:  ast.NewIdent(exported(imp.module))})
 			body.List = append(body.List, &ast.IfStmt{
 				Init: &ast.AssignStmt{
-					Lhs: []ast.Expr{newID("i"), newID("ok")},
 					Tok: token.DEFINE,
+					Lhs: []ast.Expr{newID("i"), newID("ok")},
 					Rhs: []ast.Expr{&ast.TypeAssertExpr{
 						X: localVar(i),
 						Type: &ast.InterfaceType{

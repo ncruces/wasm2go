@@ -435,7 +435,6 @@ func (m *Module) Xas_br_if_first() int32 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_last() int32 {
@@ -454,7 +453,6 @@ func (m *Module) Xas_br_if_last() int32 {
 		t0 = int32(2)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_first() int32 {
@@ -476,7 +474,6 @@ func (m *Module) Xas_br_table_first() int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_last() int32 {
@@ -498,7 +495,6 @@ func (m *Module) Xas_br_table_last() int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) f19(v0 int32, v1 int32) int32 {
@@ -614,7 +610,6 @@ func (m *Module) Xas_br_value() int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_local_set_value() int32 {
@@ -765,14 +760,13 @@ func (m *Module) Xbreak_bare() int32 {
 		goto l0
 	}
 l0:
-	;
 	{
 		if int32(1) != 0 {
 			goto l1
 		}
+		panic("unreachable")
 	}
 l1:
-	;
 	{
 		switch i32_const(0) {
 		default:
@@ -780,7 +774,6 @@ l1:
 		}
 	}
 l2:
-	;
 	{
 		switch int32(1) {
 		default:
@@ -792,7 +785,6 @@ l2:
 		}
 	}
 l3:
-	;
 	return int32(19)
 }
 func (m *Module) Xbreak_value() int32 {
@@ -803,7 +795,6 @@ func (m *Module) Xbreak_value() int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xbreak_multi_value() (int32, int32, int64) {
@@ -818,7 +809,6 @@ func (m *Module) Xbreak_multi_value() (int32, int32, int64) {
 		goto l0
 	}
 l0:
-	;
 	return t0, t1, t2
 }
 func (m *Module) Xbreak_repeated() int32 {
@@ -829,7 +819,6 @@ func (m *Module) Xbreak_repeated() int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xbreak_inner() int32 {
@@ -848,7 +837,6 @@ func (m *Module) Xbreak_inner() int32 {
 		}
 	}
 l0:
-	;
 	t3 := t0 + t1
 	v0 = t3
 	t4 := v0
@@ -859,7 +847,6 @@ l0:
 			goto l1
 		}
 	l1:
-		;
 		t5 = int32(2)
 	}
 	t6 := t4 + t5
@@ -872,7 +859,6 @@ l0:
 		goto l2
 	}
 l2:
-	;
 	t9 := t7 + t8
 	v0 = t9
 	t10 := v0
@@ -887,7 +873,6 @@ l2:
 		}
 	}
 l3:
-	;
 	t13 := t10 + t11
 	v0 = t13
 	t14 := v0
@@ -931,7 +916,6 @@ func (m *Module) Xparam_break() int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xparams_break() int32 {
@@ -943,7 +927,6 @@ func (m *Module) Xparams_break() int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xparams_id_break() int32 {
@@ -956,7 +939,6 @@ func (m *Module) Xparams_id_break() int32 {
 		goto l0
 	}
 l0:
-	;
 	t2 := t0 + t1
 	return t2
 }
@@ -977,7 +959,6 @@ func (m *Module) Xeffects() int32 {
 		goto l0
 	}
 l0:
-	;
 	t6 := v0
 	var t7 int32
 	if t6 == i32_const(-14) {

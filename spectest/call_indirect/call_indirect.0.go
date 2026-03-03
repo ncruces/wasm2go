@@ -448,7 +448,6 @@ func (m *Module) Xas_br_if_first() int64 {
 		t0 = t1
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_last() int32 {
@@ -463,7 +462,6 @@ func (m *Module) Xas_br_if_last() int32 {
 		t0 = int32(2)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_first() float32 {
@@ -481,7 +479,6 @@ func (m *Module) Xas_br_table_first() float32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_last() int32 {
@@ -499,7 +496,6 @@ func (m *Module) Xas_br_table_last() int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_store_first() {
@@ -532,7 +528,6 @@ func (m *Module) Xas_br_value() float32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_local_set_value() float64 {

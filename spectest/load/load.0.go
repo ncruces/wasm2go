@@ -34,7 +34,6 @@ func (m *Module) Xas_br_value() int32 {
 		goto l0
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_cond() {
@@ -59,7 +58,6 @@ func (m *Module) Xas_br_if_value() int32 {
 		t0 = int32(7)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_if_value_cond() int32 {
@@ -75,7 +73,6 @@ func (m *Module) Xas_br_if_value_cond() int32 {
 		t0 = int32(7)
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_index() {
@@ -110,7 +107,6 @@ func (m *Module) Xas_br_table_value() int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_br_table_value_index() int32 {
@@ -128,7 +124,6 @@ func (m *Module) Xas_br_table_value_index() int32 {
 		}
 	}
 l0:
-	;
 	return t0
 }
 func (m *Module) Xas_return_value() int32 {
