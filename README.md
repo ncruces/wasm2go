@@ -72,3 +72,14 @@ wasm2go -endian=little < input.wasm > output_little.go
 
 Both versions will be guarded by a build tag,
 so you can add both to your project.
+
+The only other knob is whether to make sure all float operations
+[canonicalize NaNs](https://github.com/WebAssembly/design/issues/1463).
+
+```
+Usage of wasm2go:
+  -endian string
+        endianness of the generated code (big or little)
+  -nanbox
+        whether to canonicalize NaNs (default true)
+```
