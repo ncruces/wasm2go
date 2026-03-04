@@ -1,0 +1,15 @@
+package wasm2go
+
+import (
+	_ "embed"
+	"testing"
+
+	"github.com/ncruces/wasm2go/spectest"
+)
+
+//go:embed labels.json
+var data []byte
+
+func Test(t *testing.T) {
+	spectest.Test(t, New(), data, "labels.0.wasm")
+}
