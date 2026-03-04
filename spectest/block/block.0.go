@@ -5,6 +5,7 @@ package wasm2go
 import (
 	"encoding/binary"
 	"math/bits"
+	"runtime"
 )
 
 type Module struct {
@@ -1013,8 +1014,10 @@ func (m *Module) Xtype_use() {
 
 func i32_const(x int32) int32 { return x }
 
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func f64_const(x float64) float64 {
+	runtime.KeepAlive(&x)
+	return x
+}
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem

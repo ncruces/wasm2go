@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "runtime"
+
 type Module struct {
 }
 
@@ -15,5 +17,7 @@ func (m *Module) Xinverse(v0 float32) float32 {
 	return t1
 }
 
-//go:noinline
-func f32_const(x float32) float32 { return x }
+func f32_const(x float32) float32 {
+	runtime.KeepAlive(&x)
+	return x
+}

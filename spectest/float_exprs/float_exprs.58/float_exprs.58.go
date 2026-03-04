@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "runtime"
+
 type Module struct {
 }
 
@@ -22,8 +24,12 @@ func (m *Module) Xf64_no_fold_recip_recip(v0 float64) float64 {
 	return t2
 }
 
-//go:noinline
-func f32_const(x float32) float32 { return x }
+func f32_const(x float32) float32 {
+	runtime.KeepAlive(&x)
+	return x
+}
 
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func f64_const(x float64) float64 {
+	runtime.KeepAlive(&x)
+	return x
+}

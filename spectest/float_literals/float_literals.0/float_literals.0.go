@@ -2,7 +2,10 @@
 
 package wasm2go
 
-import "math"
+import (
+	"math"
+	"runtime"
+)
 
 type Module struct {
 }
@@ -384,8 +387,12 @@ func (m *Module) Xf64_hex_sep5() float64 {
 	return float64(2.3605225168752e+13)
 }
 
-//go:noinline
-func f32_const(x float32) float32 { return x }
+func f32_const(x float32) float32 {
+	runtime.KeepAlive(&x)
+	return x
+}
 
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func f64_const(x float64) float64 {
+	runtime.KeepAlive(&x)
+	return x
+}

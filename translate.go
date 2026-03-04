@@ -24,9 +24,11 @@ var helpersSrc string
 
 // Standard library packages used by generated code.
 var stdlib = map[string]string{
-	"math":   "math",
-	"bits":   "math/bits",
-	"binary": "encoding/binary",
+	"runtime": "runtime",
+	"unsafe":  "unsafe",
+	"math":    "math",
+	"bits":    "math/bits",
+	"binary":  "encoding/binary",
 }
 
 type translator struct {

@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "runtime"
+
 type Module struct {
 }
 
@@ -65,5 +67,7 @@ l0:
 
 func i32_const(x int32) int32 { return x }
 
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func f64_const(x float64) float64 {
+	runtime.KeepAlive(&x)
+	return x
+}

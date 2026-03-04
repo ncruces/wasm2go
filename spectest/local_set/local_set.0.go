@@ -2,7 +2,10 @@
 
 package wasm2go
 
-import "math"
+import (
+	"math"
+	"runtime"
+)
 
 type Module struct {
 }
@@ -167,11 +170,15 @@ func i32_const(x int32) int32 { return x }
 
 func i64_const(x int64) int64 { return x }
 
-//go:noinline
-func f32_const(x float32) float32 { return x }
+func f32_const(x float32) float32 {
+	runtime.KeepAlive(&x)
+	return x
+}
 
-//go:noinline
-func f64_const(x float64) float64 { return x }
+func f64_const(x float64) float64 {
+	runtime.KeepAlive(&x)
+	return x
+}
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
