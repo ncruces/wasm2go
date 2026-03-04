@@ -25,54 +25,54 @@ func (m *Module) Xstmt(v0 int32) int32 {
 										{
 											t0 := v0
 											switch t0 {
-											default:
-												goto l0
 											case 0:
-												goto l1
+												goto l0
 											case 1:
-												goto l2
+												goto l1
 											case 2:
-												goto l3
+												goto l2
 											case 3:
-												goto l4
+												goto l3
 											case 4:
-												goto l5
+												goto l4
 											case 5:
-												goto l6
+												goto l5
 											case 6:
-												goto l7
+												goto l6
 											case 7:
+												goto l7
+											default:
 												goto l8
 											}
 										}
-									l1:
+									l0:
 										t1 := v0
 										return t1
 									}
-								l2:
+								l1:
 								}
-							l3:
+							l2:
 							}
-						l4:
+						l3:
 							t2 := v0
 							t3 := i32_const(0) - t2
 							v1 = t3
 							goto l9
 						}
-					l5:
+					l4:
 						goto l9
 					}
-				l6:
+				l5:
 					v1 = int32(101)
 					goto l9
 				}
-			l7:
+			l6:
 				v1 = int32(101)
 			}
-		l0:
+		l8:
 			v1 = int32(102)
 		}
-	l8:
+	l7:
 	}
 l9:
 	t4 := v1
@@ -97,53 +97,53 @@ func (m *Module) Xexpr(v0 int64) int64 {
 											t1 := v0
 											t2 := int32(t1)
 											switch t2 {
-											default:
-												goto l0
 											case 0:
-												goto l1
+												goto l0
 											case 1:
-												goto l2
+												goto l1
 											case 2:
-												goto l3
+												goto l2
 											case 3:
-												goto l4
+												goto l3
 											case 4:
-												goto l5
+												goto l4
 											case 5:
-												goto l6
+												goto l5
 											case 6:
-												goto l7
+												goto l6
 											case 7:
+												goto l7
+											default:
 												goto l8
 											}
 										}
-									l1:
+									l0:
 										t3 := v0
 										return t3
 									}
-								l2:
+								l1:
 								}
-							l3:
+							l2:
 							}
-						l4:
+						l3:
 							t4 := v0
 							t5 := i64_const(0) - t4
 							t0 = t5
 							goto l9
 						}
-					l7:
+					l6:
 						v1 = int64(101)
 					}
-				l6:
+				l5:
 				}
-			l5:
+			l4:
 			}
-		l0:
+		l8:
 			t6 := v1
 			t0 = t6
 			goto l9
 		}
-	l8:
+	l7:
 		t0 = i64_const(-5)
 	}
 l9:
@@ -166,34 +166,34 @@ func (m *Module) Xarg(v0 int32) int32 {
 					t5 := int32(2) * t4
 					t6 := v0
 					t7 := int32(3) & t6
-					t3 = t5
 					t2 = t5
 					t1 = t5
 					t0 = t5
+					t3 = t5
 					switch t7 {
-					default:
-						goto l0
 					case 0:
-						goto l1
+						goto l0
 					case 1:
-						goto l2
+						goto l1
 					case 2:
+						goto l2
+					default:
 						goto l3
 					}
 				}
-			l0:
+			l3:
 				t8 := i32_const(1000) + t3
 				t2 = t8
 			}
-		l1:
+		l0:
 			t9 := int32(100) + t2
 			t1 = t9
 		}
-	l2:
+	l1:
 		t10 := int32(10) + t1
 		t0 = t10
 	}
-l3:
+l2:
 	return t0
 }
 func (m *Module) Xcorner() int32 {

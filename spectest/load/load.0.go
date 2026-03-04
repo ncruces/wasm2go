@@ -79,11 +79,9 @@ func (m *Module) Xas_br_table_index() {
 	{
 		t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
 		switch t0 {
+		case 0, 1:
+			goto l0
 		default:
-			goto l0
-		case 0:
-			goto l0
-		case 1:
 			goto l0
 		}
 	}
@@ -96,13 +94,10 @@ func (m *Module) Xas_br_table_value() int32 {
 		t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
 		t0 = t1
 		t0 = t1
-		t0 = t1
 		switch int32(1) {
+		case 0, 1:
+			goto l0
 		default:
-			goto l0
-		case 0:
-			goto l0
-		case 1:
 			goto l0
 		}
 	}
@@ -117,9 +112,9 @@ func (m *Module) Xas_br_table_value_index() int32 {
 		t0 = int32(6)
 		t0 = int32(6)
 		switch t1 {
-		default:
-			goto l0
 		case 0:
+			goto l0
+		default:
 			goto l0
 		}
 	}

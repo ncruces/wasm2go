@@ -101,8 +101,6 @@ l0:
 									t27 := int32(t26)
 									t28 := t27 & int32(3)
 									switch t28 {
-									default:
-										goto l1
 									case 0:
 										goto l1
 									case 1:
@@ -111,6 +109,8 @@ l0:
 										goto l7
 									case 3:
 										goto l8
+									default:
+										goto l1
 									}
 								}
 							l5:
@@ -177,10 +177,10 @@ func f64_const(x float64) float64 {
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
-	if x < math.MinInt64 || x >= math.MaxInt64 {
+	switch {
+	case x < math.MinInt64 || x >= math.MaxInt64:
 		panic("integer overflow")
-	}
-	if math.IsNaN(x) {
+	case math.IsNaN(x):
 		panic("invalid conversion to integer")
 	}
 	return int64(x)

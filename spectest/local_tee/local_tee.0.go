@@ -315,11 +315,9 @@ func (m *Module) Xas_br_table_index(v0 int32) {
 	{
 		v0 = i32_const(0)
 		switch i32_const(0) {
+		case 0, 1:
+			goto l0
 		default:
-			goto l0
-		case 0:
-			goto l0
-		case 1:
 			goto l0
 		}
 	}
@@ -332,13 +330,10 @@ func (m *Module) Xas_br_table_value(v0 int32) int32 {
 		v0 = int32(10)
 		t0 = int32(10)
 		t0 = int32(10)
-		t0 = int32(10)
 		switch int32(1) {
+		case 0, 1:
+			goto l0
 		default:
-			goto l0
-		case 0:
-			goto l0
-		case 1:
 			goto l0
 		}
 	}
@@ -353,9 +348,9 @@ func (m *Module) Xas_br_table_value_index(v0 int32) int32 {
 		t0 = int32(6)
 		t0 = int32(6)
 		switch int32(11) {
-		default:
-			goto l0
 		case 0:
+			goto l0
+		default:
 			goto l0
 		}
 	}
@@ -578,10 +573,10 @@ func f64_const(x float64) float64 {
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
-	if x < math.MinInt64 || x >= math.MaxInt64 {
+	switch {
+	case x < math.MinInt64 || x >= math.MaxInt64:
 		panic("integer overflow")
-	}
-	if math.IsNaN(x) {
+	case math.IsNaN(x):
 		panic("invalid conversion to integer")
 	}
 	return int64(x)

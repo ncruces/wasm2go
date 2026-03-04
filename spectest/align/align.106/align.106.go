@@ -29,46 +29,46 @@ func (m *Module) Xf32_align_switch(v0 int32) float32 {
 					{
 						t0 := v0
 						switch t0 {
-						default:
-							goto l0
 						case 0:
-							goto l1
+							goto l0
 						case 1:
-							goto l2
+							goto l1
 						case 2:
-							goto l3
+							goto l2
 						case 3:
+							goto l3
+						default:
 							goto l4
 						}
 					}
-				l1:
+				l0:
 					t1 := v1
 					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t1))
 					t2 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
 					v2 = t2
-					goto l0
+					goto l4
 				}
-			l2:
+			l1:
 				t3 := v1
 				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t3))
 				t4 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
 				v2 = t4
-				goto l0
+				goto l4
 			}
-		l3:
+		l2:
 			t5 := v1
 			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t5))
 			t6 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
 			v2 = t6
-			goto l0
+			goto l4
 		}
-	l4:
+	l3:
 		t7 := v1
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t7))
 		t8 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
 		v2 = t8
 	}
-l0:
+l4:
 	t9 := v2
 	return t9
 }
@@ -84,55 +84,55 @@ func (m *Module) Xf64_align_switch(v0 int32) float64 {
 						{
 							t0 := v0
 							switch t0 {
-							default:
-								goto l0
 							case 0:
-								goto l1
+								goto l0
 							case 1:
-								goto l2
+								goto l1
 							case 2:
-								goto l3
+								goto l2
 							case 3:
-								goto l4
+								goto l3
 							case 4:
+								goto l4
+							default:
 								goto l5
 							}
 						}
-					l1:
+					l0:
 						t1 := v1
 						binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t1))
 						t2 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
 						v2 = t2
-						goto l0
+						goto l5
 					}
-				l2:
+				l1:
 					t3 := v1
 					binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t3))
 					t4 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
 					v2 = t4
-					goto l0
+					goto l5
 				}
-			l3:
+			l2:
 				t5 := v1
 				binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t5))
 				t6 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
 				v2 = t6
-				goto l0
+				goto l5
 			}
-		l4:
+		l3:
 			t7 := v1
 			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t7))
 			t8 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
 			v2 = t8
-			goto l0
+			goto l5
 		}
-	l5:
+	l4:
 		t9 := v1
 		binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t9))
 		t10 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
 		v2 = t10
 	}
-l0:
+l5:
 	t11 := v2
 	return t11
 }
@@ -148,21 +148,21 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 						{
 							t0 := v0
 							switch t0 {
-							default:
-								goto l0
 							case 0:
-								goto l1
+								goto l0
 							case 1:
-								goto l2
+								goto l1
 							case 2:
-								goto l3
+								goto l2
 							case 3:
-								goto l4
+								goto l3
 							case 4:
+								goto l4
+							default:
 								goto l5
 							}
 						}
-					l1:
+					l0:
 						t1 := v1
 						if t1 == i32_const(0) {
 							t3 := v2
@@ -177,9 +177,9 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 							t8 := int32(int8(m.memory[uint32(i32_const(0))]))
 							v3 = t8
 						}
-						goto l0
+						goto l5
 					}
-				l2:
+				l1:
 					t9 := v1
 					if t9 == i32_const(0) {
 						t11 := v2
@@ -194,9 +194,9 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 						t16 := int32(m.memory[uint32(i32_const(0))])
 						v3 = t16
 					}
-					goto l0
+					goto l5
 				}
-			l3:
+			l2:
 				t17 := v1
 				if t17 == i32_const(0) {
 					t19 := v2
@@ -218,9 +218,9 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 					t28 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
 					v3 = t28
 				}
-				goto l0
+				goto l5
 			}
-		l4:
+		l3:
 			t29 := v1
 			if t29 == i32_const(0) {
 				t31 := v2
@@ -242,9 +242,9 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 				t40 := int32(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
 				v3 = t40
 			}
-			goto l0
+			goto l5
 		}
-	l5:
+	l4:
 		t41 := v1
 		if t41 == i32_const(0) {
 			t43 := v2
@@ -274,7 +274,7 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 			v3 = t56
 		}
 	}
-l0:
+l5:
 	t57 := v3
 	return t57
 }
@@ -292,25 +292,25 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 								{
 									t0 := v0
 									switch t0 {
-									default:
-										goto l0
 									case 0:
-										goto l1
+										goto l0
 									case 1:
-										goto l2
+										goto l1
 									case 2:
-										goto l3
+										goto l2
 									case 3:
-										goto l4
+										goto l3
 									case 4:
-										goto l5
+										goto l4
 									case 5:
-										goto l6
+										goto l5
 									case 6:
+										goto l6
+									default:
 										goto l7
 									}
 								}
-							l1:
+							l0:
 								t1 := v1
 								if t1 == i32_const(0) {
 									t3 := v2
@@ -325,9 +325,9 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 									t8 := int64(int8(m.memory[uint32(i32_const(0))]))
 									v3 = t8
 								}
-								goto l0
+								goto l7
 							}
-						l2:
+						l1:
 							t9 := v1
 							if t9 == i32_const(0) {
 								t11 := v2
@@ -342,9 +342,9 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 								t16 := int64(m.memory[uint32(i32_const(0))])
 								v3 = t16
 							}
-							goto l0
+							goto l7
 						}
-					l3:
+					l2:
 						t17 := v1
 						if t17 == i32_const(0) {
 							t19 := v2
@@ -366,9 +366,9 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 							t28 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
 							v3 = t28
 						}
-						goto l0
+						goto l7
 					}
-				l4:
+				l3:
 					t29 := v1
 					if t29 == i32_const(0) {
 						t31 := v2
@@ -390,9 +390,9 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 						t40 := int64(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
 						v3 = t40
 					}
-					goto l0
+					goto l7
 				}
-			l5:
+			l4:
 				t41 := v1
 				if t41 == i32_const(0) {
 					t43 := v2
@@ -421,9 +421,9 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 					t56 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
 					v3 = t56
 				}
-				goto l0
+				goto l7
 			}
-		l6:
+		l5:
 			t57 := v1
 			if t57 == i32_const(0) {
 				t59 := v2
@@ -452,9 +452,9 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 				t72 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
 				v3 = t72
 			}
-			goto l0
+			goto l7
 		}
-	l7:
+	l6:
 		t73 := v1
 		if t73 == i32_const(0) {
 			t75 := v2
@@ -491,7 +491,7 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 			v3 = t92
 		}
 	}
-l0:
+l7:
 	t93 := v3
 	return t93
 }

@@ -948,28 +948,39 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			targets := make([]uint64, numTargets)
-			for i := range targets {
+
+			sw := &ast.SwitchStmt{Tag: fn.pop(), Body: &ast.BlockStmt{}}
+
+			// Group targets by their destination to consolidate cases.
+			var targetMap = map[uint64]int{}
+			for i := range numTargets {
 				target, err := readLEB128(t.in)
 				if err != nil {
 					return err
 				}
-				targets[i] = target
+
+				// New target, new case clause.
+				id, ok := targetMap[target]
+				if !ok {
+					id = len(sw.Body.List)
+					targetMap[target] = id
+					sw.Body.List = append(sw.Body.List,
+						&ast.CaseClause{Body: fn.branch(target)})
+				}
+
+				caseExpr := &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(i, 10)}
+				caseClse := sw.Body.List[id].(*ast.CaseClause)
+				caseClse.List = append(caseClse.List, caseExpr)
 			}
-			defaultTarget, err := readLEB128(t.in)
+
+			// Add the default target and clause.
+			target, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
+			sw.Body.List = append(sw.Body.List,
+				&ast.CaseClause{Body: fn.branch(target)})
 
-			sw := &ast.SwitchStmt{Tag: fn.pop(), Body: &ast.BlockStmt{
-				List: []ast.Stmt{&ast.CaseClause{
-					Body: fn.branch(defaultTarget)}},
-			}}
-			for i, target := range targets {
-				sw.Body.List = append(sw.Body.List, &ast.CaseClause{
-					List: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}},
-					Body: fn.branch(target)})
-			}
 			fn.emit(sw)
 			blk.unreachable = true // After switch.
 

@@ -272,31 +272,31 @@ func (m *Module) Xswitch(v0 int32) int32 {
 							{
 								t2 := v0
 								switch t2 {
-								default:
-									goto l0
 								case 0:
-									goto l1
+									goto l0
 								case 1:
-									goto l2
+									goto l1
 								case 2:
-									goto l3
+									goto l2
 								case 3:
+									goto l3
+								default:
 									goto l4
 								}
 							}
-						l2:
+						l1:
 						}
-					l3:
+					l2:
 						t1 = int32(2)
 						goto l5
 					}
-				l4:
+				l3:
 					t0 = int32(3)
 					goto l6
 				}
-			l0:
+			l4:
 			}
-		l1:
+		l0:
 			t1 = int32(5)
 		}
 	l5:
@@ -312,16 +312,16 @@ func (m *Module) Xreturn(v0 int32) int32 {
 			{
 				t0 := v0
 				switch t0 {
-				default:
-					goto l0
 				case 0:
+					goto l0
+				default:
 					goto l1
 				}
 			}
-		l1:
+		l0:
 			return i32_const(0)
 		}
-	l0:
+	l1:
 	}
 	return int32(2)
 }

@@ -1141,21 +1141,21 @@ func (m *Module) Xbr_table() int32 {
 		{
 			t2 := m.f11()
 			t3 := m.f12()
-			t1 = t2
 			t0 = t2
+			t1 = t2
 			switch t3 {
-			default:
-				goto l0
 			case 0:
+				goto l0
+			default:
 				goto l1
 			}
 		}
-	l0:
+	l1:
 		_ = t1
 		t4 := m.f10()
 		t0 = t4
 	}
-l1:
+l0:
 	return t0
 }
 

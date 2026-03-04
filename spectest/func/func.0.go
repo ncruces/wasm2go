@@ -383,20 +383,18 @@ func (m *Module) Xbreak_br_if_num(v0 int32) int32 {
 func (m *Module) Xbreak_br_table_empty(v0 int32) {
 	t0 := v0
 	switch t0 {
+	case 0, 1:
+		return
 	default:
-		return
-	case 0:
-		return
-	case 1:
 		return
 	}
 }
 func (m *Module) Xbreak_br_table_num(v0 int32) int32 {
 	t0 := v0
 	switch t0 {
-	default:
-		return int32(50)
 	case 0:
+		return int32(50)
+	default:
 		return int32(50)
 	}
 }
@@ -404,12 +402,12 @@ func (m *Module) Xbreak_br_table_nested_empty(v0 int32) {
 	{
 		t0 := v0
 		switch t0 {
-		default:
-			goto l0
 		case 0:
 			goto l0
 		case 1:
 			return
+		default:
+			goto l0
 		}
 	}
 l0:
@@ -422,12 +420,12 @@ func (m *Module) Xbreak_br_table_nested_num(v0 int32) int32 {
 		t0 = int32(50)
 		t0 = int32(50)
 		switch t1 {
-		default:
-			goto l0
 		case 0:
 			goto l0
 		case 1:
 			return int32(50)
+		default:
+			goto l0
 		}
 	}
 l0:

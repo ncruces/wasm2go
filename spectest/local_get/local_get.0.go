@@ -199,21 +199,21 @@ func (m *Module) Xas_br_table_value(v0 int32) int32 {
 			{
 				t0 := v0
 				switch t0 {
-				default:
-					goto l0
 				case 0:
-					goto l1
+					goto l0
 				case 1:
+					goto l1
+				default:
 					goto l2
 				}
 			}
-		l1:
+		l0:
 			return int32(1)
 		}
-	l2:
+	l1:
 		return int32(2)
 	}
-l0:
+l2:
 	return int32(3)
 }
 func (m *Module) Xas_return_value(v0 int32) int32 {

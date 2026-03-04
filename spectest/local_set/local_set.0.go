@@ -182,10 +182,10 @@ func f64_const(x float64) float64 {
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
-	if x < math.MinInt64 || x >= math.MaxInt64 {
+	switch {
+	case x < math.MinInt64 || x >= math.MaxInt64:
 		panic("integer overflow")
-	}
-	if math.IsNaN(x) {
+	case math.IsNaN(x):
 		panic("invalid conversion to integer")
 	}
 	return int64(x)
