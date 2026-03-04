@@ -338,10 +338,43 @@ func table_init(tab, elems []any, n, src, dest int32) {
 	copy(tab[x:y], elems[z:w])
 }
 
-func table_copy(tab []any, n, src, dest int32) {
+func table_copy(dst, tab []any, n, src, dest int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))
 	y := x + uint(uint32(n))
 	w := z + uint(uint32(n))
-	copy(tab[x:y], tab[z:w])
+	copy(dst[x:y], tab[z:w])
+}
+
+func table_grow(tab *[]any, delta int32, val any, max int32) int32 {
+	buf := *tab
+	len := len(buf)
+	old := int32(len)
+	if delta == 0 {
+		return old
+	}
+	new := old + delta
+	add := int(new) - len
+	if new > max || add < 0 {
+		return -1
+	}
+	buf = append(buf, make([]any, add)...)
+	if val != nil {
+		cpy := buf[len:]
+		for i := range cpy {
+			cpy[i] = val
+		}
+	}
+	*tab = buf
+	return old
+}
+
+func table_fill(tab []any, n int32, val any, dest int32) {
+	x := uint(uint32(dest))
+	y := x + uint(uint32(n))
+
+	buf := tab[x:y]
+	for i := range buf {
+		buf[i] = val
+	}
 }

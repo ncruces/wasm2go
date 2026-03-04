@@ -54,7 +54,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 					defer func() {
 						want := cmd.Text
 						switch want {
-						case "out of bounds memory access", "undefined element":
+						case "out of bounds memory access", "out of bounds table access", "undefined element":
 							want = "out of range"
 						case "indirect call type mismatch":
 							want = "interface conversion"
@@ -83,6 +83,13 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 					case "f64":
 						v, _ := strconv.ParseUint(arg.Value, 10, 64)
 						args[i] = reflect.ValueOf(math.Float64frombits(uint64(v)))
+					case "funcref", "externref":
+						if arg.Value == "null" {
+							var ptr *any
+							args[i] = reflect.Zero(reflect.TypeOf(ptr).Elem())
+						} else {
+							args[i] = reflect.ValueOf(arg)
+						}
 					}
 				}
 

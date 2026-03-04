@@ -12,9 +12,9 @@ var modRecvList = &ast.FieldList{List: []*ast.Field{{
 
 func (t *translator) createModuleStruct() ast.Decl {
 	var fields []*ast.Field
-	if t.table != nil {
+	for _, tab := range t.tables {
 		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{t.table.id},
+			Names: []*ast.Ident{tab.id},
 			Type:  &ast.ArrayType{Elt: newID("any")}})
 	}
 	if len(t.elements) > 0 {
@@ -92,17 +92,17 @@ func (t *translator) createNewFunc() ast.Decl {
 					X:  &ast.CompositeLit{Type: newID("Module")}}}}},
 	}
 
-	if t.table != nil {
-		body.List = append(body.List, &ast.AssignStmt{
-			Tok: token.ASSIGN,
-			Lhs: []ast.Expr{&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.table.id}},
-			Rhs: []ast.Expr{&ast.CallExpr{
-				Fun: newID("make"),
-				Args: []ast.Expr{
-					&ast.ArrayType{Elt: newID("any")},
-					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.table.min)}}}}})
+	for _, tab := range t.tables {
+		if tab.min > 0 {
+			body.List = append(body.List, &ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: tab.id}},
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: newID("make"),
+					Args: []ast.Expr{
+						&ast.ArrayType{Elt: newID("any")},
+						&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(tab.min)}}}}})
+		}
 	}
 
 	if t.memory != nil {
@@ -183,7 +183,7 @@ func (t *translator) createNewFunc() ast.Decl {
 					Fun: newID("copy"),
 					Args: []ast.Expr{
 						&ast.SliceExpr{
-							X:   &ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
+							X:   &ast.SelectorExpr{X: newID("m"), Sel: t.tables[0].id},
 							Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(elem.offset))}},
 						&ast.IndexExpr{
 							X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},

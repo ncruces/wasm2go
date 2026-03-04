@@ -35,7 +35,7 @@ This includes most Wasm 1.0 features, with the following exceptions:
 - importing tables or globals.
 
 It also supports a subset of Wasm 2.0 features:
-- the subset of bulk memory operations that doesn't "require" `externref`;
+- bulk memory operations and reference types;
 - nontrapping float-to-int conversions;
 - sign-extension operators;
 - multi-values.
@@ -73,7 +73,7 @@ wasm2go -endian=little < input.wasm > output_little.go
 Both versions will be guarded by a build tag,
 so you can add both to your project.
 
-The only other knob is whether to make sure all float operations
+The only other knob is whether to make sure float operations
 [canonicalize NaNs](https://github.com/WebAssembly/design/issues/1463).
 
 ```

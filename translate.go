@@ -42,7 +42,7 @@ type translator struct {
 	imports   []importDef
 	functions []funcCompiler
 	memory    *memoryDef
-	table     *tableDef
+	tables    []tableDef
 	globals   []globalDef
 	exports   map[string]export
 	elements  []elemSegment
@@ -101,8 +101,14 @@ func translate(r io.Reader, w io.Writer) error {
 	if t.memory != nil && t.memory.id.Name == "" {
 		t.memory.id.Name = "memory"
 	}
-	if t.table != nil && t.table.id.Name == "" {
-		t.table.id.Name = "table"
+	for i := range t.tables {
+		name := "table"
+		if len(t.tables) != 1 {
+			name = "t" + strconv.Itoa(i)
+		}
+		if t.tables[i].id.Name == "" {
+			t.tables[i].id.Name = name
+		}
 	}
 	for i := range t.globals {
 		if t.globals[i].id.Name == "" {
@@ -426,30 +432,27 @@ func (t *translator) readTableSection() error {
 	if err != nil {
 		return err
 	}
-	if numTabs == 0 {
-		return nil
-	}
-	if numTabs > 1 {
-		return fmt.Errorf("multiple tables not supported")
-	}
 
-	typ, err := t.in.ReadByte()
-	if err != nil {
-		return err
-	}
-	if typ != 0x70 { // funcref
-		return fmt.Errorf("unsupported table type: %x", typ)
-	}
+	t.tables = make([]tableDef, numTabs)
+	for i := range t.tables {
+		typ, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+		if t := wasmType(typ); t != funcref && t != externref {
+			return fmt.Errorf("unsupported table type: %x", typ)
+		}
 
-	min, max, err := t.readLimits(65536) // 1 MiB
-	if err != nil {
-		return err
-	}
+		min, max, err := t.readLimits(65536) // 1 MiB
+		if err != nil {
+			return err
+		}
 
-	t.table = &tableDef{
-		id:  &ast.Ident{},
-		min: int(min),
-		max: int(max),
+		t.tables[i] = tableDef{
+			id:  &ast.Ident{},
+			min: int(min),
+			max: int(max),
+		}
 	}
 	return nil
 }
@@ -520,6 +523,11 @@ func (t *translator) readGlobalSection() error {
 		}
 
 		switch opcode {
+		case 0x23: // global.get
+			g.init, err = t.globalGet()
+			if err != nil {
+				return err
+			}
 		case 0x41: // i32.const
 			g.init, err = t.constI32()
 			if err != nil {
@@ -540,11 +548,21 @@ func (t *translator) readGlobalSection() error {
 			if err != nil {
 				return err
 			}
-		case 0x23: // global.get
-			g.init, err = t.globalGet()
+		case 0xd0: // ref.null
+			_, err := t.in.ReadByte()
 			if err != nil {
 				return err
 			}
+			g.init = newID("nil")
+
+		case 0xd2: // ref.func
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			g.init = &ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: t.functions[i].decl.Name}
 		default:
 			return fmt.Errorf("unsupported global init opcode: %x", opcode)
 		}
@@ -648,11 +666,7 @@ func (t *translator) readExportSection() error {
 			decl := t.functions[index].decl
 			decl.Name = ast.NewIdent(exported(name))
 		case tableExport:
-			id := "Table"
-			if !strings.EqualFold(name, id) {
-				id = exported(name)
-			}
-			t.table.id = ast.NewIdent(id)
+			t.tables[index].id = ast.NewIdent(exported(name))
 		case memoryExport:
 			id := "Memory"
 			if !strings.EqualFold(name, id) {
@@ -1029,9 +1043,6 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			if tableIdx != 0 {
-				return fmt.Errorf("unsupported table index: %d", tableIdx)
-			}
 
 			idx := fn.pop()
 			typ := t.types[typeIdx]
@@ -1043,7 +1054,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			call := &ast.CallExpr{
 				Fun: &ast.TypeAssertExpr{
 					X: &ast.IndexExpr{
-						X:     &ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
+						X:     &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id},
 						Index: convert(idx, "uint32")},
 					Type: typ.toAST()},
 				Args: args}
@@ -1197,6 +1208,27 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					Sel: t.globals[i].id}},
 				Rhs: []ast.Expr{fn.pop()},
 				Tok: token.ASSIGN})
+
+		case 0x25: // table.get
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			fn.push(&ast.IndexExpr{
+				X:     &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id},
+				Index: convert(fn.pop(), "uint32")})
+
+		case 0x26: // table.set
+			i, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			fn.emit(&ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{fn.pop()},
+				Lhs: []ast.Expr{&ast.IndexExpr{
+					X:     &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id},
+					Index: convert(fn.pop(), "uint32")}}})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
 			_, err := readLEB128(t.in) // align
@@ -1647,6 +1679,27 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0xc4: // i64.extend32_s
 			fn.convert("int32", "int64")
 
+		case 0xd0: // ref.null
+			_, err := t.in.ReadByte()
+			if err != nil {
+				return err
+			}
+			fn.pushConst(newID("nil"))
+		case 0xd1: // ref.is_null
+			fn.pushCond(&ast.BinaryExpr{
+				X:  fn.pop(),
+				Op: token.EQL,
+				Y:  newID("nil")})
+		case 0xd2: // ref.func
+			index, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			fn.pushConst(&ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: t.functions[index].decl.Name,
+			})
+
 		case 0xfc:
 			code, err := readLEB128(t.in)
 			if err != nil {
@@ -1747,15 +1800,12 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				if tableIdx != 0 {
-					return fmt.Errorf("unsupported table index: %d", tableIdx)
-				}
 				fn.helpers.add("table_init")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun: newID("table_init"),
 						Args: []ast.Expr{
-							&ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
+							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id},
 							&ast.IndexExpr{
 								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
 								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)}},
@@ -1777,31 +1827,50 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				if dstIdx != 0 || srcIdx != 0 {
-					return fmt.Errorf("unsupported table index")
-				}
 				fn.helpers.add("table_copy")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun: newID("table_copy"),
 						Args: []ast.Expr{
-							&ast.SelectorExpr{X: newID("m"), Sel: t.table.id},
+							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[dstIdx].id},
+							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[srcIdx].id},
 							fn.pop(), fn.pop(), fn.pop()}}})
+
+			case 0x0f: // table.grow
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				fn.helpers.add("table_grow")
+				fn.push(&ast.CallExpr{
+					Fun: newID("table_grow"),
+					Args: []ast.Expr{
+						&ast.UnaryExpr{Op: token.AND, X: &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}},
+						fn.pop(), fn.pop(),
+						&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.tables[idx].max)}}})
 
 			case 0x10: // table.size
 				idx, err := readLEB128(t.in)
 				if err != nil {
 					return err
 				}
-				if idx != 0 {
-					return fmt.Errorf("unsupported table index")
-				}
 				fn.push(convert(&ast.CallExpr{
-					Fun: newID("len"),
-					Args: []ast.Expr{&ast.SelectorExpr{
-						X:   newID("m"),
-						Sel: t.table.id}},
+					Fun:  newID("len"),
+					Args: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}},
 				}, "int32"))
+
+			case 0x11: // table.fill
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				fn.helpers.add("table_fill")
+				fn.emit(&ast.ExprStmt{
+					X: &ast.CallExpr{
+						Fun: newID("table_fill"),
+						Args: []ast.Expr{
+							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id},
+							fn.pop(), fn.pop(), fn.pop()}}})
 
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
@@ -1821,7 +1890,7 @@ func (t *translator) readBlockType() (typ funcType, err error) {
 	switch {
 	case i >= 0:
 		return t.types[i], nil
-	case i >= -4:
+	case i >= -4 || i == -16 || i == -17:
 		typ.results = string([]wasmType{wasmType(i + 128)})
 	case i != -64:
 		err = fmt.Errorf("unsupported block type: %d", i)
@@ -2001,7 +2070,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 			mangle(&buf, string(name))
 			t.out.Name = ast.NewIdent(buf.String())
 
-		case nameFunction, nameGlobal:
+		case nameFunction, nameGlobal, nameTable:
 			count, err := readLEB128(r)
 			if err != nil {
 				return err
@@ -2029,6 +2098,10 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 				case nameGlobal:
 					if int(index) < len(t.globals) {
 						id = t.globals[index].id
+					}
+				case nameTable:
+					if int(index) < len(t.tables) {
+						id = t.tables[index].id
 					}
 				}
 				if id != nil && id.Name == "" {
