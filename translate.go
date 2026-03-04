@@ -1067,12 +1067,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0x0f: // return
-			ret := &ast.ReturnStmt{}
-			if n := len(fn.typ.results); n > 0 {
-				ret.Results = append(ret.Results, fn.stack.last(n)...)
+			if !blk.unreachable {
+				ret := &ast.ReturnStmt{}
+				if n := len(fn.typ.results); n > 0 {
+					ret.Results = append(ret.Results, fn.stack.last(n)...)
+				}
+				fn.emit(ret)
+				blk.unreachable = true // After an uncoditional return.
 			}
-			fn.emit(ret)
-			blk.unreachable = true // After an uncoditional return.
 
 		case 0x1a: // drop
 			fn.emit(&ast.AssignStmt{
