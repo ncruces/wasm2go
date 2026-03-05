@@ -728,6 +728,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 	// Declare local variables.
 	// Parameters are predeclared locals.
+	vars := make([]ast.Expr, 0, numVars)
 	numLocals := len(fn.typ.params)
 	for range numVars {
 		n, err := readLEB128(t.in)
@@ -740,10 +741,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		}
 
 		ids := make([]*ast.Ident, n)
-		rhs := make([]ast.Expr, n)
 		for i := range int(n) {
 			ids[i] = localVar(numLocals)
-			rhs[i] = ids[i]
+			vars = append(vars, ids[i])
 			numLocals++
 		}
 		body.List = append(body.List, &ast.DeclStmt{
@@ -752,11 +752,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Specs: []ast.Spec{
 					&ast.ValueSpec{
 						Names: ids,
-						Type:  wasmType(typ).Ident()}}},
-		}, &ast.AssignStmt{
-			Lhs: slices.Repeat([]ast.Expr{newID("_")}, int(n)),
+						Type:  wasmType(typ).Ident()}}}})
+	}
+	// Ensure local variables are used.
+	if len(vars) > 0 {
+		fn.emit(&ast.AssignStmt{
 			Tok: token.ASSIGN,
-			Rhs: rhs})
+			Lhs: slices.Repeat([]ast.Expr{newID("_")}, len(vars)),
+			Rhs: vars})
 	}
 
 	for {
@@ -801,11 +804,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Specs: []ast.Spec{
 							&ast.ValueSpec{
 								Names: []*ast.Ident{tmp},
-								Type:  wasmType(t).Ident()}}}},
-					&ast.AssignStmt{
-						Tok: token.ASSIGN,
-						Lhs: []ast.Expr{newID("_")},
-						Rhs: []ast.Expr{tmp}})
+								Type:  wasmType(t).Ident()}}}})
+			}
+			// Ensure results are used.
+			if len(results) > 0 {
+				fn.emit(&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: slices.Repeat([]ast.Expr{newID("_")}, len(results)),
+					Rhs: results})
 			}
 
 			childBlk := funcBlock{
@@ -1713,8 +1719,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			fn.pushConst(&ast.SelectorExpr{
 				X:   newID("m"),
-				Sel: t.functions[index].decl.Name,
-			})
+				Sel: t.functions[index].decl.Name})
 
 		case 0xfc:
 			code, err := readLEB128(t.in)

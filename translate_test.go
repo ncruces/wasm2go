@@ -13,7 +13,7 @@ import (
 
 func Test_translate(t *testing.T) {
 	tests := []string{"fib", "memory", "primes", "recursion", "stack", "table", "trig"}
-
+	*nanbox = false
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
 			path := "testdata/" + name + "/" + name
@@ -39,6 +39,7 @@ func Test_translate(t *testing.T) {
 }
 
 func Test_translateSpecTest(t *testing.T) {
+	*nanbox = true
 	filepath.WalkDir("spectest/", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
@@ -64,7 +65,7 @@ func Test_translateSpecTest(t *testing.T) {
 				return nil
 			}
 
-			err = translateSpecTest(path)
+			err = generateSpecTest(path)
 			if err != nil {
 				t.Errorf("%s: %v", path, err)
 				return nil
@@ -74,7 +75,7 @@ func Test_translateSpecTest(t *testing.T) {
 	})
 }
 
-func translateSpecTest(path string) error {
+func generateSpecTest(path string) error {
 	dir := filepath.Dir(path)
 	baseDir := filepath.Base(dir)
 	wasmFile := filepath.Base(path)

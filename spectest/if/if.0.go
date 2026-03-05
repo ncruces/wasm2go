@@ -90,11 +90,9 @@ func (m *Module) Xmulti(v0 int32) (int32, int32) {
 	}
 	t4 := v0
 	var t5 int32
-	_ = t5
 	var t6 int64
-	_ = t6
 	var t7 int32
-	_ = t7
+	_, _, _ = t5, t6, t7
 	if t4 != 0 {
 		m.f0()
 		m.f0()
@@ -700,9 +698,8 @@ func (m *Module) Xas_compare_operand(v0 int32, v1 int32) int32 {
 func (m *Module) Xas_binary_operands(v0 int32) int32 {
 	t0 := v0
 	var t1 int32
-	_ = t1
 	var t2 int32
-	_ = t2
+	_, _ = t1, t2
 	if t0 != 0 {
 		m.f0()
 		m.f0()
@@ -718,9 +715,8 @@ func (m *Module) Xas_binary_operands(v0 int32) int32 {
 func (m *Module) Xas_compare_operands(v0 int32) int32 {
 	t0 := v0
 	var t1 float32
-	_ = t1
 	var t2 float32
-	_ = t2
+	_, _ = t1, t2
 	if t0 != 0 {
 		m.f0()
 		m.f0()
@@ -739,9 +735,8 @@ func (m *Module) Xas_compare_operands(v0 int32) int32 {
 func (m *Module) Xas_mixed_operands(v0 int32) int32 {
 	t0 := v0
 	var t1 int32
-	_ = t1
 	var t2 int32
-	_ = t2
+	_, _ = t1, t2
 	if t0 != 0 {
 		m.f0()
 		m.f0()
@@ -841,11 +836,9 @@ l0:
 func (m *Module) Xbreak_multi_value(v0 int32) (int32, int32, int64) {
 	t0 := v0
 	var t1 int32
-	_ = t1
 	var t2 int32
-	_ = t2
 	var t3 int64
-	_ = t3
+	_, _, _ = t1, t2, t3
 	if t0 != 0 {
 		t1, t2, t3 = int32(18), i32_const(-18), int64(18)
 		goto l0
@@ -887,9 +880,8 @@ func (m *Module) Xparams(v0 int32) int32 {
 func (m *Module) Xparams_id(v0 int32) int32 {
 	t0 := v0
 	var t1 int32
-	_ = t1
 	var t2 int32
-	_ = t2
+	_, _ = t1, t2
 	t4, t3 := int32(1), int32(2)
 	if t0 != 0 {
 		t1, t2 = t4, t3
@@ -936,9 +928,8 @@ l0:
 func (m *Module) Xparams_id_break(v0 int32) int32 {
 	t0 := v0
 	var t1 int32
-	_ = t1
 	var t2 int32
-	_ = t2
+	_, _ = t1, t2
 	t4, t3 := int32(1), int32(2)
 	if t0 != 0 {
 		t1, t2 = t4, t3
@@ -1038,11 +1029,9 @@ func (m *Module) Xtype_use() {
 		_ = t1
 	}
 	var t2 int32
-	_ = t2
 	var t3 float64
-	_ = t3
 	var t4 int32
-	_ = t4
+	_, _, _ = t2, t3, t4
 	t7, t6, t5 := i32_const(0), f64_const(0), i32_const(0)
 	if int32(1) != 0 {
 		t2, t3, t4 = t7, t6, t5
@@ -1066,11 +1055,9 @@ func (m *Module) Xtype_use() {
 		_ = t9
 	}
 	var t10 int32
-	_ = t10
 	var t11 float64
-	_ = t11
 	var t12 int32
-	_ = t12
+	_, _, _ = t10, t11, t12
 	t15, t14, t13 := i32_const(0), f64_const(0), i32_const(0)
 	if int32(1) != 0 {
 		t10, t11, t12 = t15, t14, t13

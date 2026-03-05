@@ -33,29 +33,22 @@ func (m *Module) f8() {
 }
 func (m *Module) f9() {
 	var v0 int32
-	_ = v0
 	var v1 float64
-	_ = v1
 	var v2 int64
-	_ = v2
+	_, _, _ = v0, v1, v2
 }
 func (m *Module) f10() {
 	var v0 int32
-	_ = v0
 	var v1 float64
-	_ = v1
+	_, _ = v0, v1
 }
 func (m *Module) f11() {
 	var v0 int32
-	_ = v0
 	var v1 float32
-	_ = v1
 	var v2 int64
-	_ = v2
 	var v3 int32
-	_ = v3
 	var v4 float64
-	_ = v4
+	_, _, _, _, _ = v0, v1, v2, v3, v4
 }
 func (m *Module) f12() {
 }
@@ -98,32 +91,22 @@ func (m *Module) f28() {
 }
 func (m *Module) f29(v0 int32, v1 float32, v2 int64, v3 int32) int32 {
 	var v4 float32
-	_ = v4
 	var v5 int32
-	_ = v5
 	var v6 int64
-	_ = v6
 	var v7 int32
-	_ = v7
 	var v8 float64
-	_ = v8
 	var v9 int32
-	_ = v9
+	_, _, _, _, _, _ = v4, v5, v6, v7, v8, v9
 	panic("unreachable")
 }
 func (m *Module) f30() {
 	var v0 float32
-	_ = v0
 	var v1 int32
-	_ = v1
 	var v2 int64
-	_ = v2
 	var v3 int32
-	_ = v3
 	var v4 float64
-	_ = v4
 	var v5 int32
-	_ = v5
+	_, _, _, _, _, _ = v0, v1, v2, v3, v4, v5
 	panic("unreachable")
 }
 func (m *Module) Xlocal_first_i32() int32 {
@@ -176,17 +159,12 @@ func (m *Module) Xlocal_second_f64() float64 {
 }
 func (m *Module) Xlocal_mixed() float64 {
 	var v0 float32
-	_ = v0
 	var v1 int32
-	_ = v1
 	var v2 int64
-	_ = v2
 	var v3 int32
-	_ = v3
 	var v4 float64
-	_ = v4
 	var v5 int32
-	_ = v5
+	_, _, _, _, _, _ = v0, v1, v2, v3, v4, v5
 	t0 := v0
 	t1 := -t0
 	_ = t1

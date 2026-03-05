@@ -48,11 +48,9 @@ func (m *Module) Xtype_param_f64(v0 float64) {
 }
 func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) {
 	var v5 float32
-	_ = v5
 	var v6, v7 int64
-	_, _ = v6, v7
 	var v8 float64
-	_ = v8
+	_, _, _, _ = v5, v6, v7, v8
 	v0 = i64_const(0)
 	v1 = f32_const(0)
 	v2 = f64_const(0)
@@ -65,11 +63,9 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 }
 func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) int64 {
 	var v5 float32
-	_ = v5
 	var v6, v7 int64
-	_, _ = v6, v7
 	var v8 float64
-	_ = v8
+	_, _, _, _ = v5, v6, v7, v8
 	v1 = float32(-0.3)
 	v3 = int32(40)
 	v4 = i32_const(-7)

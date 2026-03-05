@@ -61,11 +61,9 @@ func (m *Module) Xmulti() int32 {
 	}
 	_ = t0
 	var t1 int32
-	_ = t1
 	var t2 int64
-	_ = t2
 	var t3 int32
-	_ = t3
+	_, _, _ = t1, t2, t3
 	{
 		m.f0()
 		m.f0()
@@ -679,9 +677,8 @@ func (m *Module) Xas_compare_operand() int32 {
 }
 func (m *Module) Xas_binary_operands() int32 {
 	var t0 int32
-	_ = t0
 	var t1 int32
-	_ = t1
+	_, _ = t0, t1
 	{
 		m.f0()
 		m.f0()
@@ -692,9 +689,8 @@ func (m *Module) Xas_binary_operands() int32 {
 }
 func (m *Module) Xas_compare_operands() int32 {
 	var t0 float32
-	_ = t0
 	var t1 float32
-	_ = t1
+	_, _ = t0, t1
 	{
 		m.f0()
 		m.f0()
@@ -708,9 +704,8 @@ func (m *Module) Xas_compare_operands() int32 {
 }
 func (m *Module) Xas_mixed_operands() int32 {
 	var t0 int32
-	_ = t0
 	var t1 int32
-	_ = t1
+	_, _ = t0, t1
 	{
 		m.f0()
 		m.f0()
@@ -775,11 +770,9 @@ l0:
 }
 func (m *Module) Xbreak_multi_value() (int32, int32, int64) {
 	var t0 int32
-	_ = t0
 	var t1 int32
-	_ = t1
 	var t2 int64
-	_ = t2
+	_, _, _ = t0, t1, t2
 	{
 		_, _, _ = i32_const(0), i32_const(0), i64_const(0)
 		{
@@ -943,9 +936,8 @@ func (m *Module) Xparams() int32 {
 }
 func (m *Module) Xparams_id() int32 {
 	var t0 int32
-	_ = t0
 	var t1 int32
-	_ = t1
+	_, _ = t0, t1
 	t3, t2 := int32(1), int32(2)
 	{
 		t0, t1 = t3, t2
@@ -997,9 +989,8 @@ func (m *Module) Xparams_id_break() int32 {
 	_ = v0
 	v0 = i32_const(0)
 	var t0 int32
-	_ = t0
 	var t1 int32
-	_ = t1
+	_, _ = t0, t1
 	t3, t2 := int32(1), int32(2)
 l0:
 	{
@@ -1155,11 +1146,9 @@ func (m *Module) Xtype_use() {
 		_ = t1
 	}
 	var t2 int32
-	_ = t2
 	var t3 float64
-	_ = t3
 	var t4 int32
-	_ = t4
+	_, _, _ = t2, t3, t4
 	t7, t6, t5 := i32_const(0), f64_const(0), i32_const(0)
 	{
 		t2, t3, t4 = t7, t6, t5
@@ -1177,11 +1166,9 @@ func (m *Module) Xtype_use() {
 		_ = t9
 	}
 	var t10 int32
-	_ = t10
 	var t11 float64
-	_ = t11
 	var t12 int32
-	_ = t12
+	_, _, _ = t10, t11, t12
 	t15, t14, t13 := i32_const(0), f64_const(0), i32_const(0)
 	{
 		t10, t11, t12 = t15, t14, t13

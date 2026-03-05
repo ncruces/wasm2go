@@ -51,11 +51,9 @@ func (m *Module) Xtype_param_f64(v0 float64) float64 {
 }
 func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) {
 	var v5 float32
-	_ = v5
 	var v6, v7 int64
-	_, _ = v6, v7
 	var v8 float64
-	_ = v8
+	_, _, _, _ = v5, v6, v7, v8
 	t0 := v0
 	var t1 int32
 	if t0 == 0 {
@@ -101,11 +99,9 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 }
 func (m *Module) Xread(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) float64 {
 	var v5 float32
-	_ = v5
 	var v6, v7 int64
-	_, _ = v6, v7
 	var v8 float64
-	_ = v8
+	_, _, _, _ = v5, v6, v7, v8
 	v5 = float32(5.5)
 	v6 = int64(6)
 	v8 = float64(8)

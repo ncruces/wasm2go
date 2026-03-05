@@ -81,5 +81,5 @@ Usage of wasm2go:
   -endian string
         endianness of the generated code (big or little)
   -nanbox
-        whether to canonicalize NaNs (default true)
+        whether to canonicalize NaNs
 ```

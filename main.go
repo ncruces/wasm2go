@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	nanbox = flag.Bool("nanbox", true, "whether to canonicalize NaNs")
+	nanbox = flag.Bool("nanbox", false, "whether to canonicalize NaNs")
 	endian = flag.String("endian", "", "endianness of the generated code (big or little)")
 )
 

@@ -112,9 +112,8 @@ l0:
 }
 func (m *Module) Xtype_f64_f64_value() (float64, float64) {
 	var t0 float64
-	_ = t0
 	var t1 float64
-	_ = t1
+	_, _ = t0, t1
 	{
 		t0, t1 = float64(4), float64(5)
 		goto l0
