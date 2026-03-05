@@ -655,6 +655,7 @@ func (m *Module) Xas_store_everywhere(v0 int32, v1 int32) {
 	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], uint32(t1))
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {

@@ -79,13 +79,13 @@ func (m *Module) Xf32_nearest(v0 float32) float32 {
 func (m *Module) Xf32_min(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	t2 := min(t0, t1)
+	t2 := f32_min(t0, t1)
 	return t2
 }
 func (m *Module) Xf32_max(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	t2 := max(t0, t1)
+	t2 := f32_max(t0, t1)
 	return t2
 }
 func (m *Module) Xf64_add(v0 float64, v1 float64) float64 {
@@ -156,20 +156,54 @@ func (m *Module) Xf64_nearest(v0 float64) float64 {
 func (m *Module) Xf64_min(v0 float64, v1 float64) float64 {
 	t0 := v0
 	t1 := v1
-	t2 := min(t0, t1)
+	t2 := f64_min(t0, t1)
 	return t2
 }
 func (m *Module) Xf64_max(v0 float64, v1 float64) float64 {
 	t0 := v0
 	t1 := v1
-	t2 := max(t0, t1)
+	t2 := f64_max(t0, t1)
 	return t2
 }
 
+//go:nosplit
 func f32_abs(x float32) float32 {
 	return math.Float32frombits(math.Float32bits(x) &^ (1 << 31))
 }
 
+//go:nosplit
 func f32_copysign(x, y float32) float32 {
 	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
+}
+
+//go:nosplit
+func f32_min(x, y float32) float32 {
+	if m := min(x, y); m == m {
+		return m
+	}
+	return math.Float32frombits(0x7fc00000)
+}
+
+//go:nosplit
+func f32_max(x, y float32) float32 {
+	if m := max(x, y); m == m {
+		return m
+	}
+	return math.Float32frombits(0x7fc00000)
+}
+
+//go:nosplit
+func f64_min(x, y float64) float64 {
+	if m := min(x, y); m == m {
+		return m
+	}
+	return math.Float64frombits(0x7ff8000000000000)
+}
+
+//go:nosplit
+func f64_max(x, y float64) float64 {
+	if m := max(x, y); m == m {
+		return m
+	}
+	return math.Float64frombits(0x7ff8000000000000)
 }

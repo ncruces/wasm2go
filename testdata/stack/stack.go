@@ -55,4 +55,5 @@ func (m *Module) Xtee_for_two(v0 int32, v1 int32) (int32, int32) {
 	return t4, t5
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

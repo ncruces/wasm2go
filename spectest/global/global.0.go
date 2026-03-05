@@ -360,8 +360,10 @@ func (m *Module) Xas_compare_operand() int32 {
 	return t1
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {

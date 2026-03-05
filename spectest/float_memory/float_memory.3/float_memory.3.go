@@ -37,6 +37,7 @@ func (m *Module) Xreset() {
 	binary.LittleEndian.PutUint64(m.memory[uint32(int32(1)):], uint64(i64_const(0)))
 }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }
 
 const data0 = "\x00\x00\x00\x00\x00\x00\x00\xf4\x7f"

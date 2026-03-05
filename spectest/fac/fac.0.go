@@ -158,4 +158,5 @@ l0:
 	}
 }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }

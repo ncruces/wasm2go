@@ -228,29 +228,35 @@ func (m *Module) Xge_u(v0 int32, v1 int32) int32 {
 	return t2
 }
 
+//go:nosplit
 func i32_div_s(x, y int32) int32 {
-	if x == math.MinInt32 && y == -1 {
+	if y == -1 && x == math.MinInt32 {
 		panic("integer overflow")
 	}
 	return x / y
 }
 
+//go:nosplit
 func i32_shl(x, y int32) int32 {
 	return x << (y & 31)
 }
 
+//go:nosplit
 func i32_shr_s(x, y int32) int32 {
 	return x >> (y & 31)
 }
 
+//go:nosplit
 func i32_shr_u(x, y int32) int32 {
 	return int32(uint32(x) >> (y & 31))
 }
 
+//go:nosplit
 func i32_rotl(x, y int32) int32 {
 	return int32(bits.RotateLeft32(uint32(x), +int(y)&31))
 }
 
+//go:nosplit
 func i32_rotr(x, y int32) int32 {
 	return int32(bits.RotateLeft32(uint32(x), -int(y)&31))
 }

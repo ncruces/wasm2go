@@ -528,4 +528,5 @@ func (m *Module) Xredefinition() int32 {
 	return t0
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

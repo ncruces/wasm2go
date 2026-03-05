@@ -22,19 +22,23 @@ func (m *Module) Xi64_no_fold_div_neg1(v0 int64) int64 {
 	return t1
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }
 
+//go:nosplit
 func i32_div_s(x, y int32) int32 {
-	if x == math.MinInt32 && y == -1 {
+	if y == -1 && x == math.MinInt32 {
 		panic("integer overflow")
 	}
 	return x / y
 }
 
+//go:nosplit
 func i64_div_s(x, y int64) int64 {
-	if x == math.MinInt64 && y == -1 {
+	if y == -1 && x == math.MinInt64 {
 		panic("integer overflow")
 	}
 	return x / y

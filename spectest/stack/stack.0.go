@@ -172,6 +172,8 @@ func (m *Module) Xnot_quite_a_tree() int32 {
 	return t2
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }

@@ -296,7 +296,7 @@ func i32_trunc_sat_f64_u(f float64) int32 {
 	var i uint32
 	switch {
 	case x < 0 || math.IsNaN(x):
-
+		i = 0
 	case x > math.MaxUint32:
 		i = math.MaxUint32
 	default:
@@ -310,7 +310,7 @@ func i32_trunc_sat_f32_u(f float32) int32 {
 	var i uint32
 	switch {
 	case x < 0 || math.IsNaN(x):
-
+		i = 0
 	case x > math.MaxUint32:
 		i = math.MaxUint32
 	default:
@@ -350,7 +350,7 @@ func i64_trunc_sat_f64_u(f float64) int64 {
 	var i uint64
 	switch {
 	case x < 0 || math.IsNaN(x):
-
+		i = 0
 	case x >= math.MaxUint64:
 		i = math.MaxUint64
 	default:
@@ -364,7 +364,7 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 	var i uint64
 	switch {
 	case x < 0 || math.IsNaN(x):
-
+		i = 0
 	case x >= math.MaxUint64:
 		i = math.MaxUint64
 	default:

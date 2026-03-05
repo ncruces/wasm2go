@@ -54,4 +54,5 @@ func (m *Module) Xis_odd(v0 int32) int32 {
 	return t2
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

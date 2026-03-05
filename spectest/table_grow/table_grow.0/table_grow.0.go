@@ -23,13 +23,13 @@ func (m *Module) Xset(v0 int32, v1 any) {
 func (m *Module) Xgrow(v0 int32, v1 any) int32 {
 	t0 := v1
 	t1 := v0
-	t2 := table_grow(&m.table, t1, t0, 65536)
+	t2 := table_grow(&m.table, t0, t1, 65536)
 	return t2
 }
 func (m *Module) Xgrow_abbrev(v0 int32, v1 any) int32 {
 	t0 := v1
 	t1 := v0
-	t2 := table_grow(&m.table, t1, t0, 65536)
+	t2 := table_grow(&m.table, t0, t1, 65536)
 	return t2
 }
 func (m *Module) Xsize() int32 {
@@ -37,7 +37,7 @@ func (m *Module) Xsize() int32 {
 	return t0
 }
 
-func table_grow(tab *[]any, delta int32, val any, max int32) int32 {
+func table_grow(tab *[]any, val any, delta, max int32) int32 {
 	buf := *tab
 	len := len(buf)
 	old := int32(len)

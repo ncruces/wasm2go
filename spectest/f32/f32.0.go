@@ -43,13 +43,13 @@ func (m *Module) Xsqrt(v0 float32) float32 {
 func (m *Module) Xmin(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	t2 := min(t0, t1)
+	t2 := f32_min(t0, t1)
 	return t2
 }
 func (m *Module) Xmax(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	t2 := max(t0, t1)
+	t2 := f32_max(t0, t1)
 	return t2
 }
 func (m *Module) Xceil(v0 float32) float32 {
@@ -71,4 +71,20 @@ func (m *Module) Xnearest(v0 float32) float32 {
 	t0 := v0
 	t1 := float32(math.RoundToEven(float64(t0)))
 	return t1
+}
+
+//go:nosplit
+func f32_min(x, y float32) float32 {
+	if m := min(x, y); m == m {
+		return m
+	}
+	return math.Float32frombits(0x7fc00000)
+}
+
+//go:nosplit
+func f32_max(x, y float32) float32 {
+	if m := max(x, y); m == m {
+		return m
+	}
+	return math.Float32frombits(0x7fc00000)
 }

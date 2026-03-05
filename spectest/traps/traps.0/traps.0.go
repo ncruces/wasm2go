@@ -36,15 +36,17 @@ func (m *Module) Xno_dce_i64_div_u(v0 int64, v1 int64) {
 	_ = t2
 }
 
+//go:nosplit
 func i32_div_s(x, y int32) int32 {
-	if x == math.MinInt32 && y == -1 {
+	if y == -1 && x == math.MinInt32 {
 		panic("integer overflow")
 	}
 	return x / y
 }
 
+//go:nosplit
 func i64_div_s(x, y int64) int64 {
-	if x == math.MinInt64 && y == -1 {
+	if y == -1 && x == math.MinInt64 {
 		panic("integer overflow")
 	}
 	return x / y

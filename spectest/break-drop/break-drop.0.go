@@ -33,4 +33,5 @@ func (m *Module) Xbr_table() {
 l0:
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

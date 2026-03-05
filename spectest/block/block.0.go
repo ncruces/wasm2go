@@ -1010,8 +1010,10 @@ func (m *Module) Xtype_use() {
 	_ = t5
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func f64_const(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x

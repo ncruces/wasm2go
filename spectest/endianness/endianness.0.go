@@ -195,20 +195,25 @@ func (m *Module) Xf64_store(v0 float64) float64 {
 	return t2
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i32_shl(x, y int32) int32 {
 	return x << (y & 31)
 }
 
+//go:nosplit
 func i32_shr_u(x, y int32) int32 {
 	return int32(uint32(x) >> (y & 31))
 }
 
+//go:nosplit
 func i64_shl(x, y int64) int64 {
 	return x << (y & 63)
 }
 
+//go:nosplit
 func i64_shr_u(x, y int64) int64 {
 	return int64(uint64(x) >> (y & 63))
 }

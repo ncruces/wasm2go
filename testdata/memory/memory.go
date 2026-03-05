@@ -30,7 +30,7 @@ func (m *Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	memory_fill(m.Memory, t2, t1, t0)
+	memory_fill(m.Memory, t0, t1, t2)
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
 	t0 := v0
@@ -59,15 +59,16 @@ func memory_grow(mem *[]byte, delta, max int32) int32 {
 	return old
 }
 
-func memory_fill(mem []byte, n, val, dest int32) {
+func memory_fill(mem []byte, dest, val, n int32) {
 	x := uint(uint32(dest))
 	y := x + uint(uint32(n))
-
 	buf := mem[x:y]
-	buf[0] = byte(val)
-	for i := 1; i < len(buf); {
-		chunk := min(i, 8192)
-		i += copy(buf[i:], buf[:chunk])
+	if len(buf) > 0 {
+		buf[0] = byte(val)
+		for i := 1; i < len(buf); {
+			chunk := min(i, 8192)
+			i += copy(buf[i:], buf[:chunk])
+		}
 	}
 }
 

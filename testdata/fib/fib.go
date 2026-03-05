@@ -46,4 +46,5 @@ l0:
 	return t4
 }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }

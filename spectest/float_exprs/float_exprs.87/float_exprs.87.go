@@ -48,11 +48,13 @@ l0:
 	return t4
 }
 
+//go:nosplit
 func f32_const(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
+//go:nosplit
 func f64_const(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x

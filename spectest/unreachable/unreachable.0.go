@@ -317,8 +317,10 @@ func (m *Module) Xas_memory_grow_size() int32 {
 	panic("unreachable")
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func f32_const(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x

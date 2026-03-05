@@ -233,29 +233,35 @@ func (m *Module) Xge_u(v0 int64, v1 int64) int32 {
 	return t2
 }
 
+//go:nosplit
 func i64_div_s(x, y int64) int64 {
-	if x == math.MinInt64 && y == -1 {
+	if y == -1 && x == math.MinInt64 {
 		panic("integer overflow")
 	}
 	return x / y
 }
 
+//go:nosplit
 func i64_shl(x, y int64) int64 {
 	return x << (y & 63)
 }
 
+//go:nosplit
 func i64_shr_s(x, y int64) int64 {
 	return x >> (y & 63)
 }
 
+//go:nosplit
 func i64_shr_u(x, y int64) int64 {
 	return int64(uint64(x) >> (y & 63))
 }
 
+//go:nosplit
 func i64_rotl(x, y int64) int64 {
 	return int64(bits.RotateLeft64(uint64(x), +int(y)&63))
 }
 
+//go:nosplit
 func i64_rotr(x, y int64) int64 {
 	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
 }

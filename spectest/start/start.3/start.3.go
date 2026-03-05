@@ -30,6 +30,7 @@ func (m *Module) f2() {
 	m.Xinc()
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
 const data0 = "A"

@@ -28,10 +28,12 @@ func (m *Module) Xcopysign(v0 float32, v1 float32) float32 {
 	return t2
 }
 
+//go:nosplit
 func f32_abs(x float32) float32 {
 	return math.Float32frombits(math.Float32bits(x) &^ (1 << 31))
 }
 
+//go:nosplit
 func f32_copysign(x, y float32) float32 {
 	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }

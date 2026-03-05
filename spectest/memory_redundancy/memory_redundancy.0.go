@@ -72,4 +72,5 @@ func (m *Module) Xmalloc_aliasing() int32 {
 	return t5
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

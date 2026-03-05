@@ -33,26 +33,26 @@ func (m *Module) Xsize_t3() int32 {
 }
 func (m *Module) Xgrow_t0(v0 int32) {
 	t0 := v0
-	t1 := table_grow(&m.t0, t0, nil, 65536)
+	t1 := table_grow(&m.t0, nil, t0, 65536)
 	_ = t1
 }
 func (m *Module) Xgrow_t1(v0 int32) {
 	t0 := v0
-	t1 := table_grow(&m.t1, t0, nil, 65536)
+	t1 := table_grow(&m.t1, nil, t0, 65536)
 	_ = t1
 }
 func (m *Module) Xgrow_t2(v0 int32) {
 	t0 := v0
-	t1 := table_grow(&m.t2, t0, nil, 2)
+	t1 := table_grow(&m.t2, nil, t0, 2)
 	_ = t1
 }
 func (m *Module) Xgrow_t3(v0 int32) {
 	t0 := v0
-	t1 := table_grow(&m.t3, t0, nil, 8)
+	t1 := table_grow(&m.t3, nil, t0, 8)
 	_ = t1
 }
 
-func table_grow(tab *[]any, delta int32, val any, max int32) int32 {
+func table_grow(tab *[]any, val any, delta, max int32) int32 {
 	buf := *tab
 	len := len(buf)
 	old := int32(len)

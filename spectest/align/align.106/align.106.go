@@ -496,4 +496,5 @@ l7:
 	return t93
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

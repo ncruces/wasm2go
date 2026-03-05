@@ -72,16 +72,28 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 				for i, arg := range cmd.Action.Args {
 					switch arg.Type {
 					case "i32":
-						v, _ := strconv.ParseUint(arg.Value, 10, 32)
+						v, err := strconv.ParseUint(arg.Value, 10, 32)
+						if err != nil {
+							t.Fatal(err)
+						}
 						args[i] = reflect.ValueOf(int32(v))
 					case "i64":
-						v, _ := strconv.ParseUint(arg.Value, 10, 64)
+						v, err := strconv.ParseUint(arg.Value, 10, 64)
+						if err != nil {
+							t.Fatal(err)
+						}
 						args[i] = reflect.ValueOf(int64(v))
 					case "f32":
-						v, _ := strconv.ParseUint(arg.Value, 10, 32)
+						v, err := strconv.ParseUint(arg.Value, 10, 32)
+						if err != nil {
+							t.Fatal(err)
+						}
 						args[i] = reflect.ValueOf(math.Float32frombits(uint32(v)))
 					case "f64":
-						v, _ := strconv.ParseUint(arg.Value, 10, 64)
+						v, err := strconv.ParseUint(arg.Value, 10, 64)
+						if err != nil {
+							t.Fatal(err)
+						}
 						args[i] = reflect.ValueOf(math.Float64frombits(uint64(v)))
 					case "funcref", "externref":
 						if arg.Value == "null" {
@@ -98,37 +110,59 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 					for i, exp := range cmd.Expected {
 						switch exp.Type {
 						case "i32":
-							v, _ := strconv.ParseUint(exp.Value, 10, 32)
+							v, err := strconv.ParseUint(exp.Value, 10, 32)
+							if err != nil {
+								t.Fatal(err)
+							}
 							if got, want := res[i].Interface().(int32), int32(v); got != want {
 								t.Errorf("got %d, want %d", got, want)
 							}
 						case "i64":
-							v, _ := strconv.ParseUint(exp.Value, 10, 64)
+							v, err := strconv.ParseUint(exp.Value, 10, 64)
+							if err != nil {
+								t.Fatal(err)
+							}
 							if got, want := res[i].Interface().(int64), int64(v); got != want {
 								t.Errorf("got %d, want %d", got, want)
 							}
 						case "f32":
-							f := res[i].Interface().(float32)
-							if strings.Contains(exp.Value, "nan") {
-								if f == f {
-									t.Errorf("got %f, want NaN", f)
+							f := math.Float32bits(res[i].Interface().(float32))
+							switch exp.Value {
+							case "nan:canonical":
+								if f != 0xffc00000 && f != 0x7fc00000 {
+									t.Errorf("got %x, want nan:canonical", f)
 								}
-							} else {
-								v, _ := strconv.ParseUint(exp.Value, 10, 32)
-								if got, want := math.Float32bits(f), uint32(v); got != want {
-									t.Errorf("got %d, want %d", got, want)
+							case "nan:arithmetic":
+								if f&0x7fc00000 != 0x7fc00000 {
+									t.Errorf("got %x, want nan:arithmetic", f)
+								}
+							default:
+								v, err := strconv.ParseUint(exp.Value, 10, 32)
+								if err != nil {
+									t.Fatal(err)
+								}
+								if f != uint32(v) {
+									t.Errorf("got %d, want %d", f, uint32(v))
 								}
 							}
 						case "f64":
-							f := res[i].Interface().(float64)
-							if strings.Contains(exp.Value, "nan") {
-								if f == f {
-									t.Errorf("got %f, want NaN", f)
+							f := math.Float64bits(res[i].Interface().(float64))
+							switch exp.Value {
+							case "nan:canonical":
+								if f != 0xfff8000000000000 && f != 0x7ff8000000000000 {
+									t.Errorf("got %x, want nan:canonical", f)
 								}
-							} else {
-								v, _ := strconv.ParseUint(exp.Value, 10, 64)
-								if got, want := math.Float64bits(f), uint64(v); got != want {
-									t.Errorf("got %d, want %d", got, want)
+							case "nan:arithmetic":
+								if f&0x7ff8000000000000 != 0x7ff8000000000000 {
+									t.Errorf("got %x, want nan:arithmetic", f)
+								}
+							default:
+								v, err := strconv.ParseUint(exp.Value, 10, 64)
+								if err != nil {
+									t.Fatal(err)
+								}
+								if f != uint64(v) {
+									t.Errorf("got %d, want %d", f, uint64(v))
 								}
 							}
 						}

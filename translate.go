@@ -149,7 +149,7 @@ func translate(r io.Reader, w io.Writer) error {
 		specs := make([]ast.Spec, len(t.data))
 		for i, seg := range t.data {
 			specs[i] = &ast.ValueSpec{
-				Names: []*ast.Ident{dataId(i)},
+				Names: []*ast.Ident{dataID(i)},
 				Values: []ast.Expr{&ast.BasicLit{
 					Kind:  token.STRING,
 					Value: strconv.Quote(string(seg.init)),
@@ -1576,9 +1576,17 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x95: // f32.div
 			fn.binOpF32(token.QUO) // go.dev/issue/43577
 		case 0x96: // f32.min
-			fn.binBuiltin("min")
+			if *nanbox {
+				fn.binHelper("f32_min")
+			} else {
+				fn.binBuiltin("min")
+			}
 		case 0x97: // f32.max
-			fn.binBuiltin("max")
+			if *nanbox {
+				fn.binHelper("f32_max")
+			} else {
+				fn.binBuiltin("max")
+			}
 		case 0x98: // f32.copysign
 			fn.binHelper("f32_copysign")
 
@@ -1605,9 +1613,17 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0xa3: // f64.div
 			fn.binOpF64(token.QUO) // go.dev/issue/43577
 		case 0xa4: // f64.min
-			fn.binBuiltin("min")
+			if *nanbox {
+				fn.binHelper("f64_min")
+			} else {
+				fn.binBuiltin("min")
+			}
 		case 0xa5: // f64.max
-			fn.binBuiltin("max")
+			if *nanbox {
+				fn.binHelper("f64_max")
+			} else {
+				fn.binBuiltin("max")
+			}
 		case 0xa6: // f64.copysign
 			fn.binMath64("Copysign")
 
@@ -1732,14 +1748,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-
+				n := fn.pop()
+				src := fn.pop()
+				dst := fn.pop()
 				fn.helpers.add("memory_init")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun: newID("memory_init"),
 						Args: []ast.Expr{
 							&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-							dataId(i), fn.pop(), fn.pop(), fn.pop()}}})
+							dataID(i), dst, src, n}}})
 
 			case 0x09: // data.drop
 				// No-op since data segments are constants.
@@ -1757,13 +1775,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
+				n := fn.pop()
+				src := fn.pop()
+				dst := fn.pop()
 				fn.helpers.add("memory_copy")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun: newID("memory_copy"),
 						Args: []ast.Expr{
 							&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-							fn.pop(), fn.pop(), fn.pop()}}})
+							dst, src, n}}})
 
 			case 0x0b: // memory.fill
 				_, err := readLEB128(t.in)
@@ -1780,7 +1801,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							Fun: newID("memory_zero"),
 							Args: []ast.Expr{
 								&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-								n, dest}}})
+								dest, n}}})
 				} else {
 					fn.helpers.add("memory_fill")
 					fn.emit(&ast.ExprStmt{
@@ -1788,7 +1809,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							Fun: newID("memory_fill"),
 							Args: []ast.Expr{
 								&ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
-								n, val, dest}}})
+								dest, val, n}}})
 				}
 
 			case 0x0c: // table.init
@@ -1800,6 +1821,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
+				n := fn.pop()
+				src := fn.pop()
+				dst := fn.pop()
 				fn.helpers.add("table_init")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
@@ -1809,7 +1833,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							&ast.IndexExpr{
 								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
 								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)}},
-							fn.pop(), fn.pop(), fn.pop()}}})
+							dst, src, n}}})
 
 			case 0x0d: // elem.drop
 				// No-op since element segments are static.
@@ -1827,6 +1851,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
+				n := fn.pop()
+				src := fn.pop()
+				dst := fn.pop()
 				fn.helpers.add("table_copy")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
@@ -1834,19 +1861,21 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Args: []ast.Expr{
 							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[dstIdx].id},
 							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[srcIdx].id},
-							fn.pop(), fn.pop(), fn.pop()}}})
+							dst, src, n}}})
 
 			case 0x0f: // table.grow
 				idx, err := readLEB128(t.in)
 				if err != nil {
 					return err
 				}
+				delta := fn.pop()
+				val := fn.pop()
 				fn.helpers.add("table_grow")
 				fn.push(&ast.CallExpr{
 					Fun: newID("table_grow"),
 					Args: []ast.Expr{
 						&ast.UnaryExpr{Op: token.AND, X: &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}},
-						fn.pop(), fn.pop(),
+						val, delta,
 						&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.tables[idx].max)}}})
 
 			case 0x10: // table.size
@@ -1864,13 +1893,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
+				n := fn.pop()
+				val := fn.pop()
+				dest := fn.pop()
 				fn.helpers.add("table_fill")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun: newID("table_fill"),
 						Args: []ast.Expr{
 							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id},
-							fn.pop(), fn.pop(), fn.pop()}}})
+							dest, val, n}}})
 
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)

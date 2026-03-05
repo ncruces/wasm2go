@@ -34,26 +34,32 @@ func (m *Module) Xi64_no_fold_shl_shr_u(v0 int64) int64 {
 	return t2
 }
 
+//go:nosplit
 func i32_shl(x, y int32) int32 {
 	return x << (y & 31)
 }
 
+//go:nosplit
 func i32_shr_s(x, y int32) int32 {
 	return x >> (y & 31)
 }
 
+//go:nosplit
 func i32_shr_u(x, y int32) int32 {
 	return int32(uint32(x) >> (y & 31))
 }
 
+//go:nosplit
 func i64_shl(x, y int64) int64 {
 	return x << (y & 63)
 }
 
+//go:nosplit
 func i64_shr_s(x, y int64) int64 {
 	return x >> (y & 63)
 }
 
+//go:nosplit
 func i64_shr_u(x, y int64) int64 {
 	return int64(uint64(x) >> (y & 63))
 }

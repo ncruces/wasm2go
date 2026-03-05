@@ -457,6 +457,8 @@ func (m *Module) Xinit_local_f64() float64 {
 	return t0
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }

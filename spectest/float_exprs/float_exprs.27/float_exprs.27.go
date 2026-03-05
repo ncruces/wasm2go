@@ -27,11 +27,13 @@ func (m *Module) Xf64_no_fuse_reciprocal_sqrt(v0 float64) float64 {
 	return t2
 }
 
+//go:nosplit
 func f32_const(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
+//go:nosplit
 func f64_const(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x

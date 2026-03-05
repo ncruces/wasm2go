@@ -174,15 +174,19 @@ func (m *Module) Xno_fold_promote_demote(v0 int32) int32 {
 	return t5
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }
 
+//go:nosplit
 func f32_const(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
+//go:nosplit
 func f64_const(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x

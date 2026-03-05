@@ -21,6 +21,7 @@ func (m *Module) Xllvm_pr26746(v0 float32) float32 {
 	return t2
 }
 
+//go:nosplit
 func f32_const(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x

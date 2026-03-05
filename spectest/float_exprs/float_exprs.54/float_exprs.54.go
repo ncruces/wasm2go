@@ -20,4 +20,5 @@ func (m *Module) Xllvm_pr27036(v0 int32, v1 int32) float32 {
 	return t6
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

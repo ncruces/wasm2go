@@ -76,4 +76,5 @@ func (m *Module) Xas_if_else() {
 	}
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }

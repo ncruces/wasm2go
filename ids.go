@@ -53,6 +53,6 @@ func labelId(i int) *ast.Ident {
 	return newID("l" + strconv.Itoa(i))
 }
 
-func dataId[T interface{ int | uint64 }](i T) *ast.Ident {
+func dataID[T interface{ int | uint64 }](i T) *ast.Ident {
 	return newID("data" + strconv.Itoa(int(i)))
 }

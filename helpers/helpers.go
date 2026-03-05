@@ -6,80 +6,130 @@ import (
 	"runtime"
 )
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }
 
+//go:nosplit
 func f32_const(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
+//go:nosplit
 func f64_const(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
+//go:nosplit
 func i32_div_s(x, y int32) int32 {
-	if x == math.MinInt32 && y == -1 {
+	if y == -1 && x == math.MinInt32 {
 		panic("integer overflow")
 	}
 	return x / y
 }
 
+//go:nosplit
 func i64_div_s(x, y int64) int64 {
-	if x == math.MinInt64 && y == -1 {
+	if y == -1 && x == math.MinInt64 {
 		panic("integer overflow")
 	}
 	return x / y
 }
 
+//go:nosplit
 func i32_shl(x, y int32) int32 {
 	return x << (y & 31)
 }
 
+//go:nosplit
 func i32_shr_s(x, y int32) int32 {
 	return x >> (y & 31)
 }
 
+//go:nosplit
 func i32_shr_u(x, y int32) int32 {
 	return int32(uint32(x) >> (y & 31))
 }
 
+//go:nosplit
 func i64_shl(x, y int64) int64 {
 	return x << (y & 63)
 }
 
+//go:nosplit
 func i64_shr_s(x, y int64) int64 {
 	return x >> (y & 63)
 }
 
+//go:nosplit
 func i64_shr_u(x, y int64) int64 {
 	return int64(uint64(x) >> (y & 63))
 }
 
+//go:nosplit
 func i32_rotl(x, y int32) int32 {
 	return int32(bits.RotateLeft32(uint32(x), +int(y)&31))
 }
 
+//go:nosplit
 func i32_rotr(x, y int32) int32 {
 	return int32(bits.RotateLeft32(uint32(x), -int(y)&31))
 }
 
+//go:nosplit
 func i64_rotl(x, y int64) int64 {
 	return int64(bits.RotateLeft64(uint64(x), +int(y)&63))
 }
 
+//go:nosplit
 func i64_rotr(x, y int64) int64 {
 	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
 }
 
+//go:nosplit
 func f32_abs(x float32) float32 {
 	return math.Float32frombits(math.Float32bits(x) &^ (1 << 31))
 }
 
+//go:nosplit
 func f32_copysign(x, y float32) float32 {
 	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
+}
+
+//go:nosplit
+func f32_min(x, y float32) float32 {
+	if m := min(x, y); m == m {
+		return m
+	}
+	return math.Float32frombits(0x7fc00000)
+}
+
+//go:nosplit
+func f32_max(x, y float32) float32 {
+	if m := max(x, y); m == m {
+		return m
+	}
+	return math.Float32frombits(0x7fc00000)
+}
+
+//go:nosplit
+func f64_min(x, y float64) float64 {
+	if m := min(x, y); m == m {
+		return m
+	}
+	return math.Float64frombits(0x7ff8000000000000)
+}
+
+//go:nosplit
+func f64_max(x, y float64) float64 {
+	if m := max(x, y); m == m {
+		return m
+	}
+	return math.Float64frombits(0x7ff8000000000000)
 }
 
 // go.dev/issues/76264 can speed these up
@@ -203,7 +253,7 @@ func i32_trunc_sat_f64_u(f float64) int32 {
 	var i uint32
 	switch {
 	case x < 0 || math.IsNaN(x):
-		//
+		i = 0
 	case x > math.MaxUint32:
 		i = math.MaxUint32
 	default:
@@ -217,7 +267,7 @@ func i32_trunc_sat_f32_u(f float32) int32 {
 	var i uint32
 	switch {
 	case x < 0 || math.IsNaN(x):
-		//
+		i = 0
 	case x > math.MaxUint32:
 		i = math.MaxUint32
 	default:
@@ -257,7 +307,7 @@ func i64_trunc_sat_f64_u(f float64) int64 {
 	var i uint64
 	switch {
 	case x < 0 || math.IsNaN(x):
-		//
+		i = 0
 	case x >= math.MaxUint64:
 		i = math.MaxUint64
 	default:
@@ -271,7 +321,7 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 	var i uint64
 	switch {
 	case x < 0 || math.IsNaN(x):
-		//
+		i = 0
 	case x >= math.MaxUint64:
 		i = math.MaxUint64
 	default:
@@ -296,7 +346,7 @@ func memory_grow(mem *[]byte, delta, max int32) int32 {
 	return old
 }
 
-func memory_init(mem []byte, data string, n, src, dest int32) {
+func memory_init(mem []byte, data string, dest, src, n int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))
 	y := x + uint(uint32(n))
@@ -304,7 +354,7 @@ func memory_init(mem []byte, data string, n, src, dest int32) {
 	copy(mem[x:y], data[z:w])
 }
 
-func memory_copy(mem []byte, n, src, dest int32) {
+func memory_copy(mem []byte, dest, src, n int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))
 	y := x + uint(uint32(n))
@@ -312,25 +362,26 @@ func memory_copy(mem []byte, n, src, dest int32) {
 	copy(mem[x:y], mem[z:w])
 }
 
-func memory_fill(mem []byte, n, val, dest int32) {
+func memory_fill(mem []byte, dest, val, n int32) {
 	x := uint(uint32(dest))
 	y := x + uint(uint32(n))
-
 	buf := mem[x:y]
-	buf[0] = byte(val)
-	for i := 1; i < len(buf); {
-		chunk := min(i, 8192)
-		i += copy(buf[i:], buf[:chunk])
+	if len(buf) > 0 {
+		buf[0] = byte(val)
+		for i := 1; i < len(buf); {
+			chunk := min(i, 8192)
+			i += copy(buf[i:], buf[:chunk])
+		}
 	}
 }
 
-func memory_zero(mem []byte, n, dest int32) {
+func memory_zero(mem []byte, dest, n int32) {
 	x := uint(uint32(dest))
 	y := x + uint(uint32(n))
 	clear(mem[x:y])
 }
 
-func table_init(tab, elems []any, n, src, dest int32) {
+func table_init(tab, elems []any, dest, src, n int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))
 	y := x + uint(uint32(n))
@@ -338,7 +389,7 @@ func table_init(tab, elems []any, n, src, dest int32) {
 	copy(tab[x:y], elems[z:w])
 }
 
-func table_copy(dst, tab []any, n, src, dest int32) {
+func table_copy(dst, tab []any, dest, src, n int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))
 	y := x + uint(uint32(n))
@@ -346,7 +397,7 @@ func table_copy(dst, tab []any, n, src, dest int32) {
 	copy(dst[x:y], tab[z:w])
 }
 
-func table_grow(tab *[]any, delta int32, val any, max int32) int32 {
+func table_grow(tab *[]any, val any, delta, max int32) int32 {
 	buf := *tab
 	len := len(buf)
 	old := int32(len)
@@ -369,11 +420,14 @@ func table_grow(tab *[]any, delta int32, val any, max int32) int32 {
 	return old
 }
 
-func table_fill(tab []any, n int32, val any, dest int32) {
+func table_fill(tab []any, dest int32, val any, n int32) {
 	x := uint(uint32(dest))
 	y := x + uint(uint32(n))
-
 	buf := tab[x:y]
+	if val == nil {
+		clear(buf)
+		return
+	}
 	for i := range buf {
 		buf[i] = val
 	}

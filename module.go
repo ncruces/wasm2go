@@ -212,7 +212,7 @@ func (t *translator) createNewFunc() ast.Decl {
 					&ast.SliceExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: t.memory.id},
 						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(seg.offset))}},
-					newID("data" + strconv.Itoa(i))}}})
+					dataID(i)}}})
 	}
 
 	seen := set[string]{}

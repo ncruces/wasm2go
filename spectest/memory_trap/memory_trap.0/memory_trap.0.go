@@ -40,6 +40,7 @@ func (m *Module) Xmemory_grow(v0 int32) int32 {
 	return t1
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {

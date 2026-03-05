@@ -102,6 +102,8 @@ func (m *Module) Xi64_hex_sep2() int64 {
 	return i64_const(109071)
 }
 
+//go:nosplit
 func i32_const(x int32) int32 { return x }
 
+//go:nosplit
 func i64_const(x int64) int64 { return x }
