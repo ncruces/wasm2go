@@ -23,9 +23,13 @@ func (t *translator) createModuleStruct() ast.Decl {
 			Type:  &ast.ArrayType{Elt: &ast.ArrayType{Elt: newID("any")}}})
 	}
 	if t.memory != nil {
-		if t.memory.imported != nil {
+		if t.memory.imported {
 			fields = append(fields, &ast.Field{
-				Type: &ast.StarExpr{X: t.memory.imported}})
+				Names: []*ast.Ident{t.memory.id},
+				Type:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
+			}, &ast.Field{
+				Names: []*ast.Ident{newID("memImp")},
+				Type:  newID("Memory")})
 		} else {
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
@@ -113,36 +117,33 @@ func (t *translator) createNewFunc() ast.Decl {
 				Sel: newID("maxMem")}},
 			Rhs: []ast.Expr{
 				&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(t.memory.max), 10)}}})
-		if t.memory.imported != nil {
+		if t.memory.imported {
 			params = append([]*ast.Field{{
 				Names: []*ast.Ident{newID("mem")},
-				Type:  &ast.StarExpr{X: t.memory.imported},
+				Type:  newID("Memory"),
 			}}, params...)
-			body.List = append(body.List, &ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{&ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.memory.imported}},
-				Rhs: []ast.Expr{newID("mem")},
-			}, &ast.ExprStmt{
-				X: &ast.CallExpr{
-					Fun: &ast.SelectorExpr{X: newID("mem"), Sel: newID("Grow")},
-					Args: []ast.Expr{
-						&ast.UnaryExpr{
-							Op: token.AND,
-							X: &ast.SelectorExpr{
-								X:   newID("mem"),
-								Sel: t.memory.id}},
-						&ast.BasicLit{
-							Kind:  token.INT,
-							Value: strconv.FormatUint(uint64(t.memory.min), 10)},
-						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}}})
+			body.List = append(body.List,
+				&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")}},
+					Rhs: []ast.Expr{newID("mem")},
+				}, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
+					Rhs: []ast.Expr{&ast.CallExpr{
+						Fun: &ast.SelectorExpr{X: newID("mem"), Sel: newID("Data")}}},
+				}, &ast.ExprStmt{
+					X: &ast.CallExpr{
+						Fun: &ast.SelectorExpr{X: newID("mem"), Sel: newID("Grow")},
+						Args: []ast.Expr{
+							&ast.BasicLit{
+								Kind:  token.INT,
+								Value: strconv.FormatUint(uint64(t.memory.min), 10)},
+							&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}}})
 		} else {
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{&ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.memory.id}},
+				Lhs: []ast.Expr{t.memory.selector},
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: newID("make"),
 					Args: []ast.Expr{
@@ -207,7 +208,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Fun: newID("copy"),
 				Args: []ast.Expr{
 					&ast.SliceExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: t.memory.id},
+						X:   t.memory.selector,
 						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(seg.offset))}},
 					dataID(i)}}})
 	}
@@ -264,22 +265,26 @@ func (t *translator) createNewFunc() ast.Decl {
 		Body: body}
 }
 
-func (t *translator) createMemoryStruct() ast.Decl {
+func (t *translator) createMemoryInterface() ast.Decl {
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
 			&ast.TypeSpec{
-				Name: t.memory.imported,
-				Type: &ast.StructType{
-					Fields: &ast.FieldList{
+				Name: newID("Memory"),
+				Type: &ast.InterfaceType{
+					Methods: &ast.FieldList{
 						List: []*ast.Field{{
-							Names: []*ast.Ident{t.memory.id},
-							Type:  &ast.ArrayType{Elt: newID("byte")}},
-							{
-								Names: []*ast.Ident{newID("Grow")},
-								Type: &ast.FuncType{
-									Params: &ast.FieldList{List: []*ast.Field{
-										{Names: []*ast.Ident{newID("mem")}, Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
-										{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID("int32")}}},
-									Results: &ast.FieldList{List: []*ast.Field{{Type: newID("int32")}}}}}}}}}}}
+							Names: []*ast.Ident{newID("Data")},
+							Type: &ast.FuncType{
+								Results: &ast.FieldList{
+									List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
+						}, {
+							Names: []*ast.Ident{newID("Grow")},
+							Type: &ast.FuncType{
+								Params: &ast.FieldList{
+									List: []*ast.Field{{
+										Names: []*ast.Ident{newID("delta"), newID("max")},
+										Type:  newID("int32")}}},
+								Results: &ast.FieldList{
+									List: []*ast.Field{{Type: newID("int32")}}}}}}}}}}}
 }

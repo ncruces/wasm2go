@@ -92,7 +92,8 @@ type tableDef struct {
 
 type memoryDef struct {
 	id       *ast.Ident
-	imported *ast.Ident
+	selector ast.Expr
+	imported bool
 	min      int
 	max      int
 }

@@ -70,7 +70,7 @@ func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
 // Returns an expression that loads a byte from memory (an l-value).
 func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 	return &ast.IndexExpr{
-		X:     &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+		X:     fn.memory.selector,
 		Index: fn.popAddr(offset)}
 }
 
@@ -86,7 +86,7 @@ func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 				Sel: newID("LittleEndian")},
 			Sel: newID("Uint" + bits)},
 		Args: []ast.Expr{&ast.SliceExpr{
-			X:   &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+			X:   fn.memory.selector,
 			Low: addr}}}
 
 	switch {
@@ -125,7 +125,7 @@ func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
 			Sel: newID("PutUint" + bits)},
 		Args: []ast.Expr{
 			&ast.SliceExpr{
-				X:   &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+				X:   fn.memory.selector,
 				Low: addr},
 			val}}}
 }
@@ -151,7 +151,7 @@ func (fn *funcCompiler) loadUnsafe(addr ast.Expr, typ string) ast.Expr {
 					Len: &ast.BasicLit{Kind: token.INT, Value: bytes},
 					Elt: newID("byte")}},
 				Args: []ast.Expr{&ast.SliceExpr{
-					X:   &ast.SelectorExpr{X: newID("m"), Sel: fn.memory.id},
+					X:   fn.memory.selector,
 					Low: addr}}}}}}}}
 }
 
