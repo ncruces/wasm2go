@@ -302,10 +302,7 @@ func (m *Module) Xas_br_table_first(v0 int32) int32 {
 		t1 := v0
 		t2 := v0
 		t0 = t1
-		t0 = t1
 		switch t2 {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -320,10 +317,7 @@ func (m *Module) Xas_br_table_mid(v0 int32) int32 {
 		t1 := v0
 		t2 := v0
 		t0 = t1
-		t0 = t1
 		switch t2 {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -338,10 +332,7 @@ func (m *Module) Xas_br_table_last(v0 int32) int32 {
 		t1 := v0
 		t2 := v0
 		t0 = t1
-		t0 = t1
 		switch t2 {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -356,10 +347,7 @@ func (m *Module) Xas_br_table_everywhere(v0 int32) int32 {
 		t1 := v0
 		t2 := v0
 		t0 = t1
-		t0 = t1
 		switch t2 {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}

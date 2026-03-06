@@ -26,7 +26,7 @@ func (m *Module) Xzero_everything() {
 }
 func (m *Module) Xtest_store_to_load() int32 {
 	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(i32_const(0)))
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(5)):], math.Float32bits(math.Float32frombits(2147483648)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(int32(5)):], math.Float32bits(math.Float32frombits(0x80000000)))
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
 	return t0
 }
@@ -35,7 +35,7 @@ func (m *Module) Xtest_redundant_load() int32 {
 	_, _ = v0, v1
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
 	v0 = t0
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(5)):], uint32(i32_const(-2147483648)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(int32(5)):], uint32(i32_const(-0x80000000)))
 	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
 	v1 = t1
 	t2 := v0

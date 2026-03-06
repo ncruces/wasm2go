@@ -309,8 +309,6 @@ func (m *Module) Xas_br_table_index() {
 			goto l0
 		}
 		switch int32(1) {
-		case 0, 1:
-			goto l0
 		default:
 			goto l0
 		}
@@ -326,10 +324,7 @@ func (m *Module) Xas_br_table_value() int32 {
 			goto l0
 		}
 		t0 = int32(1)
-		t0 = int32(1)
 		switch int32(3) {
-		case 0, 1:
-			goto l0
 		default:
 			goto l0
 		}
@@ -346,10 +341,7 @@ func (m *Module) Xas_br_table_value_index() int32 {
 			goto l0
 		}
 		t0 = int32(2)
-		t0 = int32(2)
 		switch int32(1) {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}

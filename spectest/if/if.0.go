@@ -369,10 +369,7 @@ func (m *Module) Xas_br_table_first(v0 int32) int32 {
 			t2 = i32_const(0)
 		}
 		t0 = t2
-		t0 = t2
 		switch int32(2) {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -395,10 +392,7 @@ func (m *Module) Xas_br_table_last(v0 int32) int32 {
 			t2 = i32_const(0)
 		}
 		t0 = int32(2)
-		t0 = int32(2)
 		switch t2 {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}

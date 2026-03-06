@@ -10,5 +10,5 @@ func New() *Module {
 	return m
 }
 func (m *Module) X4294967249() float64 {
-	return float64(4.294967249e+09)
+	return float64(0x1.ffffffa2p+31)
 }

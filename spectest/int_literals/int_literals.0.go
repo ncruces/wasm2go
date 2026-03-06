@@ -10,25 +10,25 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_test() int32 {
-	return i32_const(195940365)
+	return i32_const(0xbadd00d)
 }
 func (m *Module) Xi32_umax() int32 {
 	return i32_const(-1)
 }
 func (m *Module) Xi32_smax() int32 {
-	return i32_const(2147483647)
+	return i32_const(0x7fffffff)
 }
 func (m *Module) Xi32_neg_smax() int32 {
-	return i32_const(-2147483647)
+	return i32_const(-0x7fffffff)
 }
 func (m *Module) Xi32_smin() int32 {
-	return i32_const(-2147483648)
+	return i32_const(-0x80000000)
 }
 func (m *Module) Xi32_alt_smin() int32 {
-	return i32_const(-2147483648)
+	return i32_const(-0x80000000)
 }
 func (m *Module) Xi32_inc_smin() int32 {
-	t0 := i32_const(-2147483648) + int32(1)
+	t0 := i32_const(-0x80000000) + int32(1)
 	return t0
 }
 func (m *Module) Xi32_neg_zero() int32 {
@@ -44,25 +44,25 @@ func (m *Module) Xi32_plus_sign() int32 {
 	return int32(42)
 }
 func (m *Module) Xi64_test() int64 {
-	return i64_const(913028331277281902)
+	return i64_const(0xcabba6e0ba66a6e)
 }
 func (m *Module) Xi64_umax() int64 {
 	return i64_const(-1)
 }
 func (m *Module) Xi64_smax() int64 {
-	return i64_const(9223372036854775807)
+	return i64_const(0x7fffffffffffffff)
 }
 func (m *Module) Xi64_neg_smax() int64 {
-	return i64_const(-9223372036854775807)
+	return i64_const(-0x7fffffffffffffff)
 }
 func (m *Module) Xi64_smin() int64 {
-	return i64_const(-9223372036854775808)
+	return i64_const(-0x8000000000000000)
 }
 func (m *Module) Xi64_alt_smin() int64 {
-	return i64_const(-9223372036854775808)
+	return i64_const(-0x8000000000000000)
 }
 func (m *Module) Xi64_inc_smin() int64 {
-	t0 := i64_const(-9223372036854775808) + int64(1)
+	t0 := i64_const(-0x8000000000000000) + int64(1)
 	return t0
 }
 func (m *Module) Xi64_neg_zero() int64 {
@@ -84,7 +84,7 @@ func (m *Module) Xi32_dec_sep2() int32 {
 	return i32_const(1000)
 }
 func (m *Module) Xi32_hex_sep1() int32 {
-	return i32_const(168755353)
+	return i32_const(0xa0f0099)
 }
 func (m *Module) Xi32_hex_sep2() int32 {
 	return i32_const(109071)
@@ -96,7 +96,7 @@ func (m *Module) Xi64_dec_sep2() int64 {
 	return i64_const(1000)
 }
 func (m *Module) Xi64_hex_sep1() int64 {
-	return i64_const(3078696982321561)
+	return i64_const(0xaf00f00009999)
 }
 func (m *Module) Xi64_hex_sep2() int64 {
 	return i64_const(109071)

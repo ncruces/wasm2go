@@ -16,7 +16,7 @@ func New() *Module {
 }
 func (m *Module) Xllvm_pr26746(v0 float32) float32 {
 	t0 := v0
-	t1 := float32(math.Float32frombits(2147483648) - t0)
+	t1 := float32(math.Float32frombits(0x80000000) - t0)
 	t2 := float32(f32_const(0) - t1)
 	return t2
 }

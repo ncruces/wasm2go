@@ -28,10 +28,10 @@ func (m *Module) Xi64_load() int64 {
 	return t0
 }
 func (m *Module) Xf64_store() {
-	binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(math.Float64frombits(9222246136947933185)))
+	binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(math.Float64frombits(0x7ffc000000000001)))
 }
 func (m *Module) Xi64_store() {
-	binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(i64_const(9222246136947933185)))
+	binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(i64_const(0x7ffc000000000001)))
 }
 func (m *Module) Xreset() {
 	binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(i64_const(0)))

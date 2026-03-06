@@ -13,11 +13,11 @@ func New() *Module {
 }
 func (m *Module) Xf32_no_fold_div_neg0(v0 float32) float32 {
 	t0 := v0
-	t1 := float32(t0 / math.Float32frombits(2147483648))
+	t1 := float32(t0 / math.Float32frombits(0x80000000))
 	return t1
 }
 func (m *Module) Xf64_no_fold_div_neg0(v0 float64) float64 {
 	t0 := v0
-	t1 := float64(t0 / math.Float64frombits(9223372036854775808))
+	t1 := float64(t0 / math.Float64frombits(0x8000000000000000))
 	return t1
 }

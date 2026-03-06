@@ -970,7 +970,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			sw := &ast.SwitchStmt{Tag: fn.pop(), Body: &ast.BlockStmt{}}
 
-			// Group targets by their destination to consolidate cases.
+			// Group targets by their destination to consolidate case clauses.
 			var targetMap = map[uint64]int{}
 			for i := range numTargets {
 				target, err := readLEB128(t.in)
@@ -978,7 +978,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					return err
 				}
 
-				// New target, new case clause.
+				// New target, add a new case clause.
 				id, ok := targetMap[target]
 				if !ok {
 					id = len(sw.Body.List)
@@ -992,13 +992,24 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				caseClse.List = append(caseClse.List, caseExpr)
 			}
 
-			// Add the default target and clause.
+			// Add the default target.
 			target, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			sw.Body.List = append(sw.Body.List,
-				&ast.CaseClause{Body: fn.branch(target)})
+			id, ok := targetMap[target]
+			if !ok {
+				// New target, add a default clause.
+				sw.Body.List = append(sw.Body.List,
+					&ast.CaseClause{Body: fn.branch(target)})
+			} else {
+				// Make the existing clause the default,
+				// move it to the end.
+				caseClse := sw.Body.List[id].(*ast.CaseClause)
+				copy(sw.Body.List[id:], sw.Body.List[id+1:])
+				sw.Body.List[len(sw.Body.List)-1] = caseClse
+				caseClse.List = nil
+			}
 
 			fn.emit(sw)
 			blk.unreachable = true // After switch.

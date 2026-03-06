@@ -260,10 +260,7 @@ func (m *Module) Xunary_after_br_table() int32 {
 	_ = t0
 	{
 		t0 = int32(9)
-		t0 = int32(9)
 		switch i32_const(0) {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -404,10 +401,7 @@ func (m *Module) Xblock_value_after_br_table() int32 {
 	_ = t0
 	{
 		t0 = int32(9)
-		t0 = int32(9)
 		switch i32_const(0) {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -470,10 +464,7 @@ func (m *Module) Xloop_value_after_br_table() int32 {
 		_ = t1
 		{
 			t0 = int32(9)
-			t0 = int32(9)
 			switch i32_const(0) {
-			case 0:
-				goto l0
 			default:
 				goto l0
 			}

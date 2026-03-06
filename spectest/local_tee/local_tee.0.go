@@ -309,8 +309,6 @@ func (m *Module) Xas_br_table_index(v0 int32) {
 	{
 		v0 = i32_const(0)
 		switch i32_const(0) {
-		case 0, 1:
-			goto l0
 		default:
 			goto l0
 		}
@@ -323,10 +321,7 @@ func (m *Module) Xas_br_table_value(v0 int32) int32 {
 	{
 		v0 = int32(10)
 		t0 = int32(10)
-		t0 = int32(10)
 		switch int32(1) {
-		case 0, 1:
-			goto l0
 		default:
 			goto l0
 		}
@@ -340,10 +335,7 @@ func (m *Module) Xas_br_table_value_index(v0 int32) int32 {
 	{
 		v0 = int32(11)
 		t0 = int32(6)
-		t0 = int32(6)
 		switch int32(11) {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -502,8 +494,8 @@ func (m *Module) Xas_storeN_value(v0 int32) {
 	binary.LittleEndian.PutUint16(m.memory[uint32(int32(2)):], uint16(int32(1)))
 }
 func (m *Module) Xas_unary_operand(v0 float32) float32 {
-	v0 = math.Float32frombits(2139156962)
-	t0 := -math.Float32frombits(2139156962)
+	v0 = math.Float32frombits(0x7f80f1e2)
+	t0 := -math.Float32frombits(0x7f80f1e2)
 	return t0
 }
 func (m *Module) Xas_binary_left(v0 int32) int32 {

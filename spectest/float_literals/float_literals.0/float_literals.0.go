@@ -15,51 +15,51 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2143289344)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7fc00000)))
 	return t0
 }
 func (m *Module) Xf32_positive_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2143289344)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7fc00000)))
 	return t0
 }
 func (m *Module) Xf32_negative_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(4290772992)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0xffc00000)))
 	return t0
 }
 func (m *Module) Xf32_plain_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2143289344)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7fc00000)))
 	return t0
 }
 func (m *Module) Xf32_informally_known_as_plain_snan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2141192192)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7fa00000)))
 	return t0
 }
 func (m *Module) Xf32_all_ones_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(4294967295)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0xffffffff)))
 	return t0
 }
 func (m *Module) Xf32_misc_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2139169605)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7f812345)))
 	return t0
 }
 func (m *Module) Xf32_misc_positive_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2142257232)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7fb04050)))
 	return t0
 }
 func (m *Module) Xf32_misc_negative_nan() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(4289379550)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0xffaabcde)))
 	return t0
 }
 func (m *Module) Xf32_infinity() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2139095040)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7f800000)))
 	return t0
 }
 func (m *Module) Xf32_positive_infinity() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2139095040)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x7f800000)))
 	return t0
 }
 func (m *Module) Xf32_negative_infinity() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(4286578688)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0xff800000)))
 	return t0
 }
 func (m *Module) Xf32_zero() int32 {
@@ -71,7 +71,7 @@ func (m *Module) Xf32_positive_zero() int32 {
 	return t0
 }
 func (m *Module) Xf32_negative_zero() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2147483648)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x80000000)))
 	return t0
 }
 func (m *Module) Xf32_misc() int32 {
@@ -83,15 +83,15 @@ func (m *Module) Xf32_min_positive() int32 {
 	return t0
 }
 func (m *Module) Xf32_min_normal() int32 {
-	t0 := int32(math.Float32bits(float32(1.1754944e-38)))
+	t0 := int32(math.Float32bits(float32(0x1p-126)))
 	return t0
 }
 func (m *Module) Xf32_max_finite() int32 {
-	t0 := int32(math.Float32bits(float32(3.4028235e+38)))
+	t0 := int32(math.Float32bits(float32(0x1.fffffep+127)))
 	return t0
 }
 func (m *Module) Xf32_max_subnormal() int32 {
-	t0 := int32(math.Float32bits(float32(1.1754942e-38)))
+	t0 := int32(math.Float32bits(float32(0x1.fffffcp-127)))
 	return t0
 }
 func (m *Module) Xf32_trailing_dot() int32 {
@@ -103,15 +103,15 @@ func (m *Module) Xf32_misc_int() int32 {
 	return t0
 }
 func (m *Module) Xf32_large_int() int32 {
-	t0 := int32(math.Float32bits(float32(1.2089258e+24)))
+	t0 := int32(math.Float32bits(float32(0x1p+80)))
 	return t0
 }
 func (m *Module) Xf32_min_int32() int32 {
-	t0 := int32(math.Float32bits(float32(-2.1474836e+09)))
+	t0 := int32(math.Float32bits(float32(-0x1p+31)))
 	return t0
 }
 func (m *Module) Xf32_min_int64() int32 {
-	t0 := int32(math.Float32bits(float32(-9.223372e+18)))
+	t0 := int32(math.Float32bits(float32(-0x1p+63)))
 	return t0
 }
 func (m *Module) Xf32_dec_zero() int32 {
@@ -123,7 +123,7 @@ func (m *Module) Xf32_dec_positive_zero() int32 {
 	return t0
 }
 func (m *Module) Xf32_dec_negative_zero() int32 {
-	t0 := int32(math.Float32bits(math.Float32frombits(2147483648)))
+	t0 := int32(math.Float32bits(math.Float32frombits(0x80000000)))
 	return t0
 }
 func (m *Module) Xf32_dec_misc() int32 {
@@ -135,15 +135,15 @@ func (m *Module) Xf32_dec_min_positive() int32 {
 	return t0
 }
 func (m *Module) Xf32_dec_min_normal() int32 {
-	t0 := int32(math.Float32bits(float32(1.1754944e-38)))
+	t0 := int32(math.Float32bits(float32(0x1p-126)))
 	return t0
 }
 func (m *Module) Xf32_dec_max_subnormal() int32 {
-	t0 := int32(math.Float32bits(float32(1.1754942e-38)))
+	t0 := int32(math.Float32bits(float32(0x1.fffffcp-127)))
 	return t0
 }
 func (m *Module) Xf32_dec_max_finite() int32 {
-	t0 := int32(math.Float32bits(float32(3.4028235e+38)))
+	t0 := int32(math.Float32bits(float32(0x1.fffffep+127)))
 	return t0
 }
 func (m *Module) Xf32_dec_trailing_dot() int32 {
@@ -159,11 +159,11 @@ func (m *Module) Xf32_dec_large_int() int32 {
 	return t0
 }
 func (m *Module) Xf32_dec_min_int32() int32 {
-	t0 := int32(math.Float32bits(float32(-2.1474836e+09)))
+	t0 := int32(math.Float32bits(float32(-0x1p+31)))
 	return t0
 }
 func (m *Module) Xf32_dec_min_int64() int32 {
-	t0 := int32(math.Float32bits(float32(-9.223372e+18)))
+	t0 := int32(math.Float32bits(float32(-0x1p+63)))
 	return t0
 }
 func (m *Module) Xf32_dec_root_beer_float() int32 {
@@ -171,51 +171,51 @@ func (m *Module) Xf32_dec_root_beer_float() int32 {
 	return t0
 }
 func (m *Module) Xf64_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9221120237041090560)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff8000000000000)))
 	return t0
 }
 func (m *Module) Xf64_positive_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9221120237041090560)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff8000000000000)))
 	return t0
 }
 func (m *Module) Xf64_negative_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(18444492273895866368)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0xfff8000000000000)))
 	return t0
 }
 func (m *Module) Xf64_plain_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9221120237041090560)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff8000000000000)))
 	return t0
 }
 func (m *Module) Xf64_informally_known_as_plain_snan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9219994337134247936)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff4000000000000)))
 	return t0
 }
 func (m *Module) Xf64_all_ones_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(18446744073709551615)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0xffffffffffffffff)))
 	return t0
 }
 func (m *Module) Xf64_misc_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9218888453225749180)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff0123456789abc)))
 	return t0
 }
 func (m *Module) Xf64_misc_positive_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9219717281780008969)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff3040506070809)))
 	return t0
 }
 func (m *Module) Xf64_misc_negative_nan() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(18442992325002076997)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0xfff2abcdef012345)))
 	return t0
 }
 func (m *Module) Xf64_infinity() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9218868437227405312)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff0000000000000)))
 	return t0
 }
 func (m *Module) Xf64_positive_infinity() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9218868437227405312)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x7ff0000000000000)))
 	return t0
 }
 func (m *Module) Xf64_negative_infinity() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(18442240474082181120)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0xfff0000000000000)))
 	return t0
 }
 func (m *Module) Xf64_zero() int64 {
@@ -227,7 +227,7 @@ func (m *Module) Xf64_positive_zero() int64 {
 	return t0
 }
 func (m *Module) Xf64_negative_zero() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9223372036854775808)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x8000000000000000)))
 	return t0
 }
 func (m *Module) Xf64_misc() int64 {
@@ -239,19 +239,19 @@ func (m *Module) Xf64_min_positive() int64 {
 	return t0
 }
 func (m *Module) Xf64_min_normal() int64 {
-	t0 := int64(math.Float64bits(float64(2.2250738585072014e-308)))
+	t0 := int64(math.Float64bits(float64(0x1p-1022)))
 	return t0
 }
 func (m *Module) Xf64_max_subnormal() int64 {
-	t0 := int64(math.Float64bits(float64(2.225073858507201e-308)))
+	t0 := int64(math.Float64bits(float64(0x1.ffffffffffffep-1023)))
 	return t0
 }
 func (m *Module) Xf64_max_finite() int64 {
-	t0 := int64(math.Float64bits(float64(1.7976931348623157e+308)))
+	t0 := int64(math.Float64bits(float64(0x1.fffffffffffffp+1023)))
 	return t0
 }
 func (m *Module) Xf64_trailing_dot() int64 {
-	t0 := int64(math.Float64bits(float64(1.2676506002282294e+30)))
+	t0 := int64(math.Float64bits(float64(0x1p+100)))
 	return t0
 }
 func (m *Module) Xf64_misc_int() int64 {
@@ -259,15 +259,15 @@ func (m *Module) Xf64_misc_int() int64 {
 	return t0
 }
 func (m *Module) Xf64_large_int() int64 {
-	t0 := int64(math.Float64bits(float64(1.2089258196146292e+24)))
+	t0 := int64(math.Float64bits(float64(0x1p+80)))
 	return t0
 }
 func (m *Module) Xf64_min_int32() int64 {
-	t0 := int64(math.Float64bits(float64(-2.147483648e+09)))
+	t0 := int64(math.Float64bits(float64(-0x1p+31)))
 	return t0
 }
 func (m *Module) Xf64_min_int64() int64 {
-	t0 := int64(math.Float64bits(float64(-9.223372036854776e+18)))
+	t0 := int64(math.Float64bits(float64(-0x1p+63)))
 	return t0
 }
 func (m *Module) Xf64_dec_zero() int64 {
@@ -279,7 +279,7 @@ func (m *Module) Xf64_dec_positive_zero() int64 {
 	return t0
 }
 func (m *Module) Xf64_dec_negative_zero() int64 {
-	t0 := int64(math.Float64bits(math.Float64frombits(9223372036854775808)))
+	t0 := int64(math.Float64bits(math.Float64frombits(0x8000000000000000)))
 	return t0
 }
 func (m *Module) Xf64_dec_misc() int64 {
@@ -291,15 +291,15 @@ func (m *Module) Xf64_dec_min_positive() int64 {
 	return t0
 }
 func (m *Module) Xf64_dec_min_normal() int64 {
-	t0 := int64(math.Float64bits(float64(2.2250738585072014e-308)))
+	t0 := int64(math.Float64bits(float64(0x1p-1022)))
 	return t0
 }
 func (m *Module) Xf64_dec_max_subnormal() int64 {
-	t0 := int64(math.Float64bits(float64(2.225073858507201e-308)))
+	t0 := int64(math.Float64bits(float64(0x1.ffffffffffffep-1023)))
 	return t0
 }
 func (m *Module) Xf64_dec_max_finite() int64 {
-	t0 := int64(math.Float64bits(float64(1.7976931348623157e+308)))
+	t0 := int64(math.Float64bits(float64(0x1.fffffffffffffp+1023)))
 	return t0
 }
 func (m *Module) Xf64_dec_trailing_dot() int64 {
@@ -315,11 +315,11 @@ func (m *Module) Xf64_dec_large_int() int64 {
 	return t0
 }
 func (m *Module) Xf64_dec_min_int32() int64 {
-	t0 := int64(math.Float64bits(float64(-2.147483648e+09)))
+	t0 := int64(math.Float64bits(float64(-0x1p+31)))
 	return t0
 }
 func (m *Module) Xf64_dec_min_int64() int64 {
-	t0 := int64(math.Float64bits(float64(-9.223372036854776e+18)))
+	t0 := int64(math.Float64bits(float64(-0x1p+63)))
 	return t0
 }
 func (m *Module) Xf64_dec_root_beer_float() int64 {
@@ -351,7 +351,7 @@ func (m *Module) Xf32_hex_sep3() float32 {
 	return float32(41215.94)
 }
 func (m *Module) Xf32_hex_sep4() float32 {
-	return float32(1.96608e+06)
+	return float32(0x1.ep+20)
 }
 func (m *Module) Xf32_hex_sep5() float32 {
 	return float32(2.3605224e+13)
@@ -372,7 +372,7 @@ func (m *Module) Xf64_dec_sep5() float64 {
 	return float64(1.2200011354e+28)
 }
 func (m *Module) Xf64_hex_sep1() float64 {
-	return float64(3.078696982321561e+15)
+	return float64(0x1.5e01e00013332p+51)
 }
 func (m *Module) Xf64_hex_sep2() float64 {
 	return float64(109071)
@@ -381,10 +381,10 @@ func (m *Module) Xf64_hex_sep3() float64 {
 	return float64(41215.94240794191)
 }
 func (m *Module) Xf64_hex_sep4() float64 {
-	return float64(1.96608e+06)
+	return float64(0x1.ep+20)
 }
 func (m *Module) Xf64_hex_sep5() float64 {
-	return float64(2.3605225168752e+13)
+	return float64(0x1.578050f9f7p+44)
 }
 
 //go:nosplit

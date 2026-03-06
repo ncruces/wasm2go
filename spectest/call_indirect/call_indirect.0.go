@@ -471,10 +471,7 @@ func (m *Module) Xas_br_table_first() float32 {
 	{
 		t1 := m.table[uint32(int32(2))].(func() float32)()
 		t0 = t1
-		t0 = t1
 		switch int32(2) {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}
@@ -488,10 +485,7 @@ func (m *Module) Xas_br_table_last() int32 {
 	{
 		t1 := m.table[uint32(i32_const(0))].(func() int32)()
 		t0 = int32(2)
-		t0 = int32(2)
 		switch t1 {
-		case 0:
-			goto l0
 		default:
 			goto l0
 		}

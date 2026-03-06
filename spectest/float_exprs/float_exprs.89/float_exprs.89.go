@@ -21,7 +21,7 @@ func (m *Module) Xf32_arithmetic_nan_bitpattern(v0 int32, v1 int32) int32 {
 	t3 := math.Float32frombits(uint32(t2))
 	t4 := float32(t1 / t3)
 	t5 := int32(math.Float32bits(t4))
-	t6 := t5 & i32_const(2143289344)
+	t6 := t5 & i32_const(0x7fc00000)
 	return t6
 }
 func (m *Module) Xf32_canonical_nan_bitpattern(v0 int32, v1 int32) int32 {
@@ -31,7 +31,7 @@ func (m *Module) Xf32_canonical_nan_bitpattern(v0 int32, v1 int32) int32 {
 	t3 := math.Float32frombits(uint32(t2))
 	t4 := float32(t1 / t3)
 	t5 := int32(math.Float32bits(t4))
-	t6 := t5 & i32_const(2147483647)
+	t6 := t5 & i32_const(0x7fffffff)
 	return t6
 }
 func (m *Module) Xf32_nonarithmetic_nan_bitpattern(v0 int32) int32 {
@@ -48,7 +48,7 @@ func (m *Module) Xf64_arithmetic_nan_bitpattern(v0 int64, v1 int64) int64 {
 	t3 := math.Float64frombits(uint64(t2))
 	t4 := float64(t1 / t3)
 	t5 := int64(math.Float64bits(t4))
-	t6 := t5 & i64_const(9221120237041090560)
+	t6 := t5 & i64_const(0x7ff8000000000000)
 	return t6
 }
 func (m *Module) Xf64_canonical_nan_bitpattern(v0 int64, v1 int64) int64 {
@@ -58,7 +58,7 @@ func (m *Module) Xf64_canonical_nan_bitpattern(v0 int64, v1 int64) int64 {
 	t3 := math.Float64frombits(uint64(t2))
 	t4 := float64(t1 / t3)
 	t5 := int64(math.Float64bits(t4))
-	t6 := t5 & i64_const(9223372036854775807)
+	t6 := t5 & i64_const(0x7fffffffffffffff)
 	return t6
 }
 func (m *Module) Xf64_nonarithmetic_nan_bitpattern(v0 int64) int64 {
@@ -73,15 +73,15 @@ func (m *Module) Xf32_no_fold_sub_zero(v0 int32) int32 {
 	t1 := math.Float32frombits(uint32(t0))
 	t2 := float32(t1 - f32_const(0))
 	t3 := int32(math.Float32bits(t2))
-	t4 := t3 & i32_const(2143289344)
+	t4 := t3 & i32_const(0x7fc00000)
 	return t4
 }
 func (m *Module) Xf32_no_fold_neg0_sub(v0 int32) int32 {
 	t0 := v0
 	t1 := math.Float32frombits(uint32(t0))
-	t2 := float32(math.Float32frombits(2147483648) - t1)
+	t2 := float32(math.Float32frombits(0x80000000) - t1)
 	t3 := int32(math.Float32bits(t2))
-	t4 := t3 & i32_const(2143289344)
+	t4 := t3 & i32_const(0x7fc00000)
 	return t4
 }
 func (m *Module) Xf32_no_fold_mul_one(v0 int32) int32 {
@@ -89,7 +89,7 @@ func (m *Module) Xf32_no_fold_mul_one(v0 int32) int32 {
 	t1 := math.Float32frombits(uint32(t0))
 	t2 := float32(t1 * f32_const(1))
 	t3 := int32(math.Float32bits(t2))
-	t4 := t3 & i32_const(2143289344)
+	t4 := t3 & i32_const(0x7fc00000)
 	return t4
 }
 func (m *Module) Xf32_no_fold_neg1_mul(v0 int32) int32 {
@@ -97,7 +97,7 @@ func (m *Module) Xf32_no_fold_neg1_mul(v0 int32) int32 {
 	t1 := math.Float32frombits(uint32(t0))
 	t2 := float32(f32_const(-1) * t1)
 	t3 := int32(math.Float32bits(t2))
-	t4 := t3 & i32_const(2143289344)
+	t4 := t3 & i32_const(0x7fc00000)
 	return t4
 }
 func (m *Module) Xf32_no_fold_div_one(v0 int32) int32 {
@@ -105,7 +105,7 @@ func (m *Module) Xf32_no_fold_div_one(v0 int32) int32 {
 	t1 := math.Float32frombits(uint32(t0))
 	t2 := float32(t1 / f32_const(1))
 	t3 := int32(math.Float32bits(t2))
-	t4 := t3 & i32_const(2143289344)
+	t4 := t3 & i32_const(0x7fc00000)
 	return t4
 }
 func (m *Module) Xf32_no_fold_div_neg1(v0 int32) int32 {
@@ -113,7 +113,7 @@ func (m *Module) Xf32_no_fold_div_neg1(v0 int32) int32 {
 	t1 := math.Float32frombits(uint32(t0))
 	t2 := float32(t1 / f32_const(-1))
 	t3 := int32(math.Float32bits(t2))
-	t4 := t3 & i32_const(2143289344)
+	t4 := t3 & i32_const(0x7fc00000)
 	return t4
 }
 func (m *Module) Xf64_no_fold_sub_zero(v0 int64) int64 {
@@ -121,15 +121,15 @@ func (m *Module) Xf64_no_fold_sub_zero(v0 int64) int64 {
 	t1 := math.Float64frombits(uint64(t0))
 	t2 := float64(t1 - f64_const(0))
 	t3 := int64(math.Float64bits(t2))
-	t4 := t3 & i64_const(9221120237041090560)
+	t4 := t3 & i64_const(0x7ff8000000000000)
 	return t4
 }
 func (m *Module) Xf64_no_fold_neg0_sub(v0 int64) int64 {
 	t0 := v0
 	t1 := math.Float64frombits(uint64(t0))
-	t2 := float64(math.Float64frombits(9223372036854775808) - t1)
+	t2 := float64(math.Float64frombits(0x8000000000000000) - t1)
 	t3 := int64(math.Float64bits(t2))
-	t4 := t3 & i64_const(9221120237041090560)
+	t4 := t3 & i64_const(0x7ff8000000000000)
 	return t4
 }
 func (m *Module) Xf64_no_fold_mul_one(v0 int64) int64 {
@@ -137,7 +137,7 @@ func (m *Module) Xf64_no_fold_mul_one(v0 int64) int64 {
 	t1 := math.Float64frombits(uint64(t0))
 	t2 := float64(t1 * f64_const(1))
 	t3 := int64(math.Float64bits(t2))
-	t4 := t3 & i64_const(9221120237041090560)
+	t4 := t3 & i64_const(0x7ff8000000000000)
 	return t4
 }
 func (m *Module) Xf64_no_fold_neg1_mul(v0 int64) int64 {
@@ -145,7 +145,7 @@ func (m *Module) Xf64_no_fold_neg1_mul(v0 int64) int64 {
 	t1 := math.Float64frombits(uint64(t0))
 	t2 := float64(f64_const(-1) * t1)
 	t3 := int64(math.Float64bits(t2))
-	t4 := t3 & i64_const(9221120237041090560)
+	t4 := t3 & i64_const(0x7ff8000000000000)
 	return t4
 }
 func (m *Module) Xf64_no_fold_div_one(v0 int64) int64 {
@@ -153,7 +153,7 @@ func (m *Module) Xf64_no_fold_div_one(v0 int64) int64 {
 	t1 := math.Float64frombits(uint64(t0))
 	t2 := float64(t1 / f64_const(1))
 	t3 := int64(math.Float64bits(t2))
-	t4 := t3 & i64_const(9221120237041090560)
+	t4 := t3 & i64_const(0x7ff8000000000000)
 	return t4
 }
 func (m *Module) Xf64_no_fold_div_neg1(v0 int64) int64 {
@@ -161,7 +161,7 @@ func (m *Module) Xf64_no_fold_div_neg1(v0 int64) int64 {
 	t1 := math.Float64frombits(uint64(t0))
 	t2 := float64(t1 / f64_const(-1))
 	t3 := int64(math.Float64bits(t2))
-	t4 := t3 & i64_const(9221120237041090560)
+	t4 := t3 & i64_const(0x7ff8000000000000)
 	return t4
 }
 func (m *Module) Xno_fold_promote_demote(v0 int32) int32 {
@@ -170,7 +170,7 @@ func (m *Module) Xno_fold_promote_demote(v0 int32) int32 {
 	t2 := float64(t1)
 	t3 := float32(t2)
 	t4 := int32(math.Float32bits(t3))
-	t5 := t4 & i32_const(2143289344)
+	t5 := t4 & i32_const(0x7fc00000)
 	return t5
 }
 

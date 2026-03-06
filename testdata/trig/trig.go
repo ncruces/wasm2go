@@ -32,12 +32,12 @@ func (m *Module) Xsin(v0 float64) float64 {
 		return t2
 	}
 l0:
-	v1 = math.Float64frombits(9221120237041090560)
+	v1 = math.Float64frombits(0x7ff8000000000000)
 	{
 		t3 := v0
 		t4 := int64(math.Float64bits(t3))
-		t5 := t4 & i64_const(9223372036854775807)
-		if t5 > i64_const(9218868437227405311) {
+		t5 := t4 & i64_const(0x7fffffffffffffff)
+		if t5 > i64_const(0x7fefffffffffffff) {
 			goto l1
 		}
 		{
@@ -50,7 +50,7 @@ l0:
 				v1 = t11
 				t12 := math.Abs(t11)
 				var t13 int32
-				if t12 < float64(9.223372036854776e+18) {
+				if t12 < float64(0x1p+63) {
 					t13 = 1
 				}
 				if t13 == 0 {
@@ -62,7 +62,7 @@ l0:
 				goto l3
 			}
 		l2:
-			v2 = i64_const(-9223372036854775808)
+			v2 = i64_const(-0x8000000000000000)
 		}
 	l3:
 		t17 := v0
@@ -77,7 +77,7 @@ l0:
 			{
 				t22 := v1
 				t23 := math.Abs(t22)
-				if t23 > float64(7.450580596923828e-09) {
+				if t23 > float64(0x1p-27) {
 					goto l4
 				}
 				v4 = float64(1)
@@ -95,8 +95,6 @@ l0:
 									t27 := int32(t26)
 									t28 := t27 & int32(3)
 									switch t28 {
-									case 0:
-										goto l1
 									case 1:
 										goto l6
 									case 2:

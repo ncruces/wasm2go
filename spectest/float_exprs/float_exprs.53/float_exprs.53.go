@@ -11,9 +11,9 @@ func New() *Module {
 }
 func (m *Module) Xllvm_pr27153(v0 int32) float32 {
 	t0 := v0
-	t1 := t0 & i32_const(268435455)
+	t1 := t0 & i32_const(0xfffffff)
 	t2 := float32(t1)
-	t3 := float32(t2 + float32(-8.388608e+06))
+	t3 := float32(t2 + float32(-0x1p+23))
 	return t3
 }
 
