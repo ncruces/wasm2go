@@ -136,10 +136,7 @@ func (t *translator) createNewFunc() ast.Decl {
 						&ast.BasicLit{
 							Kind:  token.INT,
 							Value: strconv.FormatUint(uint64(t.memory.min), 10)},
-						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")},
-					},
-				},
-			})
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}}})
 		} else {
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
@@ -263,8 +260,7 @@ func (t *translator) createNewFunc() ast.Decl {
 		Name: newID("New"),
 		Type: &ast.FuncType{
 			Params:  &ast.FieldList{List: params},
-			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}},
-		},
+			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}}},
 		Body: body}
 }
 

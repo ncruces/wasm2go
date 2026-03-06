@@ -3,8 +3,11 @@ package main
 import (
 	"go/ast"
 	"go/token"
+	"slices"
 	"strconv"
 	"strings"
+
+	"golang.org/x/tools/go/ast/astutil"
 )
 
 type funcCompiler struct {
@@ -183,8 +186,7 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 	fn.emit(&ast.AssignStmt{
 		Tok: token.DEFINE,
 		Lhs: []ast.Expr{tmp},
-		Rhs: []ast.Expr{expr},
-	})
+		Rhs: []ast.Expr{expr}})
 	fn.pushConst(tmp)
 }
 
@@ -263,8 +265,7 @@ func (fn *funcCompiler) binOp(op token.Token) {
 	fn.push(&ast.BinaryExpr{
 		Y:  fn.pop(),
 		X:  fn.pop(),
-		Op: op,
-	})
+		Op: op})
 }
 
 // Executes a binary uint32 operator.
@@ -331,10 +332,8 @@ func (fn *funcCompiler) uniMath64(name string) {
 	fn.push(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
-			Sel: newID(name),
-		},
-		Args: []ast.Expr{fn.pop()},
-	})
+			Sel: newID(name)},
+		Args: []ast.Expr{fn.pop()}})
 }
 
 // Executes a binary float64 math call.
@@ -345,8 +344,7 @@ func (fn *funcCompiler) binMath64(name string) {
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID(name)},
-		Args: []ast.Expr{x, y},
-	})
+		Args: []ast.Expr{x, y}})
 }
 
 // Executes a unary float32 math call.
@@ -388,8 +386,7 @@ func (fn *funcCompiler) float32frombits() {
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID("Float32frombits")},
-		Args: []ast.Expr{convert(fn.pop(), "uint32")},
-	})
+		Args: []ast.Expr{convert(fn.pop(), "uint32")}})
 }
 
 // Executes a Float64frombits call.
@@ -398,8 +395,7 @@ func (fn *funcCompiler) float64frombits() {
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID("Float64frombits")},
-		Args: []ast.Expr{convert(fn.pop(), "uint64")},
-	})
+		Args: []ast.Expr{convert(fn.pop(), "uint64")}})
 }
 
 // Executes a unary helper call.
@@ -470,6 +466,69 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 	id := labelId(fn.labels)
 	fn.labels++
 	return id
+}
+
+func (fn *funcCompiler) cleanup() {
+	body := fn.blocks[0].body
+
+	// Add Go imports.
+	ast.Inspect(body, fn.resolveImports)
+
+	// Count identifier uses.
+	uses := make(map[string]int)
+	ast.Inspect(body, func(n ast.Node) bool {
+		if id, ok := n.(*ast.Ident); ok {
+			uses[id.Name]++
+		}
+		return true
+	})
+
+	astutil.Apply(body,
+		// If an identifer only shows up in the left side of an assignment,
+		// replace it with the blank identifier.
+		func(c *astutil.Cursor) bool {
+			if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.DEFINE {
+				anyUsed := false
+				for i := range n.Lhs {
+					if id, ok := n.Lhs[i].(*ast.Ident); ok {
+						if uses[id.Name] == 1 {
+							n.Lhs[i] = newID("_")
+						} else if id.Name != "_" {
+							anyUsed = true
+						}
+					}
+				}
+				if !anyUsed {
+					n.Tok = token.ASSIGN
+				}
+			}
+			return true
+		},
+		// Remove labels followed by an empty statement (;).
+		func(c *astutil.Cursor) bool {
+			// Iterate backwards so once we find a label with an empty statement
+			// we can attach it to the next statement, if it's not a declaration.
+			if block, ok := c.Node().(*ast.BlockStmt); ok && len(block.List) > 0 {
+				stmts := make([]ast.Stmt, 0, len(block.List))
+				for i := len(block.List) - 1; i >= 0; i-- {
+					stmt := block.List[i]
+					if ls, ok := stmt.(*ast.LabeledStmt); ok {
+						if _, ok := ls.Stmt.(*ast.EmptyStmt); ok && len(stmts) > 0 {
+							nextStmt := stmts[len(stmts)-1]
+							if _, ok := nextStmt.(*ast.DeclStmt); !ok {
+								ls.Stmt = nextStmt
+								stmts[len(stmts)-1] = ls
+								continue
+							}
+						}
+					}
+					stmts = append(stmts, stmt)
+				}
+				slices.Reverse(stmts)
+				block.List = stmts
+			}
+			return true
+		})
 }
 
 type funcBlock struct {
