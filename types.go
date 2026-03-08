@@ -121,6 +121,7 @@ type export struct {
 
 type elemSegment struct {
 	init    []uint32
+	index   uint32
 	offset  uint32
 	passive bool
 }

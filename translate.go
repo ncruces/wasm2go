@@ -83,11 +83,10 @@ func translate(r io.Reader, w io.Writer) error {
 		t.createNewFunc()},
 		t.out.Decls...)
 
-	// Late binding of names.
+	// Fill in missing names.
 	if t.out.Name == nil {
 		t.out.Name = newID("wasm2go")
 	}
-
 	for i, fn := range t.functions {
 		if fn.decl != nil && fn.decl.Name.Name == "" {
 			fn.decl.Name.Name = "f" + strconv.Itoa(i)
@@ -96,18 +95,14 @@ func translate(r io.Reader, w io.Writer) error {
 	if t.memory != nil && t.memory.id.Name == "" {
 		t.memory.id.Name = "memory"
 	}
-	for i := range t.tables {
-		name := "table"
-		if len(t.tables) != 1 {
-			name = "t" + strconv.Itoa(i)
-		}
-		if t.tables[i].id.Name == "" {
-			t.tables[i].id.Name = name
+	for i, tb := range t.tables {
+		if tb.id.Name == "" {
+			tb.id.Name = "t" + strconv.Itoa(i)
 		}
 	}
-	for i := range t.globals {
-		if t.globals[i].id.Name == "" {
-			t.globals[i].id.Name = "g" + strconv.Itoa(i)
+	for i, gv := range t.globals {
+		if gv.id.Name == "" {
+			gv.id.Name = "g" + strconv.Itoa(i)
 		}
 	}
 
@@ -379,7 +374,7 @@ func (t *translator) readImportSection() error {
 			if err != nil {
 				return err
 			}
-			id := ast.NewIdent("Memory")
+			id := &ast.Ident{}
 			t.memory = &memoryDef{
 				id:       id,
 				min:      int(min),
@@ -577,11 +572,26 @@ func (t *translator) readElementSection() error {
 
 	t.elements = make([]elemSegment, count)
 	for i := range t.elements {
-		if tag, err := readLEB128(t.in); err != nil {
+		tag, err := readLEB128(t.in)
+		if err != nil {
 			return err
-		} else if tag == 1 {
+		}
+
+		var readKind bool
+		switch tag {
+		case 0: // active segment for table 0
+			t.elements[i].index = 0
+		case 1: // passive segment
 			t.elements[i].passive = true
-		} else if tag != 0 {
+			readKind = true
+		case 2: // active segment with table index
+			readKind = true
+			if idx, err := readLEB128(t.in); err != nil {
+				return err
+			} else {
+				t.elements[i].index = uint32(idx)
+			}
+		default:
 			return fmt.Errorf("unsupported element segment tag: %d", tag)
 		}
 
@@ -600,6 +610,14 @@ func (t *translator) readElementSection() error {
 				return err
 			} else if end != 0x0b {
 				return fmt.Errorf("expected end of expression, got %x", end)
+			}
+		}
+
+		if readKind {
+			if kind, err := t.in.ReadByte(); err != nil {
+				return err
+			} else if kind != 0x00 {
+				return fmt.Errorf("unsupported element kind: %x", kind)
 			}
 		}
 
@@ -661,6 +679,10 @@ func (t *translator) readExportSection() error {
 		case tableExport:
 			t.tables[index].id = ast.NewIdent(exported(name))
 		case memoryExport:
+			// For imported memories, we export the interface.
+			if t.memory.imported {
+				break
+			}
 			id := "Memory"
 			if !strings.EqualFold(name, id) {
 				id = exported(name)
@@ -1364,7 +1386,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if fn.memory.imported {
 				fn.push(&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")},
+						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")},
 						Sel: newID("Grow")},
 					Args: []ast.Expr{
 						fn.pop(),
@@ -1840,11 +1862,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							dst, src, n}}})
 
 			case 0x0d: // elem.drop
-				// No-op since element segments are static.
-				_, err := readLEB128(t.in)
+				idx, err := readLEB128(t.in)
 				if err != nil {
 					return err
 				}
+				fn.emit(&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.IndexExpr{
+						X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
+						Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(idx, 10)}}},
+					Rhs: []ast.Expr{newID("nil")}})
 
 			case 0x0e: // table.copy
 				dstIdx, err := readLEB128(t.in)
