@@ -3,7 +3,7 @@
 package wasm2go
 
 type Module struct {
-	table []any
+	t0 []any
 }
 
 func New() *Module {
@@ -12,7 +12,7 @@ func New() *Module {
 }
 func (m *Module) Xgrow(v0 int32) int32 {
 	t0 := v0
-	t1 := table_grow(&m.table, nil, t0, 65536)
+	t1 := table_grow(&m.t0, nil, t0, 65536)
 	return t1
 }
 

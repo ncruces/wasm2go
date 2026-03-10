@@ -9,7 +9,7 @@ import (
 )
 
 type Module struct {
-	table    []any
+	t0       []any
 	elements [][]any
 	memory   []byte
 	maxMem   int32
@@ -18,11 +18,11 @@ type Module struct {
 
 func New() *Module {
 	m := &Module{}
-	m.table = make([]any, 1)
+	m.t0 = make([]any, 1)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
 	m.elements = [][]any{[]any{m.f36}}
-	copy(m.table[0:], m.elements[0])
+	copy(m.t0[0:], m.elements[0])
 	m.g0 = int32(10)
 	return m
 }
@@ -521,7 +521,7 @@ func (m *Module) Xas_call_indirect_func() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.table[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(4), int32(1), int32(2))
+		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(4), int32(1), int32(2))
 		t0 = t1
 	}
 l0:
@@ -535,7 +535,7 @@ func (m *Module) Xas_call_indirect_first() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.table[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(4), int32(2))
+		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(4), int32(2))
 		t0 = t1
 	}
 l0:
@@ -549,7 +549,7 @@ func (m *Module) Xas_call_indirect_mid() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.table[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(4))
+		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(4))
 		t0 = t1
 	}
 l0:
@@ -563,7 +563,7 @@ func (m *Module) Xas_call_indirect_last() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.table[uint32(int32(4))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+		t1 := m.t0[uint32(int32(4))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 		t0 = t1
 	}
 l0:

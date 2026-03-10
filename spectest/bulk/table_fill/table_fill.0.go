@@ -3,29 +3,29 @@
 package wasm2go
 
 type Module struct {
-	table []any
+	t0 []any
 }
 
 func New() *Module {
 	m := &Module{}
-	m.table = make([]any, 10)
+	m.t0 = make([]any, 10)
 	return m
 }
 func (m *Module) Xfill(v0 int32, v1 any, v2 int32) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	table_fill(m.table, t0, t1, t2)
+	table_fill(m.t0, t0, t1, t2)
 }
 func (m *Module) Xfill_abbrev(v0 int32, v1 any, v2 int32) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	table_fill(m.table, t0, t1, t2)
+	table_fill(m.t0, t0, t1, t2)
 }
 func (m *Module) Xget(v0 int32) any {
 	t0 := v0
-	t1 := m.table[uint32(t0)]
+	t1 := m.t0[uint32(t0)]
 	return t1
 }
 

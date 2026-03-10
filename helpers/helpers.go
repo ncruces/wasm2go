@@ -6,11 +6,18 @@ import (
 	"runtime"
 )
 
+// These prevent constant folding/propagation,
+// ensuring code using them compiles
+// and overflows/panics at runtime.
+
 //go:nosplit
 func i32_const(x int32) int32 { return x }
 
 //go:nosplit
 func i64_const(x int64) int64 { return x }
+
+// These prevent constant folding/propagation,
+// ensuring correct NaN handling.
 
 //go:nosplit
 func f32_const(x float32) float32 {
@@ -23,6 +30,9 @@ func f64_const(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }
+
+// Detect signed integer overflow.
+// These generate sub-optimal code on amd64.
 
 //go:nosplit
 func i32_div_s(x, y int32) int32 {
@@ -39,6 +49,8 @@ func i64_div_s(x, y int64) int64 {
 	}
 	return x / y
 }
+
+// These are needed for correct y wrap around behavior.
 
 //go:nosplit
 func i32_shl(x, y int32) int32 {
@@ -90,6 +102,9 @@ func i64_rotr(x, y int64) int64 {
 	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
 }
 
+// These must be implemented as bitwise operations,
+// like the math versions are for float64.
+
 //go:nosplit
 func f32_abs(x float32) float32 {
 	return math.Float32frombits(math.Float32bits(x) &^ (1 << 31))
@@ -99,6 +114,9 @@ func f32_abs(x float32) float32 {
 func f32_copysign(x, y float32) float32 {
 	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }
+
+// These must return canonical NaNs,
+// which they don't on amd64.
 
 //go:nosplit
 func f32_min(x, y float32) float32 {
@@ -131,6 +149,11 @@ func f64_max(x, y float64) float64 {
 	}
 	return math.Float64frombits(0x7ff8000000000000)
 }
+
+// Float to int conversions.
+
+// All i64 conversions use >= because both MaxInt64 and MaxUint64
+// round up when converted to a float64.
 
 // go.dev/issues/76264 can speed these up
 
@@ -329,6 +352,8 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 	}
 	return int64(i)
 }
+
+// Bulk memory operations.
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {
 	buf := *mem

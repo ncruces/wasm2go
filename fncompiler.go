@@ -518,6 +518,12 @@ func (fn *funcCompiler) cleanup() {
 							if _, ok := nextStmt.(*ast.DeclStmt); !ok {
 								ls.Stmt = nextStmt
 								stmts[len(stmts)-1] = ls
+								// If the next statement was already labeled,
+								// merge the two labels into one.
+								if inner, ok := ls.Stmt.(*ast.LabeledStmt); ok {
+									ls.Label.Name = inner.Label.Name
+									stmts[len(stmts)-1] = inner
+								}
 								continue
 							}
 						}

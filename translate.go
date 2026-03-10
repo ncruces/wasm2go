@@ -678,6 +678,8 @@ func (t *translator) readExportSection() error {
 			decl.Name = ast.NewIdent(exported(name))
 		case tableExport:
 			t.tables[index].id = ast.NewIdent(exported(name))
+		case globalExport:
+			t.globals[index].id = ast.NewIdent(exported(name))
 		case memoryExport:
 			// For imported memories, we export the interface.
 			if t.memory.imported {
@@ -688,8 +690,6 @@ func (t *translator) readExportSection() error {
 				id = exported(name)
 			}
 			t.memory.id.Name = id
-		case globalExport:
-			t.globals[index].id = ast.NewIdent(exported(name))
 		}
 	}
 	return nil
@@ -2095,13 +2095,13 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 					if int(index) < len(t.functions) {
 						id = t.functions[index].decl.Name
 					}
-				case nameGlobal:
-					if int(index) < len(t.globals) {
-						id = t.globals[index].id
-					}
 				case nameTable:
 					if int(index) < len(t.tables) {
 						id = t.tables[index].id
+					}
+				case nameGlobal:
+					if int(index) < len(t.globals) {
+						id = t.globals[index].id
 					}
 				}
 				if id != nil && id.Name == "" {

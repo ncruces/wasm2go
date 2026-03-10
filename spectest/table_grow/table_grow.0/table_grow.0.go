@@ -3,7 +3,7 @@
 package wasm2go
 
 type Module struct {
-	table []any
+	t0 []any
 }
 
 func New() *Module {
@@ -12,28 +12,28 @@ func New() *Module {
 }
 func (m *Module) Xget(v0 int32) any {
 	t0 := v0
-	t1 := m.table[uint32(t0)]
+	t1 := m.t0[uint32(t0)]
 	return t1
 }
 func (m *Module) Xset(v0 int32, v1 any) {
 	t0 := v0
 	t1 := v1
-	m.table[uint32(t0)] = t1
+	m.t0[uint32(t0)] = t1
 }
 func (m *Module) Xgrow(v0 int32, v1 any) int32 {
 	t0 := v1
 	t1 := v0
-	t2 := table_grow(&m.table, t0, t1, 65536)
+	t2 := table_grow(&m.t0, t0, t1, 65536)
 	return t2
 }
 func (m *Module) Xgrow_abbrev(v0 int32, v1 any) int32 {
 	t0 := v1
 	t1 := v0
-	t2 := table_grow(&m.table, t0, t1, 65536)
+	t2 := table_grow(&m.t0, t0, t1, 65536)
 	return t2
 }
 func (m *Module) Xsize() int32 {
-	t0 := int32(len(m.table))
+	t0 := int32(len(m.t0))
 	return t0
 }
 

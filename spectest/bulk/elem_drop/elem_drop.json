@@ -1,0 +1,13 @@
+{"source_filename": "elem_drop.wast",
+ "commands": [
+  {"type": "module", "line": 2, "filename": "elem_drop.0.wasm"}, 
+  {"type": "action", "line": 19, "action": {"type": "invoke", "field": "init_passive", "args": [{"type": "i32", "value": "1"}]}, "expected": []}, 
+  {"type": "action", "line": 20, "action": {"type": "invoke", "field": "drop_passive", "args": []}, "expected": []}, 
+  {"type": "action", "line": 21, "action": {"type": "invoke", "field": "drop_passive", "args": []}, "expected": []}, 
+  {"type": "assert_return", "line": 22, "action": {"type": "invoke", "field": "init_passive", "args": [{"type": "i32", "value": "0"}]}, "expected": []}, 
+  {"type": "assert_trap", "line": 23, "action": {"type": "invoke", "field": "init_passive", "args": [{"type": "i32", "value": "1"}]}, "text": "out of bounds table access", "expected": []}, 
+  {"type": "action", "line": 24, "action": {"type": "invoke", "field": "init_passive", "args": [{"type": "i32", "value": "0"}]}, "expected": []}, 
+  {"type": "action", "line": 25, "action": {"type": "invoke", "field": "drop_active", "args": []}, "expected": []}, 
+  {"type": "assert_return", "line": 26, "action": {"type": "invoke", "field": "init_active", "args": [{"type": "i32", "value": "0"}]}, "expected": []}, 
+  {"type": "assert_trap", "line": 27, "action": {"type": "invoke", "field": "init_active", "args": [{"type": "i32", "value": "1"}]}, "text": "out of bounds table access", "expected": []}, 
+  {"type": "action", "line": 28, "action": {"type": "invoke", "field": "init_active", "args": [{"type": "i32", "value": "0"}]}, "expected": []}]}

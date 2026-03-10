@@ -9,7 +9,7 @@ import (
 )
 
 type Module struct {
-	table    []any
+	t0       []any
 	elements [][]any
 	memory   []byte
 	maxMem   int32
@@ -17,11 +17,11 @@ type Module struct {
 
 func New() *Module {
 	m := &Module{}
-	m.table = make([]any, 8)
+	m.t0 = make([]any, 8)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
 	m.elements = [][]any{[]any{m.f0, m.f1, m.f2, m.f3, m.f4, m.f5, m.f6, m.f7}}
-	copy(m.table[0:], m.elements[0])
+	copy(m.t0[0:], m.elements[0])
 	return m
 }
 func (m *Module) f0(v0 int32, v1 int32) int32 {
@@ -446,7 +446,7 @@ func (m *Module) Xi32_call_indirect() int32 {
 	t0 := m.f11()
 	t1 := m.f12()
 	t2 := m.f14()
-	t3 := m.table[uint32(t2)].(func(v0 int32, v1 int32) int32)(t0, t1)
+	t3 := m.t0[uint32(t2)].(func(v0 int32, v1 int32) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4
@@ -746,7 +746,7 @@ func (m *Module) Xi64_call_indirect() int32 {
 	t0 := m.f16()
 	t1 := m.f17()
 	t2 := m.f19()
-	t3 := m.table[uint32(t2)].(func(v0 int64, v1 int64) int32)(t0, t1)
+	t3 := m.t0[uint32(t2)].(func(v0 int64, v1 int64) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4
@@ -920,7 +920,7 @@ func (m *Module) Xf32_call_indirect() int32 {
 	t0 := m.f21()
 	t1 := m.f22()
 	t2 := m.f24()
-	t3 := m.table[uint32(t2)].(func(v0 float32, v1 float32) int32)(t0, t1)
+	t3 := m.t0[uint32(t2)].(func(v0 float32, v1 float32) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4
@@ -1094,7 +1094,7 @@ func (m *Module) Xf64_call_indirect() int32 {
 	t0 := m.f26()
 	t1 := m.f27()
 	t2 := m.f29()
-	t3 := m.table[uint32(t2)].(func(v0 float64, v1 float64) int32)(t0, t1)
+	t3 := m.t0[uint32(t2)].(func(v0 float64, v1 float64) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4

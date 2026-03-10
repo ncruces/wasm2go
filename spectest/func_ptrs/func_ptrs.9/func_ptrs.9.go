@@ -3,15 +3,15 @@
 package wasm2go
 
 type Module struct {
-	table    []any
+	t0       []any
 	elements [][]any
 }
 
 func New() *Module {
 	m := &Module{}
-	m.table = make([]any, 2)
+	m.t0 = make([]any, 2)
 	m.elements = [][]any{[]any{m.f0, m.f1}}
-	copy(m.table[0:], m.elements[0])
+	copy(m.t0[0:], m.elements[0])
 	return m
 }
 func (m *Module) f0() int32 {
@@ -22,6 +22,6 @@ func (m *Module) f1() int32 {
 }
 func (m *Module) Xcallt(v0 int32) int32 {
 	t0 := v0
-	t1 := m.table[uint32(t0)].(func() int32)()
+	t1 := m.t0[uint32(t0)].(func() int32)()
 	return t1
 }

@@ -5,7 +5,7 @@ package wasm2go
 import "runtime"
 
 type Module struct {
-	table    []any
+	t0       []any
 	elements [][]any
 	memory   []byte
 	maxMem   int32
@@ -14,11 +14,11 @@ type Module struct {
 
 func New() *Module {
 	m := &Module{}
-	m.table = make([]any, 1)
+	m.t0 = make([]any, 1)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
 	m.elements = [][]any{[]any{m.f1}}
-	copy(m.table[0:], m.elements[0])
+	copy(m.t0[0:], m.elements[0])
 	m.g0 = f32_const(0)
 	return m
 }

@@ -41,6 +41,10 @@ func mangle(buf *strings.Builder, name string) {
 	}
 }
 
+func dataID[T interface{ int | uint64 }](i T) *ast.Ident {
+	return newID("data" + strconv.Itoa(int(i)))
+}
+
 func localVar[T interface{ int | uint64 }](i T) *ast.Ident {
 	return newID("v" + strconv.Itoa(int(i)))
 }
@@ -50,9 +54,6 @@ func tempVar(i int) *ast.Ident {
 }
 
 func labelId(i int) *ast.Ident {
-	return newID("l" + strconv.Itoa(i))
-}
-
-func dataID[T interface{ int | uint64 }](i T) *ast.Ident {
-	return newID("data" + strconv.Itoa(int(i)))
+	// Labels can be relabeled, merged; don't cache.
+	return ast.NewIdent("l" + strconv.Itoa(i))
 }
