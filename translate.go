@@ -44,9 +44,14 @@ var stdlib = map[string]string{
 type translator struct {
 	in  *bufio.Reader
 	out ast.File
+
+	// WASM module Go type.
+	moduleType *ast.TypeSpec
+
 	// Dependencies.
 	packages set[string]
 	helpers  set[string]
+
 	// Sections.
 	types     []funcType
 	imports   []importDef
@@ -89,6 +94,7 @@ func translate(r io.Reader, w io.Writer) error {
 			break
 		}
 	}
+
 	if t.memory != nil && (exported || t.memory.imported) {
 		t.out.Decls = append(t.createMemoryTypes(), t.out.Decls...)
 	}
@@ -96,18 +102,37 @@ func translate(r io.Reader, w io.Writer) error {
 		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
 	}
 
+	// Next define module, with host interface generic param(s).
+	modDecl, modType := t.createModuleStruct(hostInterfaces)
+	t.moduleType = modType
+
 	t.out.Decls = append([]ast.Decl{
-		t.createModuleStruct(),
-		t.createNewFunc()},
-		t.out.Decls...)
+		modDecl,
+		t.createNewFunc(),
+	}, t.out.Decls...)
 
 	// Fill in missing names.
 	if t.out.Name == nil {
 		t.out.Name = newID("wasm2go")
 	}
 	for i, fn := range t.functions {
-		if fn.decl != nil && fn.decl.Name.Name == "" {
-			fn.decl.Name.Name = "f" + strconv.Itoa(i)
+		if fn.decl != nil {
+			if fn.decl.Name.Name == "" {
+				// If no function name, generate one.
+				fn.decl.Name.Name = "f" + strconv.Itoa(i)
+			}
+
+			// Now module type information is known,
+			// update all module receiver methods to
+			// have any determine generic paramter(s).
+			for _, field := range fn.decl.Recv.List {
+				if len(field.Names) > 0 && field.Names[0].Name == "m" {
+					field.Type = &ast.StarExpr{X: &ast.IndexExpr{
+						X:     modType.Name,
+						Index: modType.TypeParams.List[0].Names[0],
+					}}
+				}
+			}
 		}
 	}
 	if t.memory != nil && t.memory.id.Name == "" {
@@ -382,7 +407,16 @@ func (t *translator) readImportSection() error {
 				typ: typ,
 				decl: &ast.FuncDecl{
 					Name: &ast.Ident{},
-					Recv: modRecvList,
+					Recv: &ast.FieldList{
+						List: []*ast.Field{
+							{
+								Names: []*ast.Ident{newID("m")},
+								// Don't set receiving field type
+								// yet, this gets set after module
+								// generic type params are known.
+							},
+						},
+					},
 					Type: typ.toAST(),
 					Body: &ast.BlockStmt{List: []ast.Stmt{stmt}}},
 			}
@@ -487,7 +521,16 @@ func (t *translator) readFunctionSection() error {
 		fn.typ = t.types[index]
 		fn.decl = &ast.FuncDecl{
 			Name: &ast.Ident{},
-			Recv: modRecvList,
+			Recv: &ast.FieldList{
+				List: []*ast.Field{
+					{
+						Names: []*ast.Ident{newID("m")},
+						// Don't set receiving field type
+						// yet, this gets set after module
+						// generic type params are known.
+					},
+				},
+			},
 			Type: fn.typ.toAST(),
 		}
 		t.out.Decls = append(t.out.Decls, fn.decl)

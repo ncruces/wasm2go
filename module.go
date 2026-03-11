@@ -7,11 +7,7 @@ import (
 	"strconv"
 )
 
-var modRecvList = &ast.FieldList{List: []*ast.Field{{
-	Names: []*ast.Ident{newID("m")},
-	Type:  &ast.StarExpr{X: newID("Module")}}}}
-
-func (t *translator) createModuleStruct() ast.Decl {
+func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.GenDecl, *ast.TypeSpec) {
 	var fields []*ast.Field
 	// Tables: owned are []any; imported *[]any.
 	for _, tab := range t.tables {
@@ -66,13 +62,55 @@ func (t *translator) createModuleStruct() ast.Decl {
 				Type:  ast.NewIdent(exported(imp.module))})
 		}
 	}
-	return &ast.GenDecl{
-		Tok: token.TYPE,
-		Specs: []ast.Spec{
-			&ast.TypeSpec{
-				Name: newID("Module"),
-				Type: &ast.StructType{Fields: &ast.FieldList{List: fields}}}},
+	for _, g := range t.globals {
+		fields = append(fields, &ast.Field{
+			Names: []*ast.Ident{g.id},
+			Type:  g.typ.Ident()})
 	}
+	var typeParams *ast.FieldList
+	if len(hostInterfaces) > 0 {
+		typeParams = new(ast.FieldList)
+		for _, decl := range hostInterfaces {
+			typeSpec := decl.Specs[0].(*ast.TypeSpec)
+			typeParams.List = append(typeParams.List, &ast.Field{
+				Names: []*ast.Ident{typeSpec.Name},
+				Type:  newID(typeSpec.Name.Name),
+			})
+		}
+	}
+	typeSpec := &ast.TypeSpec{
+		Name:       newID("Module"),
+		TypeParams: typeParams,
+		Type: &ast.StructType{
+			Fields: &ast.FieldList{List: fields},
+		},
+	}
+	return &ast.GenDecl{
+		Tok:   token.TYPE,
+		Specs: []ast.Spec{typeSpec},
+	}, typeSpec
+}
+
+func (t *translator) createHostInterfaces() []*ast.GenDecl {
+	ifaces := map[string][]*ast.Field{}
+
+	for _, imp := range t.imports {
+		typ := imp.typ.toAST()
+
+		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
+			Names: []*ast.Ident{ast.NewIdent(exported(imp.name))},
+			Type:  typ})
+	}
+
+	decls := make([]*ast.GenDecl, 0, len(ifaces))
+	for name, methods := range ifaces {
+		decls = append(decls, &ast.GenDecl{
+			Tok: token.TYPE,
+			Specs: []ast.Spec{&ast.TypeSpec{
+				Name: ast.NewIdent(exported(name)),
+				Type: &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
+	}
+	return decls
 }
 
 func (t *translator) createNewFunc() ast.Decl {
@@ -286,9 +324,12 @@ func (t *translator) createNewFunc() ast.Decl {
 	return &ast.FuncDecl{
 		Name: newID("New"),
 		Type: &ast.FuncType{
-			Params:  &ast.FieldList{List: params},
-			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}}},
-		Body: body}
+			TypeParams: t.moduleType.TypeParams,
+			Params:     &ast.FieldList{List: params},
+			Results:    &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}},
+		},
+		Body: body,
+	}
 }
 
 func (t *translator) createHostInterfaces() []ast.Decl {
