@@ -6,11 +6,7 @@ import (
 	"strconv"
 )
 
-var modRecvList = &ast.FieldList{List: []*ast.Field{{
-	Names: []*ast.Ident{newID("m")},
-	Type:  &ast.StarExpr{X: newID("Module")}}}}
-
-func (t *translator) createModuleStruct() ast.Decl {
+func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.GenDecl, *ast.TypeSpec) {
 	var fields []*ast.Field
 	for _, tab := range t.tables {
 		fields = append(fields, &ast.Field{
@@ -53,16 +49,31 @@ func (t *translator) createModuleStruct() ast.Decl {
 			Names: []*ast.Ident{g.id},
 			Type:  g.typ.Ident()})
 	}
-	return &ast.GenDecl{
-		Tok: token.TYPE,
-		Specs: []ast.Spec{
-			&ast.TypeSpec{
-				Name: newID("Module"),
-				Type: &ast.StructType{Fields: &ast.FieldList{List: fields}}}},
+	var typeParams *ast.FieldList
+	if len(hostInterfaces) > 0 {
+		typeParams = new(ast.FieldList)
+		for _, decl := range hostInterfaces {
+			typeSpec := decl.Specs[0].(*ast.TypeSpec)
+			typeParams.List = append(typeParams.List, &ast.Field{
+				Names: []*ast.Ident{typeSpec.Name},
+				Type:  newID(typeSpec.Name.Name),
+			})
+		}
 	}
+	typeSpec := &ast.TypeSpec{
+		Name:       newID("Module"),
+		TypeParams: typeParams,
+		Type: &ast.StructType{
+			Fields: &ast.FieldList{List: fields},
+		},
+	}
+	return &ast.GenDecl{
+		Tok:   token.TYPE,
+		Specs: []ast.Spec{typeSpec},
+	}, typeSpec
 }
 
-func (t *translator) createHostInterfaces() []ast.Decl {
+func (t *translator) createHostInterfaces() []*ast.GenDecl {
 	ifaces := map[string][]*ast.Field{}
 
 	for _, imp := range t.imports {
@@ -73,7 +84,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 			Type:  typ})
 	}
 
-	decls := make([]ast.Decl, 0, len(ifaces))
+	decls := make([]*ast.GenDecl, 0, len(ifaces))
 	for name, methods := range ifaces {
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
@@ -95,7 +106,6 @@ func (t *translator) createNewFunc() ast.Decl {
 					Op: token.AND,
 					X:  &ast.CompositeLit{Type: newID("Module")}}}}},
 	}
-
 	for _, tab := range t.tables {
 		if tab.min > 0 {
 			body.List = append(body.List, &ast.AssignStmt{
@@ -260,9 +270,12 @@ func (t *translator) createNewFunc() ast.Decl {
 	return &ast.FuncDecl{
 		Name: newID("New"),
 		Type: &ast.FuncType{
-			Params:  &ast.FieldList{List: params},
-			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}}},
-		Body: body}
+			TypeParams: t.moduleType.TypeParams,
+			Params:     &ast.FieldList{List: params},
+			Results:    &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}},
+		},
+		Body: body,
+	}
 }
 
 func (t *translator) createMemoryInterface() ast.Decl {
