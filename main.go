@@ -7,8 +7,10 @@ import (
 )
 
 var (
+	endian = flag.String("endian", "", "endianness of the generated code (little or big)")
 	nanbox = flag.Bool("nanbox", false, "whether to canonicalize NaNs")
-	endian = flag.String("endian", "", "endianness of the generated code (big or little)")
+	nohost = flag.Bool("nohost", false, "disable generating interfaces for imports")
+	nohead = flag.Bool("nohead", false, "disable the header comment (including build tags)")
 )
 
 // https://pkg.go.dev/golang.org/x/sys/cpu#pkg-constants

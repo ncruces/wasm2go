@@ -79,7 +79,11 @@ The only other knob is whether to make sure float operations
 ```
 Usage of wasm2go:
   -endian string
-        endianness of the generated code (big or little)
+        endianness of the generated code (little or big)
   -nanbox
         whether to canonicalize NaNs
+  -nohead
+        disable the header comment (including build tags)
+  -nohost
+        disable generating interfaces for imports
 ```
