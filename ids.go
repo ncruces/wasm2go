@@ -49,11 +49,15 @@ func localVar[T interface{ int | uint64 }](i T) *ast.Ident {
 	return newID("v" + strconv.Itoa(int(i)))
 }
 
-func tempVar(i int) *ast.Ident {
+func tempVal(i int) *ast.Ident {
 	return newID("t" + strconv.Itoa(i))
 }
 
+func tempVar(i int) *ast.Ident {
+	return newID("p" + strconv.Itoa(i))
+}
+
 func labelId(i int) *ast.Ident {
-	// Labels can be relabeled, merged; don't cache.
+	// Labels can be relabeled, merged; don't cache!
 	return ast.NewIdent("l" + strconv.Itoa(i))
 }

@@ -11,31 +11,31 @@ func New() *Module {
 }
 func (m *Module) Xeven(v0 int32) int32 {
 	t0 := v0
-	var t2 int32
-	_ = t2
+	var p2 int32
+	_ = p2
 	if t0 == i32_const(0) {
-		t2 = int32(1)
+		p2 = int32(1)
 	} else {
 		t3 := v0
 		t4 := t3 - int32(1)
 		t5 := m.Xodd(t4)
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xodd(v0 int32) int32 {
 	t0 := v0
-	var t2 int32
-	_ = t2
+	var p2 int32
+	_ = p2
 	if t0 == i32_const(0) {
-		t2 = i32_const(0)
+		p2 = i32_const(0)
 	} else {
 		t3 := v0
 		t4 := t3 - int32(1)
 		t5 := m.Xeven(t4)
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 
 //go:nosplit

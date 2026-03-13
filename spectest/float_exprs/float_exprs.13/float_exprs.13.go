@@ -12,18 +12,18 @@ func New() *Module {
 func (m *Module) Xf32_no_fold_ne_self(v0 float32) int32 {
 	t0 := v0
 	t1 := v0
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf64_no_fold_ne_self(v0 float64) int32 {
 	t0 := v0
 	t1 := v0
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }

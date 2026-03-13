@@ -16,115 +16,115 @@ func New() *Module {
 }
 func (m *Module) Xf32_no_fold_lt_if_to_abs(v0 float32) float32 {
 	t0 := v0
-	var t2 float32
-	_ = t2
+	var p2 float32
+	_ = p2
 	if t0 < f32_const(0) {
 		t3 := v0
 		t4 := -t3
-		t2 = t4
+		p2 = t4
 	} else {
 		t5 := v0
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf32_no_fold_le_if_to_abs(v0 float32) float32 {
 	t0 := v0
-	var t2 float32
-	_ = t2
+	var p2 float32
+	_ = p2
 	if t0 <= math.Float32frombits(0x80000000) {
 		t3 := v0
 		t4 := -t3
-		t2 = t4
+		p2 = t4
 	} else {
 		t5 := v0
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf32_no_fold_gt_if_to_abs(v0 float32) float32 {
 	t0 := v0
-	var t2 float32
-	_ = t2
+	var p2 float32
+	_ = p2
 	if t0 > math.Float32frombits(0x80000000) {
 		t3 := v0
-		t2 = t3
+		p2 = t3
 	} else {
 		t4 := v0
 		t5 := -t4
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf32_no_fold_ge_if_to_abs(v0 float32) float32 {
 	t0 := v0
-	var t2 float32
-	_ = t2
+	var p2 float32
+	_ = p2
 	if t0 >= f32_const(0) {
 		t3 := v0
-		t2 = t3
+		p2 = t3
 	} else {
 		t4 := v0
 		t5 := -t4
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf64_no_fold_lt_if_to_abs(v0 float64) float64 {
 	t0 := v0
-	var t2 float64
-	_ = t2
+	var p2 float64
+	_ = p2
 	if t0 < f64_const(0) {
 		t3 := v0
 		t4 := -t3
-		t2 = t4
+		p2 = t4
 	} else {
 		t5 := v0
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf64_no_fold_le_if_to_abs(v0 float64) float64 {
 	t0 := v0
-	var t2 float64
-	_ = t2
+	var p2 float64
+	_ = p2
 	if t0 <= math.Float64frombits(0x8000000000000000) {
 		t3 := v0
 		t4 := -t3
-		t2 = t4
+		p2 = t4
 	} else {
 		t5 := v0
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf64_no_fold_gt_if_to_abs(v0 float64) float64 {
 	t0 := v0
-	var t2 float64
-	_ = t2
+	var p2 float64
+	_ = p2
 	if t0 > math.Float64frombits(0x8000000000000000) {
 		t3 := v0
-		t2 = t3
+		p2 = t3
 	} else {
 		t4 := v0
 		t5 := -t4
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xf64_no_fold_ge_if_to_abs(v0 float64) float64 {
 	t0 := v0
-	var t2 float64
-	_ = t2
+	var p2 float64
+	_ = p2
 	if t0 >= f64_const(0) {
 		t3 := v0
-		t2 = t3
+		p2 = t3
 	} else {
 		t4 := v0
 		t5 := -t4
-		t2 = t5
+		p2 = t5
 	}
-	return t2
+	return p2
 }
 
 //go:nosplit

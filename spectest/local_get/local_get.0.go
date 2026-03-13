@@ -55,11 +55,11 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 	var v8 float64
 	_, _, _, _ = v5, v6, v7, v8
 	t0 := v0
-	var t1 int32
+	var p1 int32
 	if t0 == 0 {
-		t1 = 1
+		p1 = 1
 	}
-	_ = t1
+	_ = p1
 	t2 := v1
 	t3 := -t2
 	_ = t3
@@ -67,32 +67,32 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 	t5 := -t4
 	_ = t5
 	t6 := v3
-	var t7 int32
+	var p7 int32
 	if t6 == 0 {
-		t7 = 1
+		p7 = 1
 	}
-	_ = t7
+	_ = p7
 	t8 := v4
-	var t9 int32
+	var p9 int32
 	if t8 == 0 {
-		t9 = 1
+		p9 = 1
 	}
-	_ = t9
+	_ = p9
 	t10 := v5
 	t11 := -t10
 	_ = t11
 	t12 := v6
-	var t13 int32
+	var p13 int32
 	if t12 == 0 {
-		t13 = 1
+		p13 = 1
 	}
-	_ = t13
+	_ = p13
 	t14 := v7
-	var t15 int32
+	var p15 int32
 	if t14 == 0 {
-		t15 = 1
+		p15 = 1
 	}
-	_ = t15
+	_ = p15
 	t16 := v8
 	t17 := -t16
 	_ = t17
@@ -132,62 +132,62 @@ func (m *Module) Xread(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) flo
 	return t23
 }
 func (m *Module) Xas_block_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = t1
+		p0 = t1
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = t1
+		p0 = t1
 		if int32(1) != 0 {
 			goto l0
 		}
-		t0 = t1
+		p0 = t1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		if t2 != 0 {
 			goto l0
 		}
-		t0 = t1
+		p0 = t1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_value(v0 int32) int32 {
 	{
@@ -218,27 +218,27 @@ func (m *Module) Xas_return_value(v0 int32) int32 {
 }
 func (m *Module) Xas_if_then(v0 int32) int32 {
 	t0 := v0
-	var t1 int32
-	_ = t1
+	var p1 int32
+	_ = p1
 	if t0 != 0 {
 		t2 := v0
-		t1 = t2
+		p1 = t2
 	} else {
-		t1 = i32_const(0)
+		p1 = i32_const(0)
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_if_else(v0 int32) int32 {
 	t0 := v0
-	var t1 int32
-	_ = t1
+	var p1 int32
+	_ = p1
 	if t0 != 0 {
-		t1 = int32(1)
+		p1 = int32(1)
 	} else {
 		t2 := v0
-		t1 = t2
+		p1 = t2
 	}
-	return t1
+	return p1
 }
 
 //go:nosplit

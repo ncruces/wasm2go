@@ -12,104 +12,104 @@ func New() *Module {
 func (m *Module) Xf32_not_lt(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf32_not_le(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf32_not_gt(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf32_not_ge(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_not_lt(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_not_le(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_not_gt(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_not_ge(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	var t3 int32
-	if t2 == 0 {
-		t3 = 1
+	var p3 int32
+	if p2 == 0 {
+		p3 = 1
 	}
-	return t3
+	return p3
 }

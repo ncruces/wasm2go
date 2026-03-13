@@ -72,11 +72,11 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 	var v8 float64
 	_, _, _, _ = v5, v6, v7, v8
 	v0 = i64_const(0)
-	var t0 int32
+	var p0 int32
 	if i64_const(0) == 0 {
-		t0 = 1
+		p0 = 1
 	}
-	_ = t0
+	_ = p0
 	v1 = f32_const(0)
 	t1 := -f32_const(0)
 	_ = t1
@@ -84,32 +84,32 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 	t2 := -f64_const(0)
 	_ = t2
 	v3 = i32_const(0)
-	var t3 int32
+	var p3 int32
 	if i32_const(0) == 0 {
-		t3 = 1
+		p3 = 1
 	}
-	_ = t3
+	_ = p3
 	v4 = i32_const(0)
-	var t4 int32
+	var p4 int32
 	if i32_const(0) == 0 {
-		t4 = 1
+		p4 = 1
 	}
-	_ = t4
+	_ = p4
 	v5 = f32_const(0)
 	t5 := -f32_const(0)
 	_ = t5
 	v6 = i64_const(0)
-	var t6 int32
+	var p6 int32
 	if i64_const(0) == 0 {
-		t6 = 1
+		p6 = 1
 	}
-	_ = t6
+	_ = p6
 	v7 = i64_const(0)
-	var t7 int32
+	var p7 int32
 	if i64_const(0) == 0 {
-		t7 = 1
+		p7 = 1
 	}
-	_ = t7
+	_ = p7
 	v8 = f64_const(0)
 	t8 := -f64_const(0)
 	_ = t8
@@ -192,79 +192,79 @@ func (m *Module) Xresult(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) f
 func (m *Module) f11() {
 }
 func (m *Module) Xas_block_first(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		v0 = int32(1)
 		m.f11()
-		t0 = int32(1)
+		p0 = int32(1)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_block_mid(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f11()
 		v0 = int32(1)
 		m.f11()
-		t0 = int32(1)
+		p0 = int32(1)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_block_last(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f11()
 		m.f11()
 		v0 = int32(1)
-		t0 = int32(1)
+		p0 = int32(1)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_first(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		v0 = int32(3)
 		m.f11()
-		t0 = int32(3)
+		p0 = int32(3)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_mid(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f11()
 		v0 = int32(4)
 		m.f11()
-		t0 = int32(4)
+		p0 = int32(4)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_last(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f11()
 		m.f11()
 		v0 = int32(5)
-		t0 = int32(5)
+		p0 = int32(5)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		v0 = int32(9)
-		t0 = int32(9)
+		p0 = int32(9)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_cond(v0 int32) {
 	{
@@ -276,34 +276,34 @@ func (m *Module) Xas_br_if_cond(v0 int32) {
 l0:
 }
 func (m *Module) Xas_br_if_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		v0 = int32(8)
-		t0 = int32(8)
+		p0 = int32(8)
 		if int32(1) != 0 {
 			goto l0
 		}
 		_ = int32(8)
-		t0 = int32(7)
+		p0 = int32(7)
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		v0 = int32(9)
-		t0 = int32(6)
+		p0 = int32(6)
 		if int32(9) != 0 {
 			goto l0
 		}
 		_ = int32(6)
-		t0 = int32(7)
+		p0 = int32(7)
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_index(v0 int32) {
 	{
@@ -316,32 +316,32 @@ func (m *Module) Xas_br_table_index(v0 int32) {
 l0:
 }
 func (m *Module) Xas_br_table_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		v0 = int32(10)
-		t0 = int32(10)
+		p0 = int32(10)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_value_index(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		v0 = int32(11)
-		t0 = int32(6)
+		p0 = int32(6)
 		switch int32(11) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_return_value(v0 int32) int32 {
 	v0 = int32(7)
@@ -349,68 +349,68 @@ func (m *Module) Xas_return_value(v0 int32) int32 {
 }
 func (m *Module) Xas_if_cond(v0 int32) int32 {
 	v0 = int32(2)
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	if int32(2) != 0 {
-		t0 = i32_const(0)
+		p0 = i32_const(0)
 	} else {
-		t0 = int32(1)
+		p0 = int32(1)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_if_then(v0 int32) int32 {
 	t0 := v0
-	var t1 int32
-	_ = t1
+	var p1 int32
+	_ = p1
 	if t0 != 0 {
 		v0 = int32(3)
-		t1 = int32(3)
+		p1 = int32(3)
 	} else {
 		t2 := v0
-		t1 = t2
+		p1 = t2
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_if_else(v0 int32) int32 {
 	t0 := v0
-	var t1 int32
-	_ = t1
+	var p1 int32
+	_ = p1
 	if t0 != 0 {
 		t2 := v0
-		t1 = t2
+		p1 = t2
 	} else {
 		v0 = int32(4)
-		t1 = int32(4)
+		p1 = int32(4)
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
 	v0 = int32(5)
 	t0 := v0
 	t1 := v1
-	t2 := t0
+	p2 := t0
 	if t1 != 0 {
-		t2 = int32(5)
+		p2 = int32(5)
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xas_select_second(v0 int32, v1 int32) int32 {
 	t0 := v0
 	v0 = int32(6)
 	t1 := v1
-	t2 := int32(6)
+	p2 := int32(6)
 	if t1 != 0 {
-		t2 = t0
+		p2 = t0
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xas_select_cond(v0 int32) int32 {
 	v0 = int32(7)
-	t0 := int32(1)
+	p0 := int32(1)
 	if int32(7) != 0 {
-		t0 = i32_const(0)
+		p0 = i32_const(0)
 	}
-	return t0
+	return p0
 }
 func (m *Module) f32(v0 int32, v1 int32, v2 int32) int32 {
 	return i32_const(-1)
@@ -510,27 +510,27 @@ func (m *Module) Xas_binary_right(v0 int32) int32 {
 }
 func (m *Module) Xas_test_operand(v0 int32) int32 {
 	v0 = i32_const(0)
-	var t0 int32
+	var p0 int32
 	if i32_const(0) == 0 {
-		t0 = 1
+		p0 = 1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_compare_left(v0 int32) int32 {
 	v0 = int32(43)
-	var t0 int32
+	var p0 int32
 	if int32(43) <= int32(10) {
-		t0 = 1
+		p0 = 1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_compare_right(v0 int32) int32 {
 	v0 = int32(42)
-	var t0 int32
+	var p0 int32
 	if int32(10) != int32(42) {
-		t0 = 1
+		p0 = 1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_convert_operand(v0 int64) int32 {
 	v0 = int64(41)

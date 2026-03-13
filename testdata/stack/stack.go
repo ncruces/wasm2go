@@ -22,14 +22,14 @@ func (m *Module) Xstack_func_call() int32 {
 func (m *Module) Xgreater(v0 int32, v1 int32) int32 {
 	t0 := v0
 	t1 := v1
-	var t3 int32
-	_ = t3
+	var p3 int32
+	_ = p3
 	if t0 > t1 {
-		t3 = int32(1)
+		p3 = int32(1)
 	} else {
-		t3 = i32_const(0)
+		p3 = i32_const(0)
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xtwo_a_plus_b(v0 int32, v1 int32) int32 {
 	var v2 int32

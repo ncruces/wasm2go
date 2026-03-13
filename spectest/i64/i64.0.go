@@ -136,101 +136,101 @@ func (m *Module) Xextend32_s(v0 int64) int64 {
 }
 func (m *Module) Xeqz(v0 int64) int32 {
 	t0 := v0
-	var t1 int32
+	var p1 int32
 	if t0 == 0 {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xeq(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 == t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xne(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xlt_s(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xlt_u(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if uint64(t0) < uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xle_s(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xle_u(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if uint64(t0) <= uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xgt_s(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xgt_u(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if uint64(t0) > uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xge_s(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xge_u(v0 int64, v1 int64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if uint64(t0) >= uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 
 //go:nosplit

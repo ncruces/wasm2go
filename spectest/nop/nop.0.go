@@ -66,121 +66,121 @@ func (m *Module) Xas_select_first(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
 	t2 := v0
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xas_select_mid1(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
 	t2 := v0
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xas_select_mid2(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
 	t2 := v0
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xas_select_last(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
 	t2 := v0
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xas_select_everywhere(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
 	t2 := v0
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xas_block_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(2)
+		p0 = int32(2)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_block_mid() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(2)
+		p0 = int32(2)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_block_last() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(3)
+		p0 = int32(3)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_block_everywhere() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(4)
+		p0 = int32(4)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(2)
+		p0 = int32(2)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_mid() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(2)
+		p0 = int32(2)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_last() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(3)
+		p0 = int32(3)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_everywhere() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(4)
+		p0 = int32(4)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_if_condition(v0 int32) {
 	t0 := v0
@@ -203,157 +203,157 @@ func (m *Module) Xas_if_else(v0 int32) {
 	}
 }
 func (m *Module) Xas_br_first(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = t1
+		p0 = t1
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_last(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = t1
+		p0 = t1
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_everywhere(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = t1
+		p0 = t1
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_first(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		if t2 != 0 {
 			goto l0
 		}
-		t0 = t1
+		p0 = t1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_mid(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		if t2 != 0 {
 			goto l0
 		}
-		t0 = t1
+		p0 = t1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_last(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		if t2 != 0 {
 			goto l0
 		}
-		t0 = t1
+		p0 = t1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_everywhere(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		if t2 != 0 {
 			goto l0
 		}
-		t0 = t1
+		p0 = t1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_first(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		switch t2 {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_mid(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		switch t2 {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_last(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		switch t2 {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_everywhere(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
 		t2 := v0
-		t0 = t1
+		p0 = t1
 		switch t2 {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_return_first(v0 int32) int32 {
 	t0 := v0
@@ -443,63 +443,63 @@ func (m *Module) Xas_binary_everywhere(v0 int32) int32 {
 }
 func (m *Module) Xas_test_first(v0 int32) int32 {
 	t0 := v0
-	var t1 int32
+	var p1 int32
 	if t0 == 0 {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_test_last(v0 int32) int32 {
 	t0 := v0
-	var t1 int32
+	var p1 int32
 	if t0 == 0 {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_test_everywhere(v0 int32) int32 {
 	t0 := v0
-	var t1 int32
+	var p1 int32
 	if t0 == 0 {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_compare_first(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xas_compare_mid(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xas_compare_last(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
-	var t2 int32
+	var p2 int32
 	if uint32(t0) < uint32(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xas_compare_everywhere(v0 int32) int32 {
 	t0 := v0
 	t1 := v0
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xas_memory_grow_first(v0 int32) int32 {
 	t0 := v0
@@ -521,49 +521,49 @@ func (m *Module) f61(v0 int32, v1 int32) int32 {
 	return t0
 }
 func (m *Module) Xas_call_indirect_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_mid1() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_mid2() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_last() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_everywhere() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_local_set_first(v0 int32) int32 {
 	v0 = int32(2)

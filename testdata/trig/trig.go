@@ -49,11 +49,11 @@ l0:
 				t11 := float64(t8 + t10)
 				v1 = t11
 				t12 := math.Abs(t11)
-				var t13 int32
+				var p13 int32
 				if t12 < float64(0x1p+63) {
-					t13 = 1
+					p13 = 1
 				}
-				if t13 == 0 {
+				if p13 == 0 {
 					goto l2
 				}
 				t15 := v1

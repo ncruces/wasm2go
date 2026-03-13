@@ -63,14 +63,14 @@ l0:
 	return int32(9)
 }
 func (m *Module) Xblock_unwind_by_br_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_unwind_by_br_if() int32 {
 	{
@@ -84,19 +84,19 @@ l0:
 	return int32(9)
 }
 func (m *Module) Xblock_unwind_by_br_if_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		if int32(1) != 0 {
 			goto l0
 		}
 		_ = int32(9)
 		_ = int64(1)
-		t0 = int32(3)
+		p0 = int32(3)
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_unwind_by_br_table() int32 {
 	{
@@ -109,28 +109,28 @@ l0:
 	return int32(9)
 }
 func (m *Module) Xblock_unwind_by_br_table_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_unwind_by_return() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		return int32(9)
 	}
 }
 func (m *Module) Xblock_nested_unwind_by_unreachable() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		{
 			panic("unreachable")
@@ -147,16 +147,16 @@ l0:
 	return int32(9)
 }
 func (m *Module) Xblock_nested_unwind_by_br_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		{
-			t0 = int32(9)
+			p0 = int32(9)
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_nested_unwind_by_br_if() int32 {
 	{
@@ -172,21 +172,21 @@ l0:
 	return int32(9)
 }
 func (m *Module) Xblock_nested_unwind_by_br_if_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		{
-			t0 = int32(9)
+			p0 = int32(9)
 			if int32(1) != 0 {
 				goto l0
 			}
 			_ = int32(9)
 			_ = int64(1)
 		}
-		t0 = int32(3)
+		p0 = int32(3)
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_nested_unwind_by_br_table() int32 {
 	{
@@ -201,11 +201,11 @@ l0:
 	return int32(9)
 }
 func (m *Module) Xblock_nested_unwind_by_br_table_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		{
-			t0 = int32(9)
+			p0 = int32(9)
 			switch int32(1) {
 			default:
 				goto l0
@@ -213,11 +213,11 @@ func (m *Module) Xblock_nested_unwind_by_br_table_value() int32 {
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_nested_unwind_by_return() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		{
 			return int32(9)
@@ -228,45 +228,45 @@ func (m *Module) Xunary_after_unreachable() int32 {
 	panic("unreachable")
 }
 func (m *Module) Xunary_after_br() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xunary_after_br_if() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		if int32(1) != 0 {
 			goto l0
 		}
 		_ = int32(9)
-		var t1 int32
+		var p1 int32
 		if i64_const(0) == 0 {
-			t1 = 1
+			p1 = 1
 		}
-		t0 = t1
+		p0 = p1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xunary_after_br_table() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xunary_after_return() int32 {
 	return int32(9)
@@ -275,45 +275,45 @@ func (m *Module) Xbinary_after_unreachable() int32 {
 	panic("unreachable")
 }
 func (m *Module) Xbinary_after_br() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xbinary_after_br_if() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		if int32(1) != 0 {
 			goto l0
 		}
 		_ = int32(9)
-		var t1 int32
+		var p1 int32
 		if i64_const(0) == int64(1) {
-			t1 = 1
+			p1 = 1
 		}
-		t0 = t1
+		p0 = p1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xbinary_after_br_table() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xbinary_after_return() int32 {
 	return int32(9)
@@ -322,148 +322,148 @@ func (m *Module) Xselect_after_unreachable() int32 {
 	panic("unreachable")
 }
 func (m *Module) Xselect_after_br() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xselect_after_br_if() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		if int32(1) != 0 {
 			goto l0
 		}
 		_ = int32(9)
-		t1 := int32(1)
+		p1 := int32(1)
 		if i32_const(0) != 0 {
-			t1 = i32_const(0)
+			p1 = i32_const(0)
 		}
-		t0 = t1
+		p0 = p1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xselect_after_br_table() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xselect_after_return() int32 {
 	return int32(9)
 }
 func (m *Module) Xblock_value_after_unreachable() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
 }
 func (m *Module) Xblock_value_after_br() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_value_after_br_if() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		if int32(1) != 0 {
 			goto l0
 		}
 		_ = int32(9)
-		t0 = i32_const(0)
+		p0 = i32_const(0)
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_value_after_br_table() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xblock_value_after_return() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		return int32(9)
 	}
 }
 func (m *Module) Xloop_value_after_unreachable() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
 }
 func (m *Module) Xloop_value_after_br() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			t0 = int32(9)
+			p0 = int32(9)
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xloop_value_after_br_if() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			t0 = int32(9)
+			p0 = int32(9)
 			if int32(1) != 0 {
 				goto l0
 			}
 			_ = int32(9)
-			t1 = i32_const(0)
+			p1 = i32_const(0)
 		}
-		t0 = t1
+		p0 = p1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xloop_value_after_br_table() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			t0 = int32(9)
+			p0 = int32(9)
 			switch i32_const(0) {
 			default:
 				goto l0
@@ -471,11 +471,11 @@ func (m *Module) Xloop_value_after_br_table() int32 {
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xloop_value_after_return() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		return int32(9)
 	}

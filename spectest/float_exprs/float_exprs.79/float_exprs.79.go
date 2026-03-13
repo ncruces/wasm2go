@@ -14,20 +14,20 @@ func (m *Module) Xf32_no_extended_precision_div(v0 float32, v1 float32, v2 float
 	t1 := v1
 	t2 := float32(t0 / t1)
 	t3 := v2
-	var t4 int32
+	var p4 int32
 	if t2 == t3 {
-		t4 = 1
+		p4 = 1
 	}
-	return t4
+	return p4
 }
 func (m *Module) Xf64_no_extended_precision_div(v0 float64, v1 float64, v2 float64) int32 {
 	t0 := v0
 	t1 := v1
 	t2 := float64(t0 / t1)
 	t3 := v2
-	var t4 int32
+	var p4 int32
 	if t2 == t3 {
-		t4 = 1
+		p4 = 1
 	}
-	return t4
+	return p4
 }

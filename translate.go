@@ -1052,7 +1052,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			lhs := make([]ast.Expr, len(target.typ.results))
 			for i := range lhs {
-				lhs[i] = fn.newTempVar()
+				lhs[i] = fn.newTempVal()
 			}
 			fn.emit(&ast.AssignStmt{
 				Lhs: lhs,
@@ -1094,7 +1094,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			lhs := make([]ast.Expr, len(typ.results))
 			for i := range lhs {
-				lhs[i] = fn.newTempVar()
+				lhs[i] = fn.newTempVal()
 			}
 			fn.emit(&ast.AssignStmt{
 				Lhs: lhs,

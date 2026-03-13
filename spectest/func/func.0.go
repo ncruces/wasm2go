@@ -169,32 +169,32 @@ func (m *Module) Xlocal_mixed() float64 {
 	t1 := -t0
 	_ = t1
 	t2 := v1
-	var t3 int32
+	var p3 int32
 	if t2 == 0 {
-		t3 = 1
+		p3 = 1
 	}
-	_ = t3
+	_ = p3
 	t4 := v2
-	var t5 int32
+	var p5 int32
 	if t4 == 0 {
-		t5 = 1
+		p5 = 1
 	}
-	_ = t5
+	_ = p5
 	t6 := v3
-	var t7 int32
+	var p7 int32
 	if t6 == 0 {
-		t7 = 1
+		p7 = 1
 	}
-	_ = t7
+	_ = p7
 	t8 := v4
 	t9 := -t8
 	_ = t9
 	t10 := v5
-	var t11 int32
+	var p11 int32
 	if t10 == 0 {
-		t11 = 1
+		p11 = 1
 	}
-	_ = t11
+	_ = p11
 	t12 := v4
 	return t12
 }
@@ -235,32 +235,32 @@ func (m *Module) Xparam_mixed(v0 float32, v1 int32, v2 int64, v3 int32, v4 float
 	t1 := -t0
 	_ = t1
 	t2 := v1
-	var t3 int32
+	var p3 int32
 	if t2 == 0 {
-		t3 = 1
+		p3 = 1
 	}
-	_ = t3
+	_ = p3
 	t4 := v2
-	var t5 int32
+	var p5 int32
 	if t4 == 0 {
-		t5 = 1
+		p5 = 1
 	}
-	_ = t5
+	_ = p5
 	t6 := v3
-	var t7 int32
+	var p7 int32
 	if t6 == 0 {
-		t7 = 1
+		p7 = 1
 	}
-	_ = t7
+	_ = p7
 	t8 := v4
 	t9 := -t8
 	_ = t9
 	t10 := v5
-	var t11 int32
+	var p11 int32
 	if t10 == 0 {
-		t11 = 1
+		p11 = 1
 	}
-	_ = t11
+	_ = p11
 	t12 := v4
 	return t12
 }
@@ -288,13 +288,13 @@ func (m *Module) Xvalue_block_void() {
 	}
 }
 func (m *Module) Xvalue_block_i32() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(77)
+		p0 = int32(77)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xreturn_empty() {
 	return
@@ -312,13 +312,13 @@ func (m *Module) Xreturn_f64() float64 {
 	return float64(78.78)
 }
 func (m *Module) Xreturn_block_i32() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(77)
+		p0 = int32(77)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xbreak_empty() {
 	return
@@ -336,13 +336,13 @@ func (m *Module) Xbreak_f64() float64 {
 	return float64(79.79)
 }
 func (m *Module) Xbreak_block_i32() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(77)
+		p0 = int32(77)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xbreak_br_if_empty(v0 int32) {
 	t0 := v0
@@ -385,11 +385,11 @@ func (m *Module) Xbreak_br_table_nested_empty(v0 int32) {
 l0:
 }
 func (m *Module) Xbreak_br_table_nested_num(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = int32(50)
+		p0 = int32(50)
 		switch t1 {
 		case 1:
 			return int32(50)
@@ -398,7 +398,7 @@ func (m *Module) Xbreak_br_table_nested_num(v0 int32) int32 {
 		}
 	}
 l0:
-	t2 := t0 + int32(2)
+	t2 := p0 + int32(2)
 	return t2
 }
 func (m *Module) Xinit_local_i32() int32 {

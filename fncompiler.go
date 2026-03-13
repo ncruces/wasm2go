@@ -26,6 +26,7 @@ type funcCompiler struct {
 // Emits statements to the current function.
 func (fn *funcCompiler) emit(stmts ...ast.Stmt) {
 	fn.blocks.top().emit(stmts...)
+	fn.cond = nil
 }
 
 // Returns a statement to exit n blocks.
@@ -182,7 +183,7 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 		return
 	}
 
-	tmp := fn.newTempVar()
+	tmp := fn.newTempVal()
 	fn.emit(&ast.AssignStmt{
 		Tok: token.DEFINE,
 		Lhs: []ast.Expr{tmp},
@@ -456,6 +457,12 @@ func (fn *funcCompiler) cmpOpU64(op token.Token) {
 		Op: op})
 }
 
+func (fn *funcCompiler) newTempVal() *ast.Ident {
+	id := tempVal(fn.temps)
+	fn.temps++
+	return id
+}
+
 func (fn *funcCompiler) newTempVar() *ast.Ident {
 	id := tempVar(fn.temps)
 	fn.temps++
@@ -470,6 +477,18 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 
 func (fn *funcCompiler) cleanup() {
 	body := fn.blocks[0].body
+
+	// Verify that materialized constants are only assigned once.
+	ast.Inspect(body, func(n ast.Node) bool {
+		if assign, ok := n.(*ast.AssignStmt); ok && assign.Tok == token.ASSIGN {
+			for _, lhs := range assign.Lhs {
+				if id, ok := lhs.(*ast.Ident); ok && strings.HasPrefix(id.Name, "t") {
+					panic("assignment to materialized constant: " + id.Name)
+				}
+			}
+		}
+		return true
+	})
 
 	// Add Go imports.
 	ast.Inspect(body, fn.resolveImports)

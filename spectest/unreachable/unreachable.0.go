@@ -54,15 +54,15 @@ func (m *Module) Xas_func_value() int32 {
 	panic("unreachable")
 }
 func (m *Module) Xas_block_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
 }
 func (m *Module) Xas_block_mid() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
 		panic("unreachable")
@@ -75,34 +75,34 @@ func (m *Module) Xas_block_last() {
 	}
 }
 func (m *Module) Xas_block_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
 		panic("unreachable")
 	}
 }
 func (m *Module) Xas_block_broke() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(1)
+		p0 = int32(1)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
 }
 func (m *Module) Xas_loop_mid() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
 		panic("unreachable")
@@ -115,23 +115,23 @@ func (m *Module) Xas_loop_last() {
 	}
 }
 func (m *Module) Xas_loop_broke() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			m.f0()
-			t0 = int32(1)
+			p0 = int32(1)
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
@@ -142,15 +142,15 @@ func (m *Module) Xas_br_if_cond() {
 	}
 }
 func (m *Module) Xas_br_if_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
 }
 func (m *Module) Xas_br_if_value_cond() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
@@ -161,33 +161,33 @@ func (m *Module) Xas_br_table_index() {
 	}
 }
 func (m *Module) Xas_br_table_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
 }
 func (m *Module) Xas_br_table_value_2() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			panic("unreachable")
 		}
 	}
 }
 func (m *Module) Xas_br_table_value_index() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
 }
 func (m *Module) Xas_br_table_value_and_index() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		panic("unreachable")
 	}
@@ -200,27 +200,27 @@ func (m *Module) Xas_if_cond() int32 {
 }
 func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
 	t0 := v0
-	var t1 int32
-	_ = t1
+	var p1 int32
+	_ = p1
 	if t0 != 0 {
 		panic("unreachable")
 	} else {
 		t2 := v1
-		t1 = t2
+		p1 = t2
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
 	t0 := v0
-	var t1 int32
-	_ = t1
+	var p1 int32
+	_ = p1
 	if t0 != 0 {
 		t2 := v1
-		t1 = t2
+		p1 = t2
 	} else {
 		panic("unreachable")
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_if_then_no_else(v0 int32, v1 int32) int32 {
 	t0 := v0

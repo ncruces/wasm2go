@@ -82,8 +82,8 @@ func (m *Module) Xexpr(v0 int64) int64 {
 	var v1 int64
 	_ = v1
 	v1 = int64(100)
-	var t0 int64
-	_ = t0
+	var p0 int64
+	_ = p0
 	{
 		{
 			{
@@ -128,7 +128,7 @@ func (m *Module) Xexpr(v0 int64) int64 {
 						l3:
 							t4 := v0
 							t5 := i64_const(0) - t4
-							t0 = t5
+							p0 = t5
 							goto l9
 						}
 					l6:
@@ -140,36 +140,36 @@ func (m *Module) Xexpr(v0 int64) int64 {
 			}
 		l8:
 			t6 := v1
-			t0 = t6
+			p0 = t6
 			goto l9
 		}
 	l7:
-		t0 = i64_const(-5)
+		p0 = i64_const(-5)
 	}
 l9:
-	return t0
+	return p0
 }
 func (m *Module) Xarg(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			var t2 int32
-			_ = t2
+			var p2 int32
+			_ = p2
 			{
-				var t3 int32
-				_ = t3
+				var p3 int32
+				_ = p3
 				{
 					t4 := v0
 					t5 := int32(2) * t4
 					t6 := v0
 					t7 := int32(3) & t6
-					t2 = t5
-					t1 = t5
-					t0 = t5
-					t3 = t5
+					p2 = t5
+					p1 = t5
+					p0 = t5
+					p3 = t5
 					switch t7 {
 					case 0:
 						goto l0
@@ -182,19 +182,19 @@ func (m *Module) Xarg(v0 int32) int32 {
 					}
 				}
 			l3:
-				t8 := i32_const(1000) + t3
-				t2 = t8
+				t8 := i32_const(1000) + p3
+				p2 = t8
 			}
 		l0:
-			t9 := int32(100) + t2
-			t1 = t9
+			t9 := int32(100) + p2
+			p1 = t9
 		}
 	l1:
-		t10 := int32(10) + t1
-		t0 = t10
+		t10 := int32(10) + p1
+		p0 = t10
 	}
 l2:
-	return t0
+	return p0
 }
 func (m *Module) Xcorner() int32 {
 	{

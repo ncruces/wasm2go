@@ -16,22 +16,22 @@ func (m *Module) Xf32_no_fold_conditional_inc(v0 float32, v1 float32) float32 {
 	t1 := v0
 	t2 := float32(t1 + f32_const(1))
 	t3 := v1
-	t5 := t2
+	p5 := t2
 	if t3 < f32_const(0) {
-		t5 = t0
+		p5 = t0
 	}
-	return t5
+	return p5
 }
 func (m *Module) Xf64_no_fold_conditional_inc(v0 float64, v1 float64) float64 {
 	t0 := v0
 	t1 := v0
 	t2 := float64(t1 + f64_const(1))
 	t3 := v1
-	t5 := t2
+	p5 := t2
 	if t3 < f64_const(0) {
-		t5 = t0
+		p5 = t0
 	}
-	return t5
+	return p5
 }
 
 //go:nosplit

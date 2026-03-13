@@ -23,50 +23,50 @@ func New() *Module {
 }
 func (m *Module) Xdata() int32 {
 	t0 := int32(m.memory[uint32(i32_const(0))])
-	var t1 int32
+	var p1 int32
 	if t0 == int32(65) {
-		t1 = 1
+		p1 = 1
 	}
 	t2 := int32(m.memory[uint32(int32(3))])
-	var t3 int32
+	var p3 int32
 	if t2 == i32_const(167) {
-		t3 = 1
+		p3 = 1
 	}
-	t4 := t1 & t3
+	t4 := p1 & p3
 	t5 := int32(m.memory[uint32(int32(6))])
-	var t6 int32
+	var p6 int32
 	if t5 == i32_const(0) {
-		t6 = 1
+		p6 = 1
 	}
 	t7 := int32(m.memory[uint32(int32(19))])
-	var t8 int32
+	var p8 int32
 	if t7 == i32_const(0) {
-		t8 = 1
+		p8 = 1
 	}
-	t9 := t6 & t8
+	t9 := p6 & p8
 	t10 := t4 & t9
 	t11 := int32(m.memory[uint32(int32(20))])
-	var t12 int32
+	var p12 int32
 	if t11 == int32(87) {
-		t12 = 1
+		p12 = 1
 	}
 	t13 := int32(m.memory[uint32(int32(23))])
-	var t14 int32
+	var p14 int32
 	if t13 == int32(77) {
-		t14 = 1
+		p14 = 1
 	}
-	t15 := t12 & t14
+	t15 := p12 & p14
 	t16 := int32(m.memory[uint32(int32(24))])
-	var t17 int32
+	var p17 int32
 	if t16 == i32_const(0) {
-		t17 = 1
+		p17 = 1
 	}
 	t18 := int32(m.memory[uint32(i32_const(1023))])
-	var t19 int32
+	var p19 int32
 	if t18 == i32_const(0) {
-		t19 = 1
+		p19 = 1
 	}
-	t20 := t17 & t19
+	t20 := p17 & p19
 	t21 := t15 & t20
 	t22 := t10 & t21
 	return t22

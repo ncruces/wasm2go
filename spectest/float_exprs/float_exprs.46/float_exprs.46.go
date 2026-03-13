@@ -12,112 +12,112 @@ func New() *Module {
 func (m *Module) Xf32_no_fold_lt_if(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	var t3 float32
-	_ = t3
+	var p3 float32
+	_ = p3
 	if t0 < t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf32_no_fold_le_if(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	var t3 float32
-	_ = t3
+	var p3 float32
+	_ = p3
 	if t0 <= t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf32_no_fold_gt_if(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	var t3 float32
-	_ = t3
+	var p3 float32
+	_ = p3
 	if t0 > t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf32_no_fold_ge_if(v0 float32, v1 float32) float32 {
 	t0 := v0
 	t1 := v1
-	var t3 float32
-	_ = t3
+	var p3 float32
+	_ = p3
 	if t0 >= t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_no_fold_lt_if(v0 float64, v1 float64) float64 {
 	t0 := v0
 	t1 := v1
-	var t3 float64
-	_ = t3
+	var p3 float64
+	_ = p3
 	if t0 < t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_no_fold_le_if(v0 float64, v1 float64) float64 {
 	t0 := v0
 	t1 := v1
-	var t3 float64
-	_ = t3
+	var p3 float64
+	_ = p3
 	if t0 <= t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_no_fold_gt_if(v0 float64, v1 float64) float64 {
 	t0 := v0
 	t1 := v1
-	var t3 float64
-	_ = t3
+	var p3 float64
+	_ = p3
 	if t0 > t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xf64_no_fold_ge_if(v0 float64, v1 float64) float64 {
 	t0 := v0
 	t1 := v1
-	var t3 float64
-	_ = t3
+	var p3 float64
+	_ = p3
 	if t0 >= t1 {
 		t4 := v0
-		t3 = t4
+		p3 = t4
 	} else {
 		t5 := v1
-		t3 = t5
+		p3 = t5
 	}
-	return t3
+	return p3
 }

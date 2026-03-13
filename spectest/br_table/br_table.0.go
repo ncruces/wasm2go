@@ -59,56 +59,56 @@ func (m *Module) Xtype_f64() {
 l0:
 }
 func (m *Module) Xtype_i32_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(1)
+		p0 = int32(1)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xtype_i64_value() int64 {
-	var t0 int64
-	_ = t0
+	var p0 int64
+	_ = p0
 	{
-		t0 = int64(2)
+		p0 = int64(2)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xtype_f32_value() float32 {
-	var t0 float32
-	_ = t0
+	var p0 float32
+	_ = p0
 	{
-		t0 = float32(3)
+		p0 = float32(3)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xtype_f64_value() float64 {
-	var t0 float64
-	_ = t0
+	var p0 float64
+	_ = p0
 	{
-		t0 = float64(4)
+		p0 = float64(4)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xempty(v0 int32) int32 {
 	{
@@ -122,18 +122,18 @@ l0:
 	return int32(22)
 }
 func (m *Module) Xempty_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		t0 = int32(33)
+		p0 = int32(33)
 		switch t1 {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xsingleton(v0 int32) int32 {
 	{
@@ -153,15 +153,15 @@ l0:
 	return int32(22)
 }
 func (m *Module) Xsingleton_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			t2 := v0
-			t1 = int32(33)
-			t0 = int32(33)
+			p1 = int32(33)
+			p0 = int32(33)
 			switch t2 {
 			case 0:
 				goto l0
@@ -170,11 +170,11 @@ func (m *Module) Xsingleton_value(v0 int32) int32 {
 			}
 		}
 	l0:
-		_ = t1
-		t0 = int32(32)
+		_ = p1
+		p0 = int32(32)
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xmultiple(v0 int32) int32 {
 	{
@@ -214,27 +214,27 @@ l4:
 func (m *Module) Xmultiple_value(v0 int32) int32 {
 	var v1 int32
 	_ = v1
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			var t2 int32
-			_ = t2
+			var p2 int32
+			_ = p2
 			{
-				var t3 int32
-				_ = t3
+				var p3 int32
+				_ = p3
 				{
-					var t4 int32
-					_ = t4
+					var p4 int32
+					_ = p4
 					{
 						t5 := v0
-						t1 = i32_const(200)
-						t2 = i32_const(200)
-						t3 = i32_const(200)
-						t4 = i32_const(200)
-						t0 = i32_const(200)
+						p1 = i32_const(200)
+						p2 = i32_const(200)
+						p3 = i32_const(200)
+						p4 = i32_const(200)
+						p0 = i32_const(200)
 						switch t5 {
 						case 0:
 							goto l0
@@ -249,31 +249,31 @@ func (m *Module) Xmultiple_value(v0 int32) int32 {
 						}
 					}
 				l3:
-					v1 = t4
+					v1 = p4
 					t6 := v1
 					t7 := t6 + int32(10)
 					return t7
 				}
 			l2:
-				v1 = t3
+				v1 = p3
 				t8 := v1
 				t9 := t8 + int32(11)
 				return t9
 			}
 		l1:
-			v1 = t2
+			v1 = p2
 			t10 := v1
 			t11 := t10 + int32(12)
 			return t11
 		}
 	l0:
-		v1 = t1
+		v1 = p1
 		t12 := v1
 		t13 := t12 + int32(13)
 		return t13
 	}
 l4:
-	v1 = t0
+	v1 = p0
 	t14 := v1
 	t15 := t14 + int32(14)
 	return t15
@@ -325,22 +325,22 @@ func (m *Module) Xas_block_last() {
 l0:
 }
 func (m *Module) Xas_block_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
-		t0 = int32(2)
+		p0 = int32(2)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_loop_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		switch i32_const(0) {
 		default:
@@ -349,8 +349,8 @@ func (m *Module) Xas_loop_first() int32 {
 	}
 }
 func (m *Module) Xas_loop_mid() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
 		switch i32_const(-1) {
@@ -360,8 +360,8 @@ func (m *Module) Xas_loop_mid() int32 {
 	}
 }
 func (m *Module) Xas_loop_last() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f0()
 		switch int32(1) {
@@ -371,17 +371,17 @@ func (m *Module) Xas_loop_last() int32 {
 	}
 }
 func (m *Module) Xas_br_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_cond() {
 	{
@@ -393,30 +393,30 @@ func (m *Module) Xas_br_if_cond() {
 l0:
 }
 func (m *Module) Xas_br_if_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(8)
+		p0 = int32(8)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_value_cond() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(9)
+		p0 = int32(9)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_index() {
 	{
@@ -428,92 +428,92 @@ func (m *Module) Xas_br_table_index() {
 l0:
 }
 func (m *Module) Xas_br_table_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(10)
+		p0 = int32(10)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_value_index() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(11)
+		p0 = int32(11)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_return_value() int64 {
-	var t0 int64
-	_ = t0
+	var p0 int64
+	_ = p0
 	{
-		t0 = int64(7)
+		p0 = int64(7)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_if_cond() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(2)
+		p0 = int32(2)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		var t2 int32
-		_ = t2
+		var p2 int32
+		_ = p2
 		if t1 != 0 {
-			t0 = int32(3)
+			p0 = int32(3)
 			switch i32_const(0) {
 			default:
 				goto l0
 			}
 		} else {
 			t3 := v1
-			t2 = t3
+			p2 = t3
 		}
-		t0 = t2
+		p0 = p2
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := v0
-		var t2 int32
-		_ = t2
+		var p2 int32
+		_ = p2
 		if t1 != 0 {
 			t3 := v1
-			t2 = t3
+			p2 = t3
 		} else {
-			t0 = int32(4)
-			t2 = int32(4)
+			p0 = int32(4)
+			p2 = int32(4)
 			switch i32_const(0) {
 			case 0:
 				goto l0
@@ -522,386 +522,386 @@ func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
 			}
 		}
 	l1:
-		t0 = t2
+		p0 = p2
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(5)
+		p0 = int32(5)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_select_second(v0 int32, v1 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		_ = v0
-		t0 = int32(6)
+		p0 = int32(6)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_select_cond() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(7)
+		p0 = int32(7)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) f37(v0 int32, v1 int32, v2 int32) int32 {
 	return i32_const(-1)
 }
 func (m *Module) Xas_call_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(12)
+		p0 = int32(12)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_mid() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(13)
+		p0 = int32(13)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_last() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(14)
+		p0 = int32(14)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_first() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(20)
+		p0 = int32(20)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_mid() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(21)
+		p0 = int32(21)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_last() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(22)
+		p0 = int32(22)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_call_indirect_func() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(23)
+		p0 = int32(23)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_local_set_value() int32 {
 	var v0 float32
 	_ = v0
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(17)
+		p0 = int32(17)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_local_tee_value() int32 {
 	var v0 int32
 	_ = v0
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(1)
+		p0 = int32(1)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_global_set_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(1)
+		p0 = int32(1)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_load_address() float32 {
-	var t0 float32
-	_ = t0
+	var p0 float32
+	_ = p0
 	{
-		t0 = float32(1.7)
+		p0 = float32(1.7)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_loadN_address() int64 {
-	var t0 int64
-	_ = t0
+	var p0 int64
+	_ = p0
 	{
-		t0 = int64(30)
+		p0 = int64(30)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_store_address() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(30)
+		p0 = int32(30)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_store_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(31)
+		p0 = int32(31)
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_storeN_address() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(32)
+		p0 = int32(32)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_storeN_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(33)
+		p0 = int32(33)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_unary_operand() float32 {
-	var t0 float32
-	_ = t0
+	var p0 float32
+	_ = p0
 	{
-		t0 = float32(3.4)
+		p0 = float32(3.4)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_binary_left() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(3)
+		p0 = int32(3)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_binary_right() int64 {
-	var t0 int64
-	_ = t0
+	var p0 int64
+	_ = p0
 	{
-		t0 = int64(45)
+		p0 = int64(45)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_test_operand() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(44)
+		p0 = int32(44)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_compare_left() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(43)
+		p0 = int32(43)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_compare_right() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(42)
+		p0 = int32(42)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_convert_operand() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(41)
+		p0 = int32(41)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_memory_grow_size() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(40)
+		p0 = int32(40)
 		switch i32_const(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xnested_block_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		_ = i32_const(-1)
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			var t2 int32
-			_ = t2
+			var p2 int32
+			_ = p2
 			{
 				_ = int32(4)
 				t3 := v0
-				t2 = int32(16)
-				t1 = int32(16)
-				t0 = int32(16)
+				p2 = int32(16)
+				p1 = int32(16)
+				p0 = int32(16)
 				switch t3 {
 				case 0:
 					goto l0
@@ -912,32 +912,32 @@ func (m *Module) Xnested_block_value(v0 int32) int32 {
 				}
 			}
 		l0:
-			t4 := int32(2) + t2
-			t1 = t4
+			t4 := int32(2) + p2
+			p1 = t4
 		}
 	l1:
-		t5 := int32(1) + t1
-		t0 = t5
+		t5 := int32(1) + p1
+		p0 = t5
 	}
 l2:
-	return t0
+	return p0
 }
 func (m *Module) Xnested_br_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			_ = int32(2)
-			var t2 int32
-			_ = t2
+			var p2 int32
+			_ = p2
 			{
 				_ = int32(4)
 				t3 := v0
-				t0 = int32(8)
-				t1 = int32(8)
-				t2 = int32(8)
+				p0 = int32(8)
+				p1 = int32(8)
+				p2 = int32(8)
 				switch t3 {
 				case 0:
 					goto l0
@@ -948,32 +948,32 @@ func (m *Module) Xnested_br_value(v0 int32) int32 {
 				}
 			}
 		l2:
-			_ = t2
-			t1 = int32(16)
+			_ = p2
+			p1 = int32(16)
 		}
 	l1:
-		t4 := int32(1) + t1
-		t0 = t4
+		t4 := int32(1) + p1
+		p0 = t4
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xnested_br_if_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			_ = int32(2)
-			var t2 int32
-			_ = t2
+			var p2 int32
+			_ = p2
 			{
 				_ = int32(4)
 				t3 := v0
-				t2 = int32(8)
-				t1 = int32(8)
-				t0 = int32(8)
+				p2 = int32(8)
+				p1 = int32(8)
+				p0 = int32(8)
 				switch t3 {
 				case 0:
 					goto l0
@@ -984,27 +984,27 @@ func (m *Module) Xnested_br_if_value(v0 int32) int32 {
 				}
 			}
 		l0:
-			_ = t2
-			t1 = int32(16)
+			_ = p2
+			p1 = int32(16)
 		}
 	l1:
-		t4 := int32(1) + t1
-		t0 = t4
+		t4 := int32(1) + p1
+		p0 = t4
 	}
 l2:
-	return t0
+	return p0
 }
 func (m *Module) Xnested_br_if_value_cond(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			_ = int32(2)
 			t2 := v0
-			t1 = int32(8)
-			t0 = int32(8)
+			p1 = int32(8)
+			p0 = int32(8)
 			switch t2 {
 			case 1:
 				goto l1
@@ -1013,28 +1013,28 @@ func (m *Module) Xnested_br_if_value_cond(v0 int32) int32 {
 			}
 		}
 	l0:
-		t3 := int32(1) + t1
-		t0 = t3
+		t3 := int32(1) + p1
+		p0 = t3
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xnested_br_table_value(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			_ = int32(2)
-			var t2 int32
-			_ = t2
+			var p2 int32
+			_ = p2
 			{
 				_ = int32(4)
 				t3 := v0
-				t2 = int32(8)
-				t1 = int32(8)
-				t0 = int32(8)
+				p2 = int32(8)
+				p1 = int32(8)
+				p0 = int32(8)
 				switch t3 {
 				case 0:
 					goto l0
@@ -1045,27 +1045,27 @@ func (m *Module) Xnested_br_table_value(v0 int32) int32 {
 				}
 			}
 		l0:
-			_ = t2
-			t1 = int32(16)
+			_ = p2
+			p1 = int32(16)
 		}
 	l1:
-		t4 := int32(1) + t1
-		t0 = t4
+		t4 := int32(1) + p1
+		p0 = t4
 	}
 l2:
-	return t0
+	return p0
 }
 func (m *Module) Xnested_br_table_value_index(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			_ = int32(2)
 			t2 := v0
-			t1 = int32(8)
-			t0 = int32(8)
+			p1 = int32(8)
+			p0 = int32(8)
 			switch t2 {
 			case 1:
 				goto l1
@@ -1074,15 +1074,15 @@ func (m *Module) Xnested_br_table_value_index(v0 int32) int32 {
 			}
 		}
 	l0:
-		t3 := int32(1) + t1
-		t0 = t3
+		t3 := int32(1) + p1
+		p0 = t3
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xnested_br_table_loop_block(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 l0:
 	{
 		{
@@ -1095,11 +1095,11 @@ l0:
 			}
 		}
 	l1:
-		t0 = i32_const(0)
+		p0 = i32_const(0)
 	}
-	v0 = t0
-	var t2 int32
-	_ = t2
+	v0 = p0
+	var p2 int32
+	_ = p2
 l3:
 	{
 		{
@@ -1112,9 +1112,9 @@ l3:
 			}
 		}
 	l2:
-		t2 = int32(3)
+		p2 = int32(3)
 	}
-	return t2
+	return p2
 }
 
 //go:nosplit

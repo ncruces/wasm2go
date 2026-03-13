@@ -14,22 +14,22 @@ func (m *Module) Xfibonacci(v0 int64) int64 {
 	_, _ = v1, v2
 	t0 := v0
 	t1 := v0
-	t3 := i64_const(0)
+	p3 := i64_const(0)
 	if t1 > i64_const(0) {
-		t3 = t0
+		p3 = t0
 	}
-	v0 = t3
+	v0 = p3
 	v1 = int64(1)
-	var t4 int64
-	_ = t4
+	var p4 int64
+	_ = p4
 l0:
 	{
 		t5 := v0
-		var t7 int64
-		_ = t7
+		var p7 int64
+		_ = p7
 		if t5 == 0 {
 			t8 := v2
-			t7 = t8
+			p7 = t8
 		} else {
 			t9 := v0
 			t10 := t9 - int64(1)
@@ -41,9 +41,9 @@ l0:
 			v1 = t13
 			goto l0
 		}
-		t4 = t7
+		p4 = p7
 	}
-	return t4
+	return p4
 }
 
 //go:nosplit

@@ -26,15 +26,15 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xas_br_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-		t0 = t1
+		p0 = t1
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_cond() {
 	{
@@ -46,34 +46,34 @@ func (m *Module) Xas_br_if_cond() {
 l0:
 }
 func (m *Module) Xas_br_if_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-		t0 = t1
+		p0 = t1
 		if int32(1) != 0 {
 			goto l0
 		}
 		_ = t1
-		t0 = int32(7)
+		p0 = int32(7)
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_if_value_cond() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-		t0 = int32(6)
+		p0 = int32(6)
 		if t1 != 0 {
 			goto l0
 		}
 		_ = int32(6)
-		t0 = int32(7)
+		p0 = int32(7)
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_index() {
 	{
@@ -86,32 +86,32 @@ func (m *Module) Xas_br_table_index() {
 l0:
 }
 func (m *Module) Xas_br_table_value() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-		t0 = t1
+		p0 = t1
 		switch int32(1) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_br_table_value_index() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-		t0 = int32(6)
+		p0 = int32(6)
 		switch t1 {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xas_return_value() int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)
@@ -119,64 +119,64 @@ func (m *Module) Xas_return_value() int32 {
 }
 func (m *Module) Xas_if_cond() int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-	var t1 int32
-	_ = t1
+	var p1 int32
+	_ = p1
 	if t0 != 0 {
-		t1 = i32_const(0)
+		p1 = i32_const(0)
 	} else {
-		t1 = int32(1)
+		p1 = int32(1)
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_if_then() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	if int32(1) != 0 {
 		t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-		t0 = t1
+		p0 = t1
 	} else {
-		t0 = i32_const(0)
+		p0 = i32_const(0)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_if_else() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	if i32_const(0) != 0 {
-		t0 = i32_const(0)
+		p0 = i32_const(0)
 	} else {
 		t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-		t0 = t1
+		p0 = t1
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)
 	t1 := v0
 	t2 := v1
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xas_select_second(v0 int32, v1 int32) int32 {
 	t0 := v0
 	t1 := memory_grow(&m.memory, i32_const(0), m.maxMem)
 	t2 := v1
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	return t3
+	return p3
 }
 func (m *Module) Xas_select_cond() int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-	t1 := int32(1)
+	p1 := int32(1)
 	if t0 != 0 {
-		t1 = i32_const(0)
+		p1 = i32_const(0)
 	}
-	return t1
+	return p1
 }
 func (m *Module) f14(v0 int32, v1 int32, v2 int32) int32 {
 	return i32_const(-1)
@@ -278,27 +278,27 @@ func (m *Module) Xas_binary_right() int32 {
 }
 func (m *Module) Xas_test_operand() int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-	var t1 int32
+	var p1 int32
 	if t0 == 0 {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_compare_left() int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-	var t1 int32
+	var p1 int32
 	if t0 <= int32(10) {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_compare_right() int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)
-	var t1 int32
+	var p1 int32
 	if int32(10) != t0 {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xas_memory_grow_size() int32 {
 	t0 := memory_grow(&m.memory, i32_const(0), m.maxMem)

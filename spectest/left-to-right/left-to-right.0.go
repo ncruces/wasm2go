@@ -293,11 +293,11 @@ func (m *Module) Xi32_eq() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if t0 == t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -305,11 +305,11 @@ func (m *Module) Xi32_ne() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -317,11 +317,11 @@ func (m *Module) Xi32_lt_s() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -329,11 +329,11 @@ func (m *Module) Xi32_le_s() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -341,11 +341,11 @@ func (m *Module) Xi32_lt_u() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if uint32(t0) < uint32(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -353,11 +353,11 @@ func (m *Module) Xi32_le_u() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if uint32(t0) <= uint32(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -365,11 +365,11 @@ func (m *Module) Xi32_gt_s() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -377,11 +377,11 @@ func (m *Module) Xi32_ge_s() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -389,11 +389,11 @@ func (m *Module) Xi32_gt_u() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if uint32(t0) > uint32(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -401,11 +401,11 @@ func (m *Module) Xi32_ge_u() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	var t2 int32
+	var p2 int32
 	if uint32(t0) >= uint32(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -456,11 +456,11 @@ func (m *Module) Xi32_select() int32 {
 	t0 := m.f11()
 	t1 := m.f12()
 	t2 := m.f15()
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	_ = t3
+	_ = p3
 	t4 := m.f10()
 	return t4
 }
@@ -585,11 +585,11 @@ func (m *Module) Xi64_eq() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if t0 == t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -597,11 +597,11 @@ func (m *Module) Xi64_ne() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -609,11 +609,11 @@ func (m *Module) Xi64_lt_s() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -621,11 +621,11 @@ func (m *Module) Xi64_le_s() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -633,11 +633,11 @@ func (m *Module) Xi64_lt_u() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if uint64(t0) < uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -645,11 +645,11 @@ func (m *Module) Xi64_le_u() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if uint64(t0) <= uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -657,11 +657,11 @@ func (m *Module) Xi64_gt_s() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -669,11 +669,11 @@ func (m *Module) Xi64_ge_s() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -681,11 +681,11 @@ func (m *Module) Xi64_gt_u() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if uint64(t0) > uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -693,11 +693,11 @@ func (m *Module) Xi64_ge_u() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	var t2 int32
+	var p2 int32
 	if uint64(t0) >= uint64(t1) {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -756,11 +756,11 @@ func (m *Module) Xi64_select() int32 {
 	t0 := m.f16()
 	t1 := m.f17()
 	t2 := m.f20()
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	_ = t3
+	_ = p3
 	t4 := m.f10()
 	return t4
 }
@@ -813,11 +813,11 @@ func (m *Module) Xf32_eq() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	var t2 int32
+	var p2 int32
 	if t0 == t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -825,11 +825,11 @@ func (m *Module) Xf32_ne() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -837,11 +837,11 @@ func (m *Module) Xf32_lt() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -849,11 +849,11 @@ func (m *Module) Xf32_le() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -861,11 +861,11 @@ func (m *Module) Xf32_gt() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -873,11 +873,11 @@ func (m *Module) Xf32_ge() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -930,11 +930,11 @@ func (m *Module) Xf32_select() int32 {
 	t0 := m.f21()
 	t1 := m.f22()
 	t2 := m.f25()
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	_ = t3
+	_ = p3
 	t4 := m.f10()
 	return t4
 }
@@ -987,11 +987,11 @@ func (m *Module) Xf64_eq() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	var t2 int32
+	var p2 int32
 	if t0 == t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -999,11 +999,11 @@ func (m *Module) Xf64_ne() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	var t2 int32
+	var p2 int32
 	if t0 != t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -1011,11 +1011,11 @@ func (m *Module) Xf64_lt() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -1023,11 +1023,11 @@ func (m *Module) Xf64_le() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -1035,11 +1035,11 @@ func (m *Module) Xf64_gt() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -1047,11 +1047,11 @@ func (m *Module) Xf64_ge() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
-	_ = t2
+	_ = p2
 	t3 := m.f10()
 	return t3
 }
@@ -1104,45 +1104,45 @@ func (m *Module) Xf64_select() int32 {
 	t0 := m.f26()
 	t1 := m.f27()
 	t2 := m.f30()
-	t3 := t1
+	p3 := t1
 	if t2 != 0 {
-		t3 = t0
+		p3 = t0
 	}
-	_ = t3
+	_ = p3
 	t4 := m.f10()
 	return t4
 }
 func (m *Module) Xbr_if() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f8()
 		t1 := m.f11()
 		t2 := m.f12()
 		t3 := t2 & i32_const(0)
-		t0 = t1
+		p0 = t1
 		if t3 != 0 {
 			goto l0
 		}
 		_ = t1
 		t4 := m.f10()
-		t0 = t4
+		p0 = t4
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xbr_table() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		m.f8()
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			t2 := m.f11()
 			t3 := m.f12()
-			t0 = t2
-			t1 = t2
+			p0 = t2
+			p1 = t2
 			switch t3 {
 			case 0:
 				goto l0
@@ -1151,12 +1151,12 @@ func (m *Module) Xbr_table() int32 {
 			}
 		}
 	l1:
-		_ = t1
+		_ = p1
 		t4 := m.f10()
-		t0 = t4
+		p0 = t4
 	}
 l0:
-	return t0
+	return p0
 }
 
 //go:nosplit

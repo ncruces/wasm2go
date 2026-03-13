@@ -18,19 +18,19 @@ func New() *Module {
 }
 func (m *Module) Xfuncref(v0 any) int32 {
 	t0 := v0
-	var t1 int32
+	var p1 int32
 	if t0 == nil {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) Xexternref(v0 any) int32 {
 	t0 := v0
-	var t1 int32
+	var p1 int32
 	if t0 == nil {
-		t1 = 1
+		p1 = 1
 	}
-	return t1
+	return p1
 }
 func (m *Module) f2() {
 }

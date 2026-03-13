@@ -12,128 +12,128 @@ func New() *Module {
 func (m *Module) Xf32_no_trichotomy_lt(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 >= t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }
 func (m *Module) Xf32_no_trichotomy_le(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 > t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }
 func (m *Module) Xf32_no_trichotomy_gt(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 <= t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }
 func (m *Module) Xf32_no_trichotomy_ge(v0 float32, v1 float32) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 < t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }
 func (m *Module) Xf64_no_trichotomy_lt(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 < t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 >= t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }
 func (m *Module) Xf64_no_trichotomy_le(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 <= t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 > t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }
 func (m *Module) Xf64_no_trichotomy_gt(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 > t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 <= t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }
 func (m *Module) Xf64_no_trichotomy_ge(v0 float64, v1 float64) int32 {
 	t0 := v0
 	t1 := v1
-	var t2 int32
+	var p2 int32
 	if t0 >= t1 {
-		t2 = 1
+		p2 = 1
 	}
 	t3 := v0
 	t4 := v1
-	var t5 int32
+	var p5 int32
 	if t3 < t4 {
-		t5 = 1
+		p5 = 1
 	}
-	t6 := t2 | t5
+	t6 := p2 | p5
 	return t6
 }

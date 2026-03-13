@@ -10,24 +10,24 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xblock() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(1)
+		p0 = int32(1)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xloop1() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 	l1:
 		{
 			t2 := v0
@@ -36,24 +36,24 @@ func (m *Module) Xloop1() int32 {
 			t4 := v0
 			if t4 == int32(5) {
 				t6 := v0
-				t0 = t6
+				p0 = t6
 				goto l0
 			}
 			goto l1
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xloop2() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 	l0:
 		{
 			t2 := v0
@@ -66,7 +66,7 @@ func (m *Module) Xloop2() int32 {
 			t6 := v0
 			if t6 == int32(8) {
 				t8 := v0
-				t0 = t8
+				p0 = t8
 				goto l1
 			}
 			t9 := v0
@@ -76,17 +76,17 @@ func (m *Module) Xloop2() int32 {
 		}
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xloop3() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			t2 := v0
 			t3 := t2 + int32(1)
@@ -94,26 +94,26 @@ func (m *Module) Xloop3() int32 {
 			t4 := v0
 			if t4 == int32(5) {
 				t6 := v0
-				t0 = t6
+				p0 = t6
 				goto l0
 			}
 			t7 := v0
-			t1 = t7
+			p1 = t7
 		}
-		t0 = t1
+		p0 = p1
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xloop4(v0 int32) int32 {
 	var v1 int32
 	_ = v1
 	v1 = int32(1)
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 	l1:
 		{
 			t2 := v1
@@ -124,35 +124,35 @@ func (m *Module) Xloop4(v0 int32) int32 {
 			t6 := v0
 			if uint32(t5) > uint32(t6) {
 				t8 := v1
-				t0 = t8
+				p0 = t8
 				goto l0
 			}
 			goto l1
 		}
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xloop5() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(1)
+		p0 = int32(1)
 	}
-	t1 := t0 + int32(1)
+	t1 := p0 + int32(1)
 	return t1
 }
 func (m *Module) Xloop6() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 l0:
 	{
 		if i32_const(0) != 0 {
 			goto l0
 		}
-		t0 = int32(3)
+		p0 = int32(3)
 	}
-	return t0
+	return p0
 }
 func (m *Module) Xif() int32 {
 	var v0 int32
@@ -259,11 +259,11 @@ func (m *Module) Xif2() int32 {
 	return t10
 }
 func (m *Module) Xswitch(v0 int32) int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			{
 				{
@@ -287,24 +287,24 @@ func (m *Module) Xswitch(v0 int32) int32 {
 						l1:
 						}
 					l2:
-						t1 = int32(2)
+						p1 = int32(2)
 						goto l5
 					}
 				l3:
-					t0 = int32(3)
+					p0 = int32(3)
 					goto l6
 				}
 			l4:
 			}
 		l0:
-			t1 = int32(5)
+			p1 = int32(5)
 		}
 	l5:
-		t3 := int32(10) * t1
-		t0 = t3
+		t3 := int32(10) * p1
+		p0 = t3
 	}
 l6:
-	return t0
+	return p0
 }
 func (m *Module) Xreturn(v0 int32) int32 {
 	{
@@ -329,8 +329,8 @@ func (m *Module) Xbr_if0() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		{
 			if i32_const(0) != 0 {
@@ -348,184 +348,184 @@ func (m *Module) Xbr_if0() int32 {
 		}
 	l0:
 		;
-		var t5 int32
-		_ = t5
+		var p5 int32
+		_ = p5
 		{
 			t6 := v0
 			t7 := t6 | int32(4)
 			v0 = t7
 			t8 := v0
-			t5 = t8
+			p5 = t8
 		}
-		t0 = t5
+		p0 = p5
 		if i32_const(0) != 0 {
 			goto l1
 		}
-		_ = t5
+		_ = p5
 		t9 := v0
 		t10 := t9 | int32(8)
 		v0 = t10
-		var t11 int32
-		_ = t11
+		var p11 int32
+		_ = p11
 		{
 			t12 := v0
 			t13 := t12 | int32(16)
 			v0 = t13
 			t14 := v0
-			t11 = t14
+			p11 = t14
 		}
-		t0 = t11
+		p0 = p11
 		if int32(1) != 0 {
 			goto l1
 		}
-		_ = t11
+		_ = p11
 		t15 := v0
 		t16 := t15 | int32(32)
 		v0 = t16
 		t17 := v0
-		t0 = t17
+		p0 = t17
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xbr_if1() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			t1 = int32(1)
+			p1 = int32(1)
 			goto l0
 		}
 	l0:
-		t0 = t1
+		p0 = p1
 		if int32(1) != 0 {
 			goto l1
 		}
-		_ = t1
-		t0 = i32_const(0)
+		_ = p1
+		p0 = i32_const(0)
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xbr_if2() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		if int32(1) != 0 {
-			var t1 int32
-			_ = t1
+			var p1 int32
+			_ = p1
 			{
-				t1 = int32(1)
+				p1 = int32(1)
 				goto l0
 			}
 		l0:
-			t0 = t1
+			p0 = p1
 			if int32(1) != 0 {
 				goto l1
 			}
-			_ = t1
+			_ = p1
 		}
-		t0 = i32_const(0)
+		p0 = i32_const(0)
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xbr_if3() int32 {
 	var v0 int32
 	_ = v0
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
 			v0 = int32(1)
 			t2 := v0
-			t1 = t2
+			p1 = t2
 		}
-		var t3 int32
-		_ = t3
+		var p3 int32
+		_ = p3
 		{
 			v0 = int32(2)
 			t4 := v0
-			t3 = t4
+			p3 = t4
 		}
-		t0 = t1
-		if t3 != 0 {
+		p0 = p1
+		if p3 != 0 {
 			goto l0
 		}
-		_ = t1
-		t0 = i32_const(0)
+		_ = p1
+		p0 = i32_const(0)
 	}
 l0:
-	t5 := t0 + i32_const(0)
+	t5 := p0 + i32_const(0)
 	_ = t5
 	t6 := v0
 	return t6
 }
 func (m *Module) Xbr() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
 		if int32(1) != 0 {
-			var t1 int32
-			_ = t1
+			var p1 int32
+			_ = p1
 			{
-				t1 = int32(1)
+				p1 = int32(1)
 				goto l0
 			}
 		l0:
-			t0 = t1
+			p0 = p1
 			goto l1
 		} else {
 			{
-				var t2 int32
-				_ = t2
+				var p2 int32
+				_ = p2
 				{
-					t2 = int32(1)
+					p2 = int32(1)
 					goto l2
 				}
 			l2:
-				_ = t2
+				_ = p2
 			}
 		}
-		t0 = int32(1)
+		p0 = int32(1)
 	}
 l1:
-	return t0
+	return p0
 }
 func (m *Module) Xshadowing() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		t0 = int32(1)
+		p0 = int32(1)
 		goto l0
 	}
 l0:
-	return t0
+	return p0
 }
 func (m *Module) Xredefinition() int32 {
-	var t0 int32
-	_ = t0
+	var p0 int32
+	_ = p0
 	{
-		var t1 int32
-		_ = t1
+		var p1 int32
+		_ = p1
 		{
-			t1 = int32(2)
+			p1 = int32(2)
 		}
-		var t2 int32
-		_ = t2
+		var p2 int32
+		_ = p2
 		{
-			t2 = int32(3)
+			p2 = int32(3)
 			goto l0
 		}
 	l0:
-		t3 := t1 + t2
-		t0 = t3
+		t3 := p1 + p2
+		p0 = t3
 	}
-	return t0
+	return p0
 }
 
 //go:nosplit

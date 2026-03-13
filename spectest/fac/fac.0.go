@@ -11,35 +11,35 @@ func New() *Module {
 }
 func (m *Module) Xfac_rec(v0 int64) int64 {
 	t0 := v0
-	var t2 int64
-	_ = t2
+	var p2 int64
+	_ = p2
 	if t0 == i64_const(0) {
-		t2 = int64(1)
+		p2 = int64(1)
 	} else {
 		t3 := v0
 		t4 := v0
 		t5 := t4 - int64(1)
 		t6 := m.Xfac_rec(t5)
 		t7 := t3 * t6
-		t2 = t7
+		p2 = t7
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xfac_rec_named(v0 int64) int64 {
 	t0 := v0
-	var t2 int64
-	_ = t2
+	var p2 int64
+	_ = p2
 	if t0 == i64_const(0) {
-		t2 = int64(1)
+		p2 = int64(1)
 	} else {
 		t3 := v0
 		t4 := v0
 		t5 := t4 - int64(1)
 		t6 := m.Xfac_rec_named(t5)
 		t7 := t3 * t6
-		t2 = t7
+		p2 = t7
 	}
-	return t2
+	return p2
 }
 func (m *Module) Xfac_iter(v0 int64) int64 {
 	var v1, v2 int64
@@ -138,18 +138,18 @@ func (m *Module) f6(v0 int64, v1 int64) (int64, int64, int64) {
 }
 func (m *Module) Xfac_ssa(v0 int64) int64 {
 	t0 := v0
-	var t1 int64
-	_ = t1
-	t3, t2 := int64(1), t0
+	var p1 int64
+	_ = p1
+	p3, p2 := int64(1), t0
 l0:
 	{
-		t4, t5, t6 := m.f6(t3, t2)
+		t4, t5, t6 := m.f6(p3, p2)
 		t7, t8, t9 := m.f6(t5, t6)
 		t10 := t8 * t9
 		t11, t12, t13 := m.f6(t7, t10)
 		t14 := t13 - int64(1)
 		t15, t16 := m.f5(t14)
-		t3, t2 = t12, t15
+		p3, p2 = t12, t15
 		if uint64(t16) > uint64(i64_const(0)) {
 			goto l0
 		}
