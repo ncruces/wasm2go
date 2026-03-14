@@ -5,42 +5,58 @@ package wasm2go
 import "encoding/binary"
 
 type Module struct {
-	Memory []byte
+	memory []byte
 	maxMem int32
 }
 
 func New() *Module {
 	m := &Module{}
 	m.maxMem = 100
-	m.Memory = make([]byte, 65536)
-	copy(m.Memory[0:], data0)
-	copy(m.Memory[32:], data1)
+	m.memory = make([]byte, 65536)
+	copy(m.memory[0:], data0)
+	copy(m.memory[32:], data1)
 	return m
+}
+
+type Memory interface {
+	Slice() *[]byte
+	Grow(delta, max int32) int32
+}
+type wasmMemory []byte
+
+func (m *wasmMemory) Slice() *[]byte {
+	return (*[]byte)(m)
+}
+func (m *wasmMemory) Grow(delta, max int32) int32 {
+	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xwasm_grow(v0 int32) int32 {
 	t0 := v0
-	t1 := memory_grow(&m.Memory, t0, m.maxMem)
+	t1 := memory_grow(&m.memory, t0, m.maxMem)
 	return t1
 }
 func (m *Module) Xwasm_size() int32 {
-	t0 := int32(len(m.Memory) >> 16)
+	t0 := int32(len(m.memory) >> 16)
 	return t0
 }
 func (m *Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	memory_fill(m.Memory, t0, t1, t2)
+	memory_fill(m.memory, t0, t1, t2)
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
 	t0 := v0
-	t1 := int32(binary.LittleEndian.Uint32(m.Memory[uint32(t0):]))
+	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(t0):]))
 	return t1
 }
 func (m *Module) Xread_as_i8u(v0 int32) int32 {
 	t0 := v0
-	t1 := int32(m.Memory[uint32(t0)])
+	t1 := int32(m.memory[uint32(t0)])
 	return t1
+}
+func (m *Module) Xmemory() Memory {
+	return (*wasmMemory)(&m.memory)
 }
 
 func memory_grow(mem *[]byte, delta, max int32) int32 {

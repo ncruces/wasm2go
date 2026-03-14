@@ -71,8 +71,15 @@ func translate(r io.Reader, w io.Writer) error {
 	}
 
 	if !*nohost {
-		if t.memory != nil && t.memory.imported {
-			t.out.Decls = append([]ast.Decl{t.createMemoryInterface()}, t.out.Decls...)
+		hasMemExport := false
+		for _, exp := range t.exports {
+			if exp.kind == memoryExport {
+				hasMemExport = true
+				break
+			}
+		}
+		if t.memory != nil && (t.memory.imported || hasMemExport) {
+			t.out.Decls = append(t.createMemoryTypes(), t.out.Decls...)
 		}
 		if len(t.imports) > 0 {
 			t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
@@ -106,6 +113,8 @@ func translate(r io.Reader, w io.Writer) error {
 			gv.id.Name = "g" + strconv.Itoa(i)
 		}
 	}
+
+	t.out.Decls = append(t.out.Decls, t.createExportMethods()...)
 
 	// Add helpers.
 	fset := token.NewFileSet()
@@ -336,6 +345,7 @@ func (t *translator) readImportSection() error {
 			t.imports = append(t.imports, importDef{
 				module: mod,
 				name:   name,
+				kind:   functionImport,
 				typ:    typ,
 			})
 
@@ -384,6 +394,11 @@ func (t *translator) readImportSection() error {
 				max:      int(max),
 				imported: true,
 				selector: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
+			t.imports = append(t.imports, importDef{
+				module: mod,
+				name:   name,
+				kind:   memoryImport,
+			})
 		default:
 			return fmt.Errorf("unsupported import kind: %x", kind)
 		}
@@ -679,20 +694,6 @@ func (t *translator) readExportSection() error {
 		case functionExport:
 			decl := t.functions[index].decl
 			decl.Name = ast.NewIdent(exported(name))
-		case tableExport:
-			t.tables[index].id = ast.NewIdent(exported(name))
-		case globalExport:
-			t.globals[index].id = ast.NewIdent(exported(name))
-		case memoryExport:
-			// For imported memories, we export the interface.
-			if t.memory.imported {
-				break
-			}
-			id := "Memory"
-			if !strings.EqualFold(name, id) {
-				id = exported(name)
-			}
-			t.memory.id.Name = id
 		}
 	}
 	return nil
@@ -714,8 +715,15 @@ func (t *translator) readCodeSection() error {
 		return err
 	}
 
+	var importedFuncs uint64
+	for _, imp := range t.imports {
+		if imp.kind == functionImport {
+			importedFuncs++
+		}
+	}
+
 	for i := range numFuncs {
-		i += uint64(len(t.imports))
+		i += importedFuncs
 		_, err := readLEB128(t.in)
 		if err != nil {
 			return err

@@ -81,6 +81,7 @@ const (
 type importDef struct {
 	module string
 	name   string
+	kind   importKind
 	typ    funcType
 }
 
