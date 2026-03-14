@@ -423,6 +423,33 @@ func (t *translator) readImportSection() error {
 				index:  idx,
 			})
 
+		case tableImport:
+			typ, err := t.in.ReadByte()
+			if err != nil {
+				return err
+			}
+			if t := wasmType(typ); t != funcref && t != externref {
+				return fmt.Errorf("unsupported table type: %x", typ)
+			}
+
+			min, max, err := t.readLimits(65536) // 1 MiB
+			if err != nil {
+				return err
+			}
+			idx := len(t.tables)
+			t.tables = append(t.tables, tableDef{
+				id:       &ast.Ident{},
+				min:      int(min),
+				max:      int(max),
+				imported: true,
+			})
+			t.imports = append(t.imports, importDef{
+				module: mod,
+				name:   name,
+				kind:   tableImport,
+				index:  idx,
+			})
+
 		default:
 			return fmt.Errorf("unsupported import kind: %x", kind)
 		}
@@ -462,8 +489,10 @@ func (t *translator) readTableSection() error {
 		return err
 	}
 
-	t.tables = make([]tableDef, numTabs)
-	for i := range t.tables {
+	start := len(t.tables)
+	t.tables = append(t.tables, make([]tableDef, numTabs)...)
+	for i := range numTabs {
+		i += uint64(start)
 		typ, err := t.in.ReadByte()
 		if err != nil {
 			return err
@@ -1112,10 +1141,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				args[i] = fn.pop()
 			}
 
+			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id}
+			if t.tables[tableIdx].imported {
+				tab = &ast.StarExpr{X: tab}
+			}
 			call := &ast.CallExpr{
 				Fun: &ast.TypeAssertExpr{
 					X: &ast.IndexExpr{
-						X:     &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id},
+						X:     tab,
 						Index: convert(idx, "uint32")},
 					Type: typ.toAST()},
 				Args: args}
@@ -1264,10 +1297,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				return err
 			}
 
-			var lhs ast.Expr = &ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.globals[i].id,
-			}
+			var lhs ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.globals[i].id}
 			if t.globals[i].imported {
 				lhs = &ast.StarExpr{X: lhs}
 			}
@@ -1281,8 +1311,12 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
+			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id}
+			if t.tables[i].imported {
+				tab = &ast.StarExpr{X: tab}
+			}
 			fn.push(&ast.IndexExpr{
-				X:     &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id},
+				X:     tab,
 				Index: convert(fn.pop(), "uint32")})
 
 		case 0x26: // table.set
@@ -1290,11 +1324,15 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
+			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id}
+			if t.tables[i].imported {
+				tab = &ast.StarExpr{X: tab}
+			}
 			fn.emit(&ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Rhs: []ast.Expr{fn.pop()},
 				Lhs: []ast.Expr{&ast.IndexExpr{
-					X:     &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id},
+					X:     tab,
 					Index: convert(fn.pop(), "uint32")}}})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
@@ -1893,11 +1931,15 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				src := fn.pop()
 				dst := fn.pop()
 				fn.helpers.add("table_init")
+				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id}
+				if t.tables[tableIdx].imported {
+					tab = &ast.StarExpr{X: tab}
+				}
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun: newID("table_init"),
 						Args: []ast.Expr{
-							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id},
+							tab,
 							&ast.IndexExpr{
 								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
 								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)}},
@@ -1928,13 +1970,18 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				src := fn.pop()
 				dst := fn.pop()
 				fn.helpers.add("table_copy")
+				var dstTab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[dstIdx].id}
+				if t.tables[dstIdx].imported {
+					dstTab = &ast.StarExpr{X: dstTab}
+				}
+				var srcTab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[srcIdx].id}
+				if t.tables[srcIdx].imported {
+					srcTab = &ast.StarExpr{X: srcTab}
+				}
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
-						Fun: newID("table_copy"),
-						Args: []ast.Expr{
-							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[dstIdx].id},
-							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[srcIdx].id},
-							dst, src, n}}})
+						Fun:  newID("table_copy"),
+						Args: []ast.Expr{dstTab, srcTab, dst, src, n}}})
 
 			case 0x0f: // table.grow
 				idx, err := readLEB128(t.in)
@@ -1944,11 +1991,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				delta := fn.pop()
 				val := fn.pop()
 				fn.helpers.add("table_grow")
+				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}
+				if !t.tables[idx].imported {
+					tab = &ast.UnaryExpr{Op: token.AND, X: tab}
+				}
 				fn.push(&ast.CallExpr{
 					Fun: newID("table_grow"),
 					Args: []ast.Expr{
-						&ast.UnaryExpr{Op: token.AND, X: &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}},
-						val, delta,
+						tab, val, delta,
 						&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.tables[idx].max)}}})
 
 			case 0x10: // table.size
@@ -1956,9 +2006,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
+				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}
+				if t.tables[idx].imported {
+					tab = &ast.StarExpr{X: tab}
+				}
 				fn.push(convert(&ast.CallExpr{
 					Fun:  newID("len"),
-					Args: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}},
+					Args: []ast.Expr{tab},
 				}, "int32"))
 
 			case 0x11: // table.fill
@@ -1970,12 +2024,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				val := fn.pop()
 				dest := fn.pop()
 				fn.helpers.add("table_fill")
+				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}
+				if t.tables[idx].imported {
+					tab = &ast.StarExpr{X: tab}
+				}
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
-						Fun: newID("table_fill"),
-						Args: []ast.Expr{
-							&ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id},
-							dest, val, n}}})
+						Fun:  newID("table_fill"),
+						Args: []ast.Expr{tab, dest, val, n}}})
 
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
