@@ -31,8 +31,7 @@ The current target is a useful subset of Wasm produced by `clang`.
 
 This includes most Wasm 1.0 features, with the following exceptions:
 - export aliasing (exporting the same function/global under multiple names);
-- export conflicts (name collisions after the trivial mangling we apply);
-- importing tables or globals.
+- export conflicts (name collisions after the trivial mangling we apply).
 
 It also supports a subset of Wasm 2.0 features:
 - bulk memory operations and reference types;
