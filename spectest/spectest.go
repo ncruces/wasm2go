@@ -111,6 +111,11 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 				}
 
 				res := method.Call(args)
+				for i := range res {
+					if res[i].Kind() == reflect.Pointer {
+						res[i] = res[i].Elem()
+					}
+				}
 				if cmd.Type == "assert_return" {
 					for i, exp := range cmd.Expected {
 						switch exp.Type {
