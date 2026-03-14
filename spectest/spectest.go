@@ -58,11 +58,13 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 				if cmd.Type == "assert_trap" {
 					defer func() {
 						want := cmd.Text
-						switch want {
-						case "out of bounds memory access", "out of bounds table access", "undefined element":
+						switch {
+						case strings.Contains(want, "out of bounds") || want == "undefined element":
 							want = "out of range"
-						case "indirect call type mismatch":
+						case strings.Contains(want, "type mismatch"):
 							want = "interface conversion"
+						case strings.Contains(want, "uninitialized element"):
+							want = "is nil"
 						}
 						if r := recover(); r == nil {
 							t.Errorf("expected trap: %s", cmd.Text)
