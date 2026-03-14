@@ -154,45 +154,6 @@ func (t *translator) createNewFunc() ast.Decl {
 					&ast.ArrayType{Elt: newID("any")},
 					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(tab.min)}}}}})
 	}
-	// Intialize the tables.
-	if len(t.elements) > 0 {
-		elts := make([]ast.Expr, len(t.elements))
-		for i, elem := range t.elements {
-			inner := make([]ast.Expr, len(elem.init))
-			for j, idx := range elem.init {
-				inner[j] = &ast.SelectorExpr{X: newID("m"), Sel: t.functions[idx].decl.Name}
-			}
-			elts[i] = &ast.CompositeLit{
-				Type: &ast.ArrayType{Elt: newID("any")},
-				Elts: inner}
-		}
-		body.List = append(body.List, &ast.AssignStmt{
-			Tok: token.ASSIGN,
-			Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("elements")}},
-			Rhs: []ast.Expr{&ast.CompositeLit{
-				Type: &ast.ArrayType{Elt: &ast.ArrayType{Elt: newID("any")}},
-				Elts: elts}}})
-
-		for i, elem := range t.elements {
-			if elem.passive {
-				continue
-			}
-			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[elem.index].id}
-			if t.tables[elem.index].imported {
-				tab = &ast.StarExpr{X: tab}
-			}
-			body.List = append(body.List, &ast.ExprStmt{
-				X: &ast.CallExpr{
-					Fun: newID("copy"),
-					Args: []ast.Expr{
-						&ast.SliceExpr{
-							X:   tab,
-							Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(elem.offset))}},
-						&ast.IndexExpr{
-							X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-							Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}}}})
-		}
-	}
 	// Create owned memory.
 	if t.memory != nil {
 		body.List = append(body.List, &ast.AssignStmt{
@@ -248,6 +209,7 @@ func (t *translator) createNewFunc() ast.Decl {
 					Fun: &ast.SelectorExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
 						Sel: ast.NewIdent(exported(imp.name))}}}})
+
 		case tableImport:
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
@@ -256,6 +218,45 @@ func (t *translator) createNewFunc() ast.Decl {
 					Fun: &ast.SelectorExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
 						Sel: ast.NewIdent(exported(imp.name))}}}})
+		}
+	}
+	// Intialize the tables.
+	if len(t.elements) > 0 {
+		elts := make([]ast.Expr, len(t.elements))
+		for i, elem := range t.elements {
+			inner := make([]ast.Expr, len(elem.init))
+			for j, idx := range elem.init {
+				inner[j] = &ast.SelectorExpr{X: newID("m"), Sel: t.functions[idx].decl.Name}
+			}
+			elts[i] = &ast.CompositeLit{
+				Type: &ast.ArrayType{Elt: newID("any")},
+				Elts: inner}
+		}
+		body.List = append(body.List, &ast.AssignStmt{
+			Tok: token.ASSIGN,
+			Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("elements")}},
+			Rhs: []ast.Expr{&ast.CompositeLit{
+				Type: &ast.ArrayType{Elt: &ast.ArrayType{Elt: newID("any")}},
+				Elts: elts}}})
+
+		for i, elem := range t.elements {
+			if elem.passive {
+				continue
+			}
+			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[elem.index].id}
+			if t.tables[elem.index].imported {
+				tab = &ast.StarExpr{X: tab}
+			}
+			body.List = append(body.List, &ast.ExprStmt{
+				X: &ast.CallExpr{
+					Fun: newID("copy"),
+					Args: []ast.Expr{
+						&ast.SliceExpr{
+							X:   tab,
+							Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(elem.offset))}},
+						&ast.IndexExpr{
+							X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
+							Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}}}})
 		}
 	}
 	// Intialize the memory.
@@ -285,7 +286,6 @@ func (t *translator) createNewFunc() ast.Decl {
 			}},
 			Rhs: []ast.Expr{g.init}})
 	}
-
 	// Initialize imported modules.
 	var i int
 	seen := set[string]{}
