@@ -346,7 +346,7 @@ func (t *translator) readImportSection() error {
 				module: mod,
 				name:   name,
 				kind:   functionImport,
-				typ:    typ,
+				fnType: typ,
 			})
 
 			args := make([]ast.Expr, len(typ.params))
@@ -399,6 +399,30 @@ func (t *translator) readImportSection() error {
 				name:   name,
 				kind:   memoryImport,
 			})
+
+		case globalImport:
+			typ, err := t.in.ReadByte()
+			if err != nil {
+				return err
+			}
+			_, err = t.in.ReadByte() // mutable
+			if err != nil {
+				return err
+			}
+			idx := len(t.globals)
+			t.globals = append(t.globals, globalDef{
+				id:       &ast.Ident{},
+				typ:      wasmType(typ),
+				imported: true,
+			})
+			t.imports = append(t.imports, importDef{
+				module: mod,
+				name:   name,
+				kind:   globalImport,
+				typ:    wasmType(typ),
+				index:  idx,
+			})
+
 		default:
 			return fmt.Errorf("unsupported import kind: %x", kind)
 		}
@@ -506,8 +530,10 @@ func (t *translator) readGlobalSection() error {
 		return err
 	}
 
-	t.globals = make([]globalDef, numGlobals)
-	for i := range t.globals {
+	start := len(t.globals)
+	t.globals = append(t.globals, make([]globalDef, numGlobals)...)
+	for i := range numGlobals {
+		i += uint64(start)
 		g := &t.globals[i]
 		g.id = &ast.Ident{}
 
@@ -517,11 +543,10 @@ func (t *translator) readGlobalSection() error {
 		}
 		g.typ = wasmType(typ)
 
-		mut, err := t.in.ReadByte()
+		_, err = t.in.ReadByte() // mutable
 		if err != nil {
 			return err
 		}
-		g.mut = mut == 1
 
 		opcode, err := t.in.ReadByte()
 		if err != nil {
@@ -1238,10 +1263,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
+
+			var lhs ast.Expr = &ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: t.globals[i].id,
+			}
+			if t.globals[i].imported {
+				lhs = &ast.StarExpr{X: lhs}
+			}
 			fn.emit(&ast.AssignStmt{
-				Lhs: []ast.Expr{&ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.globals[i].id}},
+				Lhs: []ast.Expr{lhs},
 				Rhs: []ast.Expr{fn.pop()},
 				Tok: token.ASSIGN})
 

@@ -93,10 +93,14 @@ func (t *translator) globalGet() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ast.SelectorExpr{
+	var expr ast.Expr = &ast.SelectorExpr{
 		X:   newID("m"),
 		Sel: t.globals[v].id,
-	}, nil
+	}
+	if t.globals[v].imported {
+		expr = &ast.StarExpr{X: expr}
+	}
+	return expr, nil
 }
 
 func formatInt(i int64) string {
