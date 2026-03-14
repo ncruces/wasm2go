@@ -116,28 +116,6 @@ func (t *translator) createNewFunc() ast.Decl {
 		}
 	}
 
-	if t.memory != nil {
-		body.List = append(body.List, &ast.AssignStmt{
-			Tok: token.ASSIGN,
-			Lhs: []ast.Expr{&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: newID("maxMem")}},
-			Rhs: []ast.Expr{
-				&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(t.memory.max), 10)}}})
-		if !t.memory.imported {
-			body.List = append(body.List, &ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{t.memory.selector},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: newID("make"),
-					Args: []ast.Expr{
-						&ast.ArrayType{Elt: newID("byte")},
-						&ast.BasicLit{
-							Kind:  token.INT,
-							Value: strconv.FormatUint(uint64(t.memory.min)<<16, 10)}}}}})
-		}
-	}
-
 	if len(t.elements) > 0 {
 		elts := make([]ast.Expr, len(t.elements))
 		for i, elem := range t.elements {
@@ -173,14 +151,52 @@ func (t *translator) createNewFunc() ast.Decl {
 		}
 	}
 
-	for _, g := range t.globals {
+	if t.memory != nil {
 		body.List = append(body.List, &ast.AssignStmt{
 			Tok: token.ASSIGN,
 			Lhs: []ast.Expr{&ast.SelectorExpr{
 				X:   newID("m"),
-				Sel: g.id,
-			}},
-			Rhs: []ast.Expr{g.init}})
+				Sel: newID("maxMem")}},
+			Rhs: []ast.Expr{
+				&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(t.memory.max), 10)}}})
+		if !t.memory.imported {
+			body.List = append(body.List, &ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{t.memory.selector},
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: newID("make"),
+					Args: []ast.Expr{
+						&ast.ArrayType{Elt: newID("byte")},
+						&ast.BasicLit{
+							Kind:  token.INT,
+							Value: strconv.FormatUint(uint64(t.memory.min)<<16, 10)}}}}})
+		}
+	}
+	for _, imp := range t.imports {
+		switch imp.kind {
+		case memoryImport:
+			body.List = append(body.List,
+				&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}},
+					Rhs: []ast.Expr{&ast.CallExpr{
+						Fun: &ast.SelectorExpr{
+							X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
+							Sel: ast.NewIdent(exported(imp.name))}}},
+				}, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
+					Rhs: []ast.Expr{&ast.CallExpr{
+						Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Slice")}}},
+				}, &ast.ExprStmt{
+					X: &ast.CallExpr{
+						Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Grow")},
+						Args: []ast.Expr{
+							&ast.BasicLit{
+								Kind:  token.INT,
+								Value: strconv.FormatUint(uint64(t.memory.min), 10)},
+							&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}}})
+		}
 	}
 
 	for i, seg := range t.data {
@@ -195,6 +211,16 @@ func (t *translator) createNewFunc() ast.Decl {
 						X:   t.memory.selector,
 						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(seg.offset))}},
 					dataID(i)}}})
+	}
+
+	for _, g := range t.globals {
+		body.List = append(body.List, &ast.AssignStmt{
+			Tok: token.ASSIGN,
+			Lhs: []ast.Expr{&ast.SelectorExpr{
+				X:   newID("m"),
+				Sel: g.id,
+			}},
+			Rhs: []ast.Expr{g.init}})
 	}
 
 	var i int
@@ -233,33 +259,6 @@ func (t *translator) createNewFunc() ast.Decl {
 				Sel: ast.NewIdent(internal(imp.module))}},
 			Rhs: []ast.Expr{localVar(i)}})
 		i++
-	}
-
-	for _, imp := range t.imports {
-		switch imp.kind {
-		case memoryImport:
-			body.List = append(body.List,
-				&ast.AssignStmt{
-					Tok: token.ASSIGN,
-					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}},
-					Rhs: []ast.Expr{&ast.CallExpr{
-						Fun: &ast.SelectorExpr{
-							X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
-							Sel: ast.NewIdent(exported(imp.name))}}},
-				}, &ast.AssignStmt{
-					Tok: token.ASSIGN,
-					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
-					Rhs: []ast.Expr{&ast.CallExpr{
-						Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Slice")}}},
-				}, &ast.ExprStmt{
-					X: &ast.CallExpr{
-						Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Grow")},
-						Args: []ast.Expr{
-							&ast.BasicLit{
-								Kind:  token.INT,
-								Value: strconv.FormatUint(uint64(t.memory.min), 10)},
-							&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}}})
-		}
 	}
 
 	if t.start != 0 {
