@@ -14,9 +14,13 @@ var modRecvList = &ast.FieldList{List: []*ast.Field{{
 func (t *translator) createModuleStruct() ast.Decl {
 	var fields []*ast.Field
 	for _, tab := range t.tables {
+		var typ ast.Expr = &ast.ArrayType{Elt: newID("any")}
+		if tab.imported {
+			typ = &ast.StarExpr{X: typ}
+		}
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{tab.id},
-			Type:  &ast.ArrayType{Elt: newID("any")}})
+			Type:  typ})
 	}
 	if len(t.elements) > 0 {
 		fields = append(fields, &ast.Field{
@@ -75,6 +79,8 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		switch imp.kind {
 		case functionImport:
 			typ = imp.fnType.toAST()
+		case tableImport:
+			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}}
 		case memoryImport:
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}}
 		case globalImport:
@@ -136,16 +142,17 @@ func (t *translator) createNewFunc() ast.Decl {
 
 	// Create owned tables.
 	for _, tab := range t.tables {
-		if tab.min > 0 {
-			body.List = append(body.List, &ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: tab.id}},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: newID("make"),
-					Args: []ast.Expr{
-						&ast.ArrayType{Elt: newID("any")},
-						&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(tab.min)}}}}})
+		if tab.imported || tab.min == 0 {
+			continue
 		}
+		body.List = append(body.List, &ast.AssignStmt{
+			Tok: token.ASSIGN,
+			Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: tab.id}},
+			Rhs: []ast.Expr{&ast.CallExpr{
+				Fun: newID("make"),
+				Args: []ast.Expr{
+					&ast.ArrayType{Elt: newID("any")},
+					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(tab.min)}}}}})
 	}
 	// Intialize the tables.
 	if len(t.elements) > 0 {
@@ -168,12 +175,16 @@ func (t *translator) createNewFunc() ast.Decl {
 			if elem.passive {
 				continue
 			}
+			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[elem.index].id}
+			if t.tables[elem.index].imported {
+				tab = &ast.StarExpr{X: tab}
+			}
 			body.List = append(body.List, &ast.ExprStmt{
 				X: &ast.CallExpr{
 					Fun: newID("copy"),
 					Args: []ast.Expr{
 						&ast.SliceExpr{
-							X:   &ast.SelectorExpr{X: newID("m"), Sel: t.tables[elem.index].id},
+							X:   tab,
 							Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(elem.offset))}},
 						&ast.IndexExpr{
 							X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
@@ -235,6 +246,14 @@ func (t *translator) createNewFunc() ast.Decl {
 					Fun: &ast.SelectorExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
 						Sel: ast.NewIdent(exported(imp.name))}}}})
+		case tableImport:
+			body.List = append(body.List, &ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.tables[imp.index].id}},
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
+						Sel: ast.NewIdent(exported(imp.name))}}}})
 		}
 	}
 	// Intialize the memory.
@@ -253,6 +272,9 @@ func (t *translator) createNewFunc() ast.Decl {
 	}
 	// Create and initialize owned globals.
 	for _, g := range t.globals {
+		if g.imported {
+			continue
+		}
 		body.List = append(body.List, &ast.AssignStmt{
 			Tok: token.ASSIGN,
 			Lhs: []ast.Expr{&ast.SelectorExpr{
@@ -390,7 +412,11 @@ func (t *translator) createExportMethods() []ast.Decl {
 		case tableExport:
 			tab := t.tables[exp.index]
 			results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}
-			body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.UnaryExpr{Op: token.AND, X: &ast.SelectorExpr{X: newID("m"), Sel: tab.id}}}}}
+			var ret ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: tab.id}
+			if !tab.imported {
+				ret = &ast.UnaryExpr{Op: token.AND, X: ret}
+			}
+			body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}
 		case globalExport:
 			g := t.globals[exp.index]
 			results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: g.typ.Ident()}}}}
