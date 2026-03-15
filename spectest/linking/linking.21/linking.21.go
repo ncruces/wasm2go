@@ -15,7 +15,6 @@ func New(v0 XMm) *Module {
 	m.maxMem = 65536
 	m.Memory = v0.Xmem()
 	m.memory = m.Memory.Slice()
-	m.Memory.Grow(1, m.maxMem)
 	copy((*m.memory)[5:], data0)
 	if i, ok := any(v0).(interface {
 		Init(any)

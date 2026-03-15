@@ -251,15 +251,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
 				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Slice")}}},
-			}, &ast.ExprStmt{
-				X: &ast.CallExpr{
-					Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Grow")},
-					Args: []ast.Expr{
-						&ast.BasicLit{
-							Kind:  token.INT,
-							Value: strconv.FormatUint(uint64(t.memory.min), 10)},
-						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}}})
+					Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Slice")}}}})
 		}
 	}
 
