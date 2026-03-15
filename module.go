@@ -13,6 +13,7 @@ var modRecvList = &ast.FieldList{List: []*ast.Field{{
 
 func (t *translator) createModuleStruct() ast.Decl {
 	var fields []*ast.Field
+	// Tables: owned are []any; imported *[]any.
 	for _, tab := range t.tables {
 		var typ ast.Expr = &ast.ArrayType{Elt: newID("any")}
 		if tab.imported {
@@ -22,19 +23,20 @@ func (t *translator) createModuleStruct() ast.Decl {
 			Names: []*ast.Ident{tab.id},
 			Type:  typ})
 	}
+	// Elements: table initializers, [][]any.
 	if len(t.elements) > 0 {
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{newID("elements")},
 			Type:  &ast.ArrayType{Elt: &ast.ArrayType{Elt: newID("any")}}})
 	}
+	// Memory: owned a []byte; imported a *[]byte and a Memory field.
 	if t.memory != nil {
 		if t.memory.imported {
 			id := newID("Memory")
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
 				Type:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
-			}, &ast.Field{
-				Names: []*ast.Ident{id}, Type: id})
+			}, &ast.Field{Names: []*ast.Ident{id}, Type: id})
 		} else {
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
@@ -44,15 +46,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 			Names: []*ast.Ident{newID("maxMem")},
 			Type:  newID("int32")})
 	}
-	seen := set[string]{}
-	for _, imp := range t.imports {
-		if !seen.has(imp.module) {
-			seen.add(imp.module)
-			fields = append(fields, &ast.Field{
-				Names: []*ast.Ident{ast.NewIdent(internal(imp.module))},
-				Type:  ast.NewIdent(exported(imp.module))})
-		}
-	}
+	// Globals: owned are type; imported *type.
 	for _, g := range t.globals {
 		var typ ast.Expr = g.typ.Ident()
 		if g.imported {
@@ -61,6 +55,16 @@ func (t *translator) createModuleStruct() ast.Decl {
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{g.id},
 			Type:  typ})
+	}
+	// Imported modules.
+	seen := set[string]{}
+	for _, imp := range t.imports {
+		if !seen.has(imp.module) {
+			seen.add(imp.module)
+			fields = append(fields, &ast.Field{
+				Names: []*ast.Ident{ast.NewIdent(internal(imp.module))},
+				Type:  ast.NewIdent(exported(imp.module))})
+		}
 	}
 	return &ast.GenDecl{
 		Tok: token.TYPE,
@@ -79,12 +83,12 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		switch imp.kind {
 		case functionImport:
 			typ = imp.fnType.toAST()
-		case tableImport:
+		case tableImport: // *[]any
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}}
-		case memoryImport:
-			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}}
-		case globalImport:
+		case globalImport: // *type
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: imp.typ.Ident()}}}}}
+		case memoryImport: // Memory
+			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}}
 		}
 
 		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
@@ -116,27 +120,27 @@ func (t *translator) createNewFunc() ast.Decl {
 	}
 
 	// Create the params, and initialize fields.
-	var params []*ast.Field
+	params := []*ast.Field{}
+	locals := map[string]*ast.Ident{}
 	{
 		var i int
-		seen := set[string]{}
 		for _, imp := range t.imports {
-			if seen.has(imp.module) {
+			if locals[imp.module] != nil {
 				continue
 			}
-			seen.add(imp.module)
-			param := localVar(i)
+			local := localVar(i)
+			locals[imp.module] = local
 			i++
 
 			params = append(params, &ast.Field{
-				Names: []*ast.Ident{param},
+				Names: []*ast.Ident{local},
 				Type:  ast.NewIdent(exported(imp.module))})
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{
 					X:   newID("m"),
 					Sel: ast.NewIdent(internal(imp.module))}},
-				Rhs: []ast.Expr{param}})
+				Rhs: []ast.Expr{local}})
 		}
 	}
 
@@ -176,16 +180,35 @@ func (t *translator) createNewFunc() ast.Decl {
 							Value: strconv.FormatUint(uint64(t.memory.min)<<16, 10)}}}}})
 		}
 	}
-	// Set imported memory and globals.
+
+	// Set imported tables, globals and memory.
 	for _, imp := range t.imports {
 		switch imp.kind {
+		case tableImport:
+			body.List = append(body.List, &ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.tables[imp.index].id}},
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X:   locals[imp.module],
+						Sel: ast.NewIdent(exported(imp.name))}}}})
+
+		case globalImport:
+			body.List = append(body.List, &ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.globals[imp.index].id}},
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X:   locals[imp.module],
+						Sel: ast.NewIdent(exported(imp.name))}}}})
+
 		case memoryImport:
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}},
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
+						X:   locals[imp.module],
 						Sel: ast.NewIdent(exported(imp.name))}}},
 			}, &ast.AssignStmt{
 				Tok: token.ASSIGN,
@@ -200,26 +223,9 @@ func (t *translator) createNewFunc() ast.Decl {
 							Kind:  token.INT,
 							Value: strconv.FormatUint(uint64(t.memory.min), 10)},
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}}})
-
-		case globalImport:
-			body.List = append(body.List, &ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.globals[imp.index].id}},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: &ast.SelectorExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
-						Sel: ast.NewIdent(exported(imp.name))}}}})
-
-		case tableImport:
-			body.List = append(body.List, &ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.tables[imp.index].id}},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: &ast.SelectorExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(imp.module))},
-						Sel: ast.NewIdent(exported(imp.name))}}}})
 		}
 	}
+
 	// Intialize the tables.
 	if len(t.elements) > 0 {
 		elts := make([]ast.Expr, len(t.elements))
@@ -286,36 +292,28 @@ func (t *translator) createNewFunc() ast.Decl {
 			}},
 			Rhs: []ast.Expr{g.init}})
 	}
-	// Initialize imported modules.
-	var i int
-	seen := set[string]{}
-	for _, imp := range t.imports {
-		if seen.has(imp.module) {
-			continue
-		}
-		seen.add(imp.module)
 
+	// Initialize imported modules.
+	for _, param := range params {
 		body.List = append(body.List, &ast.IfStmt{
 			Init: &ast.AssignStmt{
 				Tok: token.DEFINE,
 				Lhs: []ast.Expr{newID("i"), newID("ok")},
 				Rhs: []ast.Expr{&ast.TypeAssertExpr{
-					X: localVar(i),
+					X: &ast.CallExpr{Fun: newID("any"), Args: []ast.Expr{param.Names[0]}},
 					Type: &ast.InterfaceType{
 						Methods: &ast.FieldList{List: []*ast.Field{{
 							Names: []*ast.Ident{newID("Init")},
 							Type: &ast.FuncType{
 								Params: &ast.FieldList{List: []*ast.Field{{
-									Type: &ast.StarExpr{X: newID("Module")}}}}}}}}}}}},
+									Type: newID("any")}}}}}}}}}}},
 			Cond: newID("ok"),
 			Body: &ast.BlockStmt{
 				List: []ast.Stmt{&ast.ExprStmt{
 					X: &ast.CallExpr{
 						Fun:  &ast.SelectorExpr{X: newID("i"), Sel: newID("Init")},
 						Args: []ast.Expr{newID("m")}}}}}})
-		i++
 	}
-
 	// Call start function.
 	if t.start != 0 {
 		body.List = append(body.List, &ast.ExprStmt{
@@ -336,26 +334,25 @@ func (t *translator) createNewFunc() ast.Decl {
 }
 
 func (t *translator) createMemoryTypes() []ast.Decl {
-	decls := []ast.Decl{
-		&ast.GenDecl{
-			Tok: token.TYPE,
-			Specs: []ast.Spec{&ast.TypeSpec{
-				Name: newID("Memory"),
-				Type: &ast.InterfaceType{Methods: &ast.FieldList{
-					List: []*ast.Field{{
-						Names: []*ast.Ident{newID("Slice")},
-						Type: &ast.FuncType{
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
-					}, {
-						Names: []*ast.Ident{newID("Grow")},
-						Type: &ast.FuncType{
-							Params: &ast.FieldList{
-								List: []*ast.Field{{
-									Names: []*ast.Ident{newID("delta"), newID("max")},
-									Type:  newID("int32")}}},
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: newID("int32")}}}}}}}}}}}}
+	decls := []ast.Decl{&ast.GenDecl{
+		Tok: token.TYPE,
+		Specs: []ast.Spec{&ast.TypeSpec{
+			Name: newID("Memory"),
+			Type: &ast.InterfaceType{Methods: &ast.FieldList{
+				List: []*ast.Field{{
+					Names: []*ast.Ident{newID("Slice")},
+					Type: &ast.FuncType{
+						Results: &ast.FieldList{
+							List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
+				}, {
+					Names: []*ast.Ident{newID("Grow")},
+					Type: &ast.FuncType{
+						Params: &ast.FieldList{
+							List: []*ast.Field{{
+								Names: []*ast.Ident{newID("delta"), newID("max")},
+								Type:  newID("int32")}}},
+						Results: &ast.FieldList{
+							List: []*ast.Field{{Type: newID("int32")}}}}}}}}}}}}
 
 	if !t.memory.imported {
 		decls = append(decls, &ast.GenDecl{
@@ -438,13 +435,11 @@ func (t *translator) createExportMethods() []ast.Decl {
 			}
 		}
 
-		if results != nil {
-			decls = append(decls, &ast.FuncDecl{
-				Recv: modRecvList,
-				Name: methodName,
-				Type: &ast.FuncType{Results: results},
-				Body: &ast.BlockStmt{List: body}})
-		}
+		decls = append(decls, &ast.FuncDecl{
+			Recv: modRecvList,
+			Name: methodName,
+			Type: &ast.FuncType{Results: results},
+			Body: &ast.BlockStmt{List: body}})
 	}
 	return decls
 }

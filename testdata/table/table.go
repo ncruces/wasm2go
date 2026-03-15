@@ -15,8 +15,8 @@ func New(v0 Xenv) *Module {
 	m.elements = [][]any{[]any{m.f1}, []any{m.f0}}
 	copy(m.t0[16:], m.elements[0])
 	copy(m.t0[17:], m.elements[1])
-	if i, ok := v0.(interface {
-		Init(*Module)
+	if i, ok := any(v0).(interface {
+		Init(any)
 	}); ok {
 		i.Init(m)
 	}
