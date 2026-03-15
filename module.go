@@ -371,42 +371,45 @@ func (t *translator) createNewFunc() ast.Decl {
 }
 
 func (t *translator) createMemoryTypes() []ast.Decl {
-	decls := []ast.Decl{&ast.GenDecl{
-		Tok: token.TYPE,
-		Specs: []ast.Spec{&ast.TypeSpec{
-			Name: newID("Memory"),
-			Type: &ast.InterfaceType{Methods: &ast.FieldList{
-				List: []*ast.Field{{
-					Names: []*ast.Ident{newID("Slice")},
-					Type: &ast.FuncType{
-						Results: &ast.FieldList{
-							List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
-				}, {
-					Names: []*ast.Ident{newID("Grow")},
-					Type: &ast.FuncType{
-						Params: &ast.FieldList{
-							List: []*ast.Field{{
-								Names: []*ast.Ident{newID("delta"), newID("max")},
-								Type:  newID("int32")}}},
-						Results: &ast.FieldList{
-							List: []*ast.Field{{Type: newID("int32")}}}}}}}}}}}}
-
+	var decls []ast.Decl
+	// Memory interface as a type alias.
+	if !*nohost {
+		decls = append(decls, &ast.GenDecl{
+			Tok: token.TYPE,
+			Specs: []ast.Spec{&ast.TypeSpec{
+				Assign: 1,
+				Name:   newID("Memory"),
+				Type: &ast.InterfaceType{Methods: &ast.FieldList{
+					List: []*ast.Field{{
+						Names: []*ast.Ident{newID("Slice")},
+						Type: &ast.FuncType{
+							Results: &ast.FieldList{
+								List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
+					}, {
+						Names: []*ast.Ident{newID("Grow")},
+						Type: &ast.FuncType{
+							Params: &ast.FieldList{
+								List: []*ast.Field{{
+									Names: []*ast.Ident{newID("delta"), newID("max")},
+									Type:  newID("int32")}}},
+							Results: &ast.FieldList{
+								List: []*ast.Field{{Type: newID("int32")}}}}}}}}}}})
+	}
+	// Memory structure implementing the interface for owned memory.
 	if !t.memory.imported {
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
 				Name: newID("wasmMemory"),
-				Type: &ast.ArrayType{Elt: newID("byte")}}}})
-
-		decls = append(decls, &ast.FuncDecl{
+				Type: &ast.ArrayType{Elt: newID("byte")}}},
+		}, &ast.FuncDecl{
 			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
 			Name: newID("Slice"),
 			Type: &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
 				Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
-				Args: []ast.Expr{newID("m")}}}}}}})
-
-		decls = append(decls, &ast.FuncDecl{
+				Args: []ast.Expr{newID("m")}}}}}},
+		}, &ast.FuncDecl{
 			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
 			Name: newID("Grow"),
 			Type: &ast.FuncType{
@@ -422,7 +425,6 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 					newID("max")}}}}}}})
 		t.helpers.add("memory_grow")
 	}
-
 	return decls
 }
 

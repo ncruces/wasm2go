@@ -18,7 +18,7 @@ func New() *Module {
 	return m
 }
 
-type Memory interface {
+type Memory = interface {
 	Slice() *[]byte
 	Grow(delta, max int32) int32
 }

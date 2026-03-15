@@ -70,20 +70,18 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
-	if !*nohost {
-		hasMemExport := false
-		for _, exp := range t.exports {
-			if exp.kind == memoryExport {
-				hasMemExport = true
-				break
-			}
+	exported := false
+	for _, exp := range t.exports {
+		if exp.kind == memoryExport {
+			exported = true
+			break
 		}
-		if t.memory != nil && (t.memory.imported || hasMemExport) {
-			t.out.Decls = append(t.createMemoryTypes(), t.out.Decls...)
-		}
-		if len(t.imports) > 0 {
-			t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
-		}
+	}
+	if t.memory != nil && (exported || t.memory.imported) {
+		t.out.Decls = append(t.createMemoryTypes(), t.out.Decls...)
+	}
+	if !*nohost && len(t.imports) > 0 {
+		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
 	}
 
 	t.out.Decls = append([]ast.Decl{
