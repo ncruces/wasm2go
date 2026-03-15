@@ -81,13 +81,17 @@ const (
 type importDef struct {
 	module string
 	name   string
-	typ    funcType
+	kind   importKind
+	fnType funcType
+	typ    wasmType
+	index  int
 }
 
 type tableDef struct {
-	id  *ast.Ident
-	min int
-	max int
+	id       *ast.Ident
+	imported bool
+	min      int
+	max      int
 }
 
 type memoryDef struct {
@@ -99,10 +103,10 @@ type memoryDef struct {
 }
 
 type globalDef struct {
-	typ  wasmType
-	mut  bool
-	init ast.Expr
-	id   *ast.Ident
+	id       *ast.Ident
+	typ      wasmType
+	imported bool
+	init     ast.Expr
 }
 
 type exportKind byte
