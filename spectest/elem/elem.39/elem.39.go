@@ -12,7 +12,7 @@ func New(v0 Xmodule1) *Module {
 	m := &Module{}
 	m._module1 = v0
 	m.t0 = v0.Xshared_table()
-	m.elements = [][]any{[]any{m.f0}, []any{m.f1}}
+	m.elements = [][]any{{m.f0}, {m.f1}}
 	copy((*m.t0)[7:], m.elements[0])
 	copy((*m.t0)[8:], m.elements[1])
 	if i, ok := any(v0).(interface {

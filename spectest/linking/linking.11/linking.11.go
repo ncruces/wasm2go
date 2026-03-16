@@ -12,7 +12,7 @@ func New(v0 XMt) *Module {
 	m := &Module{}
 	m._Mt = v0
 	m.t0 = v0.Xtab()
-	m.elements = [][]any{[]any{m.f1, m.f0}}
+	m.elements = [][]any{{m.f1, m.f0}}
 	copy((*m.t0)[1:], m.elements[0])
 	if i, ok := any(v0).(interface {
 		Init(any)

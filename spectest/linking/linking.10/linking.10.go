@@ -12,7 +12,7 @@ func New(v0 XMt) *Module {
 	m := &Module{}
 	m._Mt = v0
 	m.t0 = make([]any, 5)
-	m.elements = [][]any{[]any{m.f2, m.f2, m.f2, m.f1, m.XMt_call}}
+	m.elements = [][]any{{m.f2, m.f2, m.f2, m.f1, m.XMt_call}}
 	copy(m.t0[0:], m.elements[0])
 	if i, ok := any(v0).(interface {
 		Init(any)
