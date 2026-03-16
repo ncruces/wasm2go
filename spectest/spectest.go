@@ -188,22 +188,38 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 	}
 }
 
-func RecoverTrap(t testing.TB, trap string) {
+func RecoverTrap(t testing.TB, want string) {
 	t.Helper()
-	want := trap
+
+	var got string
+	if r := recover(); r != nil {
+		got = fmt.Sprint(r)
+	} else {
+		t.Fatalf("want trap: %s", want)
+	}
+
 	switch {
-	case strings.Contains(want, "out of bounds") || strings.Contains(want, "undefined"):
-		want = "out of range"
+	case strings.Contains(got, want):
+		return
+	case strings.Contains(want, "out of bounds"):
+		if strings.Contains(got, "out of range") || strings.Contains(got, "cannot convert slice with length") {
+			return
+		}
+	case strings.Contains(want, "undefined"):
+		if strings.Contains(got, "out of range") {
+			return
+		}
 	case strings.Contains(want, "type mismatch") || strings.Contains(want, "indirect call"):
-		want = "interface conversion"
+		if strings.Contains(got, "interface conversion") {
+			return
+		}
 	case strings.Contains(want, "uninitialized"):
-		want = "is nil"
+		if strings.Contains(got, "is nil") {
+			return
+		}
 	}
-	if r := recover(); r == nil {
-		t.Errorf("expected trap: %s", trap)
-	} else if !strings.Contains(fmt.Sprint(r), want) {
-		t.Errorf("got trap %q, want %q", r, trap)
-	}
+
+	t.Fatalf("got trap %q, want %q", got, want)
 }
 
 func exported(name string) string {

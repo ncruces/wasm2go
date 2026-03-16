@@ -21,7 +21,7 @@ jobs:
       with: { go-version: stable }
 
     - name: Test
-      run: go test -run translate && go test
+      run: go test
 
     - name: Test amd64
       run: go test ./helpers ./spectest/...
@@ -44,6 +44,11 @@ jobs:
     - name: Test s390x
       run: GOARCH=s390x go test ./helpers ./spectest/...
 
+    - name: Test unsafe
+      run: |
+        go test -run translate -args -endian little
+        go test ./spectest/...
+
   test-arm:
     runs-on: ubuntu-24.04-arm
 
@@ -64,17 +69,22 @@ jobs:
     - name: Verify
       run: go mod verify
 
-    # - name: Vet
-    #   run: go vet ./...
+    - name: Vet
+      run: go vet ./...
 
     - name: Build
       run: go build ./...
 
     - name: Test
-      run: go test -run translate && go test
+      run: go test
 
     - name: Test arm64
       run: go test ./helpers ./spectest/...
 
     - name: Test arm
       run: GOARCH=arm GOARM=7 go test ./helpers ./spectest/...
+
+    - name: Test unsafe
+      run: |
+        go test -run translate -args -endian little
+        go test ./spectest/...
