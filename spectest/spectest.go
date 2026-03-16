@@ -56,20 +56,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 		case "action", "assert_return", "assert_trap":
 			t.Run(fmt.Sprintf("%s/line_%d", name, cmd.Line), func(t *testing.T) {
 				if cmd.Type == "assert_trap" {
-					defer func() {
-						want := cmd.Text
-						switch want {
-						case "out of bounds memory access", "out of bounds table access", "undefined element":
-							want = "out of range"
-						case "indirect call type mismatch":
-							want = "interface conversion"
-						}
-						if r := recover(); r == nil {
-							t.Errorf("expected trap: %s", cmd.Text)
-						} else if !strings.Contains(fmt.Sprint(r), want) {
-							t.Errorf("got trap %q, want %q", r, cmd.Text)
-						}
-					}()
+					defer RecoverTrap(t, cmd.Text)
 				}
 
 				method := mod.MethodByName(exported(cmd.Action.Field))
@@ -111,6 +98,11 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 				}
 
 				res := method.Call(args)
+				for i := range res {
+					if res[i].Kind() == reflect.Pointer {
+						res[i] = res[i].Elem()
+					}
+				}
 				if cmd.Type == "assert_return" {
 					for i, exp := range cmd.Expected {
 						switch exp.Type {
@@ -193,6 +185,24 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 				}
 			})
 		}
+	}
+}
+
+func RecoverTrap(t testing.TB, trap string) {
+	t.Helper()
+	want := trap
+	switch {
+	case strings.Contains(want, "out of bounds") || strings.Contains(want, "undefined"):
+		want = "out of range"
+	case strings.Contains(want, "type mismatch") || strings.Contains(want, "indirect call"):
+		want = "interface conversion"
+	case strings.Contains(want, "uninitialized"):
+		want = "is nil"
+	}
+	if r := recover(); r == nil {
+		t.Errorf("expected trap: %s", trap)
+	} else if !strings.Contains(fmt.Sprint(r), want) {
+		t.Errorf("got trap %q, want %q", r, trap)
 	}
 }
 

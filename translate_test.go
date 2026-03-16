@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"go/format"
 	"html/template"
 	"io/fs"
@@ -81,6 +82,10 @@ func generateSpecTest(path string) error {
 	wasmFile := filepath.Base(path)
 	jsonFile := baseDir + ".json"
 	testFile := filepath.Join(dir, baseDir+"_test.go")
+
+	if _, err := os.Stat(filepath.Join(dir, baseDir+".json")); errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
 
 	type specFileInfo struct {
 		ImportPath string

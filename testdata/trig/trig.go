@@ -5,7 +5,7 @@ package trig_wasm
 import "math"
 
 type Module struct {
-	Memory           []byte
+	memory           []byte
 	maxMem           int32
 	___stack_pointer int32
 }
@@ -13,9 +13,22 @@ type Module struct {
 func New() *Module {
 	m := &Module{}
 	m.maxMem = 65536
-	m.Memory = make([]byte, 65536)
+	m.memory = make([]byte, 65536)
 	m.___stack_pointer = i32_const(65536)
 	return m
+}
+
+type Memory = interface {
+	Slice() *[]byte
+	Grow(delta, max int32) int32
+}
+type wasmMemory []byte
+
+func (m *wasmMemory) Slice() *[]byte {
+	return (*[]byte)(m)
+}
+func (m *wasmMemory) Grow(delta, max int32) int32 {
+	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xsin(v0 float64) float64 {
 	var v1 float64
@@ -157,6 +170,9 @@ l1:
 	t52 := v1
 	return t52
 }
+func (m *Module) Xmemory() Memory {
+	return (*wasmMemory)(&m.memory)
+}
 
 //go:nosplit
 func i32_const(x int32) int32 { return x }
@@ -173,4 +189,20 @@ func i64_trunc_f64_s(f float64) int64 {
 		panic("invalid conversion to integer")
 	}
 	return int64(x)
+}
+
+func memory_grow(mem *[]byte, delta, max int32) int32 {
+	buf := *mem
+	len := len(buf)
+	old := int32(len >> 16)
+	if delta == 0 {
+		return old
+	}
+	new := old + delta
+	add := int(new)<<16 - len
+	if new > max || add < 0 {
+		return -1
+	}
+	*mem = append(buf, make([]byte, add)...)
+	return old
 }

@@ -12,10 +12,8 @@ The Go file forms a self contained package,
 that exports a structure called `Module`,
 and a `New` function to initialize it.
 
-The methods of the `Module` structure are the Wasm module's exported functions,
+The methods of the `Module` structure are the Wasm module's exports,
 whereas imports are interfaces `New` consumes.
-The module may also export its global variables (as fields).
-And if it imports a memory, you can provide your own allocator.
 
 Only a subset of the Wasm specification will be supported,
 as the goal is to translate specific Wasm modules to Go.
@@ -30,9 +28,8 @@ before attempting to convert an untrusted module.
 The current target is a useful subset of Wasm produced by `clang`.
 
 This includes most Wasm 1.0 features, with the following exceptions:
-- export aliasing (exporting the same function/global under multiple names);
 - export conflicts (name collisions after the trivial mangling we apply);
-- importing tables or globals.
+- export aliasing (exporting the same function under multiple names).
 
 It also supports a subset of Wasm 2.0 features:
 - bulk memory operations and reference types;

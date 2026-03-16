@@ -10,16 +10,16 @@ type Module struct {
 
 func New(v0 Xenv) *Module {
 	m := &Module{}
+	m._env = v0
 	m.t0 = make([]any, 32)
 	m.elements = [][]any{{m.f1}, {m.f0}}
 	copy(m.t0[16:], m.elements[0])
 	copy(m.t0[17:], m.elements[1])
-	if i, ok := v0.(interface {
-		Init(*Module)
+	if i, ok := any(v0).(interface {
+		Init(any)
 	}); ok {
 		i.Init(m)
 	}
-	m._env = v0
 	return m
 }
 
