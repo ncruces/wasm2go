@@ -521,7 +521,7 @@ func (m *Module) Xas_call_indirect_func() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(4), int32(1), int32(2))
+		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(4), int32(1), int32(2))
 		p0 = t1
 	}
 l0:
@@ -535,7 +535,7 @@ func (m *Module) Xas_call_indirect_first() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(4), int32(2))
+		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(4), int32(2))
 		p0 = t1
 	}
 l0:
@@ -549,7 +549,7 @@ func (m *Module) Xas_call_indirect_mid() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(4))
+		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(4))
 		p0 = t1
 	}
 l0:
@@ -563,7 +563,7 @@ func (m *Module) Xas_call_indirect_last() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(int32(4))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+		t1 := m.t0[uint(int32(4))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 		p0 = t1
 	}
 l0:

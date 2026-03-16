@@ -90,6 +90,7 @@ type importDef struct {
 type tableDef struct {
 	id       *ast.Ident
 	imported bool
+	is64     bool
 	min      int
 	max      int
 }

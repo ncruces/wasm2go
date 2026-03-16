@@ -25,13 +25,13 @@ func (m *Module) Xfill_abbrev(v0 int32, v1 any, v2 int32) {
 }
 func (m *Module) Xget(v0 int32) any {
 	t0 := v0
-	t1 := m.t0[uint32(t0)]
+	t1 := m.t0[uint(t0)]
 	return t1
 }
 
-func table_fill(tab []any, dest int32, val any, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
+func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
+	x := uint(dest)
+	y := x + uint(n)
 	buf := tab[x:y]
 	if val == nil {
 		clear(buf)

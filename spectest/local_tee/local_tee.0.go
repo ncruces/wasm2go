@@ -432,22 +432,22 @@ func (m *Module) Xas_call_last(v0 int32) int32 {
 }
 func (m *Module) Xas_call_indirect_first(v0 int32) int32 {
 	v0 = int32(1)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_mid(v0 int32) int32 {
 	v0 = int32(2)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_last(v0 int32) int32 {
 	v0 = int32(3)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_index(v0 int32) int32 {
 	v0 = i32_const(0)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_local_set_value() {

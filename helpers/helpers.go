@@ -457,26 +457,26 @@ func memory64_zero(mem []byte, dest, n int64) {
 	clear(mem[x:y])
 }
 
-func table_init(tab, elems []any, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func table_init[T int32 | int64](tab, elems []any, dest, src, n T) {
+	x := uint(dest)
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(tab[x:y], elems[z:w])
 }
 
-func table_copy(dst, tab []any, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3) {
+	x := uint(dest)
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(dst[x:y], tab[z:w])
 }
 
-func table_grow(tab *[]any, val any, delta, max int32) int32 {
+func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {
 	buf := *tab
 	len := len(buf)
-	old := int32(len)
+	old := T(len)
 	if delta == 0 {
 		return old
 	}
@@ -496,9 +496,9 @@ func table_grow(tab *[]any, val any, delta, max int32) int32 {
 	return old
 }
 
-func table_fill(tab []any, dest int32, val any, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
+func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
+	x := uint(dest)
+	y := x + uint(n)
 	buf := tab[x:y]
 	if val == nil {
 		clear(buf)

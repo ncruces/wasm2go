@@ -435,14 +435,12 @@ func (t *translator) readImportSection() error {
 			if err != nil {
 				return err
 			}
-			if is64 {
-				return fmt.Errorf("64-bit tables not supported")
-			}
 			idx := len(t.tables)
 			t.tables = append(t.tables, tableDef{
 				id:       &ast.Ident{},
 				min:      int(min),
 				max:      int(max),
+				is64:     is64,
 				imported: true,
 			})
 			t.imports = append(t.imports, importDef{
@@ -507,14 +505,12 @@ func (t *translator) readTableSection() error {
 		if err != nil {
 			return err
 		}
-		if is64 {
-			return fmt.Errorf("64-bit tables not supported")
-		}
 
 		t.tables[i] = tableDef{
-			id:  &ast.Ident{},
-			min: int(min),
-			max: int(max),
+			id:   &ast.Ident{},
+			min:  int(min),
+			max:  int(max),
+			is64: is64,
 		}
 	}
 	return nil
@@ -1159,7 +1155,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Fun: &ast.TypeAssertExpr{
 					X: &ast.IndexExpr{
 						X:     tab,
-						Index: convert(idx, "uint32")},
+						Index: convert(idx, "uint")},
 					Type: typ.toAST()},
 				Args: args}
 
@@ -1327,7 +1323,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			fn.push(&ast.IndexExpr{
 				X:     tab,
-				Index: convert(fn.pop(), "uint32")})
+				Index: convert(fn.pop(), "uint")})
 
 		case 0x26: // table.set
 			i, err := readLEB128(t.in)
@@ -1343,7 +1339,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Rhs: []ast.Expr{fn.pop()},
 				Lhs: []ast.Expr{&ast.IndexExpr{
 					X:     tab,
-					Index: convert(fn.pop(), "uint32")}}})
+					Index: convert(fn.pop(), "uint")}}})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
 			_, err := readLEB128(t.in) // align
