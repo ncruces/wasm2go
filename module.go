@@ -101,8 +101,9 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
-				Name: ast.NewIdent(exported(name)),
-				Type: &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
+				Assign: 1,
+				Name:   ast.NewIdent(exported(name)),
+				Type:   &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
 	}
 	return decls
 }

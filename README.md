@@ -12,10 +12,8 @@ The Go file forms a self contained package,
 that exports a structure called `Module`,
 and a `New` function to initialize it.
 
-The methods of the `Module` structure are the Wasm module's exported functions,
+The methods of the `Module` structure are the Wasm module's exports,
 whereas imports are interfaces `New` consumes.
-The module may also export its global variables (as fields).
-And if it imports a memory, you can provide your own allocator.
 
 Only a subset of the Wasm specification will be supported,
 as the goal is to translate specific Wasm modules to Go.
