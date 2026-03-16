@@ -406,6 +406,57 @@ func memory_zero(mem []byte, dest, n int32) {
 	clear(mem[x:y])
 }
 
+func memory64_grow(mem *[]byte, delta, max int64) int64 {
+	buf := *mem
+	len64 := int64(len(buf))
+	old := len64 >> 16
+	if delta == 0 {
+		return old
+	}
+	newPages := old + delta
+	add := (newPages << 16) - len64
+	if newPages > max || add < 0 {
+		return -1
+	}
+	*mem = append(buf, make([]byte, add)...)
+	return old
+}
+
+func memory64_init(mem []byte, data string, dest int64, src, n int32) {
+	x := uint64(dest)
+	z := uint64(uint32(src))
+	y := x + uint64(n)
+	w := z + uint64(n)
+	copy(mem[x:y], data[z:w])
+}
+
+func memory64_copy(mem []byte, dest, src, n int64) {
+	x := uint64(dest)
+	z := uint64(src)
+	y := x + uint64(n)
+	w := z + uint64(n)
+	copy(mem[x:y], mem[z:w])
+}
+
+func memory64_fill(mem []byte, dest int64, val int32, n int64) {
+	x := uint64(dest)
+	y := x + uint64(n)
+	buf := mem[x:y]
+	if len(buf) > 0 {
+		buf[0] = byte(val)
+		for i := 1; i < len(buf); {
+			chunk := min(i, 8192)
+			i += copy(buf[i:], buf[:chunk])
+		}
+	}
+}
+
+func memory64_zero(mem []byte, dest, n int64) {
+	x := uint64(dest)
+	y := x + uint64(n)
+	clear(mem[x:y])
+}
+
 func table_init(tab, elems []any, dest, src, n int32) {
 	x := uint(uint32(dest))
 	z := uint(uint32(src))

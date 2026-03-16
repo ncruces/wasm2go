@@ -381,15 +381,16 @@ func (t *translator) readImportSection() error {
 			if t.memory != nil {
 				return fmt.Errorf("multiple memories not supported")
 			}
-			min, max, err := t.readLimits(65536) // 4 GiB
+			min, max, is64, err := t.readLimits(65536) // 4 GiB
 			if err != nil {
 				return err
 			}
 			id := &ast.Ident{}
 			t.memory = &memoryDef{
 				id:       id,
-				min:      int(min),
-				max:      int(max),
+				min:      int64(min),
+				max:      int64(max),
+				is64:     is64,
 				imported: true,
 				selector: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
 			t.imports = append(t.imports, importDef{
@@ -430,9 +431,12 @@ func (t *translator) readImportSection() error {
 				return fmt.Errorf("unsupported table type: %x", typ)
 			}
 
-			min, max, err := t.readLimits(65536) // 1 MiB
+			min, max, is64, err := t.readLimits(65536) // 1 MiB
 			if err != nil {
 				return err
+			}
+			if is64 {
+				return fmt.Errorf("64-bit tables not supported")
 			}
 			idx := len(t.tables)
 			t.tables = append(t.tables, tableDef{
@@ -499,9 +503,12 @@ func (t *translator) readTableSection() error {
 			return fmt.Errorf("unsupported table type: %x", typ)
 		}
 
-		min, max, err := t.readLimits(65536) // 1 MiB
+		min, max, is64, err := t.readLimits(65536) // 1 MiB
 		if err != nil {
 			return err
+		}
+		if is64 {
+			return fmt.Errorf("64-bit tables not supported")
 		}
 
 		t.tables[i] = tableDef{
@@ -526,25 +533,30 @@ func (t *translator) readMemorySection() error {
 	}
 
 	id := &ast.Ident{}
-	min, max, err := t.readLimits(65536) // 4 GiB
+	min, max, is64, err := t.readLimits(65536) // 4 GiB
 	t.memory = &memoryDef{
 		id:       id,
-		min:      int(min),
-		max:      int(max),
+		min:      int64(min),
+		max:      int64(max),
+		is64:     is64,
 		selector: &ast.SelectorExpr{X: newID("m"), Sel: id}}
 	return err
 }
 
-func (t *translator) readLimits(def uint64) (min, max uint64, err error) {
+func (t *translator) readLimits(def uint64) (min, max uint64, is64 bool, err error) {
 	flags, err := readLEB128(t.in)
 	if err != nil {
 		return
 	}
+	is64 = (flags & 4) != 0
 	min, err = readLEB128(t.in)
 	if err != nil {
 		return
 	}
 	max = def
+	if is64 && def == 65536 {
+		max = 1 << 48
+	}
 	if flags&1 == 1 {
 		max, err = readLEB128(t.in)
 	}
@@ -1446,7 +1458,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0x3f: // memory.size
-			_, _ = t.in.ReadByte() // reserved
+			_, _ = readLEB128(t.in) // memory index
 			fn.push(convert(
 				&ast.BinaryExpr{
 					X: &ast.CallExpr{
@@ -1454,10 +1466,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Args: []ast.Expr{t.memory.selector}},
 					Op: token.SHR,
 					Y:  &ast.BasicLit{Kind: token.INT, Value: "16"},
-				}, "int32"))
+				}, t.memory.indexType()))
 
 		case 0x40: // memory.grow
-			_, err := t.in.ReadByte() // reserved
+			_, err := readLEB128(t.in) // memory index
 			if err != nil {
 				return err
 			}
@@ -1471,9 +1483,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}})
 
 			} else {
-				fn.helpers.add("memory_grow")
+				fn.helpers.add(t.memory.helper("grow"))
 				fn.push(&ast.CallExpr{
-					Fun: newID("memory_grow"),
+					Fun: newID(t.memory.helper("grow")),
 					Args: []ast.Expr{
 						&ast.UnaryExpr{
 							Op: token.AND,
@@ -1855,10 +1867,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				n := fn.pop()
 				src := fn.pop()
 				dst := fn.pop()
-				fn.helpers.add("memory_init")
+				fn.helpers.add(t.memory.helper("init"))
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
-						Fun: newID("memory_init"),
+						Fun: newID(t.memory.helper("init")),
 						Args: []ast.Expr{
 							t.memory.selector,
 							dataID(i), dst, src, n}}})
@@ -1882,10 +1894,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				n := fn.pop()
 				src := fn.pop()
 				dst := fn.pop()
-				fn.helpers.add("memory_copy")
+				fn.helpers.add(t.memory.helper("copy"))
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
-						Fun: newID("memory_copy"),
+						Fun: newID(t.memory.helper("copy")),
 						Args: []ast.Expr{
 							t.memory.selector,
 							dst, src, n}}})
@@ -1899,18 +1911,18 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				val := fn.pop()
 				dest := fn.pop()
 				if iszero(val) {
-					fn.helpers.add("memory_zero")
+					fn.helpers.add(t.memory.helper("zero"))
 					fn.emit(&ast.ExprStmt{
 						X: &ast.CallExpr{
-							Fun: newID("memory_zero"),
+							Fun: newID(t.memory.helper("zero")),
 							Args: []ast.Expr{
 								t.memory.selector,
 								dest, n}}})
 				} else {
-					fn.helpers.add("memory_fill")
+					fn.helpers.add(t.memory.helper("fill"))
 					fn.emit(&ast.ExprStmt{
 						X: &ast.CallExpr{
-							Fun: newID("memory_fill"),
+							Fun: newID(t.memory.helper("fill")),
 							Args: []ast.Expr{
 								t.memory.selector,
 								dest, val, n}}})
@@ -2081,14 +2093,14 @@ func (t *translator) readDataSection() error {
 		if !t.data[i].passive {
 			if opcode, err := t.in.ReadByte(); err != nil {
 				return err
-			} else if opcode != 0x41 { // i32.const
+			} else if opcode != 0x41 && opcode != 0x42 { // i32.const, i64.const
 				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
 			}
 			offset, err := readSignedLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			t.data[i].offset = uint32(offset)
+			t.data[i].offset = uint64(offset)
 			if end, err := t.in.ReadByte(); err != nil {
 				return err
 			} else if end != 0x0b {

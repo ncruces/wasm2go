@@ -44,7 +44,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 		}
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{newID("maxMem")},
-			Type:  newID("int32")})
+			Type:  newID(t.memory.indexType())})
 	}
 	// Globals: owned are type; imported *type.
 	for _, g := range t.globals {
@@ -267,7 +267,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Args: []ast.Expr{
 					&ast.SliceExpr{
 						X:   t.memory.selector,
-						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(seg.offset))}},
+						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(seg.offset, 10)}},
 					dataID(i)}}})
 	}
 	// Create and initialize owned globals.
@@ -345,9 +345,9 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 							Params: &ast.FieldList{
 								List: []*ast.Field{{
 									Names: []*ast.Ident{newID("delta"), newID("max")},
-									Type:  newID("int32")}}},
+									Type:  newID(t.memory.indexType())}}},
 							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: newID("int32")}}}}}}}}}}})
+								List: []*ast.Field{{Type: newID(t.memory.indexType())}}}}}}}}}}})
 	}
 	// Memory structure implementing the interface for owned memory.
 	if !t.memory.imported {
@@ -367,17 +367,17 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
 			Name: newID("Grow"),
 			Type: &ast.FuncType{
-				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID("int32")}}},
-				Results: &ast.FieldList{List: []*ast.Field{{Type: newID("int32")}}}},
+				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID(t.memory.indexType())}}},
+				Results: &ast.FieldList{List: []*ast.Field{{Type: newID(t.memory.indexType())}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun: newID("memory_grow"),
+				Fun: newID(t.memory.helper("grow")),
 				Args: []ast.Expr{
 					&ast.CallExpr{
 						Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
 						Args: []ast.Expr{newID("m")}},
 					newID("delta"),
 					newID("max")}}}}}}})
-		t.helpers.add("memory_grow")
+		t.helpers.add(t.memory.helper("grow"))
 	}
 	return decls
 }

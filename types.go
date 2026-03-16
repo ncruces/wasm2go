@@ -98,8 +98,23 @@ type memoryDef struct {
 	id       *ast.Ident
 	selector ast.Expr
 	imported bool
-	min      int
-	max      int
+	is64     bool
+	min      int64
+	max      int64
+}
+
+func (m *memoryDef) helper(name string) string {
+	if m.is64 {
+		return "memory64_" + name
+	}
+	return "memory_" + name
+}
+
+func (m *memoryDef) indexType() string {
+	if m.is64 {
+		return "int64"
+	}
+	return "int32"
 }
 
 type globalDef struct {
@@ -132,7 +147,7 @@ type elemSegment struct {
 
 type dataSegment struct {
 	init    []byte
-	offset  uint32
+	offset  uint64
 	passive bool
 }
 
