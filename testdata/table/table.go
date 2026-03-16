@@ -11,7 +11,7 @@ type Module struct {
 func New(v0 Xenv) *Module {
 	m := &Module{}
 	m.t0 = make([]any, 32)
-	m.elements = [][]any{[]any{m.f1}, []any{m.f0}}
+	m.elements = [][]any{{m.f1}, {m.f0}}
 	copy(m.t0[16:], m.elements[0])
 	copy(m.t0[17:], m.elements[1])
 	if i, ok := v0.(interface {

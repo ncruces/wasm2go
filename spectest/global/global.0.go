@@ -24,7 +24,7 @@ func New() *Module {
 	m.t0 = make([]any, 1)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m.f26}}
+	m.elements = [][]any{{m.f26}}
 	copy(m.t0[0:], m.elements[0])
 	m.g0 = i32_const(-2)
 	m.g1 = float32(-3)

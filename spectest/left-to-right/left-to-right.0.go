@@ -20,7 +20,7 @@ func New() *Module {
 	m.t0 = make([]any, 8)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m.f0, m.f1, m.f2, m.f3, m.f4, m.f5, m.f6, m.f7}}
+	m.elements = [][]any{{m.f0, m.f1, m.f2, m.f3, m.f4, m.f5, m.f6, m.f7}}
 	copy(m.t0[0:], m.elements[0])
 	return m
 }

@@ -21,7 +21,7 @@ func New() *Module {
 	m.t0 = make([]any, 32)
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.elements = [][]any{[]any{m.f0, m.f1, m.f2, m.f3, m.f5, m.f6, m.f7, m.f8, m.f13, m.f11, m.f14, m.f12, m.Xfac_i64, m.Xfib_i64, m.Xeven, m.Xodd, m.Xrunaway, m.Xmutual_runaway, m.f54, m.f15, m.f16, m.f17, m.f18, m.Xfac_i32, m.Xfac_f32, m.Xfac_f64, m.Xfib_i32, m.Xfib_f32, m.Xfib_f64, m.f4, m.f9, m.f10}}
+	m.elements = [][]any{{m.f0, m.f1, m.f2, m.f3, m.f5, m.f6, m.f7, m.f8, m.f13, m.f11, m.f14, m.f12, m.Xfac_i64, m.Xfib_i64, m.Xeven, m.Xodd, m.Xrunaway, m.Xmutual_runaway, m.f54, m.f15, m.f16, m.f17, m.f18, m.Xfac_i32, m.Xfac_f32, m.Xfac_f64, m.Xfib_i32, m.Xfib_f32, m.Xfib_f64, m.f4, m.f9, m.f10}}
 	copy(m.t0[0:], m.elements[0])
 	m.g0 = float64(10)
 	return m

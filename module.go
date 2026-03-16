@@ -161,9 +161,7 @@ func (t *translator) createNewFunc() ast.Decl {
 			for j, idx := range elem.init {
 				inner[j] = &ast.SelectorExpr{X: newID("m"), Sel: t.functions[idx].decl.Name}
 			}
-			elts[i] = &ast.CompositeLit{
-				Type: &ast.ArrayType{Elt: newID("any")},
-				Elts: inner}
+			elts[i] = &ast.CompositeLit{Elts: inner}
 		}
 		body.List = append(body.List, &ast.AssignStmt{
 			Tok: token.ASSIGN,

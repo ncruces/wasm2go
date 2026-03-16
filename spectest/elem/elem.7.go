@@ -10,7 +10,7 @@ type Module struct {
 func New() *Module {
 	m := &Module{}
 	m.t0 = make([]any, 10)
-	m.elements = [][]any{[]any{m.f0}, []any{m.f1}}
+	m.elements = [][]any{{m.f0}, {m.f1}}
 	copy(m.t0[7:], m.elements[0])
 	copy(m.t0[9:], m.elements[1])
 	return m

@@ -1,0 +1,80 @@
+name: Test
+
+on:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+    branches: [ 'main' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: docker/setup-qemu-action@v4
+    - uses: actions/checkout@v6
+    - uses: actions/setup-go@v6
+      with: { go-version: stable }
+
+    - name: Test
+      run: go test -run translate && go test
+
+    - name: Test amd64
+      run: go test ./helpers ./spectest/...
+
+    - name: Test 386
+      run: GOARCH=386 GO386=sse2 go test ./helpers ./spectest/...
+
+    - name: Test riscv64
+      run: GOARCH=riscv64 go test ./helpers ./spectest/...
+
+    - name: Test loong64
+      run: GOARCH=loong64 go test ./helpers ./spectest/...
+
+    - name: Test ppc64le
+      run: GOARCH=ppc64le go test ./helpers ./spectest/...
+
+    - name: Test mips64le
+      run: GOARCH=mips64le go test ./helpers ./spectest/...
+
+    - name: Test s390x
+      run: GOARCH=s390x go test ./helpers ./spectest/...
+
+  test-arm:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-go@v6
+      with: { go-version: stable }
+
+    - name: Format
+      run: gofmt -s -w . && git diff --exit-code
+
+    - name: Tidy
+      run: go mod tidy && git diff --exit-code
+
+    - name: Download
+      run: go mod download
+
+    - name: Verify
+      run: go mod verify
+
+    # - name: Vet
+    #   run: go vet ./...
+
+    - name: Build
+      run: go build ./...
+
+    - name: Test
+      run: go test -run translate && go test
+
+    - name: Test arm64
+      run: go test ./helpers ./spectest/...
+
+    - name: Test arm
+      run: GOARCH=arm GOARM=7 go test ./helpers ./spectest/...

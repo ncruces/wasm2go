@@ -12,7 +12,7 @@ func New() *Module {
 	m := &Module{}
 	m.t0 = make([]any, 2)
 	m.t1 = make([]any, 2)
-	m.elements = [][]any{[]any{m.f2}}
+	m.elements = [][]any{{m.f2}}
 	copy(m.t0[1:], m.elements[0])
 	return m
 }

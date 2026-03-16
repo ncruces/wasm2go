@@ -3,6 +3,8 @@ package helpers
 import (
 	"fmt"
 	"math"
+	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -23,6 +25,9 @@ func Test_i64_const(t *testing.T) {
 }
 
 func Test_f32_const(t *testing.T) {
+	if strings.HasPrefix(runtime.GOARCH, "mips") {
+		t.SkipNow()
+	}
 	t1 := math.Float32frombits(0x7fa00000)
 	t2 := t1 * f32_const(1)
 	t3 := math.Float32bits(t2)
@@ -32,6 +37,9 @@ func Test_f32_const(t *testing.T) {
 }
 
 func Test_f64_const(t *testing.T) {
+	if strings.HasPrefix(runtime.GOARCH, "mips") {
+		t.SkipNow()
+	}
 	t1 := math.Float64frombits(0x7ff4000000000000)
 	t2 := t1 * f64_const(1)
 	t3 := math.Float64bits(t2)

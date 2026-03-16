@@ -554,6 +554,30 @@ func (fn *funcCompiler) cleanup() {
 			}
 			return true
 		})
+
+	// Remove self assignments.
+	astutil.Apply(body, func(c *astutil.Cursor) bool {
+		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN && len(n.Lhs) == len(n.Rhs) {
+			var cloned bool
+			for i := len(n.Lhs) - 1; i >= 0; i-- {
+				if idL, ok := n.Lhs[i].(*ast.Ident); ok {
+					if idR, ok := n.Rhs[i].(*ast.Ident); ok && idL.Name == idR.Name {
+						if !cloned {
+							cloned = true
+							n.Lhs = slices.Clone(n.Lhs)
+							n.Rhs = slices.Clone(n.Rhs)
+						}
+						n.Lhs = slices.Delete(n.Lhs, i, i+1)
+						n.Rhs = slices.Delete(n.Rhs, i, i+1)
+					}
+				}
+			}
+			if len(n.Lhs) == 0 {
+				c.Delete()
+			}
+		}
+		return true
+	}, nil)
 }
 
 type funcBlock struct {

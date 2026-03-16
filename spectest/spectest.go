@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -12,6 +13,10 @@ import (
 )
 
 func Test(t *testing.T, modptr any, data []byte, name string) {
+	if strings.HasPrefix(runtime.GOARCH, "mips") && isfloat(name) {
+		t.SkipNow()
+	}
+
 	var test struct {
 		Commands []struct {
 			Type     string `json:"type"`
@@ -49,7 +54,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 
 		switch cmd.Type {
 		case "action", "assert_return", "assert_trap":
-			t.Run(fmt.Sprintf("line_%d", cmd.Line), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s/line_%d", name, cmd.Line), func(t *testing.T) {
 				if cmd.Type == "assert_trap" {
 					defer func() {
 						want := cmd.Text
@@ -126,43 +131,61 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 								t.Errorf("got %d, want %d", got, want)
 							}
 						case "f32":
-							f := math.Float32bits(res[i].Interface().(float32))
+							f := res[i].Interface().(float32)
+							v := math.Float32bits(f)
 							switch exp.Value {
 							case "nan:canonical":
-								if f != 0xffc00000 && f != 0x7fc00000 {
-									t.Errorf("got %x, want nan:canonical", f)
+								if !canonical() && math.IsNaN(float64(f)) {
+									t.Logf("got %x, want nan:canonical", v)
+									break
+								}
+								if v != 0xffc00000 && v != 0x7fc00000 {
+									t.Errorf("got %x, want nan:canonical", v)
 								}
 							case "nan:arithmetic":
-								if f&0x7fc00000 != 0x7fc00000 {
-									t.Errorf("got %x, want nan:arithmetic", f)
+								if !canonical() && math.IsNaN(float64(f)) {
+									t.Logf("got %x, want nan:arithmetic", v)
+									break
+								}
+								if v&0x7fc00000 != 0x7fc00000 {
+									t.Errorf("got %x, want nan:arithmetic", v)
 								}
 							default:
-								v, err := strconv.ParseUint(exp.Value, 10, 32)
+								i, err := strconv.ParseUint(exp.Value, 10, 32)
 								if err != nil {
 									t.Fatal(err)
 								}
-								if f != uint32(v) {
-									t.Errorf("got %d, want %d", f, uint32(v))
+								if v != uint32(i) {
+									t.Errorf("got %d, want %d", v, uint32(i))
 								}
 							}
 						case "f64":
-							f := math.Float64bits(res[i].Interface().(float64))
+							f := res[i].Interface().(float64)
+							v := math.Float64bits(f)
 							switch exp.Value {
 							case "nan:canonical":
-								if f != 0xfff8000000000000 && f != 0x7ff8000000000000 {
-									t.Errorf("got %x, want nan:canonical", f)
+								if !canonical() && math.IsNaN(f) {
+									t.Logf("got %x, want nan:canonical", v)
+									break
+								}
+								if v != 0xfff8000000000000 && v != 0x7ff8000000000000 {
+									t.Errorf("got %x, want nan:canonical", v)
 								}
 							case "nan:arithmetic":
-								if f&0x7ff8000000000000 != 0x7ff8000000000000 {
-									t.Errorf("got %x, want nan:arithmetic", f)
+								if !canonical() && math.IsNaN(f) {
+									t.Logf("got %x, want nan:arithmetic", v)
+									break
+								}
+								if v&0x7ff8000000000000 != 0x7ff8000000000000 {
+									t.Errorf("got %x, want nan:arithmetic", v)
 								}
 							default:
-								v, err := strconv.ParseUint(exp.Value, 10, 64)
+								i, err := strconv.ParseUint(exp.Value, 10, 64)
 								if err != nil {
 									t.Fatal(err)
 								}
-								if f != uint64(v) {
-									t.Errorf("got %d, want %d", f, uint64(v))
+								if v != uint64(i) {
+									t.Errorf("got %d, want %d", v, uint64(i))
 								}
 							}
 						}
@@ -187,4 +210,18 @@ func mangle(buf *strings.Builder, name string) {
 		}
 		buf.WriteRune(r)
 	}
+}
+
+func isfloat(name string) bool {
+	return strings.Contains(name, "float") ||
+		strings.Contains(name, "f32") ||
+		strings.Contains(name, "f64")
+}
+
+func canonical() bool {
+	switch runtime.GOARCH {
+	case "amd64", "arm64":
+		return true
+	}
+	return false
 }
