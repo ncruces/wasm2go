@@ -22,7 +22,7 @@ func New(v0 XMm) *Module {
 	return m
 }
 
-type XMm interface {
+type XMm = interface {
 	Xload(v0 int32) int32
 }
 

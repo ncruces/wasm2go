@@ -22,7 +22,7 @@ func New(v0 XMt) *Module {
 	return m
 }
 
-type XMt interface {
+type XMt = interface {
 	Xh() int32
 	Xtab() *[]any
 }

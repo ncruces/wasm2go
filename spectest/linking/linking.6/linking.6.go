@@ -23,7 +23,7 @@ func New(v0 XMg) *Module {
 	return m
 }
 
-type XMg interface {
+type XMg = interface {
 	Xglob() *int32
 	Xmut_glob() *int32
 	Xget() int32

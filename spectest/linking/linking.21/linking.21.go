@@ -24,7 +24,7 @@ func New(v0 XMm) *Module {
 	return m
 }
 
-type XMm interface {
+type XMm = interface {
 	Xmem() Memory
 }
 type Memory = interface {

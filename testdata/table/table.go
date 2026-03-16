@@ -23,7 +23,7 @@ func New(v0 Xenv) *Module {
 	return m
 }
 
-type Xenv interface {
+type Xenv = interface {
 	Xjstimes3(v0 int32) int32
 }
 

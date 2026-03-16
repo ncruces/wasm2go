@@ -23,7 +23,7 @@ func New(v0 Xmodule1) *Module {
 	return m
 }
 
-type Xmodule1 interface {
+type Xmodule1 = interface {
 	Xshared_table() *[]any
 }
 
