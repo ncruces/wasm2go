@@ -2,9 +2,11 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 	memory []byte
-	maxMem int32
+	maxMem int64
 }
 
 func New() *Module {
@@ -17,7 +19,7 @@ func (m *Module) Xinit(v0 int32, v1 int32, v2 int32) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	memory_init(m.memory, data0, t0, t1, t2)
+	memory_init(m.memory, data0, uint32(t0), uint32(t1), uint32(t2))
 }
 func (m *Module) Xload8_u(v0 int32) int32 {
 	t0 := v0
@@ -25,11 +27,11 @@ func (m *Module) Xload8_u(v0 int32) int32 {
 	return t1
 }
 
-func memory_init(mem []byte, data string, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func memory_init[T uint32 | uint64](mem []byte, data string, dest T, src, n uint32) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(mem[x:y], data[z:w])
 }
 

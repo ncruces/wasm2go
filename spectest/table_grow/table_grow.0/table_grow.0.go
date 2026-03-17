@@ -12,13 +12,13 @@ func New() *Module {
 }
 func (m *Module) Xget(v0 int32) any {
 	t0 := v0
-	t1 := m.t0[uint32(t0)]
+	t1 := m.t0[t0]
 	return t1
 }
 func (m *Module) Xset(v0 int32, v1 any) {
 	t0 := v0
 	t1 := v1
-	m.t0[uint32(t0)] = t1
+	m.t0[t0] = t1
 }
 func (m *Module) Xgrow(v0 int32, v1 any) int32 {
 	t0 := v1
@@ -37,10 +37,10 @@ func (m *Module) Xsize() int32 {
 	return t0
 }
 
-func table_grow(tab *[]any, val any, delta, max int32) int32 {
+func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {
 	buf := *tab
 	len := len(buf)
-	old := int32(len)
+	old := T(len)
 	if delta == 0 {
 		return old
 	}

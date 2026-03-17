@@ -12,7 +12,7 @@ type Module struct {
 	t0       []any
 	elements [][]any
 	memory   []byte
-	maxMem   int32
+	maxMem   int64
 	g0       int32
 }
 
@@ -521,7 +521,7 @@ func (m *Module) Xas_call_indirect_func() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(4), int32(1), int32(2))
+		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(4), int32(1), int32(2))
 		p0 = t1
 	}
 l0:
@@ -535,7 +535,7 @@ func (m *Module) Xas_call_indirect_first() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(4), int32(2))
+		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(4), int32(2))
 		p0 = t1
 	}
 l0:
@@ -549,7 +549,7 @@ func (m *Module) Xas_call_indirect_mid() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(4))
+		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(4))
 		p0 = t1
 	}
 l0:
@@ -563,7 +563,7 @@ func (m *Module) Xas_call_indirect_last() int32 {
 		if int32(10) != 0 {
 			goto l0
 		}
-		t1 := m.t0[uint32(int32(4))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+		t1 := m.t0[uint(int32(4))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 		p0 = t1
 	}
 l0:
@@ -801,7 +801,7 @@ func (m *Module) Xas_memory_grow_size() int32 {
 		if int32(1) != 0 {
 			goto l0
 		}
-		t1 := memory_grow(&m.memory, int32(1), m.maxMem)
+		t1 := int32(memory_grow(&m.memory, int64(int32(1)), m.maxMem))
 		p0 = t1
 	}
 l0:
@@ -978,10 +978,10 @@ func f64_const(x float64) float64 {
 	return x
 }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

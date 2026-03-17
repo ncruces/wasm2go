@@ -246,10 +246,30 @@ func (fn *funcCompiler) popCond() ast.Expr {
 
 // Pops an address from the stack, adds an offset, and returns it as a uint32.
 func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
-	expr = convert(fn.pop(), "uint32")
+	addr := fn.pop()
+
+	if fn.memory.is64 {
+		if offset == 0 {
+			return addr
+		}
+		// Ensures wrap-around traps correctly.
+		return &ast.BinaryExpr{
+			Op: token.OR,
+			X: &ast.BinaryExpr{
+				Op: token.ADD,
+				X:  addr,
+				Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)}},
+			Y: &ast.BinaryExpr{
+				Op: token.SHR,
+				X:  addr,
+				Y:  &ast.BasicLit{Kind: token.INT, Value: "63"}}}
+	}
+
+	expr = convert(addr, "uint32")
 	if offset == 0 {
 		return expr
 	}
+	// Ensures wrap-around traps correctly.
 	return &ast.BinaryExpr{
 		Op: token.ADD,
 		X:  convert(expr, "int64"),

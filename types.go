@@ -16,11 +16,11 @@ const (
 	externref wasmType = 0x6f
 )
 
-func (t wasmType) Ref() bool {
+func (t wasmType) ref() bool {
 	return t == funcref || t == externref
 }
 
-func (t wasmType) Ident() *ast.Ident {
+func (t wasmType) ident() *ast.Ident {
 	switch t {
 	case i32:
 		return newID("int32")
@@ -53,7 +53,7 @@ func paramsToAST(types string) *ast.FieldList {
 	for i, t := range []byte(types) {
 		list[i] = &ast.Field{
 			Names: []*ast.Ident{localVar(i)},
-			Type:  wasmType(t).Ident()}
+			Type:  wasmType(t).ident()}
 	}
 	return &ast.FieldList{List: list}
 }
@@ -64,7 +64,7 @@ func resultsToAST(types string) *ast.FieldList {
 	}
 	list := make([]*ast.Field, len(types))
 	for i, t := range []byte(types) {
-		list[i] = &ast.Field{Type: wasmType(t).Ident()}
+		list[i] = &ast.Field{Type: wasmType(t).ident()}
 	}
 	return &ast.FieldList{List: list}
 }
@@ -90,16 +90,36 @@ type importDef struct {
 type tableDef struct {
 	id       *ast.Ident
 	imported bool
+	is64     bool
 	min      int
 	max      int
+}
+
+func (m *tableDef) stype() string {
+	if m.is64 {
+		return "int64"
+	}
+	return "int32"
 }
 
 type memoryDef struct {
 	id       *ast.Ident
 	selector ast.Expr
 	imported bool
-	min      int
-	max      int
+	is64     bool
+	min      int64
+	max      int64
+}
+
+func (m *memoryDef) stype() string {
+	if m.is64 {
+		return "int64"
+	}
+	return "int32"
+}
+
+func (m *memoryDef) utype() string {
+	return "u" + m.stype()
 }
 
 type globalDef struct {
@@ -132,7 +152,7 @@ type elemSegment struct {
 
 type dataSegment struct {
 	init    []byte
-	offset  uint32
+	offset  uint64
 	passive bool
 }
 

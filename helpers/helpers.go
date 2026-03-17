@@ -355,10 +355,10 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 
 // Bulk memory operations.
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}
@@ -371,25 +371,26 @@ func memory_grow(mem *[]byte, delta, max int32) int32 {
 	return old
 }
 
-func memory_init(mem []byte, data string, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func memory_init[T uint32 | uint64](mem []byte, data string, dest T, src, n uint32) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(mem[x:y], data[z:w])
 }
 
-func memory_copy(mem []byte, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(min(uint64(src), math.MaxUint))
+	c := uint(min(uint64(n), math.MaxUint))
+	y := x + c
+	w := z + c
 	copy(mem[x:y], mem[z:w])
 }
 
-func memory_fill(mem []byte, dest, val, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
+func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	y := x + uint(min(uint64(n), math.MaxUint))
 	buf := mem[x:y]
 	if len(buf) > 0 {
 		buf[0] = byte(val)
@@ -400,32 +401,32 @@ func memory_fill(mem []byte, dest, val, n int32) {
 	}
 }
 
-func memory_zero(mem []byte, dest, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
+func memory_zero[T uint32 | uint64](mem []byte, dest, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	y := x + uint(min(uint64(n), math.MaxUint))
 	clear(mem[x:y])
 }
 
-func table_init(tab, elems []any, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func table_init[T int32 | int64](tab, elems []any, dest, src, n T) {
+	x := uint(dest)
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(tab[x:y], elems[z:w])
 }
 
-func table_copy(dst, tab []any, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3) {
+	x := uint(dest)
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(dst[x:y], tab[z:w])
 }
 
-func table_grow(tab *[]any, val any, delta, max int32) int32 {
+func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {
 	buf := *tab
 	len := len(buf)
-	old := int32(len)
+	old := T(len)
 	if delta == 0 {
 		return old
 	}
@@ -445,9 +446,9 @@ func table_grow(tab *[]any, val any, delta, max int32) int32 {
 	return old
 }
 
-func table_fill(tab []any, dest int32, val any, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
+func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
+	x := uint(dest)
+	y := x + uint(n)
 	buf := tab[x:y]
 	if val == nil {
 		clear(buf)

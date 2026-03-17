@@ -22,6 +22,6 @@ func (m *Module) f1() int32 {
 }
 func (m *Module) Xcallt(v0 int32) int32 {
 	t0 := v0
-	t1 := m.t0[uint32(t0)].(func() int32)()
+	t1 := m.t0[uint(t0)].(func() int32)()
 	return t1
 }

@@ -16,10 +16,10 @@ func (m *Module) Xgrow(v0 int32) int32 {
 	return t1
 }
 
-func table_grow(tab *[]any, val any, delta, max int32) int32 {
+func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {
 	buf := *tab
 	len := len(buf)
-	old := int32(len)
+	old := T(len)
 	if delta == 0 {
 		return old
 	}

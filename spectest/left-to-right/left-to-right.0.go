@@ -12,7 +12,7 @@ type Module struct {
 	t0       []any
 	elements [][]any
 	memory   []byte
-	maxMem   int32
+	maxMem   int64
 }
 
 func New() *Module {
@@ -446,7 +446,7 @@ func (m *Module) Xi32_call_indirect() int32 {
 	t0 := m.f11()
 	t1 := m.f12()
 	t2 := m.f14()
-	t3 := m.t0[uint32(t2)].(func(v0 int32, v1 int32) int32)(t0, t1)
+	t3 := m.t0[uint(t2)].(func(v0 int32, v1 int32) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4
@@ -746,7 +746,7 @@ func (m *Module) Xi64_call_indirect() int32 {
 	t0 := m.f16()
 	t1 := m.f17()
 	t2 := m.f19()
-	t3 := m.t0[uint32(t2)].(func(v0 int64, v1 int64) int32)(t0, t1)
+	t3 := m.t0[uint(t2)].(func(v0 int64, v1 int64) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4
@@ -920,7 +920,7 @@ func (m *Module) Xf32_call_indirect() int32 {
 	t0 := m.f21()
 	t1 := m.f22()
 	t2 := m.f24()
-	t3 := m.t0[uint32(t2)].(func(v0 float32, v1 float32) int32)(t0, t1)
+	t3 := m.t0[uint(t2)].(func(v0 float32, v1 float32) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4
@@ -1094,7 +1094,7 @@ func (m *Module) Xf64_call_indirect() int32 {
 	t0 := m.f26()
 	t1 := m.f27()
 	t2 := m.f29()
-	t3 := m.t0[uint32(t2)].(func(v0 float64, v1 float64) int32)(t0, t1)
+	t3 := m.t0[uint(t2)].(func(v0 float64, v1 float64) int32)(t0, t1)
 	_ = t3
 	t4 := m.f10()
 	return t4

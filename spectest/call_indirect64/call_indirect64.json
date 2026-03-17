@@ -1,0 +1,4 @@
+{"source_filename": "call_indirect64.wast",
+ "commands": [
+  {"type": "module", "line": 3, "filename": "call_indirect64.0.wasm"}, 
+  {"type": "assert_return", "line": 26, "action": {"type": "invoke", "field": "type-i32-t64", "args": []}, "expected": [{"type": "i32", "value": "306"}]}]}

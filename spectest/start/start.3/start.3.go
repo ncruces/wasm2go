@@ -4,7 +4,7 @@ package wasm2go
 
 type Module struct {
 	memory []byte
-	maxMem int32
+	maxMem int64
 }
 
 func New() *Module {

@@ -6,7 +6,7 @@ type Module struct {
 	t0       []any
 	elements [][]any
 	memory   []byte
-	maxMem   int32
+	maxMem   int64
 	g0       int32
 }
 
@@ -1120,10 +1120,10 @@ l3:
 //go:nosplit
 func i32_const(x int32) int32 { return x }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

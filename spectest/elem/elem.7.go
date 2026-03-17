@@ -22,10 +22,10 @@ func (m *Module) f1() int32 {
 	return int32(66)
 }
 func (m *Module) Xcall_7() int32 {
-	t0 := m.t0[uint32(int32(7))].(func() int32)()
+	t0 := m.t0[uint(int32(7))].(func() int32)()
 	return t0
 }
 func (m *Module) Xcall_9() int32 {
-	t0 := m.t0[uint32(int32(9))].(func() int32)()
+	t0 := m.t0[uint(int32(9))].(func() int32)()
 	return t0
 }

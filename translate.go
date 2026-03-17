@@ -381,15 +381,16 @@ func (t *translator) readImportSection() error {
 			if t.memory != nil {
 				return fmt.Errorf("multiple memories not supported")
 			}
-			min, max, err := t.readLimits(65536) // 4 GiB
+			min, max, is64, err := t.readLimits(65536) // 4 GiB
 			if err != nil {
 				return err
 			}
 			id := &ast.Ident{}
 			t.memory = &memoryDef{
 				id:       id,
-				min:      int(min),
-				max:      int(max),
+				min:      int64(min),
+				max:      int64(max),
+				is64:     is64,
 				imported: true,
 				selector: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
 			t.imports = append(t.imports, importDef{
@@ -426,11 +427,11 @@ func (t *translator) readImportSection() error {
 			if err != nil {
 				return err
 			}
-			if t := wasmType(typ); t != funcref && t != externref {
+			if !wasmType(typ).ref() {
 				return fmt.Errorf("unsupported table type: %x", typ)
 			}
 
-			min, max, err := t.readLimits(65536) // 1 MiB
+			min, max, is64, err := t.readLimits(65536) // 1 MiB
 			if err != nil {
 				return err
 			}
@@ -439,6 +440,7 @@ func (t *translator) readImportSection() error {
 				id:       &ast.Ident{},
 				min:      int(min),
 				max:      int(max),
+				is64:     is64,
 				imported: true,
 			})
 			t.imports = append(t.imports, importDef{
@@ -495,19 +497,20 @@ func (t *translator) readTableSection() error {
 		if err != nil {
 			return err
 		}
-		if t := wasmType(typ); t != funcref && t != externref {
+		if !wasmType(typ).ref() {
 			return fmt.Errorf("unsupported table type: %x", typ)
 		}
 
-		min, max, err := t.readLimits(65536) // 1 MiB
+		min, max, is64, err := t.readLimits(65536) // 1 MiB
 		if err != nil {
 			return err
 		}
 
 		t.tables[i] = tableDef{
-			id:  &ast.Ident{},
-			min: int(min),
-			max: int(max),
+			id:   &ast.Ident{},
+			min:  int(min),
+			max:  int(max),
+			is64: is64,
 		}
 	}
 	return nil
@@ -526,25 +529,30 @@ func (t *translator) readMemorySection() error {
 	}
 
 	id := &ast.Ident{}
-	min, max, err := t.readLimits(65536) // 4 GiB
+	min, max, is64, err := t.readLimits(65536) // 4 GiB
 	t.memory = &memoryDef{
 		id:       id,
-		min:      int(min),
-		max:      int(max),
+		min:      int64(min),
+		max:      int64(max),
+		is64:     is64,
 		selector: &ast.SelectorExpr{X: newID("m"), Sel: id}}
 	return err
 }
 
-func (t *translator) readLimits(def uint64) (min, max uint64, err error) {
+func (t *translator) readLimits(def uint64) (min, max uint64, is64 bool, err error) {
 	flags, err := readLEB128(t.in)
 	if err != nil {
 		return
 	}
+	is64 = (flags & 4) != 0
 	min, err = readLEB128(t.in)
 	if err != nil {
 		return
 	}
 	max = def
+	if is64 && def == 65536 {
+		max = 1 << 48
+	}
 	if flags&1 == 1 {
 		max, err = readLEB128(t.in)
 	}
@@ -668,7 +676,7 @@ func (t *translator) readElementSection() error {
 		if !t.elements[i].passive {
 			if opcode, err := t.in.ReadByte(); err != nil {
 				return err
-			} else if opcode != 0x41 { // i32.const
+			} else if opcode != 0x41 && opcode != 0x42 { // i32.const, i64.const
 				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
 			}
 			offset, err := readSignedLEB128(t.in)
@@ -826,7 +834,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Specs: []ast.Spec{
 					&ast.ValueSpec{
 						Names: ids,
-						Type:  wasmType(typ).Ident()}}}})
+						Type:  wasmType(typ).ident()}}}})
 	}
 	// Ensure local variables are used.
 	if len(vars) > 0 {
@@ -878,7 +886,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Specs: []ast.Spec{
 							&ast.ValueSpec{
 								Names: []*ast.Ident{tmp},
-								Type:  wasmType(t).Ident()}}}})
+								Type:  wasmType(t).ident()}}}})
 			}
 			// Ensure results are used.
 			if len(results) > 0 {
@@ -1147,7 +1155,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Fun: &ast.TypeAssertExpr{
 					X: &ast.IndexExpr{
 						X:     tab,
-						Index: convert(idx, "uint32")},
+						Index: convert(idx, "uint")},
 					Type: typ.toAST()},
 				Args: args}
 
@@ -1313,9 +1321,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if t.tables[i].imported {
 				tab = &ast.StarExpr{X: tab}
 			}
-			fn.push(&ast.IndexExpr{
-				X:     tab,
-				Index: convert(fn.pop(), "uint32")})
+			fn.push(&ast.IndexExpr{X: tab, Index: fn.pop()})
 
 		case 0x26: // table.set
 			i, err := readLEB128(t.in)
@@ -1329,9 +1335,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(&ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Rhs: []ast.Expr{fn.pop()},
-				Lhs: []ast.Expr{&ast.IndexExpr{
-					X:     tab,
-					Index: convert(fn.pop(), "uint32")}}})
+				Lhs: []ast.Expr{&ast.IndexExpr{X: tab, Index: fn.pop()}}})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
 			_, err := readLEB128(t.in) // align
@@ -1446,7 +1450,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0x3f: // memory.size
-			_, _ = t.in.ReadByte() // reserved
+			_, _ = readLEB128(t.in) // memory index
 			fn.push(convert(
 				&ast.BinaryExpr{
 					X: &ast.CallExpr{
@@ -1454,34 +1458,31 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Args: []ast.Expr{t.memory.selector}},
 					Op: token.SHR,
 					Y:  &ast.BasicLit{Kind: token.INT, Value: "16"},
-				}, "int32"))
+				}, t.memory.stype()))
 
 		case 0x40: // memory.grow
-			_, err := t.in.ReadByte() // reserved
+			_, err := readLEB128(t.in) // memory index
 			if err != nil {
 				return err
 			}
 			if fn.memory.imported {
-				fn.push(&ast.CallExpr{
+				fn.push(convert(&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")},
 						Sel: newID("Grow")},
 					Args: []ast.Expr{
-						fn.pop(),
-						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}})
-
+						convert(fn.pop(), "int64"),
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
 			} else {
 				fn.helpers.add("memory_grow")
-				fn.push(&ast.CallExpr{
+				fn.push(convert(&ast.CallExpr{
 					Fun: newID("memory_grow"),
 					Args: []ast.Expr{
-						&ast.UnaryExpr{
-							Op: token.AND,
-							X:  t.memory.selector},
-						fn.pop(),
-						&ast.SelectorExpr{
-							X:   newID("m"),
-							Sel: newID("maxMem")}}})
+						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
+						convert(fn.pop(), "int64"),
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
 			}
 
 		case 0x41: // i32.const
@@ -1852,9 +1853,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := fn.pop()
-				src := fn.pop()
-				dst := fn.pop()
+				n := convert(fn.pop(), "uint32")
+				src := convert(fn.pop(), "uint32")
+				dst := convert(fn.pop(), t.memory.utype())
 				fn.helpers.add("memory_init")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
@@ -1879,9 +1880,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := fn.pop()
-				src := fn.pop()
-				dst := fn.pop()
+				typ := t.memory.utype()
+				n := convert(fn.pop(), typ)
+				src := convert(fn.pop(), typ)
+				dst := convert(fn.pop(), typ)
 				fn.helpers.add("memory_copy")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
@@ -1895,9 +1897,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := fn.pop()
+				typ := t.memory.utype()
+				n := convert(fn.pop(), typ)
 				val := fn.pop()
-				dest := fn.pop()
+				dest := convert(fn.pop(), typ)
 				if iszero(val) {
 					fn.helpers.add("memory_zero")
 					fn.emit(&ast.ExprStmt{
@@ -2011,7 +2014,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.push(convert(&ast.CallExpr{
 					Fun:  newID("len"),
 					Args: []ast.Expr{tab},
-				}, "int32"))
+				}, t.tables[idx].stype()))
 
 			case 0x11: // table.fill
 				idx, err := readLEB128(t.in)
@@ -2081,14 +2084,14 @@ func (t *translator) readDataSection() error {
 		if !t.data[i].passive {
 			if opcode, err := t.in.ReadByte(); err != nil {
 				return err
-			} else if opcode != 0x41 { // i32.const
+			} else if opcode != 0x41 && opcode != 0x42 { // i32.const, i64.const
 				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
 			}
 			offset, err := readSignedLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			t.data[i].offset = uint32(offset)
+			t.data[i].offset = uint64(offset)
 			if end, err := t.in.ReadByte(); err != nil {
 				return err
 			} else if end != 0x0b {

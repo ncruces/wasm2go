@@ -12,7 +12,7 @@ type Module struct {
 	t0       []any
 	elements [][]any
 	memory   []byte
-	maxMem   int32
+	maxMem   int64
 	g0       int32
 }
 
@@ -432,22 +432,22 @@ func (m *Module) Xas_call_last(v0 int32) int32 {
 }
 func (m *Module) Xas_call_indirect_first(v0 int32) int32 {
 	v0 = int32(1)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_mid(v0 int32) int32 {
 	v0 = int32(2)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_last(v0 int32) int32 {
 	v0 = int32(3)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_index(v0 int32) int32 {
 	v0 = i32_const(0)
-	t0 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_local_set_value() {
@@ -539,7 +539,7 @@ func (m *Module) Xas_convert_operand(v0 int64) int32 {
 }
 func (m *Module) Xas_memory_grow_size(v0 int32) int32 {
 	v0 = int32(40)
-	t0 := memory_grow(&m.memory, int32(40), m.maxMem)
+	t0 := int32(memory_grow(&m.memory, int64(int32(40)), m.maxMem))
 	return t0
 }
 
@@ -572,10 +572,10 @@ func i64_trunc_f64_s(f float64) int64 {
 	return int64(x)
 }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

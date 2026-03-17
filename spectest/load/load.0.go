@@ -11,7 +11,7 @@ type Module struct {
 	t0       []any
 	elements [][]any
 	memory   []byte
-	maxMem   int32
+	maxMem   int64
 	g0       int32
 }
 
@@ -198,22 +198,22 @@ func (m *Module) Xas_call_last() int32 {
 }
 func (m *Module) Xas_call_indirect_first() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(t0, int32(2), int32(3))
+	t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(t0, int32(2), int32(3))
 	return t1
 }
 func (m *Module) Xas_call_indirect_mid() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), t0, int32(3))
+	t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), t0, int32(3))
 	return t1
 }
 func (m *Module) Xas_call_indirect_last() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	t1 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), t0)
+	t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), t0)
 	return t1
 }
 func (m *Module) Xas_call_indirect_index() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-	t1 := m.t0[uint32(t0)].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t1 := m.t0[uint(t0)].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t1
 }
 func (m *Module) Xas_local_set_value() {
@@ -302,17 +302,17 @@ func (m *Module) Xas_compare_right() int32 {
 }
 func (m *Module) Xas_memory_grow_size() int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(100)):]))
-	t1 := memory_grow(&m.memory, t0, m.maxMem)
+	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
 	return t1
 }
 
 //go:nosplit
 func i32_const(x int32) int32 { return x }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

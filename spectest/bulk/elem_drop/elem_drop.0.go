@@ -34,10 +34,10 @@ func (m *Module) Xinit_active(v0 int32) {
 //go:nosplit
 func i32_const(x int32) int32 { return x }
 
-func table_init(tab, elems []any, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func table_init[T int32 | int64](tab, elems []any, dest, src, n T) {
+	x := uint(dest)
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(tab[x:y], elems[z:w])
 }

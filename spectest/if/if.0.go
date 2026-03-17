@@ -12,7 +12,7 @@ type Module struct {
 	t0       []any
 	elements [][]any
 	memory   []byte
-	maxMem   int32
+	maxMem   int64
 	g0       int32
 }
 
@@ -418,7 +418,7 @@ func (m *Module) Xas_call_indirect_first(v0 int32) int32 {
 			m.f0()
 			p2 = i32_const(0)
 		}
-		t3 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32) int32)(p2, int32(2))
+		t3 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(p2, int32(2))
 		p0 = t3
 	}
 	return p0
@@ -437,7 +437,7 @@ func (m *Module) Xas_call_indirect_mid(v0 int32) int32 {
 			m.f0()
 			p2 = i32_const(0)
 		}
-		t3 := m.t0[uint32(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(2), p2)
+		t3 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(2), p2)
 		p0 = t3
 	}
 	return p0
@@ -456,7 +456,7 @@ func (m *Module) Xas_call_indirect_last(v0 int32) int32 {
 			m.f0()
 			p2 = i32_const(0)
 		}
-		t3 := m.t0[uint32(p2)].(func(v0 int32, v1 int32) int32)(int32(2), i32_const(0))
+		t3 := m.t0[uint(p2)].(func(v0 int32, v1 int32) int32)(int32(2), i32_const(0))
 		p0 = t3
 	}
 	return p0
@@ -496,7 +496,7 @@ func (m *Module) Xas_memory_grow_value(v0 int32) int32 {
 	} else {
 		p1 = i32_const(0)
 	}
-	t2 := memory_grow(&m.memory, p1, m.maxMem)
+	t2 := int32(memory_grow(&m.memory, int64(p1), m.maxMem))
 	return t2
 }
 func (m *Module) f23(v0 int32) int32 {
@@ -1081,10 +1081,10 @@ func f64_const(x float64) float64 {
 	return x
 }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

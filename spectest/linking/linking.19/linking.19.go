@@ -4,7 +4,7 @@ package wasm2go
 
 type Module struct {
 	memory []byte
-	maxMem int32
+	maxMem int64
 }
 
 func New() *Module {
@@ -17,14 +17,14 @@ func New() *Module {
 
 type Memory = interface {
 	Slice() *[]byte
-	Grow(delta, max int32) int32
+	Grow(delta, max int64) int64
 }
 type wasmMemory []byte
 
 func (m *wasmMemory) Slice() *[]byte {
 	return (*[]byte)(m)
 }
-func (m *wasmMemory) Grow(delta, max int32) int32 {
+func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xload(v0 int32) int32 {
@@ -36,10 +36,10 @@ func (m *Module) Xmem() Memory {
 	return (*wasmMemory)(&m.memory)
 }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

@@ -31,17 +31,17 @@ func (m *Module) Xcopy(v0 int32, v1 int32, v2 int32) {
 }
 func (m *Module) Xcall(v0 int32) int32 {
 	t0 := v0
-	t1 := m.t0[uint32(t0)].(func() int32)()
+	t1 := m.t0[uint(t0)].(func() int32)()
 	return t1
 }
 
 //go:nosplit
 func i32_const(x int32) int32 { return x }
 
-func table_copy(dst, tab []any, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3) {
+	x := uint(dest)
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(dst[x:y], tab[z:w])
 }

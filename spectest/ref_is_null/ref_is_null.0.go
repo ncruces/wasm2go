@@ -36,21 +36,21 @@ func (m *Module) f2() {
 }
 func (m *Module) Xinit(v0 any) {
 	t0 := v0
-	m.t1[uint32(int32(1))] = t0
+	m.t1[int32(1)] = t0
 }
 func (m *Module) Xdeinit() {
-	m.t0[uint32(int32(1))] = nil
-	m.t1[uint32(int32(1))] = nil
+	m.t0[int32(1)] = nil
+	m.t1[int32(1)] = nil
 }
 func (m *Module) Xfuncref_elem(v0 int32) int32 {
 	t0 := v0
-	t1 := m.t0[uint32(t0)]
+	t1 := m.t0[t0]
 	t2 := m.Xfuncref(t1)
 	return t2
 }
 func (m *Module) Xexternref_elem(v0 int32) int32 {
 	t0 := v0
-	t1 := m.t1[uint32(t0)]
+	t1 := m.t1[t0]
 	t2 := m.Xexternref(t1)
 	return t2
 }
