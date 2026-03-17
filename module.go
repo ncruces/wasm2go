@@ -48,7 +48,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 	}
 	// Globals: owned are type; imported *type.
 	for _, g := range t.globals {
-		var typ ast.Expr = g.typ.Ident()
+		var typ ast.Expr = g.typ.ident()
 		if g.imported {
 			typ = &ast.StarExpr{X: typ}
 		}
@@ -86,7 +86,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		case tableImport: // *[]any
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}}
 		case globalImport: // *type
-			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: imp.typ.Ident()}}}}}
+			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: imp.typ.ident()}}}}}
 		case memoryImport: // Memory
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}}
 		}
@@ -370,14 +370,14 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID(t.memory.indexType())}}},
 				Results: &ast.FieldList{List: []*ast.Field{{Type: newID(t.memory.indexType())}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun: newID(t.memory.helper("grow")),
+				Fun: newID("memory_grow"),
 				Args: []ast.Expr{
 					&ast.CallExpr{
 						Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
 						Args: []ast.Expr{newID("m")}},
 					newID("delta"),
 					newID("max")}}}}}}})
-		t.helpers.add(t.memory.helper("grow"))
+		t.helpers.add("memory_grow")
 	}
 	return decls
 }
@@ -411,7 +411,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 			body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}
 		case globalExport:
 			g := t.globals[exp.index]
-			results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: g.typ.Ident()}}}}
+			results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: g.typ.ident()}}}}
 			var ret ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: g.id}
 			if !g.imported {
 				ret = &ast.UnaryExpr{Op: token.AND, X: ret}

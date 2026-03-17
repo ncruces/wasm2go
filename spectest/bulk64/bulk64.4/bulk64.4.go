@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 	memory []byte
 	maxMem int64
@@ -17,12 +19,12 @@ func New() *Module {
 func (m *Module) Xdrop_passive() {
 }
 func (m *Module) Xinit_passive() {
-	memory64_init(m.memory, data0, i64_const(0), i32_const(0), i32_const(0))
+	memory_init(m.memory, data0, uint64(i64_const(0)), uint32(i32_const(0)), uint32(i32_const(0)))
 }
 func (m *Module) Xdrop_active() {
 }
 func (m *Module) Xinit_active() {
-	memory64_init(m.memory, data1, i64_const(0), i32_const(0), i32_const(0))
+	memory_init(m.memory, data1, uint64(i64_const(0)), uint32(i32_const(0)), uint32(i32_const(0)))
 }
 
 //go:nosplit
@@ -31,11 +33,11 @@ func i32_const(x int32) int32 { return x }
 //go:nosplit
 func i64_const(x int64) int64 { return x }
 
-func memory64_init(mem []byte, data string, dest int64, src, n int32) {
-	x := uint64(dest)
-	z := uint64(uint32(src))
-	y := x + uint64(n)
-	w := z + uint64(n)
+func memory_init[T uint32 | uint64](mem []byte, data string, dest T, src, n uint32) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(mem[x:y], data[z:w])
 }
 

@@ -427,7 +427,7 @@ func (t *translator) readImportSection() error {
 			if err != nil {
 				return err
 			}
-			if t := wasmType(typ); t != funcref && t != externref {
+			if !wasmType(typ).ref() {
 				return fmt.Errorf("unsupported table type: %x", typ)
 			}
 
@@ -497,7 +497,7 @@ func (t *translator) readTableSection() error {
 		if err != nil {
 			return err
 		}
-		if t := wasmType(typ); t != funcref && t != externref {
+		if !wasmType(typ).ref() {
 			return fmt.Errorf("unsupported table type: %x", typ)
 		}
 
@@ -834,7 +834,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Specs: []ast.Spec{
 					&ast.ValueSpec{
 						Names: ids,
-						Type:  wasmType(typ).Ident()}}}})
+						Type:  wasmType(typ).ident()}}}})
 	}
 	// Ensure local variables are used.
 	if len(vars) > 0 {
@@ -886,7 +886,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Specs: []ast.Spec{
 							&ast.ValueSpec{
 								Names: []*ast.Ident{tmp},
-								Type:  wasmType(t).Ident()}}}})
+								Type:  wasmType(t).ident()}}}})
 			}
 			// Ensure results are used.
 			if len(results) > 0 {
@@ -1479,9 +1479,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}})
 
 			} else {
-				fn.helpers.add(t.memory.helper("grow"))
+				fn.helpers.add("memory_grow")
 				fn.push(&ast.CallExpr{
-					Fun: newID(t.memory.helper("grow")),
+					Fun: newID("memory_grow"),
 					Args: []ast.Expr{
 						&ast.UnaryExpr{
 							Op: token.AND,
@@ -1860,13 +1860,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := fn.pop()
-				src := fn.pop()
-				dst := fn.pop()
-				fn.helpers.add(t.memory.helper("init"))
+				n := convert(fn.pop(), "uint32")
+				src := convert(fn.pop(), "uint32")
+				dst := convert(fn.pop(), "u"+t.memory.indexType())
+				fn.helpers.add("memory_init")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
-						Fun: newID(t.memory.helper("init")),
+						Fun: newID("memory_init"),
 						Args: []ast.Expr{
 							t.memory.selector,
 							dataID(i), dst, src, n}}})
@@ -1887,13 +1887,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := fn.pop()
-				src := fn.pop()
-				dst := fn.pop()
-				fn.helpers.add(t.memory.helper("copy"))
+				n := convert(fn.pop(), "u"+t.memory.indexType())
+				src := convert(fn.pop(), "u"+t.memory.indexType())
+				dst := convert(fn.pop(), "u"+t.memory.indexType())
+				fn.helpers.add("memory_copy")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
-						Fun: newID(t.memory.helper("copy")),
+						Fun: newID("memory_copy"),
 						Args: []ast.Expr{
 							t.memory.selector,
 							dst, src, n}}})
@@ -1903,22 +1903,22 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := fn.pop()
+				n := convert(fn.pop(), "u"+t.memory.indexType())
 				val := fn.pop()
-				dest := fn.pop()
+				dest := convert(fn.pop(), "u"+t.memory.indexType())
 				if iszero(val) {
-					fn.helpers.add(t.memory.helper("zero"))
+					fn.helpers.add("memory_zero")
 					fn.emit(&ast.ExprStmt{
 						X: &ast.CallExpr{
-							Fun: newID(t.memory.helper("zero")),
+							Fun: newID("memory_zero"),
 							Args: []ast.Expr{
 								t.memory.selector,
 								dest, n}}})
 				} else {
-					fn.helpers.add(t.memory.helper("fill"))
+					fn.helpers.add("memory_fill")
 					fn.emit(&ast.ExprStmt{
 						X: &ast.CallExpr{
-							Fun: newID(t.memory.helper("fill")),
+							Fun: newID("memory_fill"),
 							Args: []ast.Expr{
 								t.memory.selector,
 								dest, val, n}}})

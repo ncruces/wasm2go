@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 	memory []byte
 	maxMem int64
@@ -17,7 +19,7 @@ func (m *Module) Xfill(v0 int64, v1 int32, v2 int64) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	memory64_fill(m.memory, t0, t1, t2)
+	memory_fill(m.memory, uint64(t0), t1, uint64(t2))
 }
 func (m *Module) Xload8_u(v0 int64) int32 {
 	t0 := v0
@@ -25,9 +27,9 @@ func (m *Module) Xload8_u(v0 int64) int32 {
 	return t1
 }
 
-func memory64_fill(mem []byte, dest int64, val int32, n int64) {
-	x := uint64(dest)
-	y := x + uint64(n)
+func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	y := x + uint(min(uint64(n), math.MaxUint))
 	buf := mem[x:y]
 	if len(buf) > 0 {
 		buf[0] = byte(val)

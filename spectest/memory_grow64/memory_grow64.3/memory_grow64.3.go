@@ -15,7 +15,7 @@ func New() *Module {
 }
 func (m *Module) Xgrow(v0 int64) int64 {
 	t0 := v0
-	t1 := memory64_grow(&m.memory, t0, m.maxMem)
+	t1 := memory_grow(&m.memory, t0, m.maxMem)
 	return t1
 }
 func (m *Module) Xcheck_memory_zero(v0 int64, v1 int64) int32 {
@@ -55,16 +55,16 @@ l0:
 //go:nosplit
 func i32_const(x int32) int32 { return x }
 
-func memory64_grow(mem *[]byte, delta, max int64) int64 {
+func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
 	buf := *mem
-	len64 := int64(len(buf))
-	old := len64 >> 16
+	len := len(buf)
+	old := T(len >> 16)
 	if delta == 0 {
 		return old
 	}
-	newPages := old + delta
-	add := (newPages << 16) - len64
-	if newPages > max || add < 0 {
+	new := old + delta
+	add := int(new)<<16 - len
+	if new > max || add < 0 {
 		return -1
 	}
 	*mem = append(buf, make([]byte, add)...)

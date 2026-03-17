@@ -355,10 +355,10 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 
 // Bulk memory operations.
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := T(len >> 16)
 	if delta == 0 {
 		return old
 	}
@@ -371,25 +371,26 @@ func memory_grow(mem *[]byte, delta, max int32) int32 {
 	return old
 }
 
-func memory_init(mem []byte, data string, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func memory_init[T uint32 | uint64](mem []byte, data string, dest T, src, n uint32) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
 	copy(mem[x:y], data[z:w])
 }
 
-func memory_copy(mem []byte, dest, src, n int32) {
-	x := uint(uint32(dest))
-	z := uint(uint32(src))
-	y := x + uint(uint32(n))
-	w := z + uint(uint32(n))
+func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(min(uint64(src), math.MaxUint))
+	c := uint(min(uint64(n), math.MaxUint))
+	y := x + c
+	w := z + c
 	copy(mem[x:y], mem[z:w])
 }
 
-func memory_fill(mem []byte, dest, val, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
+func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	y := x + uint(min(uint64(n), math.MaxUint))
 	buf := mem[x:y]
 	if len(buf) > 0 {
 		buf[0] = byte(val)
@@ -400,60 +401,9 @@ func memory_fill(mem []byte, dest, val, n int32) {
 	}
 }
 
-func memory_zero(mem []byte, dest, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
-	clear(mem[x:y])
-}
-
-func memory64_grow(mem *[]byte, delta, max int64) int64 {
-	buf := *mem
-	len64 := int64(len(buf))
-	old := len64 >> 16
-	if delta == 0 {
-		return old
-	}
-	newPages := old + delta
-	add := (newPages << 16) - len64
-	if newPages > max || add < 0 {
-		return -1
-	}
-	*mem = append(buf, make([]byte, add)...)
-	return old
-}
-
-func memory64_init(mem []byte, data string, dest int64, src, n int32) {
-	x := uint64(dest)
-	z := uint64(uint32(src))
-	y := x + uint64(n)
-	w := z + uint64(n)
-	copy(mem[x:y], data[z:w])
-}
-
-func memory64_copy(mem []byte, dest, src, n int64) {
-	x := uint64(dest)
-	z := uint64(src)
-	y := x + uint64(n)
-	w := z + uint64(n)
-	copy(mem[x:y], mem[z:w])
-}
-
-func memory64_fill(mem []byte, dest int64, val int32, n int64) {
-	x := uint64(dest)
-	y := x + uint64(n)
-	buf := mem[x:y]
-	if len(buf) > 0 {
-		buf[0] = byte(val)
-		for i := 1; i < len(buf); {
-			chunk := min(i, 8192)
-			i += copy(buf[i:], buf[:chunk])
-		}
-	}
-}
-
-func memory64_zero(mem []byte, dest, n int64) {
-	x := uint64(dest)
-	y := x + uint64(n)
+func memory_zero[T uint32 | uint64](mem []byte, dest, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	y := x + uint(min(uint64(n), math.MaxUint))
 	clear(mem[x:y])
 }
 

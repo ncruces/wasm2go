@@ -2,7 +2,10 @@
 
 package wasm2go
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"math"
+)
 
 type Module struct {
 	memory []byte
@@ -43,7 +46,7 @@ func (m *Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	memory_fill(m.memory, t0, t1, t2)
+	memory_fill(m.memory, uint32(t0), t1, uint32(t2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
 	t0 := v0
@@ -59,10 +62,10 @@ func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)
 }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := T(len >> 16)
 	if delta == 0 {
 		return old
 	}
@@ -75,9 +78,9 @@ func memory_grow(mem *[]byte, delta, max int32) int32 {
 	return old
 }
 
-func memory_fill(mem []byte, dest, val, n int32) {
-	x := uint(uint32(dest))
-	y := x + uint(uint32(n))
+func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	y := x + uint(min(uint64(n), math.MaxUint))
 	buf := mem[x:y]
 	if len(buf) > 0 {
 		buf[0] = byte(val)

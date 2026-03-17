@@ -2,6 +2,8 @@
 
 package wasm2go
 
+import "math"
+
 type Module struct {
 	memory []byte
 	maxMem int64
@@ -18,7 +20,7 @@ func (m *Module) Xcopy(v0 int64, v1 int64, v2 int64) {
 	t0 := v0
 	t1 := v1
 	t2 := v2
-	memory64_copy(m.memory, t0, t1, t2)
+	memory_copy(m.memory, uint64(t0), uint64(t1), uint64(t2))
 }
 func (m *Module) Xload8_u(v0 int64) int32 {
 	t0 := v0
@@ -26,11 +28,12 @@ func (m *Module) Xload8_u(v0 int64) int32 {
 	return t1
 }
 
-func memory64_copy(mem []byte, dest, src, n int64) {
-	x := uint64(dest)
-	z := uint64(src)
-	y := x + uint64(n)
-	w := z + uint64(n)
+func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(min(uint64(src), math.MaxUint))
+	c := uint(min(uint64(n), math.MaxUint))
+	y := x + c
+	w := z + c
 	copy(mem[x:y], mem[z:w])
 }
 

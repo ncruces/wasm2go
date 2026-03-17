@@ -528,10 +528,10 @@ func f32_const(x float32) float32 {
 	return x
 }
 
-func memory_grow(mem *[]byte, delta, max int32) int32 {
+func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
 	buf := *mem
 	len := len(buf)
-	old := int32(len >> 16)
+	old := T(len >> 16)
 	if delta == 0 {
 		return old
 	}
