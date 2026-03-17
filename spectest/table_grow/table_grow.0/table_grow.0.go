@@ -12,13 +12,13 @@ func New() *Module {
 }
 func (m *Module) Xget(v0 int32) any {
 	t0 := v0
-	t1 := m.t0[uint(t0)]
+	t1 := m.t0[t0]
 	return t1
 }
 func (m *Module) Xset(v0 int32, v1 any) {
 	t0 := v0
 	t1 := v1
-	m.t0[uint(t0)] = t1
+	m.t0[t0] = t1
 }
 func (m *Module) Xgrow(v0 int32, v1 any) int32 {
 	t0 := v1

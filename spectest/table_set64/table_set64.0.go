@@ -20,29 +20,29 @@ func (m *Module) f0() {
 }
 func (m *Module) Xget_externref(v0 int64) any {
 	t0 := v0
-	t1 := m.t0[uint(t0)]
+	t1 := m.t0[t0]
 	return t1
 }
 func (m *Module) Xget_funcref(v0 int64) any {
 	t0 := v0
-	t1 := m.t1[uint(t0)]
+	t1 := m.t1[t0]
 	return t1
 }
 func (m *Module) Xset_externref(v0 int64, v1 any) {
 	t0 := v0
 	t1 := v1
-	m.t0[uint(t0)] = t1
+	m.t0[t0] = t1
 }
 func (m *Module) Xset_funcref(v0 int64, v1 any) {
 	t0 := v0
 	t1 := v1
-	m.t1[uint(t0)] = t1
+	m.t1[t0] = t1
 }
 func (m *Module) Xset_funcref_from(v0 int64, v1 int64) {
 	t0 := v0
 	t1 := v1
-	t2 := m.t1[uint(t1)]
-	m.t1[uint(t0)] = t2
+	t2 := m.t1[t1]
+	m.t1[t0] = t2
 }
 func (m *Module) Xis_null_funcref(v0 int64) int32 {
 	t0 := v0

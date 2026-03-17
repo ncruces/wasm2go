@@ -27,7 +27,7 @@ func (m *Module) Xfill_abbrev(v0 int32, v1 any, v2 int32) {
 }
 func (m *Module) Xget(v0 int32) any {
 	t0 := v0
-	t1 := m.t0[uint(t0)]
+	t1 := m.t0[t0]
 	return t1
 }
 func (m *Module) Xfill_t64(v0 int64, v1 any, v2 int64) {
@@ -38,7 +38,7 @@ func (m *Module) Xfill_t64(v0 int64, v1 any, v2 int64) {
 }
 func (m *Module) Xget_t64(v0 int64) any {
 	t0 := v0
-	t1 := m.t1[uint(t0)]
+	t1 := m.t1[t0]
 	return t1
 }
 

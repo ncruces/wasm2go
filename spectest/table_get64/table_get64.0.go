@@ -20,18 +20,18 @@ func (m *Module) f0() {
 }
 func (m *Module) Xinit(v0 any) {
 	t0 := v0
-	m.t0[uint(int64(1))] = t0
-	t1 := m.t1[uint(int64(1))]
-	m.t1[uint(int64(2))] = t1
+	m.t0[int64(1)] = t0
+	t1 := m.t1[int64(1)]
+	m.t1[int64(2)] = t1
 }
 func (m *Module) Xget_externref(v0 int64) any {
 	t0 := v0
-	t1 := m.t0[uint(t0)]
+	t1 := m.t0[t0]
 	return t1
 }
 func (m *Module) Xget_funcref(v0 int64) any {
 	t0 := v0
-	t1 := m.t1[uint(t0)]
+	t1 := m.t1[t0]
 	return t1
 }
 func (m *Module) Xis_null_funcref(v0 int64) int32 {

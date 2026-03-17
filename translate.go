@@ -1321,9 +1321,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if t.tables[i].imported {
 				tab = &ast.StarExpr{X: tab}
 			}
-			fn.push(&ast.IndexExpr{
-				X:     tab,
-				Index: convert(fn.pop(), "uint")})
+			fn.push(&ast.IndexExpr{X: tab, Index: fn.pop()})
 
 		case 0x26: // table.set
 			i, err := readLEB128(t.in)
@@ -1337,9 +1335,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(&ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Rhs: []ast.Expr{fn.pop()},
-				Lhs: []ast.Expr{&ast.IndexExpr{
-					X:     tab,
-					Index: convert(fn.pop(), "uint")}}})
+				Lhs: []ast.Expr{&ast.IndexExpr{X: tab, Index: fn.pop()}}})
 
 		case 0x2c, 0x2d, 0x30, 0x31: // load8
 			_, err := readLEB128(t.in) // align
