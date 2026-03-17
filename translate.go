@@ -1462,7 +1462,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Args: []ast.Expr{t.memory.selector}},
 					Op: token.SHR,
 					Y:  &ast.BasicLit{Kind: token.INT, Value: "16"},
-				}, t.memory.indexType()))
+				}, t.memory.stype()))
 
 		case 0x40: // memory.grow
 			_, err := readLEB128(t.in) // memory index
@@ -1470,26 +1470,23 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				return err
 			}
 			if fn.memory.imported {
-				fn.push(&ast.CallExpr{
+				fn.push(convert(&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")},
 						Sel: newID("Grow")},
 					Args: []ast.Expr{
-						fn.pop(),
-						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}})
-
+						convert(fn.pop(), "int64"),
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
 			} else {
 				fn.helpers.add("memory_grow")
-				fn.push(&ast.CallExpr{
+				fn.push(convert(&ast.CallExpr{
 					Fun: newID("memory_grow"),
 					Args: []ast.Expr{
-						&ast.UnaryExpr{
-							Op: token.AND,
-							X:  t.memory.selector},
-						fn.pop(),
-						&ast.SelectorExpr{
-							X:   newID("m"),
-							Sel: newID("maxMem")}}})
+						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
+						convert(fn.pop(), "int64"),
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
 			}
 
 		case 0x41: // i32.const
@@ -1862,7 +1859,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				}
 				n := convert(fn.pop(), "uint32")
 				src := convert(fn.pop(), "uint32")
-				dst := convert(fn.pop(), "u"+t.memory.indexType())
+				dst := convert(fn.pop(), t.memory.utype())
 				fn.helpers.add("memory_init")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
@@ -1887,9 +1884,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := convert(fn.pop(), "u"+t.memory.indexType())
-				src := convert(fn.pop(), "u"+t.memory.indexType())
-				dst := convert(fn.pop(), "u"+t.memory.indexType())
+				typ := t.memory.utype()
+				n := convert(fn.pop(), typ)
+				src := convert(fn.pop(), typ)
+				dst := convert(fn.pop(), typ)
 				fn.helpers.add("memory_copy")
 				fn.emit(&ast.ExprStmt{
 					X: &ast.CallExpr{
@@ -1903,9 +1901,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				if err != nil {
 					return err
 				}
-				n := convert(fn.pop(), "u"+t.memory.indexType())
+				typ := t.memory.utype()
+				n := convert(fn.pop(), typ)
 				val := fn.pop()
-				dest := convert(fn.pop(), "u"+t.memory.indexType())
+				dest := convert(fn.pop(), typ)
 				if iszero(val) {
 					fn.helpers.add("memory_zero")
 					fn.emit(&ast.ExprStmt{

@@ -6,7 +6,7 @@ import "math"
 
 type Module struct {
 	memory           []byte
-	maxMem           int32
+	maxMem           int64
 	___stack_pointer int32
 }
 
@@ -20,14 +20,14 @@ func New() *Module {
 
 type Memory = interface {
 	Slice() *[]byte
-	Grow(delta, max int32) int32
+	Grow(delta, max int64) int64
 }
 type wasmMemory []byte
 
 func (m *wasmMemory) Slice() *[]byte {
 	return (*[]byte)(m)
 }
-func (m *wasmMemory) Grow(delta, max int32) int32 {
+func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xsin(v0 float64) float64 {
@@ -191,10 +191,10 @@ func i64_trunc_f64_s(f float64) int64 {
 	return int64(x)
 }
 
-func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := T(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

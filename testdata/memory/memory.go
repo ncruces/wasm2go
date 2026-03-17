@@ -9,7 +9,7 @@ import (
 
 type Module struct {
 	memory []byte
-	maxMem int32
+	maxMem int64
 }
 
 func New() *Module {
@@ -23,19 +23,19 @@ func New() *Module {
 
 type Memory = interface {
 	Slice() *[]byte
-	Grow(delta, max int32) int32
+	Grow(delta, max int64) int64
 }
 type wasmMemory []byte
 
 func (m *wasmMemory) Slice() *[]byte {
 	return (*[]byte)(m)
 }
-func (m *wasmMemory) Grow(delta, max int32) int32 {
+func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xwasm_grow(v0 int32) int32 {
 	t0 := v0
-	t1 := memory_grow(&m.memory, t0, m.maxMem)
+	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
 	return t1
 }
 func (m *Module) Xwasm_size() int32 {
@@ -62,10 +62,10 @@ func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)
 }
 
-func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := T(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

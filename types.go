@@ -104,11 +104,15 @@ type memoryDef struct {
 	max      int64
 }
 
-func (m *memoryDef) indexType() string {
+func (m *memoryDef) stype() string {
 	if m.is64 {
 		return "int64"
 	}
 	return "int32"
+}
+
+func (m *memoryDef) utype() string {
+	return "u" + m.stype()
 }
 
 type globalDef struct {

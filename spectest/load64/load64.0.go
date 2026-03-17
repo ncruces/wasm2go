@@ -302,7 +302,7 @@ func (m *Module) Xas_compare_right() int32 {
 }
 func (m *Module) Xas_memory_grow_size() int64 {
 	t0 := int64(binary.LittleEndian.Uint64(m.memory[int64(100):]))
-	t1 := memory_grow(&m.memory, t0, m.maxMem)
+	t1 := int64(memory_grow(&m.memory, int64(t0), m.maxMem))
 	return t1
 }
 
@@ -312,10 +312,10 @@ func i32_const(x int32) int32 { return x }
 //go:nosplit
 func i64_const(x int64) int64 { return x }
 
-func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := T(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

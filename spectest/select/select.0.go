@@ -11,7 +11,7 @@ type Module struct {
 	t0       []any
 	elements [][]any
 	memory   []byte
-	maxMem   int32
+	maxMem   int64
 	g0       int32
 }
 
@@ -337,7 +337,7 @@ func (m *Module) Xas_memory_grow_value(v0 int32) int32 {
 	if t0 != 0 {
 		p1 = int32(1)
 	}
-	t2 := memory_grow(&m.memory, p1, m.maxMem)
+	t2 := int32(memory_grow(&m.memory, int64(p1), m.maxMem))
 	return t2
 }
 func (m *Module) f28(v0 int32) int32 {
@@ -528,10 +528,10 @@ func f32_const(x float32) float32 {
 	return x
 }
 
-func memory_grow[T int | int32 | int64](mem *[]byte, delta, max T) T {
+func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
 	len := len(buf)
-	old := T(len >> 16)
+	old := int64(len) >> 16
 	if delta == 0 {
 		return old
 	}

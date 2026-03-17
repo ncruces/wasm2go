@@ -44,7 +44,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 		}
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{newID("maxMem")},
-			Type:  newID(t.memory.indexType())})
+			Type:  newID("int64")})
 	}
 	// Globals: owned are type; imported *type.
 	for _, g := range t.globals {
@@ -345,9 +345,9 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 							Params: &ast.FieldList{
 								List: []*ast.Field{{
 									Names: []*ast.Ident{newID("delta"), newID("max")},
-									Type:  newID(t.memory.indexType())}}},
+									Type:  newID("int64")}}},
 							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: newID(t.memory.indexType())}}}}}}}}}}})
+								List: []*ast.Field{{Type: newID("int64")}}}}}}}}}}})
 	}
 	// Memory structure implementing the interface for owned memory.
 	if !t.memory.imported {
@@ -367,8 +367,8 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
 			Name: newID("Grow"),
 			Type: &ast.FuncType{
-				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID(t.memory.indexType())}}},
-				Results: &ast.FieldList{List: []*ast.Field{{Type: newID(t.memory.indexType())}}}},
+				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID("int64")}}},
+				Results: &ast.FieldList{List: []*ast.Field{{Type: newID("int64")}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
 				Fun: newID("memory_grow"),
 				Args: []ast.Expr{

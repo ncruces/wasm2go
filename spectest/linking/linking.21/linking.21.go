@@ -5,7 +5,7 @@ package wasm2go
 type Module struct {
 	memory *[]byte
 	Memory Memory
-	maxMem int32
+	maxMem int64
 	_Mm    XMm
 }
 
@@ -29,7 +29,7 @@ type XMm = interface {
 }
 type Memory = interface {
 	Slice() *[]byte
-	Grow(delta, max int32) int32
+	Grow(delta, max int64) int64
 }
 
 func (m *Module) Xload(v0 int32) int32 {
