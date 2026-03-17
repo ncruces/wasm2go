@@ -676,7 +676,7 @@ func (t *translator) readElementSection() error {
 		if !t.elements[i].passive {
 			if opcode, err := t.in.ReadByte(); err != nil {
 				return err
-			} else if opcode != 0x41 { // i32.const
+			} else if opcode != 0x41 && opcode != 0x42 { // i32.const, i64.const
 				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
 			}
 			offset, err := readSignedLEB128(t.in)
@@ -2018,7 +2018,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.push(convert(&ast.CallExpr{
 					Fun:  newID("len"),
 					Args: []ast.Expr{tab},
-				}, "int32"))
+				}, t.tables[idx].stype()))
 
 			case 0x11: // table.fill
 				idx, err := readLEB128(t.in)

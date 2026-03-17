@@ -95,6 +95,13 @@ type tableDef struct {
 	max      int
 }
 
+func (m *tableDef) stype() string {
+	if m.is64 {
+		return "int64"
+	}
+	return "int32"
+}
+
 type memoryDef struct {
 	id       *ast.Ident
 	selector ast.Expr

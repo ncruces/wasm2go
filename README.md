@@ -31,11 +31,12 @@ This includes most Wasm 1.0 features, with the following exceptions:
 - export conflicts (name collisions after the trivial mangling we apply);
 - export aliasing (exporting the same function under multiple names).
 
-It also supports a subset of Wasm 2.0 features:
-- bulk memory operations and reference types;
-- nontrapping float-to-int conversions;
-- sign-extension operators;
-- multi-values.
+It also supports a subset of Wasm 2.0 and 3.0 features:
+- bulk memory instructions and reference types;
+- non-trapping float-to-int conversions;
+- sign-extension instructions;
+- multi-value results;
+- 64-bit address space.
 
 The goal is not to produce particularly readable Go code:
 - because Go makes a distinction between statements and expresions,
