@@ -21,6 +21,7 @@ type funcCompiler struct {
 	blocks stack[funcBlock]
 	labels int
 	temps  int
+	nkdret bool
 }
 
 // Emits statements to the current function.
@@ -30,14 +31,37 @@ func (fn *funcCompiler) emit(stmts ...ast.Stmt) {
 }
 
 // Returns a statement to exit n blocks.
-func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
+func (fn *funcCompiler) branch(n uint64) (stmts []ast.Stmt) {
 	// Target block index.
 	i := uint64(len(fn.blocks)) - n - 1
+
+	targetDepth := 0
+	if i > 0 {
+		targetDepth = fn.blocks[i-1].iifeDepth
+	}
+	escapes := fn.blocks.top().iifeDepth > targetDepth
 
 	// Returning from the function body.
 	if i == 0 {
 		fn.cond = nil
 		n := len(fn.typ.results)
+
+		if escapes {
+			if n > 0 {
+				stmt := &ast.AssignStmt{Tok: token.ASSIGN}
+				for j := range n {
+					stmt.Lhs = append(stmt.Lhs, returnVal(j))
+				}
+				stmt.Rhs = append(stmt.Rhs, fn.stack.last(n)...)
+				stmts = append(stmts, stmt)
+			}
+			stmts = append(stmts, &ast.ReturnStmt{
+				Results: []ast.Expr{
+					&ast.BasicLit{Kind: token.INT, Value: "-1"},
+					newID("nil")}})
+			return
+		}
+
 		ret := &ast.ReturnStmt{}
 		ret.Results = append(ret.Results, fn.stack.last(n)...)
 		return []ast.Stmt{ret}
@@ -61,10 +85,16 @@ func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
 		return nil
 	}
 
+	if escapes {
+		return []ast.Stmt{&ast.ReturnStmt{
+			Results: []ast.Expr{
+				&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(i, 10)},
+				newID("nil")}}}
+	}
+
 	if blk.label == nil {
 		blk.label = fn.newLabel()
 	}
-
 	return []ast.Stmt{&ast.BranchStmt{Tok: token.GOTO, Label: blk.label}}
 }
 
@@ -609,9 +639,14 @@ type funcBlock struct {
 	results     []ast.Expr
 	loopPos     int
 	stackPos    int
+	iifeDepth   int
 	unreachable bool
 	ifreachable bool
 	elreachable bool
+	isTry       bool
+	deferBody   *ast.BlockStmt
+	deferCatch  *ast.BlockStmt
+	catchSwitch *ast.SwitchStmt
 }
 
 func (b *funcBlock) emit(stmts ...ast.Stmt) {

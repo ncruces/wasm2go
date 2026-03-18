@@ -53,10 +53,13 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 		}
 
 		switch cmd.Type {
-		case "action", "assert_return", "assert_trap":
+		case "action", "assert_return", "assert_trap", "assert_exception":
 			t.Run(fmt.Sprintf("%s/line_%d", name, cmd.Line), func(t *testing.T) {
-				if cmd.Type == "assert_trap" {
+				switch cmd.Type {
+				case "assert_trap":
 					defer RecoverTrap(t, cmd.Text)
+				case "assert_exception":
+					defer RecoverTrap(t, "exception")
 				}
 
 				method := mod.MethodByName(exported(cmd.Action.Field))
@@ -192,7 +195,11 @@ func RecoverTrap(t testing.TB, want string) {
 	t.Helper()
 
 	var got string
-	if r := recover(); r != nil {
+	if r := recover(); want == "exception" {
+		if _, ok := r.(*exception); ok {
+			return
+		}
+	} else if r != nil {
 		got = fmt.Sprint(r)
 	} else {
 		t.Fatalf("want trap: %s", want)
@@ -220,6 +227,11 @@ func RecoverTrap(t testing.TB, want string) {
 	}
 
 	t.Fatalf("got trap %q, want %q", got, want)
+}
+
+type exception = struct {
+	Tag *byte
+	Val []any
 }
 
 func exported(name string) string {

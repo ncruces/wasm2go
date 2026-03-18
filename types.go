@@ -76,6 +76,7 @@ const (
 	externTable
 	externMemory
 	externGlobal
+	externTag
 )
 
 type importDef struct {
@@ -127,6 +128,11 @@ type globalDef struct {
 	typ      wasmType
 	imported bool
 	init     ast.Expr
+}
+
+type tagDef struct {
+	typ      funcType
+	imported bool
 }
 
 type export struct {

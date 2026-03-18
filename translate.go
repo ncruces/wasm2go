@@ -35,6 +35,7 @@ type translator struct {
 	// Dependencies.
 	packages set[string]
 	helpers  set[string]
+	usesExn  bool
 	// Sections.
 	types     []funcType
 	imports   []importDef
@@ -42,6 +43,7 @@ type translator struct {
 	memory    *memoryDef
 	tables    []tableDef
 	globals   []globalDef
+	tags      []tagDef
 	exports   map[string]export
 	elements  []elemSegment
 	start     uint64
@@ -70,18 +72,21 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
-	exported := false
+	memExported := false
 	for _, exp := range t.exports {
 		if exp.kind == externMemory {
-			exported = true
+			memExported = true
 			break
 		}
 	}
-	if t.memory != nil && (exported || t.memory.imported) {
+	if memExported || t.memory != nil && t.memory.imported {
 		t.out.Decls = append(t.createMemoryTypes(), t.out.Decls...)
 	}
 	if !*nohost && len(t.imports) > 0 {
 		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
+	}
+	if t.usesExn {
+		t.out.Decls = append(t.out.Decls, t.createExceptionType())
 	}
 
 	t.out.Decls = append([]ast.Decl{
@@ -192,6 +197,7 @@ const (
 	sectionCode
 	sectionData
 	sectionDataCount
+	sectionTag
 )
 
 func readHeader(r io.Reader) error {
@@ -244,6 +250,8 @@ func (t *translator) readSection() error {
 		return t.readDataSection()
 	case sectionDataCount:
 		return t.readDataCountSection()
+	case sectionTag:
+		return t.readTagSection()
 	case sectionCustom:
 		return t.readCustomSection(int(size))
 	default:
@@ -450,6 +458,30 @@ func (t *translator) readImportSection() error {
 				index:  idx,
 			})
 
+		case externTag:
+			attribute, err := t.in.ReadByte()
+			if err != nil {
+				return err
+			}
+			if attribute != 0 {
+				return fmt.Errorf("unsupported tag attribute: %x", attribute)
+			}
+			index, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			idx := len(t.tags)
+			t.tags = append(t.tags, tagDef{
+				typ:      t.types[index],
+				imported: true,
+			})
+			t.imports = append(t.imports, importDef{
+				module: mod,
+				name:   name,
+				kind:   externTag,
+				index:  idx,
+			})
+
 		default:
 			return fmt.Errorf("unsupported import kind: %x", kind)
 		}
@@ -637,6 +669,36 @@ func (t *translator) readGlobalSection() error {
 			return err
 		} else if end != 0x0b { // end
 			return fmt.Errorf("expected end of init expr, got %x", end)
+		}
+	}
+	return nil
+}
+
+func (t *translator) readTagSection() error {
+	numTags, err := readLEB128(t.in)
+	if err != nil {
+		return err
+	}
+
+	start := len(t.tags)
+	t.tags = append(t.tags, make([]tagDef, numTags)...)
+	for i := range numTags {
+		i += uint64(start)
+
+		attribute, err := t.in.ReadByte()
+		if err != nil {
+			return err
+		}
+		if attribute != 0 {
+			return fmt.Errorf("unsupported tag attribute: %x", attribute)
+		}
+
+		index, err := readLEB128(t.in)
+		if err != nil {
+			return err
+		}
+		t.tags[i] = tagDef{
+			typ: t.types[index],
 		}
 	}
 	return nil
@@ -904,6 +966,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				unreachable: blk.unreachable,
 				ifreachable: blk.unreachable,
 				elreachable: blk.unreachable,
+				iifeDepth:   blk.iifeDepth,
 			}
 
 			// Blocks can naturally consume their arguments.
@@ -963,6 +1026,23 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			blk.ifreachable = blk.unreachable
 			blk.unreachable = blk.elreachable
 
+		case 0x06: // try
+			bt, err := t.readBlockType()
+			if err != nil {
+				return err
+			}
+			fn.try(bt)
+
+		case 0x07, 0x19: // catch, catch_all
+			if err := fn.catch(opcode); err != nil {
+				return err
+			}
+
+		case 0x08: // throw
+			if err := fn.throw(); err != nil {
+				return err
+			}
+
 		case 0x0b: // end
 			if len(fn.blocks) == 1 { // End of the function body.
 				if n := len(fn.typ.results); n > 0 && !blk.unreachable {
@@ -971,6 +1051,12 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					fn.emit(ret)
 				}
 				fn.cleanup()
+
+				if fn.nkdret { // Function uses naked returns, add names.
+					for i, t := range fn.decl.Type.Results.List {
+						t.Names = []*ast.Ident{returnVal(i)}
+					}
+				}
 				return nil
 			}
 
@@ -1019,7 +1105,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			// or both branches were unreachable.
 			parent.unreachable = blk.unreachable &&
 				(blk.loopPos != 0 || blk.label == nil &&
-					(blk.ifStmt == nil || blk.ifreachable))
+					(blk.ifStmt == nil || blk.isTry || blk.ifreachable))
 
 		case 0x0c: // br
 			n, err := readLEB128(t.in)
@@ -1178,11 +1264,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x0f: // return
 			if !blk.unreachable {
-				ret := &ast.ReturnStmt{}
-				if n := len(fn.typ.results); n > 0 {
-					ret.Results = append(ret.Results, fn.stack.last(n)...)
-				}
-				fn.emit(ret)
+				fn.emit(fn.branch(uint64(len(fn.blocks) - 1))...)
 				blk.unreachable = true // After an uncoditional return.
 			}
 

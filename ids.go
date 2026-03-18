@@ -49,6 +49,10 @@ func localVar[T interface{ int | uint64 }](i T) *ast.Ident {
 	return newID("v" + strconv.Itoa(int(i)))
 }
 
+func returnVal(i int) *ast.Ident {
+	return newID("r" + strconv.Itoa(i))
+}
+
 func tempVal(i int) *ast.Ident {
 	return newID("t" + strconv.Itoa(i))
 }

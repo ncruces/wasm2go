@@ -29,6 +29,12 @@ func (t *translator) createModuleStruct() ast.Decl {
 			Names: []*ast.Ident{newID("elements")},
 			Type:  &ast.ArrayType{Elt: &ast.ArrayType{Elt: newID("any")}}})
 	}
+	// Tags: Exception descriptors, []*byte.
+	if len(t.tags) > 0 {
+		fields = append(fields, &ast.Field{
+			Names: []*ast.Ident{newID("tags")},
+			Type:  &ast.ArrayType{Elt: &ast.StarExpr{X: newID("byte")}}})
+	}
 	// Memory: owned a []byte; imported a *[]byte and a Memory field.
 	if t.memory != nil {
 		if t.memory.imported {
@@ -149,6 +155,18 @@ func (t *translator) createNewFunc() ast.Decl {
 		}
 	}
 
+	// Create tags array.
+	if len(t.tags) > 0 {
+		body.List = append(body.List, &ast.AssignStmt{
+			Tok: token.ASSIGN,
+			Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("tags")}},
+			Rhs: []ast.Expr{&ast.CallExpr{
+				Fun: newID("make"),
+				Args: []ast.Expr{
+					&ast.ArrayType{Elt: &ast.StarExpr{X: newID("byte")}},
+					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(len(t.tags))}}}}})
+	}
+
 	// Set imported tables, globals and memory.
 	for _, imp := range t.imports {
 		switch imp.kind {
@@ -183,6 +201,17 @@ func (t *translator) createNewFunc() ast.Decl {
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Slice")}}}})
+
+		case externTag:
+			body.List = append(body.List, &ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{&ast.IndexExpr{
+					X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("tags")},
+					Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(imp.index)}}},
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X:   locals[imp.module],
+						Sel: ast.NewIdent(exported(imp.name))}}}})
 		}
 	}
 
@@ -250,6 +279,18 @@ func (t *translator) createNewFunc() ast.Decl {
 			}},
 			Rhs: []ast.Expr{g.init}})
 	}
+	// Initialize owned tags.
+	for i, tag := range t.tags {
+		if tag.imported {
+			continue
+		}
+		body.List = append(body.List, &ast.AssignStmt{
+			Tok: token.ASSIGN,
+			Lhs: []ast.Expr{&ast.IndexExpr{
+				X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("tags")},
+				Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}},
+			Rhs: []ast.Expr{&ast.CallExpr{Fun: newID("new"), Args: []ast.Expr{newID("byte")}}}})
+	}
 
 	// Initialize imported modules.
 	for _, param := range params {
@@ -303,6 +344,8 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}}
 		case externGlobal: // *type
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: imp.typ.ident()}}}}}
+		case externTag: // []*byte
+			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("byte")}}}}}
 		case externMemory: // Memory
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}}
 		}
@@ -382,6 +425,20 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 	return decls
 }
 
+func (t *translator) createExceptionType() ast.Decl {
+	return &ast.GenDecl{
+		Tok: token.TYPE,
+		Specs: []ast.Spec{&ast.TypeSpec{
+			Assign: 1,
+			Name:   newID("Exception"),
+			Type: &ast.StructType{Fields: &ast.FieldList{
+				List: []*ast.Field{{
+					Names: []*ast.Ident{newID("Tag")},
+					Type:  &ast.StarExpr{X: newID("byte")}}, {
+					Names: []*ast.Ident{newID("Val")},
+					Type:  &ast.ArrayType{Elt: newID("any")}}}}}}}}
+}
+
 func (t *translator) createExportMethods() []ast.Decl {
 	var decls []ast.Decl
 
@@ -417,6 +474,11 @@ func (t *translator) createExportMethods() []ast.Decl {
 				ret = &ast.UnaryExpr{Op: token.AND, X: ret}
 			}
 			body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}
+		case externTag:
+			results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("byte")}}}}
+			body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.IndexExpr{
+				X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("tags")},
+				Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(exp.index)}}}}}
 		case externMemory:
 			results = &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}
 			if t.memory.imported {
