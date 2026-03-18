@@ -46,7 +46,8 @@ type translator struct {
 	out ast.File
 
 	// WASM module Go type.
-	moduleType *ast.TypeSpec
+	modType *ast.TypeSpec
+	modRecv *ast.Field
 
 	// Dependencies.
 	packages set[string]
@@ -95,16 +96,33 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
+	var hostInterfaces []*ast.GenDecl
+
 	if t.memory != nil && (exported || t.memory.imported) {
 		t.out.Decls = append(t.createMemoryTypes(), t.out.Decls...)
 	}
+
 	if !*nohost && len(t.imports) > 0 {
-		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
+		hostInterfaces = t.createHostInterfaces()
+		t.out.Decls = append(toDecl(hostInterfaces...), t.out.Decls...)
 	}
 
 	// Next define module, with host interface generic param(s).
 	modDecl, modType := t.createModuleStruct(hostInterfaces)
-	t.moduleType = modType
+	t.modRecv = &ast.Field{Names: []*ast.Ident{newID("m")}}
+	t.modType = modType
+
+	// Set module receiver type depending
+	// on if generic type params do exist.
+	if len(modType.TypeParams.List) > 0 {
+		var paramNames []ast.Expr
+		for _, field := range modType.TypeParams.List {
+			paramNames = append(paramNames, field.Names[0])
+		}
+		t.modRecv.Type = &ast.StarExpr{X: &ast.IndexListExpr{X: newID("Module"), Indices: paramNames}}
+	} else {
+		t.modRecv.Type = &ast.StarExpr{X: newID("Module")}
+	}
 
 	t.out.Decls = append([]ast.Decl{
 		modDecl,

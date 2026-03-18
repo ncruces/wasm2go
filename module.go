@@ -62,18 +62,34 @@ func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.Gen
 				Type:  ast.NewIdent(exported(imp.module))})
 		}
 	}
-	for _, g := range t.globals {
-		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{g.id},
-			Type:  g.typ.Ident()})
-	}
 	var typeParams *ast.FieldList
 	if len(hostInterfaces) > 0 {
+		seen := set[string]{}
 		typeParams = new(ast.FieldList)
 		for _, decl := range hostInterfaces {
 			typeSpec := decl.Specs[0].(*ast.TypeSpec)
+
+			var paramName string
+
+			// Use shortest possible prefix
+			// of the type parameter for
+			// the generic parameter name.
+			typeName := typeSpec.Name.Name
+			for i := 1; i < len(typeName); i++ {
+				if seen.has(typeName[:i]) {
+					continue
+				}
+				paramName = typeName[:i]
+				seen.add(paramName)
+				break
+			}
+
+			if paramName == "" {
+				panic("could not determine type param prefix for: " + typeName)
+			}
+
 			typeParams.List = append(typeParams.List, &ast.Field{
-				Names: []*ast.Ident{typeSpec.Name},
+				Names: []*ast.Ident{ast.NewIdent(paramName)},
 				Type:  newID(typeSpec.Name.Name),
 			})
 		}
@@ -89,28 +105,6 @@ func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.Gen
 		Tok:   token.TYPE,
 		Specs: []ast.Spec{typeSpec},
 	}, typeSpec
-}
-
-func (t *translator) createHostInterfaces() []*ast.GenDecl {
-	ifaces := map[string][]*ast.Field{}
-
-	for _, imp := range t.imports {
-		typ := imp.typ.toAST()
-
-		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
-			Names: []*ast.Ident{ast.NewIdent(exported(imp.name))},
-			Type:  typ})
-	}
-
-	decls := make([]*ast.GenDecl, 0, len(ifaces))
-	for name, methods := range ifaces {
-		decls = append(decls, &ast.GenDecl{
-			Tok: token.TYPE,
-			Specs: []ast.Spec{&ast.TypeSpec{
-				Name: ast.NewIdent(exported(name)),
-				Type: &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
-	}
-	return decls
 }
 
 func (t *translator) createNewFunc() ast.Decl {
@@ -322,17 +316,16 @@ func (t *translator) createNewFunc() ast.Decl {
 	body.List = append(body.List, &ast.ReturnStmt{Results: []ast.Expr{newID("m")}})
 
 	return &ast.FuncDecl{
-		Name: newID("New"),
-		Type: &ast.FuncType{
-			TypeParams: t.moduleType.TypeParams,
+		Name: newID("New"), Type: &ast.FuncType{
 			Params:     &ast.FieldList{List: params},
-			Results:    &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}},
+			TypeParams: t.modType.TypeParams,
+			Results:    &ast.FieldList{List: []*ast.Field{{Type: t.modRecv.Type}}},
 		},
 		Body: body,
 	}
 }
 
-func (t *translator) createHostInterfaces() []ast.Decl {
+func (t *translator) createHostInterfaces() []*ast.GenDecl {
 	ifaces := map[string][]*ast.Field{}
 
 	for _, imp := range t.imports {
@@ -353,7 +346,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 			Type:  typ})
 	}
 
-	decls := make([]ast.Decl, 0, len(ifaces))
+	decls := make([]*ast.GenDecl, 0, len(ifaces))
 	for name, methods := range ifaces {
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
@@ -362,6 +355,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 				Name:   ast.NewIdent(exported(name)),
 				Type:   &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
 	}
+
 	return decls
 }
 
@@ -470,7 +464,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 		}
 
 		decls = append(decls, &ast.FuncDecl{
-			Recv: modRecvList,
+			Recv: &ast.FieldList{List: []*ast.Field{t.modRecv}},
 			Name: methodName,
 			Type: &ast.FuncType{Results: results},
 			Body: &ast.BlockStmt{List: body}})
