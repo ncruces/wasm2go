@@ -69,19 +69,19 @@ func resultsToAST(types string) *ast.FieldList {
 	return &ast.FieldList{List: list}
 }
 
-type importKind byte
+type externKind byte
 
 const (
-	functionImport importKind = iota
-	tableImport
-	memoryImport
-	globalImport
+	externFunction externKind = iota
+	externTable
+	externMemory
+	externGlobal
 )
 
 type importDef struct {
 	module string
 	name   string
-	kind   importKind
+	kind   externKind
 	fnType funcType
 	typ    wasmType
 	index  int
@@ -129,17 +129,8 @@ type globalDef struct {
 	init     ast.Expr
 }
 
-type exportKind byte
-
-const (
-	functionExport exportKind = iota
-	tableExport
-	memoryExport
-	globalExport
-)
-
 type export struct {
-	kind  exportKind
+	kind  externKind
 	index int
 }
 

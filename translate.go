@@ -72,7 +72,7 @@ func translate(r io.Reader, w io.Writer) error {
 
 	exported := false
 	for _, exp := range t.exports {
-		if exp.kind == memoryExport {
+		if exp.kind == externMemory {
 			exported = true
 			break
 		}
@@ -333,8 +333,8 @@ func (t *translator) readImportSection() error {
 			return err
 		}
 
-		switch importKind(kind) {
-		case functionImport:
+		switch externKind(kind) {
+		case externFunction:
 			index, err := readLEB128(t.in)
 			if err != nil {
 				return err
@@ -343,7 +343,7 @@ func (t *translator) readImportSection() error {
 			t.imports = append(t.imports, importDef{
 				module: mod,
 				name:   name,
-				kind:   functionImport,
+				kind:   externFunction,
 				fnType: typ,
 			})
 
@@ -377,7 +377,7 @@ func (t *translator) readImportSection() error {
 			t.functions = append(t.functions, fn)
 			t.out.Decls = append(t.out.Decls, fn.decl)
 
-		case memoryImport:
+		case externMemory:
 			if t.memory != nil {
 				return fmt.Errorf("multiple memories not supported")
 			}
@@ -396,10 +396,10 @@ func (t *translator) readImportSection() error {
 			t.imports = append(t.imports, importDef{
 				module: mod,
 				name:   name,
-				kind:   memoryImport,
+				kind:   externMemory,
 			})
 
-		case globalImport:
+		case externGlobal:
 			typ, err := t.in.ReadByte()
 			if err != nil {
 				return err
@@ -417,12 +417,12 @@ func (t *translator) readImportSection() error {
 			t.imports = append(t.imports, importDef{
 				module: mod,
 				name:   name,
-				kind:   globalImport,
+				kind:   externGlobal,
 				typ:    wasmType(typ),
 				index:  idx,
 			})
 
-		case tableImport:
+		case externTable:
 			typ, err := t.in.ReadByte()
 			if err != nil {
 				return err
@@ -446,7 +446,7 @@ func (t *translator) readImportSection() error {
 			t.imports = append(t.imports, importDef{
 				module: mod,
 				name:   name,
-				kind:   tableImport,
+				kind:   externTable,
 				index:  idx,
 			})
 
@@ -746,12 +746,12 @@ func (t *translator) readExportSection() error {
 		}
 
 		t.exports[name] = export{
-			kind:  exportKind(kind),
+			kind:  externKind(kind),
 			index: int(index),
 		}
 
-		switch exportKind(kind) {
-		case functionExport:
+		switch externKind(kind) {
+		case externFunction:
 			decl := t.functions[index].decl
 			decl.Name = ast.NewIdent(exported(name))
 		}
@@ -777,7 +777,7 @@ func (t *translator) readCodeSection() error {
 
 	var importedFuncs uint64
 	for _, imp := range t.imports {
-		if imp.kind == functionImport {
+		if imp.kind == externFunction {
 			importedFuncs++
 		}
 	}
