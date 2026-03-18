@@ -148,22 +148,11 @@ func translate(r io.Reader, w io.Writer) error {
 				fn.decl.Name.Name = "f" + strconv.Itoa(i)
 			}
 
-			// Skip below
-			// if generics
-			// are disabled.
-			if !*generic {
-				continue
-			}
-
 			// Now module type information is known,
-			// update all module receiver methods to
-			// have any determine generic paramter(s).
+			// update all module receiver methods with it.
 			for _, field := range fn.decl.Recv.List {
 				if len(field.Names) > 0 && field.Names[0].Name == "m" {
-					field.Type = &ast.StarExpr{X: &ast.IndexExpr{
-						X:     modType.Name,
-						Index: modType.TypeParams.List[0].Names[0],
-					}}
+					field.Type = t.modRecv.Type
 				}
 			}
 		}
