@@ -105,6 +105,13 @@ func translate(r io.Reader, w io.Writer) error {
 	if !*nohost && len(t.imports) > 0 {
 		hostInterfaces = t.createHostInterfaces()
 		t.out.Decls = append(toDecl(hostInterfaces...), t.out.Decls...)
+
+		if !*generic {
+			// Drop host interface slice here, to
+			// prevent generic type parameters being
+			// generated in module creation below.
+			hostInterfaces = nil
+		}
 	}
 
 	// Next define module, with host interface generic param(s).
@@ -114,7 +121,8 @@ func translate(r io.Reader, w io.Writer) error {
 
 	// Set module receiver type depending
 	// on if generic type params do exist.
-	if len(modType.TypeParams.List) > 0 {
+	if modType.TypeParams != nil &&
+		len(modType.TypeParams.List) > 0 {
 		var paramNames []ast.Expr
 		for _, field := range modType.TypeParams.List {
 			paramNames = append(paramNames, field.Names[0])
@@ -138,6 +146,13 @@ func translate(r io.Reader, w io.Writer) error {
 			if fn.decl.Name.Name == "" {
 				// If no function name, generate one.
 				fn.decl.Name.Name = "f" + strconv.Itoa(i)
+			}
+
+			// Skip below
+			// if generics
+			// are disabled.
+			if !*generic {
+				continue
 			}
 
 			// Now module type information is known,

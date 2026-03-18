@@ -62,13 +62,16 @@ func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.Gen
 				Type:  ast.NewIdent(exported(imp.module))})
 		}
 	}
+
+	// If host module imports are provided,
+	// use these to generate generic type
+	// parameters for the module struct.
 	var typeParams *ast.FieldList
 	if len(hostInterfaces) > 0 {
 		seen := set[string]{}
 		typeParams = new(ast.FieldList)
 		for _, decl := range hostInterfaces {
 			typeSpec := decl.Specs[0].(*ast.TypeSpec)
-
 			var paramName string
 
 			// Use shortest possible prefix
@@ -88,19 +91,20 @@ func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.Gen
 				panic("could not determine type param prefix for: " + typeName)
 			}
 
+			// Append type parameter with shorted name to list.
 			typeParams.List = append(typeParams.List, &ast.Field{
 				Names: []*ast.Ident{ast.NewIdent(paramName)},
 				Type:  newID(typeSpec.Name.Name),
 			})
 		}
 	}
+
 	typeSpec := &ast.TypeSpec{
 		Name:       newID("Module"),
+		Type:       &ast.StructType{Fields: &ast.FieldList{List: fields}},
 		TypeParams: typeParams,
-		Type: &ast.StructType{
-			Fields: &ast.FieldList{List: fields},
-		},
 	}
+
 	return &ast.GenDecl{
 		Tok:   token.TYPE,
 		Specs: []ast.Spec{typeSpec},
