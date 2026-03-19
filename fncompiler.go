@@ -179,7 +179,6 @@ func (fn *funcCompiler) pushConst(expr ast.Expr) {
 // Pushes the materialization of expr to the value stack.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
-		fn.pushConst(&ast.BasicLit{Kind: token.INT, Value: "0"})
 		return
 	}
 
@@ -193,6 +192,10 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 
 // Pushes the integer materialization of cond the value stack.
 func (fn *funcCompiler) pushCond(cond ast.Expr) {
+	if fn.blocks.top().unreachable {
+		return
+	}
+
 	tmp := fn.newTempVar()
 	fn.emit(&ast.DeclStmt{
 		Decl: &ast.GenDecl{
@@ -215,7 +218,7 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 
 // Pops a value from the value stack.
 func (fn *funcCompiler) pop() ast.Expr {
-	if blk := fn.blocks.top(); blk.unreachable {
+	if fn.blocks.top().unreachable {
 		return &ast.BasicLit{Kind: token.INT, Value: "0"}
 	}
 
@@ -226,7 +229,7 @@ func (fn *funcCompiler) pop() ast.Expr {
 // Pops a condition from the value stack.
 // The condition must be immediately used once and only once.
 func (fn *funcCompiler) popCond() ast.Expr {
-	if blk := fn.blocks.top(); blk.unreachable {
+	if fn.blocks.top().unreachable {
 		return newID("false")
 	}
 
