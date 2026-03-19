@@ -120,7 +120,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Lhs: []ast.Expr{newID("m")},
 				Rhs: []ast.Expr{&ast.UnaryExpr{
 					Op: token.AND,
-					X:  &ast.CompositeLit{Type: newID("Module")}}}}},
+					X:  &ast.CompositeLit{Type: t.modRecv.Type.(*ast.StarExpr).X}}}}},
 	}
 
 	// Create the params, and initialize fields.
