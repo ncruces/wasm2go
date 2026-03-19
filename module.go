@@ -5,6 +5,7 @@ import (
 	"go/token"
 	"slices"
 	"strconv"
+	"strings"
 )
 
 func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.GenDecl, *ast.TypeSpec) {
@@ -78,6 +79,7 @@ func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.Gen
 			// of the type parameter for
 			// the generic parameter name.
 			typeName := typeSpec.Name.Name
+			typeName = strings.TrimPrefix(typeName, "X")
 			for i := 1; i < len(typeName); i++ {
 				if seen.has(typeName[:i]) {
 					continue
@@ -93,7 +95,7 @@ func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.Gen
 
 			// Append type parameter with shorted name to list.
 			typeParams.List = append(typeParams.List, &ast.Field{
-				Names: []*ast.Ident{ast.NewIdent(paramName)},
+				Names: []*ast.Ident{ast.NewIdent(strings.ToUpper(paramName))},
 				Type:  newID(typeSpec.Name.Name),
 			})
 		}
