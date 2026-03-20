@@ -16,30 +16,85 @@ type funcCompiler struct {
 	typ  funcType
 	decl *ast.FuncDecl
 
-	cond   ast.Expr
-	stack  stack[ast.Expr]
+	stack  stack[stackEntry]
 	blocks stack[funcBlock]
 	labels int
 	temps  int
 }
 
+type entryKind int
+
+const (
+	entryConst entryKind = iota
+	entryCond            // unevaluated condition
+	entryExpr            // unevaluated expression
+)
+
+type stackEntry struct {
+	kind entryKind
+	expr ast.Expr
+}
+
+// Materializes all pending entryExpr and entryCond entries on the stack into temps.
+func (fn *funcCompiler) flush() {
+	for i := range fn.stack {
+		e := &fn.stack[i]
+		switch e.kind {
+		case entryExpr:
+			tmp := fn.newTempVal()
+			fn.blocks.top().emit(&ast.AssignStmt{
+				Tok: token.DEFINE,
+				Lhs: []ast.Expr{tmp},
+				Rhs: []ast.Expr{e.expr}})
+			e.kind = entryConst
+			e.expr = tmp
+		case entryCond:
+			tmp := fn.newTempVar()
+			fn.blocks.top().emit(&ast.DeclStmt{
+				Decl: &ast.GenDecl{
+					Tok: token.VAR,
+					Specs: []ast.Spec{
+						&ast.ValueSpec{
+							Names: []*ast.Ident{tmp},
+							Type:  newID("int32")}}},
+			}, &ast.IfStmt{
+				Cond: e.expr,
+				Body: &ast.BlockStmt{
+					List: []ast.Stmt{
+						&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: []ast.Expr{tmp},
+							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}}}}}})
+			e.kind = entryConst
+			e.expr = tmp
+		}
+	}
+}
+
 // Emits statements to the current function.
 func (fn *funcCompiler) emit(stmts ...ast.Stmt) {
-	fn.blocks.top().emit(stmts...)
-	fn.cond = nil
+	if len(stmts) > 0 {
+		fn.flush()
+		fn.blocks.top().emit(stmts...)
+	}
 }
 
 // Returns a statement to exit n blocks.
-func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
+func (fn *funcCompiler) branch(n uint64) (stmts []ast.Stmt) {
+	if fn.blocks.top().unreachable {
+		return nil
+	}
+
 	// Target block index.
 	i := uint64(len(fn.blocks)) - n - 1
 
 	// Returning from the function body.
 	if i == 0 {
-		fn.cond = nil
-		n := len(fn.typ.results)
+		fn.flush()
 		ret := &ast.ReturnStmt{}
-		ret.Results = append(ret.Results, fn.stack.last(n)...)
+		for _, e := range fn.stack.last(len(fn.typ.results)) {
+			ret.Results = append(ret.Results, e.expr)
+		}
 		return []ast.Stmt{ret}
 	}
 
@@ -47,25 +102,17 @@ func (fn *funcCompiler) branch(n uint64) []ast.Stmt {
 	blk := &fn.blocks[i]
 	if blk.loopPos == 0 {
 		// Breaking out of a block, set its results.
-		blk.setResults(fn)
-	} else if n := len(blk.params); n > 0 {
+		stmts = append(stmts, blk.resultStmts(fn)...)
+	} else {
 		// Breaking to the start of a loop, set its parameters.
-		stmt := &ast.AssignStmt{Tok: token.ASSIGN, Lhs: blk.params}
-		stmt.Rhs = append(stmt.Rhs, fn.stack.last(n)...)
-		fn.stack = fn.stack[:blk.stackPos+n]
-		fn.cond = nil
-		fn.emit(stmt)
-	}
-
-	if fn.blocks.top().unreachable {
-		return nil
+		stmts = append(stmts, blk.paramStmts(fn)...)
 	}
 
 	if blk.label == nil {
 		blk.label = fn.newLabel()
 	}
 
-	return []ast.Stmt{&ast.BranchStmt{Tok: token.GOTO, Label: blk.label}}
+	return append(stmts, &ast.BranchStmt{Tok: token.GOTO, Label: blk.label})
 }
 
 // Returns an expression that loads a byte from memory (an l-value).
@@ -172,8 +219,21 @@ func (fn *funcCompiler) storeUnsafe(addr, val ast.Expr, typ string) ast.Stmt {
 
 // Pushes expr (a literal, constant or materialized temporary) to the value stack.
 func (fn *funcCompiler) pushConst(expr ast.Expr) {
-	fn.stack.append(expr)
-	fn.cond = nil
+	fn.stack.append(stackEntry{expr: expr})
+}
+
+func (fn *funcCompiler) pushPure(expr ast.Expr) {
+	if fn.blocks.top().unreachable {
+		return
+	}
+	fn.stack.append(stackEntry{expr: expr, kind: entryExpr})
+}
+
+func (fn *funcCompiler) pushCond(cond ast.Expr) {
+	if fn.blocks.top().unreachable {
+		return
+	}
+	fn.stack.append(stackEntry{expr: cond, kind: entryCond})
 }
 
 // Pushes the materialization of expr to the value stack.
@@ -190,40 +250,16 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 	fn.pushConst(tmp)
 }
 
-// Pushes the integer materialization of cond the value stack.
-func (fn *funcCompiler) pushCond(cond ast.Expr) {
-	if fn.blocks.top().unreachable {
-		return
-	}
-
-	tmp := fn.newTempVar()
-	fn.emit(&ast.DeclStmt{
-		Decl: &ast.GenDecl{
-			Tok: token.VAR,
-			Specs: []ast.Spec{
-				&ast.ValueSpec{
-					Names: []*ast.Ident{tmp},
-					Type:  newID("int32")}}},
-	}, &ast.IfStmt{
-		Cond: cond,
-		Body: &ast.BlockStmt{
-			List: []ast.Stmt{
-				&ast.AssignStmt{
-					Tok: token.ASSIGN,
-					Lhs: []ast.Expr{tmp},
-					Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}}}}}})
-	fn.pushConst(tmp)
-	fn.cond = cond
-}
-
 // Pops a value from the value stack.
 func (fn *funcCompiler) pop() ast.Expr {
 	if fn.blocks.top().unreachable {
 		return &ast.BasicLit{Kind: token.INT, Value: "0"}
 	}
 
-	fn.cond = nil
-	return fn.stack.pop()
+	if fn.stack.top().kind == entryCond {
+		fn.flush()
+	}
+	return fn.stack.pop().expr
 }
 
 // Pops a condition from the value stack.
@@ -233,18 +269,14 @@ func (fn *funcCompiler) popCond() ast.Expr {
 		return newID("false")
 	}
 
-	expr := fn.stack.pop()
-	cond := fn.cond
-	fn.cond = nil
-	if cond == nil {
-		return &ast.BinaryExpr{
-			X: expr, Op: token.NEQ,
-			Y: &ast.BasicLit{Kind: token.INT, Value: "0"}}
+	entry := fn.stack.pop()
+	if entry.kind == entryCond {
+		return entry.expr
 	}
 
-	lst := &fn.blocks.top().body.List
-	*lst = (*lst)[:len(*lst)-2]
-	return cond
+	return &ast.BinaryExpr{
+		X: entry.expr, Op: token.NEQ,
+		Y: &ast.BasicLit{Kind: token.INT, Value: "0"}}
 }
 
 // Pops an address from the stack, adds an offset, and returns it as a uint32.
@@ -281,15 +313,21 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.
 func (fn *funcCompiler) convert(types ...string) {
-	fn.push(convert(fn.pop(), types...))
+	fn.pushPure(convert(fn.pop(), types...))
 }
 
 // Executes a binary operator.
 func (fn *funcCompiler) binOp(op token.Token) {
-	fn.push(&ast.BinaryExpr{
+	expr := &ast.BinaryExpr{
 		Y:  fn.pop(),
 		X:  fn.pop(),
-		Op: op})
+		Op: op}
+	switch op {
+	case token.QUO, token.REM:
+		fn.push(expr)
+	default:
+		fn.pushPure(expr)
+	}
 }
 
 // Executes a binary uint32 operator.
@@ -318,7 +356,7 @@ func (fn *funcCompiler) binOpU64(op token.Token) {
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF64(op token.Token) {
-	fn.push(convert(
+	fn.pushPure(convert(
 		&ast.BinaryExpr{
 			Y:  fn.pop(),
 			X:  fn.pop(),
@@ -330,7 +368,7 @@ func (fn *funcCompiler) binOpF64(op token.Token) {
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF32(op token.Token) {
-	fn.push(convert(
+	fn.pushPure(convert(
 		&ast.BinaryExpr{
 			Y:  fn.pop(),
 			X:  fn.pop(),
@@ -342,7 +380,7 @@ func (fn *funcCompiler) binOpF32(op token.Token) {
 func (fn *funcCompiler) bitOp(name string) {
 	bits := name[len(name)-2:]
 
-	fn.push(convert(
+	fn.pushPure(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("bits"),
@@ -353,7 +391,7 @@ func (fn *funcCompiler) bitOp(name string) {
 
 // Executes a unary float64 math call.
 func (fn *funcCompiler) uniMath64(name string) {
-	fn.push(&ast.CallExpr{
+	fn.pushPure(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID(name)},
@@ -364,7 +402,7 @@ func (fn *funcCompiler) uniMath64(name string) {
 func (fn *funcCompiler) binMath64(name string) {
 	y := fn.pop()
 	x := fn.pop()
-	fn.push(&ast.CallExpr{
+	fn.pushPure(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID(name)},
@@ -373,7 +411,7 @@ func (fn *funcCompiler) binMath64(name string) {
 
 // Executes a unary float32 math call.
 func (fn *funcCompiler) uniMath32(name string) {
-	fn.push(convert(
+	fn.pushPure(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
@@ -384,7 +422,7 @@ func (fn *funcCompiler) uniMath32(name string) {
 
 // Executes a Float32bits call.
 func (fn *funcCompiler) float32bits() {
-	fn.push(convert(
+	fn.pushPure(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
@@ -395,7 +433,7 @@ func (fn *funcCompiler) float32bits() {
 
 // Executes a Float64bits call.
 func (fn *funcCompiler) float64bits() {
-	fn.push(convert(
+	fn.pushPure(convert(
 		&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
@@ -406,7 +444,7 @@ func (fn *funcCompiler) float64bits() {
 
 // Executes a Float32frombits call.
 func (fn *funcCompiler) float32frombits() {
-	fn.push(&ast.CallExpr{
+	fn.pushPure(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID("Float32frombits")},
@@ -415,7 +453,7 @@ func (fn *funcCompiler) float32frombits() {
 
 // Executes a Float64frombits call.
 func (fn *funcCompiler) float64frombits() {
-	fn.push(&ast.CallExpr{
+	fn.pushPure(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID("Float64frombits")},
@@ -425,9 +463,14 @@ func (fn *funcCompiler) float64frombits() {
 // Executes a unary helper call.
 func (fn *funcCompiler) uniHelper(name string) {
 	fn.helpers.add(name)
-	fn.push(&ast.CallExpr{
+	call := &ast.CallExpr{
 		Fun:  newID(name),
-		Args: []ast.Expr{fn.pop()}})
+		Args: []ast.Expr{fn.pop()}}
+	if pureHelpers.has(name) {
+		fn.pushPure(call)
+	} else {
+		fn.push(call)
+	}
 }
 
 // Executes a binary helper call.
@@ -435,18 +478,28 @@ func (fn *funcCompiler) binHelper(name string) {
 	fn.helpers.add(name)
 	y := fn.pop()
 	x := fn.pop()
-	fn.push(&ast.CallExpr{
+	call := &ast.CallExpr{
 		Fun:  newID(name),
-		Args: []ast.Expr{x, y}})
+		Args: []ast.Expr{x, y}}
+	if pureHelpers.has(name) {
+		fn.pushPure(call)
+	} else {
+		fn.push(call)
+	}
 }
 
 // Executes a binary builtin call.
 func (fn *funcCompiler) binBuiltin(name string) {
 	y := fn.pop()
 	x := fn.pop()
-	fn.push(&ast.CallExpr{
+	call := &ast.CallExpr{
 		Fun:  newID(name),
-		Args: []ast.Expr{x, y}})
+		Args: []ast.Expr{x, y}}
+	if pureHelpers.has(name) {
+		fn.pushPure(call)
+	} else {
+		fn.push(call)
+	}
 }
 
 // Executes a zero equality comparison operator.
@@ -624,9 +677,10 @@ func (b *funcBlock) emit(stmts ...ast.Stmt) {
 	}
 }
 
-func (b *funcBlock) setResults(fn *funcCompiler) {
+// Returns statements to assign the stack values to the block results.
+func (b *funcBlock) resultStmts(fn *funcCompiler) []ast.Stmt {
 	if b.unreachable || len(b.results) == 0 {
-		return
+		return nil
 	}
 
 	// Don't pop results from the stack.
@@ -634,13 +688,32 @@ func (b *funcBlock) setResults(fn *funcCompiler) {
 	// the values are supposed to stay on the stack
 	// for the next instruction.
 
+	fn.flush()
 	stmt := &ast.AssignStmt{
 		Tok: token.ASSIGN,
 		Lhs: b.results,
 	}
-	stmt.Rhs = append(stmt.Rhs, fn.stack.last(len(b.results))...)
-	fn.cond = nil
-	fn.emit(stmt)
+	for _, e := range fn.stack.last(len(b.results)) {
+		stmt.Rhs = append(stmt.Rhs, e.expr)
+	}
+	return []ast.Stmt{stmt}
+}
+
+// Returns statements to assign the stack values to the loop parameters.
+func (b *funcBlock) paramStmts(fn *funcCompiler) []ast.Stmt {
+	if len(b.params) == 0 {
+		return nil
+	}
+
+	fn.flush()
+	stmt := &ast.AssignStmt{
+		Tok: token.ASSIGN,
+		Lhs: b.params,
+	}
+	for _, e := range fn.stack.last(len(b.params)) {
+		stmt.Rhs = append(stmt.Rhs, e.expr)
+	}
+	return []ast.Stmt{stmt}
 }
 
 // Constructs a type conversion, first to types[0], then to types[1] and so on.
