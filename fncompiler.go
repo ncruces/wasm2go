@@ -219,7 +219,7 @@ func (fn *funcCompiler) storeUnsafe(addr, val ast.Expr, typ string) ast.Stmt {
 
 // Pushes expr (a literal, constant or materialized temporary) to the value stack.
 func (fn *funcCompiler) pushConst(expr ast.Expr) {
-	fn.stack.append(stackEntry{expr: expr})
+	fn.stack.append(stackEntry{expr: expr, kind: entryConst})
 }
 
 // Pushes a pure expression (no observable side effects, including traps) to the value stack.
