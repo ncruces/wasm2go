@@ -1302,7 +1302,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{fn.pop()},
 				Tok: token.ASSIGN})
-			fn.pushPure(localVar(i))
+			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
 
 		case 0x23: // global.get
 			e, err := t.globalGet()
