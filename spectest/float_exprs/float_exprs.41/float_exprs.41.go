@@ -12,100 +12,68 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_i32_no_fold_trunc_s_convert_s(v0 float32) float32 {
-	t0 := v0
-	t1 := i32_trunc_f32_s(t0)
-	t2 := float32(t1)
-	return t2
+	t0 := i32_trunc_f32_s(v0)
+	return float32(t0)
 }
 func (m *Module) Xf32_i32_no_fold_trunc_u_convert_s(v0 float32) float32 {
-	t0 := v0
-	t1 := i32_trunc_f32_u(t0)
-	t2 := float32(t1)
-	return t2
+	t0 := i32_trunc_f32_u(v0)
+	return float32(t0)
 }
 func (m *Module) Xf32_i32_no_fold_trunc_s_convert_u(v0 float32) float32 {
-	t0 := v0
-	t1 := i32_trunc_f32_s(t0)
-	t2 := float32(uint32(t1))
-	return t2
+	t0 := i32_trunc_f32_s(v0)
+	return float32(uint32(t0))
 }
 func (m *Module) Xf32_i32_no_fold_trunc_u_convert_u(v0 float32) float32 {
-	t0 := v0
-	t1 := i32_trunc_f32_u(t0)
-	t2 := float32(uint32(t1))
-	return t2
+	t0 := i32_trunc_f32_u(v0)
+	return float32(uint32(t0))
 }
 func (m *Module) Xf64_i32_no_fold_trunc_s_convert_s(v0 float64) float64 {
-	t0 := v0
-	t1 := i32_trunc_f64_s(t0)
-	t2 := float64(t1)
-	return t2
+	t0 := i32_trunc_f64_s(v0)
+	return float64(t0)
 }
 func (m *Module) Xf64_i32_no_fold_trunc_u_convert_s(v0 float64) float64 {
-	t0 := v0
-	t1 := i32_trunc_f64_u(t0)
-	t2 := float64(t1)
-	return t2
+	t0 := i32_trunc_f64_u(v0)
+	return float64(t0)
 }
 func (m *Module) Xf64_i32_no_fold_trunc_s_convert_u(v0 float64) float64 {
-	t0 := v0
-	t1 := i32_trunc_f64_s(t0)
-	t2 := float64(uint32(t1))
-	return t2
+	t0 := i32_trunc_f64_s(v0)
+	return float64(uint32(t0))
 }
 func (m *Module) Xf64_i32_no_fold_trunc_u_convert_u(v0 float64) float64 {
-	t0 := v0
-	t1 := i32_trunc_f64_u(t0)
-	t2 := float64(uint32(t1))
-	return t2
+	t0 := i32_trunc_f64_u(v0)
+	return float64(uint32(t0))
 }
 func (m *Module) Xf32_i64_no_fold_trunc_s_convert_s(v0 float32) float32 {
-	t0 := v0
-	t1 := i64_trunc_f32_s(t0)
-	t2 := float32(t1)
-	return t2
+	t0 := i64_trunc_f32_s(v0)
+	return float32(t0)
 }
 func (m *Module) Xf32_i64_no_fold_trunc_u_convert_s(v0 float32) float32 {
-	t0 := v0
-	t1 := i64_trunc_f32_u(t0)
-	t2 := float32(t1)
-	return t2
+	t0 := i64_trunc_f32_u(v0)
+	return float32(t0)
 }
 func (m *Module) Xf32_i64_no_fold_trunc_s_convert_u(v0 float32) float32 {
-	t0 := v0
-	t1 := i64_trunc_f32_s(t0)
-	t2 := float32(uint64(t1))
-	return t2
+	t0 := i64_trunc_f32_s(v0)
+	return float32(uint64(t0))
 }
 func (m *Module) Xf32_i64_no_fold_trunc_u_convert_u(v0 float32) float32 {
-	t0 := v0
-	t1 := i64_trunc_f32_u(t0)
-	t2 := float32(uint64(t1))
-	return t2
+	t0 := i64_trunc_f32_u(v0)
+	return float32(uint64(t0))
 }
 func (m *Module) Xf64_i64_no_fold_trunc_s_convert_s(v0 float64) float64 {
-	t0 := v0
-	t1 := i64_trunc_f64_s(t0)
-	t2 := float64(t1)
-	return t2
+	t0 := i64_trunc_f64_s(v0)
+	return float64(t0)
 }
 func (m *Module) Xf64_i64_no_fold_trunc_u_convert_s(v0 float64) float64 {
-	t0 := v0
-	t1 := i64_trunc_f64_u(t0)
-	t2 := float64(t1)
-	return t2
+	t0 := i64_trunc_f64_u(v0)
+	return float64(t0)
 }
 func (m *Module) Xf64_i64_no_fold_trunc_s_convert_u(v0 float64) float64 {
-	t0 := v0
-	t1 := i64_trunc_f64_s(t0)
-	t2 := float64(uint64(t1))
-	return t2
+	t0 := i64_trunc_f64_s(v0)
+	return float64(uint64(t0))
 }
 func (m *Module) Xf64_i64_no_fold_trunc_u_convert_u(v0 float64) float64 {
-	t0 := v0
-	t1 := i64_trunc_f64_u(t0)
-	t2 := float64(uint64(t1))
-	return t2
+	t0 := i64_trunc_f64_u(v0)
+	return float64(uint64(t0))
 }
 
 func i32_trunc_f64_s(f float64) int32 {

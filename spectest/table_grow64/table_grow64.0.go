@@ -11,20 +11,15 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xget_t64(v0 int64) any {
-	t0 := v0
-	t1 := m.t0[t0]
-	return t1
+	t0 := m.t0[v0]
+	return t0
 }
 func (m *Module) Xset_t64(v0 int64, v1 any) {
-	t0 := v0
-	t1 := v1
-	m.t0[t0] = t1
+	m.t0[v0] = v1
 }
 func (m *Module) Xgrow_t64(v0 int64, v1 any) int64 {
-	t0 := v1
-	t1 := v0
-	t2 := table_grow(&m.t0, t0, t1, 281474976710656)
-	return t2
+	t0 := table_grow(&m.t0, v1, v0, 281474976710656)
+	return t0
 }
 func (m *Module) Xsize_t64() int64 {
 	t0 := int64(len(m.t0))

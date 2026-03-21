@@ -11,26 +11,19 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xget(v0 int32) any {
-	t0 := v0
-	t1 := m.t0[t0]
-	return t1
+	t0 := m.t0[v0]
+	return t0
 }
 func (m *Module) Xset(v0 int32, v1 any) {
-	t0 := v0
-	t1 := v1
-	m.t0[t0] = t1
+	m.t0[v0] = v1
 }
 func (m *Module) Xgrow(v0 int32, v1 any) int32 {
-	t0 := v1
-	t1 := v0
-	t2 := table_grow(&m.t0, t0, t1, 65536)
-	return t2
+	t0 := table_grow(&m.t0, v1, v0, 65536)
+	return t0
 }
 func (m *Module) Xgrow_abbrev(v0 int32, v1 any) int32 {
-	t0 := v1
-	t1 := v0
-	t2 := table_grow(&m.t0, t0, t1, 65536)
-	return t2
+	t0 := table_grow(&m.t0, v1, v0, 65536)
+	return t0
 }
 func (m *Module) Xsize() int32 {
 	t0 := int32(len(m.t0))

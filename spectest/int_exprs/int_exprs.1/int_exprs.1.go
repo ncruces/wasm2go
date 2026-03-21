@@ -10,8 +10,5 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi64_no_fold_wrap_extend_s(v0 int64) int64 {
-	t0 := v0
-	t1 := int32(t0)
-	t2 := int64(t1)
-	return t2
+	return int64(int32(v0))
 }

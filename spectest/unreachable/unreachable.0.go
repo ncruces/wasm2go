@@ -199,36 +199,32 @@ func (m *Module) Xas_if_cond() int32 {
 	panic("unreachable")
 }
 func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
-	t0 := v0
-	var p1 int32
-	_ = p1
-	if t0 != 0 {
+	var p0 int32
+	_ = p0
+	if v0 != 0 {
 		panic("unreachable")
 	} else {
-		t2 := v1
-		p1 = t2
+		t1 := v1
+		p0 = t1
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
-	t0 := v0
-	var p1 int32
-	_ = p1
-	if t0 != 0 {
-		t2 := v1
-		p1 = t2
+	var p0 int32
+	_ = p0
+	if v0 != 0 {
+		t1 := v1
+		p0 = t1
 	} else {
 		panic("unreachable")
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xas_if_then_no_else(v0 int32, v1 int32) int32 {
-	t0 := v0
-	if t0 != 0 {
+	if v0 != 0 {
 		panic("unreachable")
 	}
-	t1 := v1
-	return t1
+	return v1
 }
 func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
 	panic("unreachable")

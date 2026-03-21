@@ -12,28 +12,20 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_no_fold_div_s_self(v0 int32) int32 {
-	t0 := v0
-	t1 := v0
-	t2 := i32_div_s(t0, t1)
-	return t2
+	t0 := i32_div_s(v0, v0)
+	return t0
 }
 func (m *Module) Xi32_no_fold_div_u_self(v0 int32) int32 {
-	t0 := v0
-	t1 := v0
-	t2 := int32(uint32(t0) / uint32(t1))
-	return t2
+	t0 := int32(uint32(v0) / uint32(v0))
+	return t0
 }
 func (m *Module) Xi64_no_fold_div_s_self(v0 int64) int64 {
-	t0 := v0
-	t1 := v0
-	t2 := i64_div_s(t0, t1)
-	return t2
+	t0 := i64_div_s(v0, v0)
+	return t0
 }
 func (m *Module) Xi64_no_fold_div_u_self(v0 int64) int64 {
-	t0 := v0
-	t1 := v0
-	t2 := int64(uint64(t0) / uint64(t1))
-	return t2
+	t0 := int64(uint64(v0) / uint64(v0))
+	return t0
 }
 
 //go:nosplit

@@ -12,65 +12,37 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xadd(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 + t1)
-	return t2
+	return float64(v0 + v1)
 }
 func (m *Module) Xsub(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 - t1)
-	return t2
+	return float64(v0 - v1)
 }
 func (m *Module) Xmul(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	return t2
+	return float64(v0 * v1)
 }
 func (m *Module) Xdiv(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 / t1)
-	return t2
+	return float64(v0 / v1)
 }
 func (m *Module) Xsqrt(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Sqrt(t0)
-	return t1
+	return math.Sqrt(v0)
 }
 func (m *Module) Xmin(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := f64_min(t0, t1)
-	return t2
+	return f64_min(v0, v1)
 }
 func (m *Module) Xmax(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := f64_max(t0, t1)
-	return t2
+	return f64_max(v0, v1)
 }
 func (m *Module) Xceil(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Ceil(t0)
-	return t1
+	return math.Ceil(v0)
 }
 func (m *Module) Xfloor(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Floor(t0)
-	return t1
+	return math.Floor(v0)
 }
 func (m *Module) Xtrunc(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Trunc(t0)
-	return t1
+	return math.Trunc(v0)
 }
 func (m *Module) Xnearest(v0 float64) float64 {
-	t0 := v0
-	t1 := math.RoundToEven(t0)
-	return t1
+	return math.RoundToEven(v0)
 }
 
 //go:nosplit

@@ -34,29 +34,23 @@ func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xwasm_grow(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
-	return t1
+	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
+	return t0
 }
 func (m *Module) Xwasm_size() int32 {
 	t0 := int32(len(m.memory) >> 16)
 	return t0
 }
 func (m *Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	memory_fill(m.memory, uint32(t0), t1, uint32(t2))
+	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(t0):]))
-	return t1
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
+	return t0
 }
 func (m *Module) Xread_as_i8u(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(m.memory[uint32(t0)])
-	return t1
+	t0 := int32(m.memory[uint32(v0)])
+	return t0
 }
 func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)

@@ -27,8 +27,7 @@ func (m *Module) Xf32_align_switch(v0 int32) float32 {
 			{
 				{
 					{
-						t0 := v0
-						switch t0 {
+						switch v0 {
 						case 0:
 							goto l0
 						case 1:
@@ -42,35 +41,30 @@ func (m *Module) Xf32_align_switch(v0 int32) float32 {
 						}
 					}
 				l0:
-					t1 := v1
-					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t1))
-					t2 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-					v2 = t2
+					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(v1))
+					t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+					v2 = t0
 					goto l4
 				}
 			l1:
-				t3 := v1
-				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t3))
-				t4 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-				v2 = t4
+				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(v1))
+				t1 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+				v2 = t1
 				goto l4
 			}
 		l2:
-			t5 := v1
-			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t5))
-			t6 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-			v2 = t6
+			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(v1))
+			t2 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+			v2 = t2
 			goto l4
 		}
 	l3:
-		t7 := v1
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(t7))
-		t8 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-		v2 = t8
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(v1))
+		t3 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+		v2 = t3
 	}
 l4:
-	t9 := v2
-	return t9
+	return v2
 }
 func (m *Module) Xf64_align_switch(v0 int32) float64 {
 	var v1, v2 float64
@@ -82,8 +76,7 @@ func (m *Module) Xf64_align_switch(v0 int32) float64 {
 				{
 					{
 						{
-							t0 := v0
-							switch t0 {
+							switch v0 {
 							case 0:
 								goto l0
 							case 1:
@@ -99,42 +92,36 @@ func (m *Module) Xf64_align_switch(v0 int32) float64 {
 							}
 						}
 					l0:
-						t1 := v1
-						binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t1))
-						t2 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-						v2 = t2
+						binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(v1))
+						t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+						v2 = t0
 						goto l5
 					}
 				l1:
-					t3 := v1
-					binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t3))
-					t4 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-					v2 = t4
+					binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(v1))
+					t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+					v2 = t1
 					goto l5
 				}
 			l2:
-				t5 := v1
-				binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t5))
-				t6 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-				v2 = t6
+				binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(v1))
+				t2 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+				v2 = t2
 				goto l5
 			}
 		l3:
-			t7 := v1
-			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t7))
-			t8 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-			v2 = t8
+			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(v1))
+			t3 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+			v2 = t3
 			goto l5
 		}
 	l4:
-		t9 := v1
-		binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(t9))
-		t10 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-		v2 = t10
+		binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], math.Float64bits(v1))
+		t4 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+		v2 = t4
 	}
 l5:
-	t11 := v2
-	return t11
+	return v2
 }
 func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 	var v2, v3 int32
@@ -146,8 +133,7 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 				{
 					{
 						{
-							t0 := v0
-							switch t0 {
+							switch v0 {
 							case 0:
 								goto l0
 							case 1:
@@ -163,120 +149,91 @@ func (m *Module) Xi32_align_switch(v0 int32, v1 int32) int32 {
 							}
 						}
 					l0:
-						t1 := v1
-						if t1 == i32_const(0) {
-							t3 := v2
-							m.memory[uint32(i32_const(0))] = byte(t3)
-							t4 := int32(int8(m.memory[uint32(i32_const(0))]))
-							v3 = t4
+						if v1 == i32_const(0) {
+							m.memory[uint32(i32_const(0))] = byte(v2)
+							t0 := int32(int8(m.memory[uint32(i32_const(0))]))
+							v3 = t0
 						}
-						t5 := v1
-						if t5 == int32(1) {
-							t7 := v2
-							m.memory[uint32(i32_const(0))] = byte(t7)
-							t8 := int32(int8(m.memory[uint32(i32_const(0))]))
-							v3 = t8
+						if v1 == int32(1) {
+							m.memory[uint32(i32_const(0))] = byte(v2)
+							t1 := int32(int8(m.memory[uint32(i32_const(0))]))
+							v3 = t1
 						}
 						goto l5
 					}
 				l1:
-					t9 := v1
-					if t9 == i32_const(0) {
-						t11 := v2
-						m.memory[uint32(i32_const(0))] = byte(t11)
-						t12 := int32(m.memory[uint32(i32_const(0))])
-						v3 = t12
+					if v1 == i32_const(0) {
+						m.memory[uint32(i32_const(0))] = byte(v2)
+						t2 := int32(m.memory[uint32(i32_const(0))])
+						v3 = t2
 					}
-					t13 := v1
-					if t13 == int32(1) {
-						t15 := v2
-						m.memory[uint32(i32_const(0))] = byte(t15)
-						t16 := int32(m.memory[uint32(i32_const(0))])
-						v3 = t16
+					if v1 == int32(1) {
+						m.memory[uint32(i32_const(0))] = byte(v2)
+						t3 := int32(m.memory[uint32(i32_const(0))])
+						v3 = t3
 					}
 					goto l5
 				}
 			l2:
-				t17 := v1
-				if t17 == i32_const(0) {
-					t19 := v2
-					binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t19))
-					t20 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
-					v3 = t20
+				if v1 == i32_const(0) {
+					binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+					t4 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
+					v3 = t4
 				}
-				t21 := v1
-				if t21 == int32(1) {
-					t23 := v2
-					binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t23))
-					t24 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
-					v3 = t24
+				if v1 == int32(1) {
+					binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+					t5 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
+					v3 = t5
 				}
-				t25 := v1
-				if t25 == int32(2) {
-					t27 := v2
-					binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t27))
-					t28 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
-					v3 = t28
+				if v1 == int32(2) {
+					binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+					t6 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
+					v3 = t6
 				}
 				goto l5
 			}
 		l3:
-			t29 := v1
-			if t29 == i32_const(0) {
-				t31 := v2
-				binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t31))
-				t32 := int32(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
-				v3 = t32
+			if v1 == i32_const(0) {
+				binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+				t7 := int32(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
+				v3 = t7
 			}
-			t33 := v1
-			if t33 == int32(1) {
-				t35 := v2
-				binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t35))
-				t36 := int32(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
-				v3 = t36
+			if v1 == int32(1) {
+				binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+				t8 := int32(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
+				v3 = t8
 			}
-			t37 := v1
-			if t37 == int32(2) {
-				t39 := v2
-				binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t39))
-				t40 := int32(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
-				v3 = t40
+			if v1 == int32(2) {
+				binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+				t9 := int32(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
+				v3 = t9
 			}
 			goto l5
 		}
 	l4:
-		t41 := v1
-		if t41 == i32_const(0) {
-			t43 := v2
-			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t43))
-			t44 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-			v3 = t44
+		if v1 == i32_const(0) {
+			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+			t10 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+			v3 = t10
 		}
-		t45 := v1
-		if t45 == int32(1) {
-			t47 := v2
-			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t47))
-			t48 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-			v3 = t48
+		if v1 == int32(1) {
+			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+			t11 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+			v3 = t11
 		}
-		t49 := v1
-		if t49 == int32(2) {
-			t51 := v2
-			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t51))
-			t52 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-			v3 = t52
+		if v1 == int32(2) {
+			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+			t12 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+			v3 = t12
 		}
-		t53 := v1
-		if t53 == int32(4) {
-			t55 := v2
-			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t55))
-			t56 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-			v3 = t56
+		if v1 == int32(4) {
+			binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+			t13 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+			v3 = t13
 		}
 	}
 l5:
-	t57 := v3
-	return t57
+	return v3
 }
 func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 	var v2, v3 int64
@@ -290,8 +247,7 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 						{
 							{
 								{
-									t0 := v0
-									switch t0 {
+									switch v0 {
 									case 0:
 										goto l0
 									case 1:
@@ -311,189 +267,142 @@ func (m *Module) Xi64_align_switch(v0 int32, v1 int32) int64 {
 									}
 								}
 							l0:
-								t1 := v1
-								if t1 == i32_const(0) {
-									t3 := v2
-									m.memory[uint32(i32_const(0))] = byte(t3)
-									t4 := int64(int8(m.memory[uint32(i32_const(0))]))
-									v3 = t4
+								if v1 == i32_const(0) {
+									m.memory[uint32(i32_const(0))] = byte(v2)
+									t0 := int64(int8(m.memory[uint32(i32_const(0))]))
+									v3 = t0
 								}
-								t5 := v1
-								if t5 == int32(1) {
-									t7 := v2
-									m.memory[uint32(i32_const(0))] = byte(t7)
-									t8 := int64(int8(m.memory[uint32(i32_const(0))]))
-									v3 = t8
+								if v1 == int32(1) {
+									m.memory[uint32(i32_const(0))] = byte(v2)
+									t1 := int64(int8(m.memory[uint32(i32_const(0))]))
+									v3 = t1
 								}
 								goto l7
 							}
 						l1:
-							t9 := v1
-							if t9 == i32_const(0) {
-								t11 := v2
-								m.memory[uint32(i32_const(0))] = byte(t11)
-								t12 := int64(m.memory[uint32(i32_const(0))])
-								v3 = t12
+							if v1 == i32_const(0) {
+								m.memory[uint32(i32_const(0))] = byte(v2)
+								t2 := int64(m.memory[uint32(i32_const(0))])
+								v3 = t2
 							}
-							t13 := v1
-							if t13 == int32(1) {
-								t15 := v2
-								m.memory[uint32(i32_const(0))] = byte(t15)
-								t16 := int64(m.memory[uint32(i32_const(0))])
-								v3 = t16
+							if v1 == int32(1) {
+								m.memory[uint32(i32_const(0))] = byte(v2)
+								t3 := int64(m.memory[uint32(i32_const(0))])
+								v3 = t3
 							}
 							goto l7
 						}
 					l2:
-						t17 := v1
-						if t17 == i32_const(0) {
-							t19 := v2
-							binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t19))
-							t20 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
-							v3 = t20
+						if v1 == i32_const(0) {
+							binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+							t4 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
+							v3 = t4
 						}
-						t21 := v1
-						if t21 == int32(1) {
-							t23 := v2
-							binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t23))
-							t24 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
-							v3 = t24
+						if v1 == int32(1) {
+							binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+							t5 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
+							v3 = t5
 						}
-						t25 := v1
-						if t25 == int32(2) {
-							t27 := v2
-							binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t27))
-							t28 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
-							v3 = t28
+						if v1 == int32(2) {
+							binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+							t6 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):])))
+							v3 = t6
 						}
 						goto l7
 					}
 				l3:
-					t29 := v1
-					if t29 == i32_const(0) {
-						t31 := v2
-						binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t31))
-						t32 := int64(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
-						v3 = t32
+					if v1 == i32_const(0) {
+						binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+						t7 := int64(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
+						v3 = t7
 					}
-					t33 := v1
-					if t33 == int32(1) {
-						t35 := v2
-						binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t35))
-						t36 := int64(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
-						v3 = t36
+					if v1 == int32(1) {
+						binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+						t8 := int64(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
+						v3 = t8
 					}
-					t37 := v1
-					if t37 == int32(2) {
-						t39 := v2
-						binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(t39))
-						t40 := int64(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
-						v3 = t40
+					if v1 == int32(2) {
+						binary.LittleEndian.PutUint16(m.memory[uint32(i32_const(0)):], uint16(v2))
+						t9 := int64(binary.LittleEndian.Uint16(m.memory[uint32(i32_const(0)):]))
+						v3 = t9
 					}
 					goto l7
 				}
 			l4:
-				t41 := v1
-				if t41 == i32_const(0) {
-					t43 := v2
-					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t43))
-					t44 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
-					v3 = t44
+				if v1 == i32_const(0) {
+					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+					t10 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
+					v3 = t10
 				}
-				t45 := v1
-				if t45 == int32(1) {
-					t47 := v2
-					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t47))
-					t48 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
-					v3 = t48
+				if v1 == int32(1) {
+					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+					t11 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
+					v3 = t11
 				}
-				t49 := v1
-				if t49 == int32(2) {
-					t51 := v2
-					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t51))
-					t52 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
-					v3 = t52
+				if v1 == int32(2) {
+					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+					t12 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
+					v3 = t12
 				}
-				t53 := v1
-				if t53 == int32(4) {
-					t55 := v2
-					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t55))
-					t56 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
-					v3 = t56
+				if v1 == int32(4) {
+					binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+					t13 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):])))
+					v3 = t13
 				}
 				goto l7
 			}
 		l5:
-			t57 := v1
-			if t57 == i32_const(0) {
-				t59 := v2
-				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t59))
-				t60 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-				v3 = t60
+			if v1 == i32_const(0) {
+				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+				t14 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+				v3 = t14
 			}
-			t61 := v1
-			if t61 == int32(1) {
-				t63 := v2
-				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t63))
-				t64 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-				v3 = t64
+			if v1 == int32(1) {
+				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+				t15 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+				v3 = t15
 			}
-			t65 := v1
-			if t65 == int32(2) {
-				t67 := v2
-				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t67))
-				t68 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-				v3 = t68
+			if v1 == int32(2) {
+				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+				t16 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+				v3 = t16
 			}
-			t69 := v1
-			if t69 == int32(4) {
-				t71 := v2
-				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t71))
-				t72 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
-				v3 = t72
+			if v1 == int32(4) {
+				binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(v2))
+				t17 := int64(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+				v3 = t17
 			}
 			goto l7
 		}
 	l6:
-		t73 := v1
-		if t73 == i32_const(0) {
-			t75 := v2
-			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(t75))
-			t76 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-			v3 = t76
+		if v1 == i32_const(0) {
+			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(v2))
+			t18 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+			v3 = t18
 		}
-		t77 := v1
-		if t77 == int32(1) {
-			t79 := v2
-			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(t79))
-			t80 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-			v3 = t80
+		if v1 == int32(1) {
+			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(v2))
+			t19 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+			v3 = t19
 		}
-		t81 := v1
-		if t81 == int32(2) {
-			t83 := v2
-			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(t83))
-			t84 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-			v3 = t84
+		if v1 == int32(2) {
+			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(v2))
+			t20 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+			v3 = t20
 		}
-		t85 := v1
-		if t85 == int32(4) {
-			t87 := v2
-			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(t87))
-			t88 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-			v3 = t88
+		if v1 == int32(4) {
+			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(v2))
+			t21 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+			v3 = t21
 		}
-		t89 := v1
-		if t89 == int32(8) {
-			t91 := v2
-			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(t91))
-			t92 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
-			v3 = t92
+		if v1 == int32(8) {
+			binary.LittleEndian.PutUint64(m.memory[uint32(i32_const(0)):], uint64(v2))
+			t22 := int64(binary.LittleEndian.Uint64(m.memory[uint32(i32_const(0)):]))
+			v3 = t22
 		}
 	}
 l7:
-	t93 := v3
-	return t93
+	return v3
 }
 
 //go:nosplit

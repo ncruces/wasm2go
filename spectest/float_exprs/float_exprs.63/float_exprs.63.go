@@ -25,34 +25,20 @@ func (m *Module) Xf32_kahan_sum(v0 int32, v1 int32) float32 {
 	{
 	l0:
 		{
-			t0 := v3
-			t1 := v0
-			t2 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t1):]))
-			t3 := v4
-			t4 := float32(t2 - t3)
-			v4 = t4
-			t5 := float32(t0 + t4)
-			v2 = t5
-			t6 := v3
-			t7 := float32(t5 - t6)
-			t8 := v4
-			t9 := float32(t7 - t8)
-			v4 = t9
-			t10 := v0
-			t11 := t10 + int32(4)
-			v0 = t11
-			t12 := v2
-			v3 = t12
-			t13 := v1
-			t14 := t13 + i32_const(-1)
-			v1 = t14
-			if t14 != 0 {
+			t1 := v3
+			t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
+			v4 = float32(t0 - v4)
+			v2 = float32(t1 + v4)
+			v4 = float32(float32(v2-v3) - v4)
+			v0 = v0 + int32(4)
+			v3 = v2
+			v1 = v1 + i32_const(-1)
+			if v1 != 0 {
 				goto l0
 			}
 		}
 	}
-	t15 := v2
-	return t15
+	return v2
 }
 func (m *Module) Xf32_plain_sum(v0 int32, v1 int32) float32 {
 	var v2 float32
@@ -60,25 +46,17 @@ func (m *Module) Xf32_plain_sum(v0 int32, v1 int32) float32 {
 	{
 	l0:
 		{
-			t0 := v2
-			t1 := v0
-			t2 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t1):]))
-			t3 := float32(t0 + t2)
-			v2 = t3
-			t4 := v0
-			t5 := t4 + int32(4)
-			v0 = t5
-			t6 := v1
-			t7 := t6 + i32_const(-1)
-			v1 = t7
-			t8 := v1
-			if t8 != 0 {
+			t1 := v2
+			t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
+			v2 = float32(t1 + t0)
+			v0 = v0 + int32(4)
+			v1 = v1 + i32_const(-1)
+			if v1 != 0 {
 				goto l0
 			}
 		}
 	}
-	t9 := v2
-	return t9
+	return v2
 }
 
 //go:nosplit

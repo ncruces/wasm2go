@@ -20,15 +20,13 @@ func (m *Module) Xdrop_passive() {
 	m.elements[0] = nil
 }
 func (m *Module) Xinit_passive(v0 int32) {
-	t0 := v0
-	table_init(m.t0, m.elements[0], i32_const(0), i32_const(0), t0)
+	table_init(m.t0, m.elements[0], i32_const(0), i32_const(0), v0)
 }
 func (m *Module) Xdrop_active() {
 	m.elements[1] = nil
 }
 func (m *Module) Xinit_active(v0 int32) {
-	t0 := v0
-	table_init(m.t0, m.elements[1], i32_const(0), i32_const(0), t0)
+	table_init(m.t0, m.elements[1], i32_const(0), i32_const(0), v0)
 }
 
 //go:nosplit

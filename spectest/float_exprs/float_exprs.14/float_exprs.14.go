@@ -10,14 +10,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_sub_self(v0 float32) float32 {
-	t0 := v0
-	t1 := v0
-	t2 := float32(t0 - t1)
-	return t2
+	return float32(v0 - v0)
 }
 func (m *Module) Xf64_no_fold_sub_self(v0 float64) float64 {
-	t0 := v0
-	t1 := v0
-	t2 := float64(t0 - t1)
-	return t2
+	return float64(v0 - v0)
 }

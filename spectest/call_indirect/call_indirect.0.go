@@ -42,62 +42,46 @@ func (m *Module) f4() (float64, int32) {
 	return float64(3940), int32(32)
 }
 func (m *Module) f5(v0 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f6(v0 int64) int64 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f7(v0 float32) float32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f8(v0 float64) float64 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f9(v0 int32, v1 float64) (int32, float64) {
-	t0 := v0
-	t1 := v1
-	return t0, t1
+	return v0, v1
 }
 func (m *Module) f10(v0 int32, v1 int64) (int64, int32) {
-	t0 := v1
-	t1 := v0
-	return t0, t1
+	return v1, v0
 }
 func (m *Module) f11(v0 int32, v1 int64) int64 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) f12(v0 int64, v1 float64) float64 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) f13(v0 float32, v1 int32) int32 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) f14(v0 float64, v1 float32) float32 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) f15(v0 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f16(v0 int64) int64 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f17(v0 float32) float32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f18(v0 float64) float64 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) f19() {
 	m.t0[uint(i32_const(0))].(func())()
@@ -204,194 +188,150 @@ func (m *Module) Xtype_all_i32_i64() (int64, int32) {
 	return t0, t1
 }
 func (m *Module) Xdispatch(v0 int32, v1 int64) int64 {
-	t0 := v1
-	t1 := v0
-	t2 := m.t0[uint(t1)].(func(v0 int64) int64)(t0)
-	return t2
+	t0 := m.t0[uint(v0)].(func(v0 int64) int64)(v1)
+	return t0
 }
 func (m *Module) Xdispatch_structural_i64(v0 int32) int64 {
-	t0 := v0
-	t1 := m.t0[uint(t0)].(func(v0 int64) int64)(int64(9))
-	return t1
+	t0 := m.t0[uint(v0)].(func(v0 int64) int64)(int64(9))
+	return t0
 }
 func (m *Module) Xdispatch_structural_i32(v0 int32) int32 {
-	t0 := v0
-	t1 := m.t0[uint(t0)].(func(v0 int32) int32)(int32(9))
-	return t1
+	t0 := m.t0[uint(v0)].(func(v0 int32) int32)(int32(9))
+	return t0
 }
 func (m *Module) Xdispatch_structural_f32(v0 int32) float32 {
-	t0 := v0
-	t1 := m.t0[uint(t0)].(func(v0 float32) float32)(float32(9))
-	return t1
+	t0 := m.t0[uint(v0)].(func(v0 float32) float32)(float32(9))
+	return t0
 }
 func (m *Module) Xdispatch_structural_f64(v0 int32) float64 {
-	t0 := v0
-	t1 := m.t0[uint(t0)].(func(v0 float64) float64)(float64(9))
-	return t1
+	t0 := m.t0[uint(v0)].(func(v0 float64) float64)(float64(9))
+	return t0
 }
 func (m *Module) Xfac_i64(v0 int64) int64 {
-	t0 := v0
-	var p2 int64
-	_ = p2
-	if t0 == 0 {
-		p2 = int64(1)
+	var p0 int64
+	_ = p0
+	if v0 == 0 {
+		p0 = int64(1)
 	} else {
-		t3 := v0
-		t4 := v0
-		t5 := t4 - int64(1)
-		t6 := m.t0[uint(int32(12))].(func(v0 int64) int64)(t5)
-		t7 := t3 * t6
-		p2 = t7
+		t2 := v0
+		t1 := m.t0[uint(int32(12))].(func(v0 int64) int64)(v0 - int64(1))
+		t3 := t2 * t1
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfib_i64(v0 int64) int64 {
-	t0 := v0
-	var p2 int64
-	_ = p2
-	if uint64(t0) <= uint64(int64(1)) {
-		p2 = int64(1)
+	var p0 int64
+	_ = p0
+	if uint64(v0) <= uint64(int64(1)) {
+		p0 = int64(1)
 	} else {
-		t3 := v0
-		t4 := t3 - int64(2)
-		t5 := m.t0[uint(int32(13))].(func(v0 int64) int64)(t4)
-		t6 := v0
-		t7 := t6 - int64(1)
-		t8 := m.t0[uint(int32(13))].(func(v0 int64) int64)(t7)
-		t9 := t5 + t8
-		p2 = t9
+		t1 := m.t0[uint(int32(13))].(func(v0 int64) int64)(v0 - int64(2))
+		t2 := m.t0[uint(int32(13))].(func(v0 int64) int64)(v0 - int64(1))
+		t3 := t1 + t2
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfac_i32(v0 int32) int32 {
-	t0 := v0
-	var p2 int32
-	_ = p2
-	if t0 == 0 {
-		p2 = int32(1)
+	var p0 int32
+	_ = p0
+	if v0 == 0 {
+		p0 = int32(1)
 	} else {
-		t3 := v0
-		t4 := v0
-		t5 := t4 - int32(1)
-		t6 := m.t0[uint(int32(23))].(func(v0 int32) int32)(t5)
-		t7 := t3 * t6
-		p2 = t7
+		t2 := v0
+		t1 := m.t0[uint(int32(23))].(func(v0 int32) int32)(v0 - int32(1))
+		t3 := t2 * t1
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfac_f32(v0 float32) float32 {
-	t0 := v0
-	var p2 float32
-	_ = p2
-	if t0 == f32_const(0) {
-		p2 = f32_const(1)
+	var p0 float32
+	_ = p0
+	if v0 == f32_const(0) {
+		p0 = f32_const(1)
 	} else {
-		t3 := v0
-		t4 := v0
-		t5 := float32(t4 - f32_const(1))
-		t6 := m.t0[uint(int32(24))].(func(v0 float32) float32)(t5)
-		t7 := float32(t3 * t6)
-		p2 = t7
+		t2 := v0
+		t1 := m.t0[uint(int32(24))].(func(v0 float32) float32)(float32(v0 - f32_const(1)))
+		t3 := float32(t2 * t1)
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfac_f64(v0 float64) float64 {
-	t0 := v0
-	var p2 float64
-	_ = p2
-	if t0 == f64_const(0) {
-		p2 = f64_const(1)
+	var p0 float64
+	_ = p0
+	if v0 == f64_const(0) {
+		p0 = f64_const(1)
 	} else {
-		t3 := v0
-		t4 := v0
-		t5 := float64(t4 - f64_const(1))
-		t6 := m.t0[uint(int32(25))].(func(v0 float64) float64)(t5)
-		t7 := float64(t3 * t6)
-		p2 = t7
+		t2 := v0
+		t1 := m.t0[uint(int32(25))].(func(v0 float64) float64)(float64(v0 - f64_const(1)))
+		t3 := float64(t2 * t1)
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfib_i32(v0 int32) int32 {
-	t0 := v0
-	var p2 int32
-	_ = p2
-	if uint32(t0) <= uint32(int32(1)) {
-		p2 = int32(1)
+	var p0 int32
+	_ = p0
+	if uint32(v0) <= uint32(int32(1)) {
+		p0 = int32(1)
 	} else {
-		t3 := v0
-		t4 := t3 - int32(2)
-		t5 := m.t0[uint(int32(26))].(func(v0 int32) int32)(t4)
-		t6 := v0
-		t7 := t6 - int32(1)
-		t8 := m.t0[uint(int32(26))].(func(v0 int32) int32)(t7)
-		t9 := t5 + t8
-		p2 = t9
+		t1 := m.t0[uint(int32(26))].(func(v0 int32) int32)(v0 - int32(2))
+		t2 := m.t0[uint(int32(26))].(func(v0 int32) int32)(v0 - int32(1))
+		t3 := t1 + t2
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfib_f32(v0 float32) float32 {
-	t0 := v0
-	var p2 float32
-	_ = p2
-	if t0 <= f32_const(1) {
-		p2 = f32_const(1)
+	var p0 float32
+	_ = p0
+	if v0 <= f32_const(1) {
+		p0 = f32_const(1)
 	} else {
-		t3 := v0
-		t4 := float32(t3 - float32(2))
-		t5 := m.t0[uint(int32(27))].(func(v0 float32) float32)(t4)
-		t6 := v0
-		t7 := float32(t6 - f32_const(1))
-		t8 := m.t0[uint(int32(27))].(func(v0 float32) float32)(t7)
-		t9 := float32(t5 + t8)
-		p2 = t9
+		t1 := m.t0[uint(int32(27))].(func(v0 float32) float32)(float32(v0 - float32(2)))
+		t2 := m.t0[uint(int32(27))].(func(v0 float32) float32)(float32(v0 - f32_const(1)))
+		t3 := float32(t1 + t2)
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfib_f64(v0 float64) float64 {
-	t0 := v0
-	var p2 float64
-	_ = p2
-	if t0 <= f64_const(1) {
-		p2 = f64_const(1)
+	var p0 float64
+	_ = p0
+	if v0 <= f64_const(1) {
+		p0 = f64_const(1)
 	} else {
-		t3 := v0
-		t4 := float64(t3 - float64(2))
-		t5 := m.t0[uint(int32(28))].(func(v0 float64) float64)(t4)
-		t6 := v0
-		t7 := float64(t6 - f64_const(1))
-		t8 := m.t0[uint(int32(28))].(func(v0 float64) float64)(t7)
-		t9 := float64(t5 + t8)
-		p2 = t9
+		t1 := m.t0[uint(int32(28))].(func(v0 float64) float64)(float64(v0 - float64(2)))
+		t2 := m.t0[uint(int32(28))].(func(v0 float64) float64)(float64(v0 - f64_const(1)))
+		t3 := float64(t1 + t2)
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xeven(v0 int32) int32 {
-	t0 := v0
-	var p2 int32
-	_ = p2
-	if t0 == 0 {
-		p2 = int32(44)
+	var p0 int32
+	_ = p0
+	if v0 == 0 {
+		p0 = int32(44)
 	} else {
-		t3 := v0
-		t4 := t3 - int32(1)
-		t5 := m.t0[uint(int32(15))].(func(v0 int32) int32)(t4)
-		p2 = t5
+		t1 := m.t0[uint(int32(15))].(func(v0 int32) int32)(v0 - int32(1))
+		p0 = t1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xodd(v0 int32) int32 {
-	t0 := v0
-	var p2 int32
-	_ = p2
-	if t0 == 0 {
-		p2 = int32(99)
+	var p0 int32
+	_ = p0
+	if v0 == 0 {
+		p0 = int32(99)
 	} else {
-		t3 := v0
-		t4 := t3 - int32(1)
-		t5 := m.t0[uint(int32(14))].(func(v0 int32) int32)(t4)
-		p2 = t5
+		t1 := m.t0[uint(int32(14))].(func(v0 int32) int32)(v0 - int32(1))
+		p0 = t1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xrunaway() {
 	m.t0[uint(int32(16))].(func())()
@@ -442,8 +382,8 @@ func (m *Module) Xas_br_if_first() int64 {
 	_ = p0
 	{
 		t1 := m.t0[uint(int32(1))].(func() int64)()
-		p0 = t1
 		if int32(2) != 0 {
+			p0 = t1
 			goto l0
 		}
 		p0 = t1
@@ -456,8 +396,8 @@ func (m *Module) Xas_br_if_last() int32 {
 	_ = p0
 	{
 		t1 := m.t0[uint(i32_const(0))].(func() int32)()
-		p0 = int32(2)
 		if t1 != 0 {
+			p0 = int32(2)
 			goto l0
 		}
 		p0 = int32(2)
@@ -470,9 +410,9 @@ func (m *Module) Xas_br_table_first() float32 {
 	_ = p0
 	{
 		t1 := m.t0[uint(int32(2))].(func() float32)()
-		p0 = t1
 		switch int32(2) {
 		default:
+			p0 = t1
 			goto l0
 		}
 	}
@@ -484,9 +424,9 @@ func (m *Module) Xas_br_table_last() int32 {
 	_ = p0
 	{
 		t1 := m.t0[uint(i32_const(0))].(func() int32)()
-		p0 = int32(2)
 		switch t1 {
 		default:
+			p0 = int32(2)
 			goto l0
 		}
 	}
@@ -530,15 +470,14 @@ func (m *Module) Xas_local_set_value() float64 {
 	_ = v0
 	t0 := m.t0[uint(int32(7))].(func(v0 float64) float64)(f64_const(1))
 	v0 = t0
-	t1 := v0
-	return t1
+	return v0
 }
 func (m *Module) Xas_local_tee_value() float64 {
 	var v0 float64
 	_ = v0
 	t0 := m.t0[uint(int32(7))].(func(v0 float64) float64)(f64_const(1))
 	v0 = t0
-	return t0
+	return v0
 }
 func (m *Module) Xas_global_set_value() float64 {
 	t0 := m.t0[uint(int32(7))].(func(v0 float64) float64)(f64_const(1))

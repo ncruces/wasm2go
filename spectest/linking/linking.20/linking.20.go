@@ -30,9 +30,8 @@ func (m *Module) XMm_load(v0 int32) int32 {
 	return m._Mm.Xload(v0)
 }
 func (m *Module) Xload(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(m.memory[uint32(t0)])
-	return t1
+	t0 := int32(m.memory[uint32(v0)])
+	return t0
 }
 
 const data0 = "\xf0\xf1\xf2\xf3\xf4\xf5"

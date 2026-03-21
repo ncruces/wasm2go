@@ -34,7 +34,6 @@ func (m *Module) f1() int32 {
 	return int32(6)
 }
 func (m *Module) Xcall(v0 int32) int32 {
-	t0 := v0
-	t1 := (*m.t0)[uint(t0)].(func() int32)()
-	return t1
+	t0 := (*m.t0)[uint(v0)].(func() int32)()
+	return t0
 }

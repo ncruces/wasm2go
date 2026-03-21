@@ -12,28 +12,20 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_no_fold_f32_s(v0 int32) int32 {
-	t0 := v0
-	t1 := float32(t0)
-	t2 := i32_trunc_f32_s(t1)
-	return t2
+	t0 := i32_trunc_f32_s(float32(v0))
+	return t0
 }
 func (m *Module) Xi32_no_fold_f32_u(v0 int32) int32 {
-	t0 := v0
-	t1 := float32(uint32(t0))
-	t2 := i32_trunc_f32_u(t1)
-	return t2
+	t0 := i32_trunc_f32_u(float32(uint32(v0)))
+	return t0
 }
 func (m *Module) Xi64_no_fold_f64_s(v0 int64) int64 {
-	t0 := v0
-	t1 := float64(t0)
-	t2 := i64_trunc_f64_s(t1)
-	return t2
+	t0 := i64_trunc_f64_s(float64(v0))
+	return t0
 }
 func (m *Module) Xi64_no_fold_f64_u(v0 int64) int64 {
-	t0 := v0
-	t1 := float64(uint64(t0))
-	t2 := i64_trunc_f64_u(t1)
-	return t2
+	t0 := i64_trunc_f64_u(float64(uint64(v0)))
+	return t0
 }
 
 func i32_trunc_f32_s(f float32) int32 {

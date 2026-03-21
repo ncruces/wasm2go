@@ -17,17 +17,13 @@ func (m *Module) Xf32_epsilon() float32 {
 	v0 = f32_const(1)
 l0:
 	{
-		t0 := v0
-		v1 = t0
-		t1 := float32(t0 * float32(0.5))
-		v0 = t1
-		t2 := float32(t1 + f32_const(1))
-		if t2 > f32_const(1) {
+		v1 = v0
+		v0 = float32(v1 * float32(0.5))
+		if float32(v0+f32_const(1)) > f32_const(1) {
 			goto l0
 		}
 	}
-	t4 := v1
-	return t4
+	return v1
 }
 func (m *Module) Xf64_epsilon() float64 {
 	var v0, v1 float64
@@ -35,17 +31,13 @@ func (m *Module) Xf64_epsilon() float64 {
 	v0 = f64_const(1)
 l0:
 	{
-		t0 := v0
-		v1 = t0
-		t1 := float64(t0 * float64(0.5))
-		v0 = t1
-		t2 := float64(t1 + f64_const(1))
-		if t2 > f64_const(1) {
+		v1 = v0
+		v0 = float64(v1 * float64(0.5))
+		if float64(v0+f64_const(1)) > f64_const(1) {
 			goto l0
 		}
 	}
-	t4 := v1
-	return t4
+	return v1
 }
 
 //go:nosplit

@@ -19,9 +19,7 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xinit(v0 int32, v1 float32) {
-	t0 := v0
-	t1 := v1
-	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], math.Float32bits(t1))
+	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], math.Float32bits(v1))
 }
 func (m *Module) Xrun(v0 int32, v1 float32) {
 	var v2 int32
@@ -29,25 +27,17 @@ func (m *Module) Xrun(v0 int32, v1 float32) {
 	{
 	l0:
 		{
-			t0 := v2
 			t1 := v2
-			t2 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t1):]))
-			t3 := v1
-			t4 := float32(t2 / t3)
-			binary.LittleEndian.PutUint32(m.memory[uint32(t0):], math.Float32bits(t4))
-			t5 := v2
-			t6 := t5 + int32(4)
-			v2 = t6
-			t7 := v2
-			t8 := v0
-			if uint32(t7) < uint32(t8) {
+			t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v2):]))
+			binary.LittleEndian.PutUint32(m.memory[uint32(t1):], math.Float32bits(float32(t0/v1)))
+			v2 = v2 + int32(4)
+			if uint32(v2) < uint32(v0) {
 				goto l0
 			}
 		}
 	}
 }
 func (m *Module) Xcheck(v0 int32) float32 {
-	t0 := v0
-	t1 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(t0):]))
-	return t1
+	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
+	return t0
 }

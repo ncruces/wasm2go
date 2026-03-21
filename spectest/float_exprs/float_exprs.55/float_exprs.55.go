@@ -10,28 +10,11 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xthepast0(v0 float64, v1 float64, v2 float64, v3 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	t3 := v2
-	t4 := v3
-	t5 := float64(t3 * t4)
-	t6 := float64(t2 / t5)
-	return t6
+	return float64(float64(v0*v1) / float64(v2*v3))
 }
 func (m *Module) Xthepast1(v0 float64, v1 float64, v2 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	t3 := v2
-	t4 := float64(t2 - t3)
-	return t4
+	return float64(float64(v0*v1) - v2)
 }
 func (m *Module) Xthepast2(v0 float32, v1 float32, v2 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 * t1)
-	t3 := v2
-	t4 := float32(t2 * t3)
-	return t4
+	return float32(float32(v0*v1) * v2)
 }

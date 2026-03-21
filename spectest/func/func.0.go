@@ -112,50 +112,42 @@ func (m *Module) f30() {
 func (m *Module) Xlocal_first_i32() int32 {
 	var v0, v1 int32
 	_, _ = v0, v1
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xlocal_first_i64() int64 {
 	var v0, v1 int64
 	_, _ = v0, v1
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xlocal_first_f32() float32 {
 	var v0, v1 float32
 	_, _ = v0, v1
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xlocal_first_f64() float64 {
 	var v0, v1 float64
 	_, _ = v0, v1
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xlocal_second_i32() int32 {
 	var v0, v1 int32
 	_, _ = v0, v1
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xlocal_second_i64() int64 {
 	var v0, v1 int64
 	_, _ = v0, v1
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xlocal_second_f32() float32 {
 	var v0, v1 float32
 	_, _ = v0, v1
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xlocal_second_f64() float64 {
 	var v0, v1 float64
 	_, _ = v0, v1
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xlocal_mixed() float64 {
 	var v0 float32
@@ -165,104 +157,78 @@ func (m *Module) Xlocal_mixed() float64 {
 	var v4 float64
 	var v5 int32
 	_, _, _, _, _, _ = v0, v1, v2, v3, v4, v5
-	t0 := v0
-	t1 := -t0
-	_ = t1
-	t2 := v1
+	_ = -v0
+	var p0 int32
+	if v1 == 0 {
+		p0 = 1
+	}
+	_ = p0
+	var p1 int32
+	if v2 == 0 {
+		p1 = 1
+	}
+	_ = p1
+	var p2 int32
+	if v3 == 0 {
+		p2 = 1
+	}
+	_ = p2
+	_ = -v4
 	var p3 int32
-	if t2 == 0 {
+	if v5 == 0 {
 		p3 = 1
 	}
 	_ = p3
-	t4 := v2
-	var p5 int32
-	if t4 == 0 {
-		p5 = 1
-	}
-	_ = p5
-	t6 := v3
-	var p7 int32
-	if t6 == 0 {
-		p7 = 1
-	}
-	_ = p7
-	t8 := v4
-	t9 := -t8
-	_ = t9
-	t10 := v5
-	var p11 int32
-	if t10 == 0 {
-		p11 = 1
-	}
-	_ = p11
-	t12 := v4
-	return t12
+	return v4
 }
 func (m *Module) Xparam_first_i32(v0 int32, v1 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xparam_first_i64(v0 int64, v1 int64) int64 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xparam_first_f32(v0 float32, v1 float32) float32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xparam_first_f64(v0 float64, v1 float64) float64 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xparam_second_i32(v0 int32, v1 int32) int32 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xparam_second_i64(v0 int64, v1 int64) int64 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xparam_second_f32(v0 float32, v1 float32) float32 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xparam_second_f64(v0 float64, v1 float64) float64 {
-	t0 := v1
-	return t0
+	return v1
 }
 func (m *Module) Xparam_mixed(v0 float32, v1 int32, v2 int64, v3 int32, v4 float64, v5 int32) float64 {
-	t0 := v0
-	t1 := -t0
-	_ = t1
-	t2 := v1
+	_ = -v0
+	var p0 int32
+	if v1 == 0 {
+		p0 = 1
+	}
+	_ = p0
+	var p1 int32
+	if v2 == 0 {
+		p1 = 1
+	}
+	_ = p1
+	var p2 int32
+	if v3 == 0 {
+		p2 = 1
+	}
+	_ = p2
+	_ = -v4
 	var p3 int32
-	if t2 == 0 {
+	if v5 == 0 {
 		p3 = 1
 	}
 	_ = p3
-	t4 := v2
-	var p5 int32
-	if t4 == 0 {
-		p5 = 1
-	}
-	_ = p5
-	t6 := v3
-	var p7 int32
-	if t6 == 0 {
-		p7 = 1
-	}
-	_ = p7
-	t8 := v4
-	t9 := -t8
-	_ = t9
-	t10 := v5
-	var p11 int32
-	if t10 == 0 {
-		p11 = 1
-	}
-	_ = p11
-	t12 := v4
-	return t12
+	return v4
 }
 func (m *Module) Xempty() {
 }
@@ -345,37 +311,32 @@ func (m *Module) Xbreak_block_i32() int32 {
 	return p0
 }
 func (m *Module) Xbreak_br_if_empty(v0 int32) {
-	t0 := v0
-	if t0 != 0 {
+	if v0 != 0 {
 		return
 	}
 }
 func (m *Module) Xbreak_br_if_num(v0 int32) int32 {
-	t0 := v0
-	if t0 != 0 {
+	if v0 != 0 {
 		return int32(50)
 	}
 	_ = int32(50)
 	return int32(51)
 }
 func (m *Module) Xbreak_br_table_empty(v0 int32) {
-	t0 := v0
-	switch t0 {
+	switch v0 {
 	default:
 		return
 	}
 }
 func (m *Module) Xbreak_br_table_num(v0 int32) int32 {
-	t0 := v0
-	switch t0 {
+	switch v0 {
 	default:
 		return int32(50)
 	}
 }
 func (m *Module) Xbreak_br_table_nested_empty(v0 int32) {
 	{
-		t0 := v0
-		switch t0 {
+		switch v0 {
 		case 1:
 			return
 		default:
@@ -388,42 +349,36 @@ func (m *Module) Xbreak_br_table_nested_num(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p0 = int32(50)
-		switch t1 {
+		switch v0 {
 		case 1:
 			return int32(50)
 		default:
+			p0 = int32(50)
 			goto l0
 		}
 	}
 l0:
-	t2 := p0 + int32(2)
-	return t2
+	return p0 + int32(2)
 }
 func (m *Module) Xinit_local_i32() int32 {
 	var v0 int32
 	_ = v0
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xinit_local_i64() int64 {
 	var v0 int64
 	_ = v0
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xinit_local_f32() float32 {
 	var v0 float32
 	_ = v0
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xinit_local_f64() float64 {
 	var v0 float64
 	_ = v0
-	t0 := v0
-	return t0
+	return v0
 }
 
 //go:nosplit

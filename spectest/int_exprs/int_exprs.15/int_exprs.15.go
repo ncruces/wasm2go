@@ -10,22 +10,18 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_rem_s_3(v0 int32) int32 {
-	t0 := v0
-	t1 := t0 % int32(3)
-	return t1
+	t0 := v0 % int32(3)
+	return t0
 }
 func (m *Module) Xi32_rem_u_3(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(uint32(t0) % uint32(int32(3)))
-	return t1
+	t0 := int32(uint32(v0) % uint32(int32(3)))
+	return t0
 }
 func (m *Module) Xi64_rem_s_3(v0 int64) int64 {
-	t0 := v0
-	t1 := t0 % int64(3)
-	return t1
+	t0 := v0 % int64(3)
+	return t0
 }
 func (m *Module) Xi64_rem_u_3(v0 int64) int64 {
-	t0 := v0
-	t1 := int64(uint64(t0) % uint64(int64(3)))
-	return t1
+	t0 := int64(uint64(v0) % uint64(int64(3)))
+	return t0
 }

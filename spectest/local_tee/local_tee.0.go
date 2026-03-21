@@ -30,41 +30,41 @@ func (m *Module) Xtype_local_i32() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
-	return i32_const(0)
+	return v0
 }
 func (m *Module) Xtype_local_i64() int64 {
 	var v0 int64
 	_ = v0
 	v0 = i64_const(0)
-	return i64_const(0)
+	return v0
 }
 func (m *Module) Xtype_local_f32() float32 {
 	var v0 float32
 	_ = v0
 	v0 = f32_const(0)
-	return f32_const(0)
+	return v0
 }
 func (m *Module) Xtype_local_f64() float64 {
 	var v0 float64
 	_ = v0
 	v0 = f64_const(0)
-	return f64_const(0)
+	return v0
 }
 func (m *Module) Xtype_param_i32(v0 int32) int32 {
 	v0 = int32(10)
-	return int32(10)
+	return v0
 }
 func (m *Module) Xtype_param_i64(v0 int64) int64 {
 	v0 = int64(11)
-	return int64(11)
+	return v0
 }
 func (m *Module) Xtype_param_f32(v0 float32) float32 {
 	v0 = float32(11.1)
-	return float32(11.1)
+	return v0
 }
 func (m *Module) Xtype_param_f64(v0 float64) float64 {
 	v0 = float64(12.2)
-	return float64(12.2)
+	return v0
 }
 func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) {
 	var v5 float32
@@ -73,46 +73,42 @@ func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int3
 	_, _, _, _ = v5, v6, v7, v8
 	v0 = i64_const(0)
 	var p0 int32
-	if i64_const(0) == 0 {
+	if v0 == 0 {
 		p0 = 1
 	}
 	_ = p0
 	v1 = f32_const(0)
-	t1 := -f32_const(0)
-	_ = t1
+	_ = -v1
 	v2 = f64_const(0)
-	t2 := -f64_const(0)
-	_ = t2
+	_ = -v2
 	v3 = i32_const(0)
+	var p1 int32
+	if v3 == 0 {
+		p1 = 1
+	}
+	_ = p1
+	v4 = i32_const(0)
+	var p2 int32
+	if v4 == 0 {
+		p2 = 1
+	}
+	_ = p2
+	v5 = f32_const(0)
+	_ = -v5
+	v6 = i64_const(0)
 	var p3 int32
-	if i32_const(0) == 0 {
+	if v6 == 0 {
 		p3 = 1
 	}
 	_ = p3
-	v4 = i32_const(0)
+	v7 = i64_const(0)
 	var p4 int32
-	if i32_const(0) == 0 {
+	if v7 == 0 {
 		p4 = 1
 	}
 	_ = p4
-	v5 = f32_const(0)
-	t5 := -f32_const(0)
-	_ = t5
-	v6 = i64_const(0)
-	var p6 int32
-	if i64_const(0) == 0 {
-		p6 = 1
-	}
-	_ = p6
-	v7 = i64_const(0)
-	var p7 int32
-	if i64_const(0) == 0 {
-		p7 = 1
-	}
-	_ = p7
 	v8 = f64_const(0)
-	t8 := -f64_const(0)
-	_ = t8
+	_ = -v8
 }
 func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) int64 {
 	var v5 float32
@@ -120,43 +116,19 @@ func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) in
 	var v8 float64
 	_, _, _, _ = v5, v6, v7, v8
 	v1 = float32(-0.3)
-	_ = float32(-0.3)
+	_ = v1
 	v3 = int32(40)
-	_ = int32(40)
+	_ = v3
 	v4 = i32_const(-7)
-	_ = i32_const(-7)
+	_ = v4
 	v5 = float32(5.5)
-	_ = float32(5.5)
+	_ = v5
 	v6 = int64(6)
-	_ = int64(6)
+	_ = v6
 	v8 = float64(8)
-	_ = float64(8)
-	t0 := v0
-	t1 := float64(uint64(t0))
-	t2 := v1
-	t3 := float64(t2)
-	t4 := v2
-	t5 := v3
-	t6 := float64(uint32(t5))
-	t7 := v4
-	t8 := float64(t7)
-	t9 := v5
-	t10 := float64(t9)
-	t11 := v6
-	t12 := float64(uint64(t11))
-	t13 := v7
-	t14 := float64(uint64(t13))
-	t15 := v8
-	t16 := float64(t14 + t15)
-	t17 := float64(t12 + t16)
-	t18 := float64(t10 + t17)
-	t19 := float64(t8 + t18)
-	t20 := float64(t6 + t19)
-	t21 := float64(t4 + t20)
-	t22 := float64(t3 + t21)
-	t23 := float64(t1 + t22)
-	t24 := i64_trunc_f64_s(t23)
-	return t24
+	_ = v8
+	t0 := i64_trunc_f64_s(float64(float64(uint64(v0)) + float64(float64(v1)+float64(v2+float64(float64(uint32(v3))+float64(float64(v4)+float64(float64(v5)+float64(float64(uint64(v6))+float64(float64(uint64(v7))+v8)))))))))
+	return t0
 }
 func (m *Module) Xresult(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) float64 {
 	var v5 float32
@@ -164,30 +136,23 @@ func (m *Module) Xresult(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) f
 	var v8 float64
 	_, _, _, _ = v5, v6, v7, v8
 	v0 = int64(1)
-	t0 := float64(uint64(int64(1)))
+	t0 := float64(uint64(v0))
 	v1 = float32(2)
-	t1 := float64(float32(2))
+	t1 := float64(v1)
 	v2 = float64(3.3)
+	t2 := v2
 	v3 = int32(4)
-	t2 := float64(uint32(int32(4)))
+	t3 := float64(uint32(v3))
 	v4 = int32(5)
-	t3 := float64(int32(5))
+	t4 := float64(v4)
 	v5 = float32(5.5)
-	t4 := float64(float32(5.5))
+	t5 := float64(v5)
 	v6 = int64(6)
-	t5 := float64(uint64(int64(6)))
+	t6 := float64(uint64(v6))
 	v7 = i64_const(0)
-	t6 := float64(uint64(i64_const(0)))
+	t7 := float64(uint64(v7))
 	v8 = float64(8)
-	t7 := float64(t6 + float64(8))
-	t8 := float64(t5 + t7)
-	t9 := float64(t4 + t8)
-	t10 := float64(t3 + t9)
-	t11 := float64(t2 + t10)
-	t12 := float64(float64(3.3) + t11)
-	t13 := float64(t1 + t12)
-	t14 := float64(t0 + t13)
-	return t14
+	return float64(t0 + float64(t1+float64(t2+float64(t3+float64(t4+float64(t5+float64(t6+float64(t7+v8))))))))
 }
 func (m *Module) f11() {
 }
@@ -196,8 +161,9 @@ func (m *Module) Xas_block_first(v0 int32) int32 {
 	_ = p0
 	{
 		v0 = int32(1)
+		t1 := v0
 		m.f11()
-		p0 = int32(1)
+		p0 = t1
 	}
 	return p0
 }
@@ -207,8 +173,9 @@ func (m *Module) Xas_block_mid(v0 int32) int32 {
 	{
 		m.f11()
 		v0 = int32(1)
+		t1 := v0
 		m.f11()
-		p0 = int32(1)
+		p0 = t1
 	}
 	return p0
 }
@@ -219,7 +186,8 @@ func (m *Module) Xas_block_last(v0 int32) int32 {
 		m.f11()
 		m.f11()
 		v0 = int32(1)
-		p0 = int32(1)
+		t1 := v0
+		p0 = t1
 	}
 	return p0
 }
@@ -228,8 +196,9 @@ func (m *Module) Xas_loop_first(v0 int32) int32 {
 	_ = p0
 	{
 		v0 = int32(3)
+		t1 := v0
 		m.f11()
-		p0 = int32(3)
+		p0 = t1
 	}
 	return p0
 }
@@ -239,8 +208,9 @@ func (m *Module) Xas_loop_mid(v0 int32) int32 {
 	{
 		m.f11()
 		v0 = int32(4)
+		t1 := v0
 		m.f11()
-		p0 = int32(4)
+		p0 = t1
 	}
 	return p0
 }
@@ -251,7 +221,8 @@ func (m *Module) Xas_loop_last(v0 int32) int32 {
 		m.f11()
 		m.f11()
 		v0 = int32(5)
-		p0 = int32(5)
+		t1 := v0
+		p0 = t1
 	}
 	return p0
 }
@@ -260,7 +231,8 @@ func (m *Module) Xas_br_value(v0 int32) int32 {
 	_ = p0
 	{
 		v0 = int32(9)
-		p0 = int32(9)
+		t1 := v0
+		p0 = t1
 		goto l0
 	}
 l0:
@@ -269,7 +241,7 @@ l0:
 func (m *Module) Xas_br_if_cond(v0 int32) {
 	{
 		v0 = int32(1)
-		if int32(1) != 0 {
+		if v0 != 0 {
 			goto l0
 		}
 	}
@@ -280,11 +252,12 @@ func (m *Module) Xas_br_if_value(v0 int32) int32 {
 	_ = p0
 	{
 		v0 = int32(8)
-		p0 = int32(8)
+		t1 := v0
 		if int32(1) != 0 {
+			p0 = t1
 			goto l0
 		}
-		_ = int32(8)
+		_ = t1
 		p0 = int32(7)
 	}
 l0:
@@ -295,8 +268,8 @@ func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
 	_ = p0
 	{
 		v0 = int32(9)
-		p0 = int32(6)
-		if int32(9) != 0 {
+		if v0 != 0 {
+			p0 = int32(6)
 			goto l0
 		}
 		_ = int32(6)
@@ -308,7 +281,7 @@ l0:
 func (m *Module) Xas_br_table_index(v0 int32) {
 	{
 		v0 = i32_const(0)
-		switch i32_const(0) {
+		switch v0 {
 		default:
 			goto l0
 		}
@@ -320,9 +293,10 @@ func (m *Module) Xas_br_table_value(v0 int32) int32 {
 	_ = p0
 	{
 		v0 = int32(10)
-		p0 = int32(10)
+		t1 := v0
 		switch int32(1) {
 		default:
+			p0 = t1
 			goto l0
 		}
 	}
@@ -334,9 +308,9 @@ func (m *Module) Xas_br_table_value_index(v0 int32) int32 {
 	_ = p0
 	{
 		v0 = int32(11)
-		p0 = int32(6)
-		switch int32(11) {
+		switch v0 {
 		default:
+			p0 = int32(6)
 			goto l0
 		}
 	}
@@ -345,13 +319,13 @@ l0:
 }
 func (m *Module) Xas_return_value(v0 int32) int32 {
 	v0 = int32(7)
-	return int32(7)
+	return v0
 }
 func (m *Module) Xas_if_cond(v0 int32) int32 {
 	v0 = int32(2)
 	var p0 int32
 	_ = p0
-	if int32(2) != 0 {
+	if v0 != 0 {
 		p0 = i32_const(0)
 	} else {
 		p0 = int32(1)
@@ -359,55 +333,52 @@ func (m *Module) Xas_if_cond(v0 int32) int32 {
 	return p0
 }
 func (m *Module) Xas_if_then(v0 int32) int32 {
-	t0 := v0
-	var p1 int32
-	_ = p1
-	if t0 != 0 {
+	var p0 int32
+	_ = p0
+	if v0 != 0 {
 		v0 = int32(3)
-		p1 = int32(3)
+		t1 := v0
+		p0 = t1
 	} else {
 		t2 := v0
-		p1 = t2
+		p0 = t2
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xas_if_else(v0 int32) int32 {
-	t0 := v0
-	var p1 int32
-	_ = p1
-	if t0 != 0 {
-		t2 := v0
-		p1 = t2
+	var p0 int32
+	_ = p0
+	if v0 != 0 {
+		t1 := v0
+		p0 = t1
 	} else {
 		v0 = int32(4)
-		p1 = int32(4)
+		t2 := v0
+		p0 = t2
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
 	v0 = int32(5)
-	t0 := v0
-	t1 := v1
-	p2 := t0
-	if t1 != 0 {
-		p2 = int32(5)
+	p0 := v0
+	if v1 != 0 {
+		p0 = v0
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xas_select_second(v0 int32, v1 int32) int32 {
 	t0 := v0
 	v0 = int32(6)
-	t1 := v1
-	p2 := int32(6)
-	if t1 != 0 {
-		p2 = t0
+	p1 := v0
+	if v1 != 0 {
+		p1 = t0
 	}
-	return p2
+	return p1
 }
 func (m *Module) Xas_select_cond(v0 int32) int32 {
 	v0 = int32(7)
 	p0 := int32(1)
-	if int32(7) != 0 {
+	if v0 != 0 {
 		p0 = i32_const(0)
 	}
 	return p0
@@ -417,101 +388,96 @@ func (m *Module) f32(v0 int32, v1 int32, v2 int32) int32 {
 }
 func (m *Module) Xas_call_first(v0 int32) int32 {
 	v0 = int32(12)
-	t0 := m.f32(int32(12), int32(2), int32(3))
+	t0 := m.f32(v0, int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_mid(v0 int32) int32 {
 	v0 = int32(13)
-	t0 := m.f32(int32(1), int32(13), int32(3))
+	t0 := m.f32(int32(1), v0, int32(3))
 	return t0
 }
 func (m *Module) Xas_call_last(v0 int32) int32 {
 	v0 = int32(14)
-	t0 := m.f32(int32(1), int32(2), int32(14))
+	t0 := m.f32(int32(1), int32(2), v0)
 	return t0
 }
 func (m *Module) Xas_call_indirect_first(v0 int32) int32 {
 	v0 = int32(1)
-	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(v0, int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_mid(v0 int32) int32 {
 	v0 = int32(2)
-	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), v0, int32(3))
 	return t0
 }
 func (m *Module) Xas_call_indirect_last(v0 int32) int32 {
 	v0 = int32(3)
-	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), v0)
 	return t0
 }
 func (m *Module) Xas_call_indirect_index(v0 int32) int32 {
 	v0 = i32_const(0)
-	t0 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
+	t0 := m.t0[uint(v0)].(func(v0 int32, v1 int32, v2 int32) int32)(int32(1), int32(2), int32(3))
 	return t0
 }
 func (m *Module) Xas_local_set_value() {
 	var v0 int32
 	_ = v0
 	v0 = int32(1)
-	v0 = int32(1)
 }
 func (m *Module) Xas_local_tee_value(v0 int32) int32 {
 	v0 = int32(1)
-	v0 = int32(1)
-	return int32(1)
+	return v0
 }
 func (m *Module) Xas_global_set_value() {
 	var v0 int32
 	_ = v0
 	v0 = int32(1)
-	m.g0 = int32(1)
+	m.g0 = v0
 }
 func (m *Module) Xas_load_address(v0 int32) int32 {
 	v0 = int32(1)
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(1)):]))
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	return t0
 }
 func (m *Module) Xas_loadN_address(v0 int32) int32 {
 	v0 = int32(3)
-	t0 := int32(int8(m.memory[uint32(int32(3))]))
+	t0 := int32(int8(m.memory[uint32(v0)]))
 	return t0
 }
 func (m *Module) Xas_store_address(v0 int32) {
 	v0 = int32(30)
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(30)):], uint32(int32(7)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(int32(7)))
 }
 func (m *Module) Xas_store_value(v0 int32) {
 	v0 = int32(1)
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(2)):], uint32(int32(1)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(int32(2)):], uint32(v0))
 }
 func (m *Module) Xas_storeN_address(v0 int32) {
 	v0 = int32(1)
-	m.memory[uint32(int32(1))] = byte(int32(7))
+	m.memory[uint32(v0)] = byte(int32(7))
 }
 func (m *Module) Xas_storeN_value(v0 int32) {
 	v0 = int32(1)
-	binary.LittleEndian.PutUint16(m.memory[uint32(int32(2)):], uint16(int32(1)))
+	binary.LittleEndian.PutUint16(m.memory[uint32(int32(2)):], uint16(v0))
 }
 func (m *Module) Xas_unary_operand(v0 float32) float32 {
 	v0 = math.Float32frombits(0x7f80f1e2)
-	t0 := -math.Float32frombits(0x7f80f1e2)
-	return t0
+	return -v0
 }
 func (m *Module) Xas_binary_left(v0 int32) int32 {
 	v0 = int32(3)
-	t0 := int32(3) + int32(10)
-	return t0
+	return v0 + int32(10)
 }
 func (m *Module) Xas_binary_right(v0 int32) int32 {
 	v0 = int32(4)
-	t0 := int32(10) - int32(4)
-	return t0
+	return int32(10) - v0
 }
 func (m *Module) Xas_test_operand(v0 int32) int32 {
 	v0 = i32_const(0)
 	var p0 int32
-	if i32_const(0) == 0 {
+	if v0 == 0 {
 		p0 = 1
 	}
 	return p0
@@ -519,7 +485,7 @@ func (m *Module) Xas_test_operand(v0 int32) int32 {
 func (m *Module) Xas_compare_left(v0 int32) int32 {
 	v0 = int32(43)
 	var p0 int32
-	if int32(43) <= int32(10) {
+	if v0 <= int32(10) {
 		p0 = 1
 	}
 	return p0
@@ -527,19 +493,18 @@ func (m *Module) Xas_compare_left(v0 int32) int32 {
 func (m *Module) Xas_compare_right(v0 int32) int32 {
 	v0 = int32(42)
 	var p0 int32
-	if int32(10) != int32(42) {
+	if int32(10) != v0 {
 		p0 = 1
 	}
 	return p0
 }
 func (m *Module) Xas_convert_operand(v0 int64) int32 {
 	v0 = int64(41)
-	t0 := int32(int64(41))
-	return t0
+	return int32(v0)
 }
 func (m *Module) Xas_memory_grow_size(v0 int32) int32 {
 	v0 = int32(40)
-	t0 := int32(memory_grow(&m.memory, int64(int32(40)), m.maxMem))
+	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }
 

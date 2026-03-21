@@ -53,12 +53,10 @@ func (m *Module) Xget_y() int64 {
 	return t0
 }
 func (m *Module) Xset_x(v0 int32) {
-	t0 := v0
-	m.g4 = t0
+	m.g4 = v0
 }
 func (m *Module) Xset_y(v0 int64) {
-	t0 := v0
-	m.g7 = t0
+	m.g7 = v0
 }
 func (m *Module) Xget_1() float32 {
 	t0 := m.g1
@@ -77,12 +75,10 @@ func (m *Module) Xget_6() float64 {
 	return t0
 }
 func (m *Module) Xset_5(v0 float32) {
-	t0 := v0
-	m.g5 = t0
+	m.g5 = v0
 }
 func (m *Module) Xset_6(v0 float64) {
-	t0 := v0
-	m.g6 = t0
+	m.g6 = v0
 }
 func (m *Module) f12() {
 }
@@ -183,8 +179,8 @@ func (m *Module) Xas_br_if_first() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		p0 = t1
 		if int32(2) != 0 {
+			p0 = t1
 			goto l0
 		}
 		return int32(3)
@@ -197,8 +193,8 @@ func (m *Module) Xas_br_if_last() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		p0 = int32(2)
 		if t1 != 0 {
+			p0 = int32(2)
 			goto l0
 		}
 		return int32(3)
@@ -211,9 +207,9 @@ func (m *Module) Xas_br_table_first() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		p0 = t1
 		switch int32(2) {
 		default:
+			p0 = t1
 			goto l0
 		}
 	}
@@ -225,9 +221,9 @@ func (m *Module) Xas_br_table_last() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		p0 = int32(2)
 		switch t1 {
 		default:
+			p0 = int32(2)
 			goto l0
 		}
 	}
@@ -235,8 +231,7 @@ l0:
 	return p0
 }
 func (m *Module) f26(v0 int32, v1 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xas_call_indirect_first() int32 {
 	var p0 int32
@@ -287,8 +282,7 @@ func (m *Module) Xas_memory_grow_value() int32 {
 	return t1
 }
 func (m *Module) f34(v0 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xas_call_value() int32 {
 	t0 := m.g4
@@ -317,13 +311,12 @@ l0:
 func (m *Module) Xas_local_set_value(v0 int32) int32 {
 	t0 := m.g4
 	v0 = t0
-	t1 := v0
-	return t1
+	return v0
 }
 func (m *Module) Xas_local_tee_value(v0 int32) int32 {
 	t0 := m.g4
 	v0 = t0
-	return t0
+	return v0
 }
 func (m *Module) Xas_global_set_value() int32 {
 	t0 := m.g4
@@ -342,8 +335,7 @@ func (m *Module) Xas_unary_operand() int32 {
 func (m *Module) Xas_binary_operand() int32 {
 	t0 := m.g4
 	t1 := m.g4
-	t2 := t0 * t1
-	return t2
+	return t0 * t1
 }
 func (m *Module) Xas_compare_operand() int32 {
 	t0 := m.g0

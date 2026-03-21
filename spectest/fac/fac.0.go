@@ -10,150 +10,113 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xfac_rec(v0 int64) int64 {
-	t0 := v0
-	var p2 int64
-	_ = p2
-	if t0 == i64_const(0) {
-		p2 = int64(1)
+	var p0 int64
+	_ = p0
+	if v0 == i64_const(0) {
+		p0 = int64(1)
 	} else {
-		t3 := v0
-		t4 := v0
-		t5 := t4 - int64(1)
-		t6 := m.Xfac_rec(t5)
-		t7 := t3 * t6
-		p2 = t7
+		t2 := v0
+		t1 := m.Xfac_rec(v0 - int64(1))
+		t3 := t2 * t1
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfac_rec_named(v0 int64) int64 {
-	t0 := v0
-	var p2 int64
-	_ = p2
-	if t0 == i64_const(0) {
-		p2 = int64(1)
+	var p0 int64
+	_ = p0
+	if v0 == i64_const(0) {
+		p0 = int64(1)
 	} else {
-		t3 := v0
-		t4 := v0
-		t5 := t4 - int64(1)
-		t6 := m.Xfac_rec_named(t5)
-		t7 := t3 * t6
-		p2 = t7
+		t2 := v0
+		t1 := m.Xfac_rec_named(v0 - int64(1))
+		t3 := t2 * t1
+		p0 = t3
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xfac_iter(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
-	t0 := v0
-	v1 = t0
+	v1 = v0
 	v2 = int64(1)
 	{
 	l1:
 		{
-			t1 := v1
-			if t1 == i64_const(0) {
+			if v1 == i64_const(0) {
 				goto l0
 			} else {
-				t3 := v1
-				t4 := v2
-				t5 := t3 * t4
-				v2 = t5
-				t6 := v1
-				t7 := t6 - int64(1)
-				v1 = t7
+				v2 = v1 * v2
+				v1 = v1 - int64(1)
 			}
 			goto l1
 		}
 	}
 l0:
-	t8 := v2
-	return t8
+	return v2
 }
 func (m *Module) Xfac_iter_named(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
-	t0 := v0
-	v1 = t0
+	v1 = v0
 	v2 = int64(1)
 	{
 	l1:
 		{
-			t1 := v1
-			if t1 == i64_const(0) {
+			if v1 == i64_const(0) {
 				goto l0
 			} else {
-				t3 := v1
-				t4 := v2
-				t5 := t3 * t4
-				v2 = t5
-				t6 := v1
-				t7 := t6 - int64(1)
-				v1 = t7
+				v2 = v1 * v2
+				v1 = v1 - int64(1)
 			}
 			goto l1
 		}
 	}
 l0:
-	t8 := v2
-	return t8
+	return v2
 }
 func (m *Module) Xfac_opt(v0 int64) int64 {
 	var v1 int64
 	_ = v1
 	v1 = int64(1)
 	{
-		t0 := v0
-		if t0 < int64(2) {
+		if v0 < int64(2) {
 			goto l0
 		}
 	l1:
 		{
-			t2 := v1
-			t3 := v0
-			t4 := t2 * t3
-			v1 = t4
-			t5 := v0
-			t6 := t5 + i64_const(-1)
-			v0 = t6
-			t7 := v0
-			if t7 > int64(1) {
+			v1 = v1 * v0
+			v0 = v0 + i64_const(-1)
+			if v0 > int64(1) {
 				goto l1
 			}
 		}
 	}
 l0:
-	t9 := v1
-	return t9
+	return v1
 }
 func (m *Module) f5(v0 int64) (int64, int64) {
-	t0 := v0
-	t1 := v0
-	return t0, t1
+	return v0, v0
 }
 func (m *Module) f6(v0 int64, v1 int64) (int64, int64, int64) {
-	t0 := v0
-	t1 := v1
-	t2 := v0
-	return t0, t1, t2
+	return v0, v1, v0
 }
 func (m *Module) Xfac_ssa(v0 int64) int64 {
-	t0 := v0
-	var p1 int64
-	_ = p1
-	p3, p2 := int64(1), t0
+	t1 := v0
+	var p0 int64
+	_ = p0
+	p3, p2 := int64(1), t1
 l0:
 	{
 		t4, t5, t6 := m.f6(p3, p2)
 		t7, t8, t9 := m.f6(t5, t6)
-		t10 := t8 * t9
-		t11, t12, t13 := m.f6(t7, t10)
-		t14 := t13 - int64(1)
-		t15, t16 := m.f5(t14)
-		p3, p2 = t12, t15
-		if uint64(t16) > uint64(i64_const(0)) {
+		t10, t11, t12 := m.f6(t7, t8*t9)
+		t13, t14 := m.f5(t12 - int64(1))
+		if uint64(t14) > uint64(i64_const(0)) {
+			p3, p2 = t11, t13
 			goto l0
 		}
-		_ = t11
+		_ = t10
 		return t4
 	}
 }

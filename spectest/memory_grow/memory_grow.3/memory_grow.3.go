@@ -30,9 +30,8 @@ func (m *Module) Xstore_at_page_size() {
 	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(65536)):], uint32(int32(3)))
 }
 func (m *Module) Xgrow(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
-	return t1
+	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
+	return t0
 }
 func (m *Module) Xsize() int32 {
 	t0 := int32(len(m.memory) >> 16)

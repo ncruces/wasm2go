@@ -12,44 +12,36 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xno_dce_i32_trunc_f32_s(v0 float32) {
-	t0 := v0
-	t1 := i32_trunc_f32_s(t0)
-	_ = t1
+	t0 := i32_trunc_f32_s(v0)
+	_ = t0
 }
 func (m *Module) Xno_dce_i32_trunc_f32_u(v0 float32) {
-	t0 := v0
-	t1 := i32_trunc_f32_u(t0)
-	_ = t1
+	t0 := i32_trunc_f32_u(v0)
+	_ = t0
 }
 func (m *Module) Xno_dce_i32_trunc_f64_s(v0 float64) {
-	t0 := v0
-	t1 := i32_trunc_f64_s(t0)
-	_ = t1
+	t0 := i32_trunc_f64_s(v0)
+	_ = t0
 }
 func (m *Module) Xno_dce_i32_trunc_f64_u(v0 float64) {
-	t0 := v0
-	t1 := i32_trunc_f64_u(t0)
-	_ = t1
+	t0 := i32_trunc_f64_u(v0)
+	_ = t0
 }
 func (m *Module) Xno_dce_i64_trunc_f32_s(v0 float32) {
-	t0 := v0
-	t1 := i64_trunc_f32_s(t0)
-	_ = t1
+	t0 := i64_trunc_f32_s(v0)
+	_ = t0
 }
 func (m *Module) Xno_dce_i64_trunc_f32_u(v0 float32) {
-	t0 := v0
-	t1 := i64_trunc_f32_u(t0)
-	_ = t1
+	t0 := i64_trunc_f32_u(v0)
+	_ = t0
 }
 func (m *Module) Xno_dce_i64_trunc_f64_s(v0 float64) {
-	t0 := v0
-	t1 := i64_trunc_f64_s(t0)
-	_ = t1
+	t0 := i64_trunc_f64_s(v0)
+	_ = t0
 }
 func (m *Module) Xno_dce_i64_trunc_f64_u(v0 float64) {
-	t0 := v0
-	t1 := i64_trunc_f64_u(t0)
-	_ = t1
+	t0 := i64_trunc_f64_u(v0)
+	_ = t0
 }
 
 func i32_trunc_f64_s(f float64) int32 {

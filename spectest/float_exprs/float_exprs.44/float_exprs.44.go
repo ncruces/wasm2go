@@ -10,106 +10,90 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_ult(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 >= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 >= v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }
 func (m *Module) Xf32_ule(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 > t1 {
-		p2 = 1
+	var p0 int32
+	if v0 > v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }
 func (m *Module) Xf32_ugt(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 <= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 <= v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }
 func (m *Module) Xf32_uge(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 < t1 {
-		p2 = 1
+	var p0 int32
+	if v0 < v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }
 func (m *Module) Xf64_ult(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 >= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 >= v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }
 func (m *Module) Xf64_ule(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 > t1 {
-		p2 = 1
+	var p0 int32
+	if v0 > v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }
 func (m *Module) Xf64_ugt(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 <= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 <= v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }
 func (m *Module) Xf64_uge(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 < t1 {
-		p2 = 1
+	var p0 int32
+	if v0 < v1 {
+		p0 = 1
 	}
-	var p3 int32
-	if p2 == 0 {
-		p3 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p3
+	return p1
 }

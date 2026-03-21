@@ -10,54 +10,30 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_add_le_monotonicity(v0 float32, v1 float32, v2 float32) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float32(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float32(t3 + t4)
-	var p6 int32
-	if t2 <= t5 {
-		p6 = 1
+	var p0 int32
+	if float32(v0+v2) <= float32(v1+v2) {
+		p0 = 1
 	}
-	return p6
+	return p0
 }
 func (m *Module) Xf32_no_fold_add_ge_monotonicity(v0 float32, v1 float32, v2 float32) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float32(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float32(t3 + t4)
-	var p6 int32
-	if t2 >= t5 {
-		p6 = 1
+	var p0 int32
+	if float32(v0+v2) >= float32(v1+v2) {
+		p0 = 1
 	}
-	return p6
+	return p0
 }
 func (m *Module) Xf64_no_fold_add_le_monotonicity(v0 float64, v1 float64, v2 float64) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float64(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float64(t3 + t4)
-	var p6 int32
-	if t2 <= t5 {
-		p6 = 1
+	var p0 int32
+	if float64(v0+v2) <= float64(v1+v2) {
+		p0 = 1
 	}
-	return p6
+	return p0
 }
 func (m *Module) Xf64_no_fold_add_ge_monotonicity(v0 float64, v1 float64, v2 float64) int32 {
-	t0 := v0
-	t1 := v2
-	t2 := float64(t0 + t1)
-	t3 := v1
-	t4 := v2
-	t5 := float64(t3 + t4)
-	var p6 int32
-	if t2 >= t5 {
-		p6 = 1
+	var p0 int32
+	if float64(v0+v2) >= float64(v1+v2) {
+		p0 = 1
 	}
-	return p6
+	return p0
 }

@@ -17,15 +17,11 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xcopy(v0 int64, v1 int64, v2 int64) {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	memory_copy(m.memory, uint64(t0), uint64(t1), uint64(t2))
+	memory_copy(m.memory, uint64(v0), uint64(v1), uint64(v2))
 }
 func (m *Module) Xload8_u(v0 int64) int32 {
-	t0 := v0
-	t1 := int32(m.memory[t0])
-	return t1
+	t0 := int32(m.memory[v0])
+	return t0
 }
 
 func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {

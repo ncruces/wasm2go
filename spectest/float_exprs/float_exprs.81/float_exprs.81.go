@@ -12,100 +12,32 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_sqrt(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(math.Sqrt(float64(t0)))
-	return t1
+	return float32(math.Sqrt(float64(v0)))
 }
 func (m *Module) Xf32_xkcd_sqrt_2(v0 float32, v1 float32, v2 float32, v3 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 / t1)
-	t3 := v2
-	t4 := v3
-	t5 := v2
-	t6 := float32(t4 - t5)
-	t7 := float32(t3 / t6)
-	t8 := float32(t2 + t7)
-	return t8
+	return float32(float32(v0/v1) + float32(v2/float32(v3-v2)))
 }
 func (m *Module) Xf32_xkcd_sqrt_3(v0 float32, v1 float32, v2 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 * t1)
-	t3 := v2
-	t4 := float32(t2 / t3)
-	return t4
+	return float32(float32(v0*v1) / v2)
 }
 func (m *Module) Xf32_xkcd_sqrt_5(v0 float32, v1 float32, v2 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 / t1)
-	t3 := v2
-	t4 := v0
-	t5 := float32(t3 / t4)
-	t6 := float32(t2 + t5)
-	return t6
+	return float32(float32(v0/v1) + float32(v2/v0))
 }
 func (m *Module) Xf32_xkcd_better_sqrt_5(v0 float32, v1 float32, v2 float32, v3 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	t3 := float32(t1 * t2)
-	t4 := float32(t0 + t3)
-	t5 := v3
-	t6 := v1
-	t7 := v2
-	t8 := float32(t6 * t7)
-	t9 := float32(t5 - t8)
-	t10 := float32(t4 / t9)
-	return t10
+	return float32(float32(v0+float32(v1*v2)) / float32(v3-float32(v1*v2)))
 }
 func (m *Module) Xf64_sqrt(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Sqrt(t0)
-	return t1
+	return math.Sqrt(v0)
 }
 func (m *Module) Xf64_xkcd_sqrt_2(v0 float64, v1 float64, v2 float64, v3 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 / t1)
-	t3 := v2
-	t4 := v3
-	t5 := v2
-	t6 := float64(t4 - t5)
-	t7 := float64(t3 / t6)
-	t8 := float64(t2 + t7)
-	return t8
+	return float64(float64(v0/v1) + float64(v2/float64(v3-v2)))
 }
 func (m *Module) Xf64_xkcd_sqrt_3(v0 float64, v1 float64, v2 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	t3 := v2
-	t4 := float64(t2 / t3)
-	return t4
+	return float64(float64(v0*v1) / v2)
 }
 func (m *Module) Xf64_xkcd_sqrt_5(v0 float64, v1 float64, v2 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 / t1)
-	t3 := v2
-	t4 := v0
-	t5 := float64(t3 / t4)
-	t6 := float64(t2 + t5)
-	return t6
+	return float64(float64(v0/v1) + float64(v2/v0))
 }
 func (m *Module) Xf64_xkcd_better_sqrt_5(v0 float64, v1 float64, v2 float64, v3 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	t3 := float64(t1 * t2)
-	t4 := float64(t0 + t3)
-	t5 := v3
-	t6 := v1
-	t7 := v2
-	t8 := float64(t6 * t7)
-	t9 := float64(t5 - t8)
-	t10 := float64(t4 / t9)
-	return t10
+	return float64(float64(v0+float64(v1*v2)) / float64(v3-float64(v1*v2)))
 }

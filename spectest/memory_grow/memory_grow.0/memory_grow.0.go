@@ -14,9 +14,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xgrow(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
-	return t1
+	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
+	return t0
 }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {

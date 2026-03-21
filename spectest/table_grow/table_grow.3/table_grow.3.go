@@ -11,9 +11,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xgrow(v0 int32) int32 {
-	t0 := v0
-	t1 := table_grow(&m.t0, nil, t0, 10)
-	return t1
+	t0 := table_grow(&m.t0, nil, v0, 10)
+	return t0
 }
 
 func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {

@@ -20,34 +20,28 @@ func New() *Module {
 	return m
 }
 func (m *Module) X64_good1(v0 int64) float64 {
-	t0 := v0
-	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[t0:]))
-	return t1
+	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[v0:]))
+	return t0
 }
 func (m *Module) X64_good2(v0 int64) float64 {
-	t0 := v0
-	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[t0:]))
-	return t1
+	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[v0:]))
+	return t0
 }
 func (m *Module) X64_good3(v0 int64) float64 {
-	t0 := v0
-	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[t0+1|t0>>63:]))
-	return t1
+	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[v0+1|v0>>63:]))
+	return t0
 }
 func (m *Module) X64_good4(v0 int64) float64 {
-	t0 := v0
-	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[t0+2|t0>>63:]))
-	return t1
+	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[v0+2|v0>>63:]))
+	return t0
 }
 func (m *Module) X64_good5(v0 int64) float64 {
-	t0 := v0
-	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[t0+18|t0>>63:]))
-	return t1
+	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[v0+18|v0>>63:]))
+	return t0
 }
 func (m *Module) X64_bad(v0 int64) {
-	t0 := v0
-	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[t0+4294967295|t0>>63:]))
-	_ = t1
+	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[v0+4294967295|v0>>63:]))
+	_ = t0
 }
 
 const data0 = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf4\x7f\x01\x00\x00\x00\x00\x00\xfc\x7f"

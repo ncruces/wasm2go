@@ -16,15 +16,11 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xfill(v0 int32, v1 int32, v2 int32) {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	memory_fill(m.memory, uint32(t0), t1, uint32(t2))
+	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xload8_u(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(m.memory[uint32(t0)])
-	return t1
+	t0 := int32(m.memory[uint32(v0)])
+	return t0
 }
 
 func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {

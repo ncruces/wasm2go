@@ -12,18 +12,11 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xabs(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Abs(t0)
-	return t1
+	return math.Abs(v0)
 }
 func (m *Module) Xneg(v0 float64) float64 {
-	t0 := v0
-	t1 := -t0
-	return t1
+	return -v0
 }
 func (m *Module) Xcopysign(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := math.Copysign(t0, t1)
-	return t2
+	return math.Copysign(v0, v1)
 }

@@ -12,20 +12,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_mul_sqrt_div(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(math.Sqrt(float64(t1)))
-	t3 := float32(t0 * t2)
-	t4 := v1
-	t5 := float32(t3 / t4)
-	return t5
+	return float32(float32(v0*float32(math.Sqrt(float64(v1)))) / v1)
 }
 func (m *Module) Xf64_no_fold_mul_sqrt_div(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := math.Sqrt(t1)
-	t3 := float64(t0 * t2)
-	t4 := v1
-	t5 := float64(t3 / t4)
-	return t5
+	return float64(float64(v0*math.Sqrt(v1)) / v1)
 }

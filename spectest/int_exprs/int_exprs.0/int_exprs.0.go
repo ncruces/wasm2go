@@ -10,46 +10,30 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_no_fold_cmp_s_offset(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := t0 + int32(1)
-	t2 := v1
-	t3 := t2 + int32(1)
-	var p4 int32
-	if t1 < t3 {
-		p4 = 1
+	var p0 int32
+	if v0+int32(1) < v1+int32(1) {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xi32_no_fold_cmp_u_offset(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := t0 + int32(1)
-	t2 := v1
-	t3 := t2 + int32(1)
-	var p4 int32
-	if uint32(t1) < uint32(t3) {
-		p4 = 1
+	var p0 int32
+	if uint32(v0+int32(1)) < uint32(v1+int32(1)) {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xi64_no_fold_cmp_s_offset(v0 int64, v1 int64) int32 {
-	t0 := v0
-	t1 := t0 + int64(1)
-	t2 := v1
-	t3 := t2 + int64(1)
-	var p4 int32
-	if t1 < t3 {
-		p4 = 1
+	var p0 int32
+	if v0+int64(1) < v1+int64(1) {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xi64_no_fold_cmp_u_offset(v0 int64, v1 int64) int32 {
-	t0 := v0
-	t1 := t0 + int64(1)
-	t2 := v1
-	t3 := t2 + int64(1)
-	var p4 int32
-	if uint64(t1) < uint64(t3) {
-		p4 = 1
+	var p0 int32
+	if uint64(v0+int64(1)) < uint64(v1+int64(1)) {
+		p0 = 1
 	}
-	return p4
+	return p0
 }

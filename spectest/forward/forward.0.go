@@ -10,32 +10,26 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xeven(v0 int32) int32 {
-	t0 := v0
-	var p2 int32
-	_ = p2
-	if t0 == i32_const(0) {
-		p2 = int32(1)
+	var p0 int32
+	_ = p0
+	if v0 == i32_const(0) {
+		p0 = int32(1)
 	} else {
-		t3 := v0
-		t4 := t3 - int32(1)
-		t5 := m.Xodd(t4)
-		p2 = t5
+		t1 := m.Xodd(v0 - int32(1))
+		p0 = t1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xodd(v0 int32) int32 {
-	t0 := v0
-	var p2 int32
-	_ = p2
-	if t0 == i32_const(0) {
-		p2 = i32_const(0)
+	var p0 int32
+	_ = p0
+	if v0 == i32_const(0) {
+		p0 = i32_const(0)
 	} else {
-		t3 := v0
-		t4 := t3 - int32(1)
-		t5 := m.Xeven(t4)
-		p2 = t5
+		t1 := m.Xeven(v0 - int32(1))
+		p0 = t1
 	}
-	return p2
+	return p0
 }
 
 //go:nosplit

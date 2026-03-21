@@ -12,20 +12,13 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xabs(v0 float32) float32 {
-	t0 := v0
-	t1 := f32_abs(t0)
-	return t1
+	return f32_abs(v0)
 }
 func (m *Module) Xneg(v0 float32) float32 {
-	t0 := v0
-	t1 := -t0
-	return t1
+	return -v0
 }
 func (m *Module) Xcopysign(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := f32_copysign(t0, t1)
-	return t2
+	return f32_copysign(v0, v1)
 }
 
 //go:nosplit

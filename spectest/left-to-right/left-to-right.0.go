@@ -176,28 +176,25 @@ func (m *Module) Xi32_add() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := t0 + t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 + t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_sub() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := t0 - t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 - t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_mul() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := t0 * t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 * t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_div_s() int32 {
 	m.f8()
@@ -239,55 +236,49 @@ func (m *Module) Xi32_and() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := t0 & t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 & t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_or() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := t0 | t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 | t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_xor() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := t0 ^ t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 ^ t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_shl() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := i32_shl(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = i32_shl(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_shr_u() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := i32_shr_u(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = i32_shr_u(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_shr_s() int32 {
 	m.f8()
 	t0 := m.f11()
 	t1 := m.f12()
-	t2 := i32_shr_s(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = i32_shr_s(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi32_eq() int32 {
 	m.f8()
@@ -468,28 +459,25 @@ func (m *Module) Xi64_add() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := t0 + t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 + t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_sub() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := t0 - t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 - t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_mul() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := t0 * t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 * t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_div_s() int32 {
 	m.f8()
@@ -531,55 +519,49 @@ func (m *Module) Xi64_and() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := t0 & t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 & t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_or() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := t0 | t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 | t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_xor() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := t0 ^ t1
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = t0 ^ t1
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_shl() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := i64_shl(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = i64_shl(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_shr_u() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := i64_shr_u(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = i64_shr_u(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_shr_s() int32 {
 	m.f8()
 	t0 := m.f16()
 	t1 := m.f17()
-	t2 := i64_shr_s(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = i64_shr_s(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xi64_eq() int32 {
 	m.f8()
@@ -768,46 +750,41 @@ func (m *Module) Xf32_add() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	t2 := float32(t0 + t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float32(t0 + t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf32_sub() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	t2 := float32(t0 - t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float32(t0 - t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf32_mul() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	t2 := float32(t0 * t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float32(t0 * t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf32_div() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	t2 := float32(t0 / t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float32(t0 / t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf32_copysign() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	t2 := f32_copysign(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = f32_copysign(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf32_eq() int32 {
 	m.f8()
@@ -885,19 +862,17 @@ func (m *Module) Xf32_min() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	t2 := f32_min(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = f32_min(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf32_max() int32 {
 	m.f8()
 	t0 := m.f21()
 	t1 := m.f22()
-	t2 := f32_max(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = f32_max(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf32_store() int32 {
 	m.f8()
@@ -942,46 +917,41 @@ func (m *Module) Xf64_add() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	t2 := float64(t0 + t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float64(t0 + t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf64_sub() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	t2 := float64(t0 - t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float64(t0 - t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf64_mul() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	t2 := float64(t0 * t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float64(t0 * t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf64_div() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	t2 := float64(t0 / t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = float64(t0 / t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf64_copysign() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	t2 := math.Copysign(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = math.Copysign(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf64_eq() int32 {
 	m.f8()
@@ -1059,19 +1029,17 @@ func (m *Module) Xf64_min() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	t2 := f64_min(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = f64_min(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf64_max() int32 {
 	m.f8()
 	t0 := m.f26()
 	t1 := m.f27()
-	t2 := f64_max(t0, t1)
-	_ = t2
-	t3 := m.f10()
-	return t3
+	_ = f64_max(t0, t1)
+	t2 := m.f10()
+	return t2
 }
 func (m *Module) Xf64_store() int32 {
 	m.f8()
@@ -1119,14 +1087,13 @@ func (m *Module) Xbr_if() int32 {
 		m.f8()
 		t1 := m.f11()
 		t2 := m.f12()
-		t3 := t2 & i32_const(0)
-		p0 = t1
-		if t3 != 0 {
+		if t2&i32_const(0) != 0 {
+			p0 = t1
 			goto l0
 		}
 		_ = t1
-		t4 := m.f10()
-		p0 = t4
+		t3 := m.f10()
+		p0 = t3
 	}
 l0:
 	return p0
@@ -1141,12 +1108,12 @@ func (m *Module) Xbr_table() int32 {
 		{
 			t2 := m.f11()
 			t3 := m.f12()
-			p0 = t2
-			p1 = t2
 			switch t3 {
 			case 0:
+				p0 = t2
 				goto l0
 			default:
+				p1 = t2
 				goto l1
 			}
 		}

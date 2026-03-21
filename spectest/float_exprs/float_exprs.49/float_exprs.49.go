@@ -10,14 +10,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_incorrect_correction() float32 {
-	t0 := float32(float32(1.333) + float32(1.225))
-	t1 := float32(t0 - float32(1.333))
-	t2 := float32(t1 - float32(1.225))
-	return t2
+	return float32(float32(float32(float32(1.333)+float32(1.225))-float32(1.333)) - float32(1.225))
 }
 func (m *Module) Xf64_incorrect_correction() float64 {
-	t0 := float64(float64(1.333) + float64(1.225))
-	t1 := float64(t0 - float64(1.333))
-	t2 := float64(t1 - float64(1.225))
-	return t2
+	return float64(float64(float64(float64(1.333)+float64(1.225))-float64(1.333)) - float64(1.225))
 }

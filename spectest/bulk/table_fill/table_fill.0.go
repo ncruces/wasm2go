@@ -12,21 +12,14 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xfill(v0 int32, v1 any, v2 int32) {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	table_fill(m.t0, t0, t1, t2)
+	table_fill(m.t0, v0, v1, v2)
 }
 func (m *Module) Xfill_abbrev(v0 int32, v1 any, v2 int32) {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	table_fill(m.t0, t0, t1, t2)
+	table_fill(m.t0, v0, v1, v2)
 }
 func (m *Module) Xget(v0 int32) any {
-	t0 := v0
-	t1 := m.t0[t0]
-	return t1
+	t0 := m.t0[v0]
+	return t0
 }
 
 func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {

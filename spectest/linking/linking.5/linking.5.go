@@ -22,8 +22,7 @@ func (m *Module) Xget_mut() int32 {
 	return t0
 }
 func (m *Module) Xset_mut(v0 int32) {
-	t0 := v0
-	m.g1 = t0
+	m.g1 = v0
 }
 func (m *Module) Xglob() *int32 {
 	return &m.g0

@@ -30,13 +30,10 @@ func (m *Module) Xloop1() int32 {
 		_ = p1
 	l1:
 		{
-			t2 := v0
-			t3 := t2 + int32(1)
-			v0 = t3
-			t4 := v0
-			if t4 == int32(5) {
-				t6 := v0
-				p0 = t6
+			v0 = v0 + int32(1)
+			if v0 == int32(5) {
+				t2 := v0
+				p0 = t2
 				goto l0
 			}
 			goto l1
@@ -56,22 +53,16 @@ func (m *Module) Xloop2() int32 {
 		_ = p1
 	l0:
 		{
-			t2 := v0
-			t3 := t2 + int32(1)
-			v0 = t3
-			t4 := v0
-			if t4 == int32(5) {
+			v0 = v0 + int32(1)
+			if v0 == int32(5) {
 				goto l0
 			}
-			t6 := v0
-			if t6 == int32(8) {
-				t8 := v0
-				p0 = t8
+			if v0 == int32(8) {
+				t2 := v0
+				p0 = t2
 				goto l1
 			}
-			t9 := v0
-			t10 := t9 + int32(1)
-			v0 = t10
+			v0 = v0 + int32(1)
 			goto l0
 		}
 	}
@@ -88,17 +79,14 @@ func (m *Module) Xloop3() int32 {
 		var p1 int32
 		_ = p1
 		{
-			t2 := v0
-			t3 := t2 + int32(1)
-			v0 = t3
-			t4 := v0
-			if t4 == int32(5) {
-				t6 := v0
-				p0 = t6
+			v0 = v0 + int32(1)
+			if v0 == int32(5) {
+				t2 := v0
+				p0 = t2
 				goto l0
 			}
-			t7 := v0
-			p1 = t7
+			t3 := v0
+			p1 = t3
 		}
 		p0 = p1
 	}
@@ -116,15 +104,10 @@ func (m *Module) Xloop4(v0 int32) int32 {
 		_ = p1
 	l1:
 		{
-			t2 := v1
-			t3 := v1
-			t4 := t2 + t3
-			v1 = t4
-			t5 := v1
-			t6 := v0
-			if uint32(t5) > uint32(t6) {
-				t8 := v1
-				p0 = t8
+			v1 = v1 + v1
+			if uint32(v1) > uint32(v0) {
+				t2 := v1
+				p0 = t2
 				goto l0
 			}
 			goto l1
@@ -139,8 +122,7 @@ func (m *Module) Xloop5() int32 {
 	{
 		p0 = int32(1)
 	}
-	t1 := p0 + int32(1)
-	return t1
+	return p0 + int32(1)
 }
 func (m *Module) Xloop6() int32 {
 	var p0 int32
@@ -163,48 +145,37 @@ func (m *Module) Xif() int32 {
 			goto l0
 		}
 	l0:
-		t0 := v0
-		t1 := t0 + int32(1)
-		v0 = t1
+		v0 = v0 + int32(1)
 		if int32(1) != 0 {
 			goto l1
 		} else {
 			v0 = i32_const(888)
 		}
 	l1:
-		t2 := v0
-		t3 := t2 + int32(1)
-		v0 = t3
+		v0 = v0 + int32(1)
 		if int32(1) != 0 {
 			goto l2
 		} else {
 			v0 = i32_const(888)
 		}
 	l2:
-		t4 := v0
-		t5 := t4 + int32(1)
-		v0 = t5
+		v0 = v0 + int32(1)
 		if i32_const(0) != 0 {
 			v0 = i32_const(888)
 		} else {
 			goto l3
 		}
 	l3:
-		t6 := v0
-		t7 := t6 + int32(1)
-		v0 = t7
+		v0 = v0 + int32(1)
 		if i32_const(0) != 0 {
 			v0 = i32_const(888)
 		} else {
 			goto l4
 		}
 	l4:
-		t8 := v0
-		t9 := t8 + int32(1)
-		v0 = t9
+		v0 = v0 + int32(1)
 	}
-	t10 := v0
-	return t10
+	return v0
 }
 func (m *Module) Xif2() int32 {
 	var v0 int32
@@ -215,48 +186,37 @@ func (m *Module) Xif2() int32 {
 			goto l0
 		}
 	l0:
-		t0 := v0
-		t1 := t0 + int32(1)
-		v0 = t1
+		v0 = v0 + int32(1)
 		if int32(1) != 0 {
 			goto l1
 		} else {
 			v0 = i32_const(888)
 		}
 	l1:
-		t2 := v0
-		t3 := t2 + int32(1)
-		v0 = t3
+		v0 = v0 + int32(1)
 		if int32(1) != 0 {
 			goto l2
 		} else {
 			v0 = i32_const(888)
 		}
 	l2:
-		t4 := v0
-		t5 := t4 + int32(1)
-		v0 = t5
+		v0 = v0 + int32(1)
 		if i32_const(0) != 0 {
 			v0 = i32_const(888)
 		} else {
 			goto l3
 		}
 	l3:
-		t6 := v0
-		t7 := t6 + int32(1)
-		v0 = t7
+		v0 = v0 + int32(1)
 		if i32_const(0) != 0 {
 			v0 = i32_const(888)
 		} else {
 			goto l4
 		}
 	l4:
-		t8 := v0
-		t9 := t8 + int32(1)
-		v0 = t9
+		v0 = v0 + int32(1)
 	}
-	t10 := v0
-	return t10
+	return v0
 }
 func (m *Module) Xswitch(v0 int32) int32 {
 	var p0 int32
@@ -270,8 +230,7 @@ func (m *Module) Xswitch(v0 int32) int32 {
 					{
 						{
 							{
-								t2 := v0
-								switch t2 {
+								switch v0 {
 								case 0:
 									goto l0
 								case 1:
@@ -300,8 +259,8 @@ func (m *Module) Xswitch(v0 int32) int32 {
 			p1 = int32(5)
 		}
 	l5:
-		t3 := int32(10) * p1
-		p0 = t3
+		t2 := int32(10) * p1
+		p0 = t2
 	}
 l6:
 	return p0
@@ -310,8 +269,7 @@ func (m *Module) Xreturn(v0 int32) int32 {
 	{
 		{
 			{
-				t0 := v0
-				switch t0 {
+				switch v0 {
 				case 0:
 					goto l0
 				default:
@@ -336,54 +294,42 @@ func (m *Module) Xbr_if0() int32 {
 			if i32_const(0) != 0 {
 				goto l0
 			}
-			t1 := v0
-			t2 := t1 | int32(1)
-			v0 = t2
+			v0 = v0 | int32(1)
 			if int32(1) != 0 {
 				goto l0
 			}
-			t3 := v0
-			t4 := t3 | int32(2)
-			v0 = t4
+			v0 = v0 | int32(2)
 		}
 	l0:
 		;
-		var p5 int32
-		_ = p5
+		var p1 int32
+		_ = p1
 		{
-			t6 := v0
-			t7 := t6 | int32(4)
-			v0 = t7
-			t8 := v0
-			p5 = t8
+			v0 = v0 | int32(4)
+			t2 := v0
+			p1 = t2
 		}
-		p0 = p5
 		if i32_const(0) != 0 {
+			p0 = p1
 			goto l1
 		}
-		_ = p5
-		t9 := v0
-		t10 := t9 | int32(8)
-		v0 = t10
-		var p11 int32
-		_ = p11
+		_ = p1
+		v0 = v0 | int32(8)
+		var p3 int32
+		_ = p3
 		{
-			t12 := v0
-			t13 := t12 | int32(16)
-			v0 = t13
-			t14 := v0
-			p11 = t14
+			v0 = v0 | int32(16)
+			t4 := v0
+			p3 = t4
 		}
-		p0 = p11
 		if int32(1) != 0 {
+			p0 = p3
 			goto l1
 		}
-		_ = p11
-		t15 := v0
-		t16 := t15 | int32(32)
-		v0 = t16
-		t17 := v0
-		p0 = t17
+		_ = p3
+		v0 = v0 | int32(32)
+		t5 := v0
+		p0 = t5
 	}
 l1:
 	return p0
@@ -399,8 +345,8 @@ func (m *Module) Xbr_if1() int32 {
 			goto l0
 		}
 	l0:
-		p0 = p1
 		if int32(1) != 0 {
+			p0 = p1
 			goto l1
 		}
 		_ = p1
@@ -421,8 +367,8 @@ func (m *Module) Xbr_if2() int32 {
 				goto l0
 			}
 		l0:
-			p0 = p1
 			if int32(1) != 0 {
+				p0 = p1
 				goto l1
 			}
 			_ = p1
@@ -452,18 +398,16 @@ func (m *Module) Xbr_if3() int32 {
 			t4 := v0
 			p3 = t4
 		}
-		p0 = p1
 		if p3 != 0 {
+			p0 = p1
 			goto l0
 		}
 		_ = p1
 		p0 = i32_const(0)
 	}
 l0:
-	t5 := p0 + i32_const(0)
-	_ = t5
-	t6 := v0
-	return t6
+	_ = p0 + i32_const(0)
+	return v0
 }
 func (m *Module) Xbr() int32 {
 	var p0 int32

@@ -17,40 +17,35 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xfuncref(v0 any) int32 {
-	t0 := v0
-	var p1 int32
-	if t0 == nil {
-		p1 = 1
+	var p0 int32
+	if v0 == nil {
+		p0 = 1
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xexternref(v0 any) int32 {
-	t0 := v0
-	var p1 int32
-	if t0 == nil {
-		p1 = 1
+	var p0 int32
+	if v0 == nil {
+		p0 = 1
 	}
-	return p1
+	return p0
 }
 func (m *Module) f2() {
 }
 func (m *Module) Xinit(v0 any) {
-	t0 := v0
-	m.t1[int32(1)] = t0
+	m.t1[int32(1)] = v0
 }
 func (m *Module) Xdeinit() {
 	m.t0[int32(1)] = nil
 	m.t1[int32(1)] = nil
 }
 func (m *Module) Xfuncref_elem(v0 int32) int32 {
-	t0 := v0
-	t1 := m.t0[t0]
-	t2 := m.Xfuncref(t1)
-	return t2
+	t0 := m.t0[v0]
+	t1 := m.Xfuncref(t0)
+	return t1
 }
 func (m *Module) Xexternref_elem(v0 int32) int32 {
-	t0 := v0
-	t1 := m.t1[t0]
-	t2 := m.Xexternref(t1)
-	return t2
+	t0 := m.t1[v0]
+	t1 := m.Xexternref(t0)
+	return t1
 }

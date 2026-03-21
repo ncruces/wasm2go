@@ -19,27 +19,23 @@ func New() *Module {
 func (m *Module) f0() {
 }
 func (m *Module) Xinit(v0 any) {
-	t0 := v0
-	m.t0[int64(1)] = t0
-	t1 := m.t1[int64(1)]
-	m.t1[int64(2)] = t1
+	m.t0[int64(1)] = v0
+	t0 := m.t1[int64(1)]
+	m.t1[int64(2)] = t0
 }
 func (m *Module) Xget_externref(v0 int64) any {
-	t0 := v0
-	t1 := m.t0[t0]
-	return t1
+	t0 := m.t0[v0]
+	return t0
 }
 func (m *Module) Xget_funcref(v0 int64) any {
-	t0 := v0
-	t1 := m.t1[t0]
-	return t1
+	t0 := m.t1[v0]
+	return t0
 }
 func (m *Module) Xis_null_funcref(v0 int64) int32 {
-	t0 := v0
-	t1 := m.Xget_funcref(t0)
-	var p2 int32
-	if t1 == nil {
-		p2 = 1
+	t0 := m.Xget_funcref(v0)
+	var p1 int32
+	if t0 == nil {
+		p1 = 1
 	}
-	return p2
+	return p1
 }
