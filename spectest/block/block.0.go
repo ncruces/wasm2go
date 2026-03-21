@@ -297,7 +297,7 @@ func (m *Module) Xdeep() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_select_first() int32 {
+func (m *Module) Xas응2Dselect응2Dfirst() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -309,7 +309,7 @@ func (m *Module) Xas_select_first() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_select_mid() int32 {
+func (m *Module) Xas응2Dselect응2Dmid() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -321,7 +321,7 @@ func (m *Module) Xas_select_mid() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_select_last() int32 {
+func (m *Module) Xas응2Dselect응2Dlast() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -333,7 +333,7 @@ func (m *Module) Xas_select_last() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_loop_first() int32 {
+func (m *Module) Xas응2Dloop응2Dfirst() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -348,7 +348,7 @@ func (m *Module) Xas_loop_first() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_mid() int32 {
+func (m *Module) Xas응2Dloop응2Dmid() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -363,7 +363,7 @@ func (m *Module) Xas_loop_mid() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_last() int32 {
+func (m *Module) Xas응2Dloop응2Dlast() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -378,7 +378,7 @@ func (m *Module) Xas_loop_last() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_condition() {
+func (m *Module) Xas응2Dif응2Dcondition() {
 	var p0 int32
 	_ = p0
 	{
@@ -388,7 +388,7 @@ func (m *Module) Xas_if_condition() {
 		m.f0()
 	}
 }
-func (m *Module) Xas_if_then() int32 {
+func (m *Module) Xas응2Dif응2Dthen() int32 {
 	var p0 int32
 	_ = p0
 	if int32(1) != 0 {
@@ -403,7 +403,7 @@ func (m *Module) Xas_if_then() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_else() int32 {
+func (m *Module) Xas응2Dif응2Delse() int32 {
 	var p0 int32
 	_ = p0
 	if int32(1) != 0 {
@@ -418,7 +418,7 @@ func (m *Module) Xas_if_else() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_br_if_first() int32 {
+func (m *Module) Xas응2Dbr_if응2Dfirst() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -436,7 +436,7 @@ func (m *Module) Xas_br_if_first() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_last() int32 {
+func (m *Module) Xas응2Dbr_if응2Dlast() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -454,7 +454,7 @@ func (m *Module) Xas_br_if_last() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_first() int32 {
+func (m *Module) Xas응2Dbr_table응2Dfirst() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -472,7 +472,7 @@ func (m *Module) Xas_br_table_first() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_last() int32 {
+func (m *Module) Xas응2Dbr_table응2Dlast() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -493,7 +493,7 @@ l0:
 func (m *Module) f19(v0 int32, v1 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_call_indirect_first() int32 {
+func (m *Module) Xas응2Dcall_indirect응2Dfirst() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -507,7 +507,7 @@ func (m *Module) Xas_call_indirect_first() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_mid() int32 {
+func (m *Module) Xas응2Dcall_indirect응2Dmid() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -521,7 +521,7 @@ func (m *Module) Xas_call_indirect_mid() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_last() int32 {
+func (m *Module) Xas응2Dcall_indirect응2Dlast() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -535,7 +535,7 @@ func (m *Module) Xas_call_indirect_last() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_store_first() {
+func (m *Module) Xas응2Dstore응2Dfirst() {
 	var p0 int32
 	_ = p0
 	{
@@ -543,7 +543,7 @@ func (m *Module) Xas_store_first() {
 	}
 	binary.LittleEndian.PutUint32(m.memory[uint32(p0):], uint32(int32(1)))
 }
-func (m *Module) Xas_store_last() {
+func (m *Module) Xas응2Dstore응2Dlast() {
 	var p0 int32
 	_ = p0
 	{
@@ -551,7 +551,7 @@ func (m *Module) Xas_store_last() {
 	}
 	binary.LittleEndian.PutUint32(m.memory[uint32(int32(10)):], uint32(p0))
 }
-func (m *Module) Xas_memory_grow_value() int32 {
+func (m *Module) Xas응2Dmemory응2Egrow응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -563,7 +563,7 @@ func (m *Module) Xas_memory_grow_value() int32 {
 func (m *Module) f26(v0 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_call_value() int32 {
+func (m *Module) Xas응2Dcall응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -572,7 +572,7 @@ func (m *Module) Xas_call_value() int32 {
 	t1 := m.f26(p0)
 	return t1
 }
-func (m *Module) Xas_return_value() int32 {
+func (m *Module) Xas응2Dreturn응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -580,7 +580,7 @@ func (m *Module) Xas_return_value() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_drop_operand() {
+func (m *Module) Xas응2Ddrop응2Doperand() {
 	var p0 int32
 	_ = p0
 	{
@@ -588,7 +588,7 @@ func (m *Module) Xas_drop_operand() {
 	}
 	_ = p0
 }
-func (m *Module) Xas_br_value() int32 {
+func (m *Module) Xas응2Dbr응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -603,7 +603,7 @@ func (m *Module) Xas_br_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_local_set_value() int32 {
+func (m *Module) Xas응2Dlocal응2Eset응2Dvalue() int32 {
 	var v0 int32
 	_ = v0
 	var p0 int32
@@ -614,7 +614,7 @@ func (m *Module) Xas_local_set_value() int32 {
 	v0 = p0
 	return v0
 }
-func (m *Module) Xas_local_tee_value() int32 {
+func (m *Module) Xas응2Dlocal응2Etee응2Dvalue() int32 {
 	var v0 int32
 	_ = v0
 	var p0 int32
@@ -625,7 +625,7 @@ func (m *Module) Xas_local_tee_value() int32 {
 	v0 = p0
 	return v0
 }
-func (m *Module) Xas_global_set_value() int32 {
+func (m *Module) Xas응2Dglobal응2Eset응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -635,7 +635,7 @@ func (m *Module) Xas_global_set_value() int32 {
 	t1 := m.g0
 	return t1
 }
-func (m *Module) Xas_load_operand() int32 {
+func (m *Module) Xas응2Dload응2Doperand() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -644,7 +644,7 @@ func (m *Module) Xas_load_operand() int32 {
 	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(p0):]))
 	return t1
 }
-func (m *Module) Xas_unary_operand() int32 {
+func (m *Module) Xas응2Dunary응2Doperand() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -653,7 +653,7 @@ func (m *Module) Xas_unary_operand() int32 {
 	}
 	return int32(bits.TrailingZeros32(uint32(p0)))
 }
-func (m *Module) Xas_binary_operand() int32 {
+func (m *Module) Xas응2Dbinary응2Doperand() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -668,7 +668,7 @@ func (m *Module) Xas_binary_operand() int32 {
 	}
 	return p0 * p1
 }
-func (m *Module) Xas_test_operand() int32 {
+func (m *Module) Xas응2Dtest응2Doperand() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -681,7 +681,7 @@ func (m *Module) Xas_test_operand() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_compare_operand() int32 {
+func (m *Module) Xas응2Dcompare응2Doperand() int32 {
 	var p0 float32
 	_ = p0
 	{
@@ -700,7 +700,7 @@ func (m *Module) Xas_compare_operand() int32 {
 	}
 	return p2
 }
-func (m *Module) Xas_binary_operands() int32 {
+func (m *Module) Xas응2Dbinary응2Doperands() int32 {
 	var p0 int32
 	var p1 int32
 	_, _ = p0, p1
@@ -711,7 +711,7 @@ func (m *Module) Xas_binary_operands() int32 {
 	}
 	return p0 * p1
 }
-func (m *Module) Xas_compare_operands() int32 {
+func (m *Module) Xas응2Dcompare응2Doperands() int32 {
 	var p0 float32
 	var p1 float32
 	_, _ = p0, p1
@@ -726,7 +726,7 @@ func (m *Module) Xas_compare_operands() int32 {
 	}
 	return p2
 }
-func (m *Module) Xas_mixed_operands() int32 {
+func (m *Module) Xas응2Dmixed응2Doperands() int32 {
 	var p0 int32
 	var p1 int32
 	_, _ = p0, p1
@@ -737,7 +737,7 @@ func (m *Module) Xas_mixed_operands() int32 {
 	}
 	return p0 * (p1 + int32(5))
 }
-func (m *Module) Xbreak_bare() int32 {
+func (m *Module) Xbreak응2Dbare() int32 {
 	{
 		goto l0
 	}
@@ -765,7 +765,7 @@ l2:
 l3:
 	return int32(19)
 }
-func (m *Module) Xbreak_value() int32 {
+func (m *Module) Xbreak응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -775,7 +775,7 @@ func (m *Module) Xbreak_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbreak_multi_value() (int32, int32, int64) {
+func (m *Module) Xbreak응2Dmulti응2Dvalue() (int32, int32, int64) {
 	var p0 int32
 	var p1 int32
 	var p2 int64
@@ -787,7 +787,7 @@ func (m *Module) Xbreak_multi_value() (int32, int32, int64) {
 l0:
 	return p0, p1, p2
 }
-func (m *Module) Xbreak_repeated() int32 {
+func (m *Module) Xbreak응2Drepeated() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -797,7 +797,7 @@ func (m *Module) Xbreak_repeated() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbreak_inner() int32 {
+func (m *Module) Xbreak응2Dinner() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
@@ -867,7 +867,7 @@ func (m *Module) Xparams() int32 {
 	}
 	return p0
 }
-func (m *Module) Xparams_id() int32 {
+func (m *Module) Xparams응2Did() int32 {
 	var p0 int32
 	var p1 int32
 	_, _ = p0, p1
@@ -876,7 +876,7 @@ func (m *Module) Xparams_id() int32 {
 	}
 	return p0 + p1
 }
-func (m *Module) Xparam_break() int32 {
+func (m *Module) Xparam응2Dbreak() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -887,7 +887,7 @@ func (m *Module) Xparam_break() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xparams_break() int32 {
+func (m *Module) Xparams응2Dbreak() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -898,7 +898,7 @@ func (m *Module) Xparams_break() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xparams_id_break() int32 {
+func (m *Module) Xparams응2Did응2Dbreak() int32 {
 	var p0 int32
 	var p1 int32
 	_, _ = p0, p1
@@ -927,7 +927,7 @@ l0:
 	}
 	return p0
 }
-func (m *Module) Xtype_use() {
+func (m *Module) Xtype응2Duse() {
 	{
 	}
 	var p0 int32

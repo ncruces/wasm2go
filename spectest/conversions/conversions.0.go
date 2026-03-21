@@ -11,111 +11,111 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xi64_extend_i32_s(v0 int32) int64 {
+func (m *Module) Xi64응2Eextend_i32_s(v0 int32) int64 {
 	return int64(v0)
 }
-func (m *Module) Xi64_extend_i32_u(v0 int32) int64 {
+func (m *Module) Xi64응2Eextend_i32_u(v0 int32) int64 {
 	return int64(uint32(v0))
 }
-func (m *Module) Xi32_wrap_i64(v0 int64) int32 {
+func (m *Module) Xi32응2Ewrap_i64(v0 int64) int32 {
 	return int32(v0)
 }
-func (m *Module) Xi32_trunc_f32_s(v0 float32) int32 {
+func (m *Module) Xi32응2Etrunc_f32_s(v0 float32) int32 {
 	t0 := i32_trunc_f32_s(v0)
 	return t0
 }
-func (m *Module) Xi32_trunc_f32_u(v0 float32) int32 {
+func (m *Module) Xi32응2Etrunc_f32_u(v0 float32) int32 {
 	t0 := i32_trunc_f32_u(v0)
 	return t0
 }
-func (m *Module) Xi32_trunc_f64_s(v0 float64) int32 {
+func (m *Module) Xi32응2Etrunc_f64_s(v0 float64) int32 {
 	t0 := i32_trunc_f64_s(v0)
 	return t0
 }
-func (m *Module) Xi32_trunc_f64_u(v0 float64) int32 {
+func (m *Module) Xi32응2Etrunc_f64_u(v0 float64) int32 {
 	t0 := i32_trunc_f64_u(v0)
 	return t0
 }
-func (m *Module) Xi64_trunc_f32_s(v0 float32) int64 {
+func (m *Module) Xi64응2Etrunc_f32_s(v0 float32) int64 {
 	t0 := i64_trunc_f32_s(v0)
 	return t0
 }
-func (m *Module) Xi64_trunc_f32_u(v0 float32) int64 {
+func (m *Module) Xi64응2Etrunc_f32_u(v0 float32) int64 {
 	t0 := i64_trunc_f32_u(v0)
 	return t0
 }
-func (m *Module) Xi64_trunc_f64_s(v0 float64) int64 {
+func (m *Module) Xi64응2Etrunc_f64_s(v0 float64) int64 {
 	t0 := i64_trunc_f64_s(v0)
 	return t0
 }
-func (m *Module) Xi64_trunc_f64_u(v0 float64) int64 {
+func (m *Module) Xi64응2Etrunc_f64_u(v0 float64) int64 {
 	t0 := i64_trunc_f64_u(v0)
 	return t0
 }
-func (m *Module) Xi32_trunc_sat_f32_s(v0 float32) int32 {
+func (m *Module) Xi32응2Etrunc_sat_f32_s(v0 float32) int32 {
 	return i32_trunc_sat_f32_s(v0)
 }
-func (m *Module) Xi32_trunc_sat_f32_u(v0 float32) int32 {
+func (m *Module) Xi32응2Etrunc_sat_f32_u(v0 float32) int32 {
 	return i32_trunc_sat_f32_u(v0)
 }
-func (m *Module) Xi32_trunc_sat_f64_s(v0 float64) int32 {
+func (m *Module) Xi32응2Etrunc_sat_f64_s(v0 float64) int32 {
 	return i32_trunc_sat_f64_s(v0)
 }
-func (m *Module) Xi32_trunc_sat_f64_u(v0 float64) int32 {
+func (m *Module) Xi32응2Etrunc_sat_f64_u(v0 float64) int32 {
 	return i32_trunc_sat_f64_u(v0)
 }
-func (m *Module) Xi64_trunc_sat_f32_s(v0 float32) int64 {
+func (m *Module) Xi64응2Etrunc_sat_f32_s(v0 float32) int64 {
 	return i64_trunc_sat_f32_s(v0)
 }
-func (m *Module) Xi64_trunc_sat_f32_u(v0 float32) int64 {
+func (m *Module) Xi64응2Etrunc_sat_f32_u(v0 float32) int64 {
 	return i64_trunc_sat_f32_u(v0)
 }
-func (m *Module) Xi64_trunc_sat_f64_s(v0 float64) int64 {
+func (m *Module) Xi64응2Etrunc_sat_f64_s(v0 float64) int64 {
 	return i64_trunc_sat_f64_s(v0)
 }
-func (m *Module) Xi64_trunc_sat_f64_u(v0 float64) int64 {
+func (m *Module) Xi64응2Etrunc_sat_f64_u(v0 float64) int64 {
 	return i64_trunc_sat_f64_u(v0)
 }
-func (m *Module) Xf32_convert_i32_s(v0 int32) float32 {
+func (m *Module) Xf32응2Econvert_i32_s(v0 int32) float32 {
 	return float32(v0)
 }
-func (m *Module) Xf32_convert_i64_s(v0 int64) float32 {
+func (m *Module) Xf32응2Econvert_i64_s(v0 int64) float32 {
 	return float32(v0)
 }
-func (m *Module) Xf64_convert_i32_s(v0 int32) float64 {
+func (m *Module) Xf64응2Econvert_i32_s(v0 int32) float64 {
 	return float64(v0)
 }
-func (m *Module) Xf64_convert_i64_s(v0 int64) float64 {
+func (m *Module) Xf64응2Econvert_i64_s(v0 int64) float64 {
 	return float64(v0)
 }
-func (m *Module) Xf32_convert_i32_u(v0 int32) float32 {
+func (m *Module) Xf32응2Econvert_i32_u(v0 int32) float32 {
 	return float32(uint32(v0))
 }
-func (m *Module) Xf32_convert_i64_u(v0 int64) float32 {
+func (m *Module) Xf32응2Econvert_i64_u(v0 int64) float32 {
 	return float32(uint64(v0))
 }
-func (m *Module) Xf64_convert_i32_u(v0 int32) float64 {
+func (m *Module) Xf64응2Econvert_i32_u(v0 int32) float64 {
 	return float64(uint32(v0))
 }
-func (m *Module) Xf64_convert_i64_u(v0 int64) float64 {
+func (m *Module) Xf64응2Econvert_i64_u(v0 int64) float64 {
 	return float64(uint64(v0))
 }
-func (m *Module) Xf64_promote_f32(v0 float32) float64 {
+func (m *Module) Xf64응2Epromote_f32(v0 float32) float64 {
 	return float64(v0)
 }
-func (m *Module) Xf32_demote_f64(v0 float64) float32 {
+func (m *Module) Xf32응2Edemote_f64(v0 float64) float32 {
 	return float32(v0)
 }
-func (m *Module) Xf32_reinterpret_i32(v0 int32) float32 {
+func (m *Module) Xf32응2Ereinterpret_i32(v0 int32) float32 {
 	return math.Float32frombits(uint32(v0))
 }
-func (m *Module) Xf64_reinterpret_i64(v0 int64) float64 {
+func (m *Module) Xf64응2Ereinterpret_i64(v0 int64) float64 {
 	return math.Float64frombits(uint64(v0))
 }
-func (m *Module) Xi32_reinterpret_f32(v0 float32) int32 {
+func (m *Module) Xi32응2Ereinterpret_f32(v0 float32) int32 {
 	return int32(math.Float32bits(v0))
 }
-func (m *Module) Xi64_reinterpret_f64(v0 float64) int64 {
+func (m *Module) Xi64응2Ereinterpret_f64(v0 float64) int64 {
 	return int64(math.Float64bits(v0))
 }
 

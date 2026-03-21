@@ -31,23 +31,23 @@ type XMg = interface {
 	Xset_mut(v0 int32)
 }
 
-func (m *Module) XMg_get() int32 {
+func (m *Module) XMg응2Eget() int32 {
 	return m._Mg.Xget()
 }
-func (m *Module) XMg_get_mut() int32 {
+func (m *Module) XMg응2Eget_mut() int32 {
 	return m._Mg.Xget_mut()
 }
-func (m *Module) XMg_set_mut(v0 int32) {
+func (m *Module) XMg응2Eset_mut(v0 int32) {
 	m._Mg.Xset_mut(v0)
 }
 func (m *Module) Xget() int32 {
 	t0 := m.g2
 	return t0
 }
-func (m *Module) XMg_glob() *int32 {
+func (m *Module) XMg응2Eglob() *int32 {
 	return m.g0
 }
-func (m *Module) XMg_mut_glob() *int32 {
+func (m *Module) XMg응2Emut_glob() *int32 {
 	return m.g1
 }
 func (m *Module) Xglob() *int32 {

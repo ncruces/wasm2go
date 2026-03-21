@@ -20,22 +20,22 @@ func Test_globals(t *testing.T) {
 	ng := linking6.New(mg)
 
 	assert_return(t, *mg.Xglob(), 42)    // (assert_return (get $Mg "glob") (i32.const 42))
-	assert_return(t, *ng.XMg_glob(), 42) // (assert_return (get $Ng "Mg.glob") (i32.const 42))
+	assert_return(t, *ng.XMg응2Eglob(), 42) // (assert_return (get $Ng "Mg.glob") (i32.const 42))
 	assert_return(t, *ng.Xglob(), 43)    // (assert_return (get $Ng "glob") (i32.const 43))
 	assert_return(t, mg.Xget(), 42)      // (assert_return (invoke $Mg "get") (i32.const 42))
-	assert_return(t, ng.XMg_get(), 42)   // (assert_return (invoke $Ng "Mg.get") (i32.const 42))
+	assert_return(t, ng.XMg응2Eget(), 42)   // (assert_return (invoke $Ng "Mg.get") (i32.const 42))
 	assert_return(t, ng.Xget(), 43)      // (assert_return (invoke $Ng "get") (i32.const 43))
 
 	assert_return(t, *mg.Xmut_glob(), 142)    // (assert_return (get $Mg "mut_glob") (i32.const 142))
-	assert_return(t, *ng.XMg_mut_glob(), 142) // (assert_return (get $Ng "Mg.mut_glob") (i32.const 142))
+	assert_return(t, *ng.XMg응2Emut_glob(), 142) // (assert_return (get $Ng "Mg.mut_glob") (i32.const 142))
 	assert_return(t, mg.Xget_mut(), 142)      // (assert_return (invoke $Mg "get_mut") (i32.const 142))
-	assert_return(t, ng.XMg_get_mut(), 142)   // (assert_return (invoke $Ng "Mg.get_mut") (i32.const 142))
+	assert_return(t, ng.XMg응2Eget_mut(), 142)   // (assert_return (invoke $Ng "Mg.get_mut") (i32.const 142))
 
 	mg.Xset_mut(241)                          // (assert_return (invoke $Mg "set_mut" (i32.const 241)))
 	assert_return(t, *mg.Xmut_glob(), 241)    // (assert_return (get $Mg "mut_glob") (i32.const 241))
-	assert_return(t, *ng.XMg_mut_glob(), 241) // (assert_return (get $Ng "Mg.mut_glob") (i32.const 241))
+	assert_return(t, *ng.XMg응2Emut_glob(), 241) // (assert_return (get $Ng "Mg.mut_glob") (i32.const 241))
 	assert_return(t, mg.Xget_mut(), 241)      // (assert_return (invoke $Mg "get_mut") (i32.const 241))
-	assert_return(t, ng.XMg_get_mut(), 241)   // (assert_return (invoke $Ng "Mg.get_mut") (i32.const 241))
+	assert_return(t, ng.XMg응2Eget_mut(), 241)   // (assert_return (invoke $Ng "Mg.get_mut") (i32.const 241))
 }
 
 func Test_tables(t *testing.T) {
@@ -43,24 +43,24 @@ func Test_tables(t *testing.T) {
 	nt := linking10.New(mt)
 
 	assert_return(t, mt.Xcall(2), 4)         // (assert_return (invoke $Mt "call" (i32.const 2)) (i32.const 4))
-	assert_return(t, nt.XMt_call(2), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 2)) (i32.const 4))
+	assert_return(t, nt.XMt응2Ecall(2), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 2)) (i32.const 4))
 	assert_return(t, nt.Xcall(2), 5)         // (assert_return (invoke $Nt "call" (i32.const 2)) (i32.const 5))
-	assert_return(t, nt.Xcall_Mt_call(2), 4) // (assert_return (invoke $Nt "call Mt.call" (i32.const 2)) (i32.const 4))
+	assert_return(t, nt.Xcall응20Mt응2Ecall(2), 4) // (assert_return (invoke $Nt "call Mt.call" (i32.const 2)) (i32.const 4))
 
 	assert_trap(t, func() { mt.Xcall(1) }, "uninitialized")         // (assert_trap (invoke $Mt "call" (i32.const 1)) "uninitialized")
-	assert_trap(t, func() { nt.XMt_call(1) }, "uninitialized")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 1)) "uninitialized")
+	assert_trap(t, func() { nt.XMt응2Ecall(1) }, "uninitialized")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 1)) "uninitialized")
 	assert_return(t, nt.Xcall(1), 5)                                // (assert_return (invoke $Nt "call" (i32.const 1)) (i32.const 5))
-	assert_trap(t, func() { nt.Xcall_Mt_call(1) }, "uninitialized") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 1)) "uninitialized")
+	assert_trap(t, func() { nt.Xcall응20Mt응2Ecall(1) }, "uninitialized") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 1)) "uninitialized")
 
 	assert_trap(t, func() { mt.Xcall(0) }, "uninitialized")         // (assert_trap (invoke $Mt "call" (i32.const 0)) "uninitialized")
-	assert_trap(t, func() { nt.XMt_call(0) }, "uninitialized")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 0)) "uninitialized")
+	assert_trap(t, func() { nt.XMt응2Ecall(0) }, "uninitialized")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 0)) "uninitialized")
 	assert_return(t, nt.Xcall(0), 5)                                // (assert_return (invoke $Nt "call" (i32.const 0)) (i32.const 5))
-	assert_trap(t, func() { nt.Xcall_Mt_call(0) }, "uninitialized") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 0)) "uninitialized")
+	assert_trap(t, func() { nt.Xcall응20Mt응2Ecall(0) }, "uninitialized") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 0)) "uninitialized")
 
 	assert_trap(t, func() { mt.Xcall(20) }, "undefined")         // (assert_trap (invoke $Mt "call" (i32.const 20)) "undefined")
-	assert_trap(t, func() { nt.XMt_call(20) }, "undefined")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 20)) "undefined")
+	assert_trap(t, func() { nt.XMt응2Ecall(20) }, "undefined")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 20)) "undefined")
 	assert_trap(t, func() { nt.Xcall(7) }, "undefined")          // (assert_trap (invoke $Nt "call" (i32.const 7)) "undefined")
-	assert_trap(t, func() { nt.Xcall_Mt_call(20) }, "undefined") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 20)) "undefined")
+	assert_trap(t, func() { nt.Xcall응20Mt응2Ecall(20) }, "undefined") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 20)) "undefined")
 
 	assert_return(t, nt.Xcall(3), -4)                       // (assert_return (invoke $Nt "call" (i32.const 3)) (i32.const -4))
 	assert_trap(t, func() { nt.Xcall(4) }, "indirect call") // (assert_trap (invoke $Nt "call" (i32.const 4)) "indirect call")
@@ -68,26 +68,26 @@ func Test_tables(t *testing.T) {
 	ot := linking11.New(mt)
 
 	assert_return(t, mt.Xcall(3), 4)         // (assert_return (invoke $Mt "call" (i32.const 3)) (i32.const 4))
-	assert_return(t, nt.XMt_call(3), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 3)) (i32.const 4))
-	assert_return(t, nt.Xcall_Mt_call(3), 4) // (assert_return (invoke $Nt "call Mt.call" (i32.const 3)) (i32.const 4))
+	assert_return(t, nt.XMt응2Ecall(3), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 3)) (i32.const 4))
+	assert_return(t, nt.Xcall응20Mt응2Ecall(3), 4) // (assert_return (invoke $Nt "call Mt.call" (i32.const 3)) (i32.const 4))
 	assert_return(t, ot.Xcall(3), 4)         // (assert_return (invoke $Ot "call" (i32.const 3)) (i32.const 4))
 
 	assert_return(t, mt.Xcall(2), -4)         // (assert_return (invoke $Mt "call" (i32.const 2)) (i32.const -4))
-	assert_return(t, nt.XMt_call(2), -4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 2)) (i32.const -4))
+	assert_return(t, nt.XMt응2Ecall(2), -4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 2)) (i32.const -4))
 	assert_return(t, nt.Xcall(2), 5)          // (assert_return (invoke $Nt "call" (i32.const 2)) (i32.const 5))
-	assert_return(t, nt.Xcall_Mt_call(2), -4) // (assert_return (invoke $Nt "call Mt.call" (i32.const 2)) (i32.const -4))
+	assert_return(t, nt.Xcall응20Mt응2Ecall(2), -4) // (assert_return (invoke $Nt "call Mt.call" (i32.const 2)) (i32.const -4))
 	assert_return(t, ot.Xcall(2), -4)         // (assert_return (invoke $Ot "call" (i32.const 2)) (i32.const -4))
 
 	assert_return(t, mt.Xcall(1), 6)         // (assert_return (invoke $Mt "call" (i32.const 1)) (i32.const 6))
-	assert_return(t, nt.XMt_call(1), 6)      // (assert_return (invoke $Nt "Mt.call" (i32.const 1)) (i32.const 6))
+	assert_return(t, nt.XMt응2Ecall(1), 6)      // (assert_return (invoke $Nt "Mt.call" (i32.const 1)) (i32.const 6))
 	assert_return(t, nt.Xcall(1), 5)         // (assert_return (invoke $Nt "call" (i32.const 1)) (i32.const 5))
-	assert_return(t, nt.Xcall_Mt_call(1), 6) // (assert_return (invoke $Nt "call Mt.call" (i32.const 1)) (i32.const 6))
+	assert_return(t, nt.Xcall응20Mt응2Ecall(1), 6) // (assert_return (invoke $Nt "call Mt.call" (i32.const 1)) (i32.const 6))
 	assert_return(t, ot.Xcall(1), 6)         // (assert_return (invoke $Ot "call" (i32.const 1)) (i32.const 6))
 
 	assert_trap(t, func() { mt.Xcall(0) }, "uninitialized")         // (assert_trap (invoke $Mt "call" (i32.const 0)) "uninitialized")
-	assert_trap(t, func() { nt.XMt_call(0) }, "uninitialized")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 0)) "uninitialized")
+	assert_trap(t, func() { nt.XMt응2Ecall(0) }, "uninitialized")      // (assert_trap (invoke $Nt "Mt.call" (i32.const 0)) "uninitialized")
 	assert_return(t, nt.Xcall(0), 5)                                // (assert_return (invoke $Nt "call" (i32.const 0)) (i32.const 5))
-	assert_trap(t, func() { nt.Xcall_Mt_call(0) }, "uninitialized") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 0)) "uninitialized")
+	assert_trap(t, func() { nt.Xcall응20Mt응2Ecall(0) }, "uninitialized") // (assert_trap (invoke $Nt "call Mt.call" (i32.const 0)) "uninitialized")
 	assert_trap(t, func() { ot.Xcall(0) }, "uninitialized")         // (assert_trap (invoke $Ot "call" (i32.const 0)) "uninitialized")
 
 	assert_trap(t, func() { ot.Xcall(20) }, "undefined") // (assert_trap (invoke $Ot "call" (i32.const 20)) "undefined")
@@ -98,13 +98,13 @@ func Test_memory(t *testing.T) {
 	nm := linking20.New(mm)
 
 	assert_return(t, mm.Xload(12), 2)    // (assert_return (invoke $Mm "load" (i32.const 12)) (i32.const 2))
-	assert_return(t, nm.XMm_load(12), 2) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 2))
+	assert_return(t, nm.XMm응2Eload(12), 2) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 2))
 	assert_return(t, nm.Xload(12), 0xf2) // (assert_return (invoke $Nm "load" (i32.const 12)) (i32.const 0xf2))
 
 	om := linking21.New(mm)
 
 	assert_return(t, mm.Xload(12), 0xa7)    // (assert_return (invoke $Mm "load" (i32.const 12)) (i32.const 0xa7))
-	assert_return(t, nm.XMm_load(12), 0xa7) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 0xa7))
+	assert_return(t, nm.XMm응2Eload(12), 0xa7) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 0xa7))
 	assert_return(t, nm.Xload(12), 0xf2)    // (assert_return (invoke $Nm "load" (i32.const 12)) (i32.const 0xf2))
 	assert_return(t, om.Xload(12), 0xa7)    // (assert_return (invoke $Om "load" (i32.const 12)) (i32.const 0xa7))
 }

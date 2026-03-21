@@ -28,7 +28,7 @@ func (m *Module) Xload(v0 int64) int32 {
 	t1 := int32(binary.LittleEndian.Uint32(m.memory[t0+v0:]))
 	return t1
 }
-func (m *Module) Xmemory_grow(v0 int64) int64 {
+func (m *Module) Xmemory응2Egrow(v0 int64) int64 {
 	t0 := int64(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }

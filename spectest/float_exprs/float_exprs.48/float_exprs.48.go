@@ -14,7 +14,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_lt_if_to_abs(v0 float32) float32 {
+func (m *Module) Xf32응2Eno_fold_lt_if_to_abs(v0 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 < f32_const(0) {
@@ -26,7 +26,7 @@ func (m *Module) Xf32_no_fold_lt_if_to_abs(v0 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_le_if_to_abs(v0 float32) float32 {
+func (m *Module) Xf32응2Eno_fold_le_if_to_abs(v0 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 <= math.Float32frombits(0x80000000) {
@@ -38,7 +38,7 @@ func (m *Module) Xf32_no_fold_le_if_to_abs(v0 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_gt_if_to_abs(v0 float32) float32 {
+func (m *Module) Xf32응2Eno_fold_gt_if_to_abs(v0 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 > math.Float32frombits(0x80000000) {
@@ -50,7 +50,7 @@ func (m *Module) Xf32_no_fold_gt_if_to_abs(v0 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_ge_if_to_abs(v0 float32) float32 {
+func (m *Module) Xf32응2Eno_fold_ge_if_to_abs(v0 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 >= f32_const(0) {
@@ -62,7 +62,7 @@ func (m *Module) Xf32_no_fold_ge_if_to_abs(v0 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_lt_if_to_abs(v0 float64) float64 {
+func (m *Module) Xf64응2Eno_fold_lt_if_to_abs(v0 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 < f64_const(0) {
@@ -74,7 +74,7 @@ func (m *Module) Xf64_no_fold_lt_if_to_abs(v0 float64) float64 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_le_if_to_abs(v0 float64) float64 {
+func (m *Module) Xf64응2Eno_fold_le_if_to_abs(v0 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 <= math.Float64frombits(0x8000000000000000) {
@@ -86,7 +86,7 @@ func (m *Module) Xf64_no_fold_le_if_to_abs(v0 float64) float64 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_gt_if_to_abs(v0 float64) float64 {
+func (m *Module) Xf64응2Eno_fold_gt_if_to_abs(v0 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 > math.Float64frombits(0x8000000000000000) {
@@ -98,7 +98,7 @@ func (m *Module) Xf64_no_fold_gt_if_to_abs(v0 float64) float64 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_ge_if_to_abs(v0 float64) float64 {
+func (m *Module) Xf64응2Eno_fold_ge_if_to_abs(v0 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 >= f64_const(0) {

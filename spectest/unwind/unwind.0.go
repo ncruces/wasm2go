@@ -11,23 +11,23 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xfunc_unwind_by_unreachable() {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dunreachable() {
 	panic("unreachable")
 }
-func (m *Module) Xfunc_unwind_by_br() {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dbr() {
 	return
 }
-func (m *Module) Xfunc_unwind_by_br_value() int32 {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dbr응2Dvalue() int32 {
 	return int32(9)
 }
-func (m *Module) Xfunc_unwind_by_br_if() {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dbr_if() {
 	if int32(1) != 0 {
 		return
 	}
 	_ = int64(1)
 	_ = int32(3)
 }
-func (m *Module) Xfunc_unwind_by_br_if_value() int32 {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dbr_if응2Dvalue() int32 {
 	if int32(1) != 0 {
 		return int32(9)
 	}
@@ -35,34 +35,34 @@ func (m *Module) Xfunc_unwind_by_br_if_value() int32 {
 	_ = int64(1)
 	return int32(3)
 }
-func (m *Module) Xfunc_unwind_by_br_table() {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dbr_table() {
 	switch i32_const(0) {
 	default:
 		return
 	}
 }
-func (m *Module) Xfunc_unwind_by_br_table_value() int32 {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dbr_table응2Dvalue() int32 {
 	switch i32_const(0) {
 	default:
 		return int32(9)
 	}
 }
-func (m *Module) Xfunc_unwind_by_return() int32 {
+func (m *Module) Xfunc응2Dunwind응2Dby응2Dreturn() int32 {
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_unreachable() {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dunreachable() {
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xblock_unwind_by_br() int32 {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dbr() int32 {
 	{
 		goto l0
 	}
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_br_value() int32 {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dbr응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -72,7 +72,7 @@ func (m *Module) Xblock_unwind_by_br_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_unwind_by_br_if() int32 {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dbr_if() int32 {
 	{
 		if int32(1) != 0 {
 			goto l0
@@ -83,7 +83,7 @@ func (m *Module) Xblock_unwind_by_br_if() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_br_if_value() int32 {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dbr_if응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -98,7 +98,7 @@ func (m *Module) Xblock_unwind_by_br_if_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_unwind_by_br_table() int32 {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dbr_table() int32 {
 	{
 		switch i32_const(0) {
 		default:
@@ -108,7 +108,7 @@ func (m *Module) Xblock_unwind_by_br_table() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_br_table_value() int32 {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dbr_table응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -121,14 +121,14 @@ func (m *Module) Xblock_unwind_by_br_table_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_unwind_by_return() int32 {
+func (m *Module) Xblock응2Dunwind응2Dby응2Dreturn() int32 {
 	var p0 int32
 	_ = p0
 	{
 		return int32(9)
 	}
 }
-func (m *Module) Xblock_nested_unwind_by_unreachable() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dunreachable() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -137,7 +137,7 @@ func (m *Module) Xblock_nested_unwind_by_unreachable() int32 {
 		}
 	}
 }
-func (m *Module) Xblock_nested_unwind_by_br() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dbr() int32 {
 	{
 		{
 			goto l0
@@ -146,7 +146,7 @@ func (m *Module) Xblock_nested_unwind_by_br() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_nested_unwind_by_br_value() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dbr응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -158,7 +158,7 @@ func (m *Module) Xblock_nested_unwind_by_br_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_nested_unwind_by_br_if() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dbr_if() int32 {
 	{
 		{
 			if int32(1) != 0 {
@@ -171,7 +171,7 @@ func (m *Module) Xblock_nested_unwind_by_br_if() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_nested_unwind_by_br_if_value() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dbr_if응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -188,7 +188,7 @@ func (m *Module) Xblock_nested_unwind_by_br_if_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_nested_unwind_by_br_table() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dbr_table() int32 {
 	{
 		{
 			switch int32(1) {
@@ -200,7 +200,7 @@ func (m *Module) Xblock_nested_unwind_by_br_table() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_nested_unwind_by_br_table_value() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dbr_table응2Dvalue() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -215,7 +215,7 @@ func (m *Module) Xblock_nested_unwind_by_br_table_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_nested_unwind_by_return() int32 {
+func (m *Module) Xblock응2Dnested응2Dunwind응2Dby응2Dreturn() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -224,10 +224,10 @@ func (m *Module) Xblock_nested_unwind_by_return() int32 {
 		}
 	}
 }
-func (m *Module) Xunary_after_unreachable() int32 {
+func (m *Module) Xunary응2Dafter응2Dunreachable() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xunary_after_br() int32 {
+func (m *Module) Xunary응2Dafter응2Dbr() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -237,7 +237,7 @@ func (m *Module) Xunary_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xunary_after_br_if() int32 {
+func (m *Module) Xunary응2Dafter응2Dbr_if() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -255,7 +255,7 @@ func (m *Module) Xunary_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xunary_after_br_table() int32 {
+func (m *Module) Xunary응2Dafter응2Dbr_table() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -268,13 +268,13 @@ func (m *Module) Xunary_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xunary_after_return() int32 {
+func (m *Module) Xunary응2Dafter응2Dreturn() int32 {
 	return int32(9)
 }
-func (m *Module) Xbinary_after_unreachable() int32 {
+func (m *Module) Xbinary응2Dafter응2Dunreachable() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xbinary_after_br() int32 {
+func (m *Module) Xbinary응2Dafter응2Dbr() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -284,7 +284,7 @@ func (m *Module) Xbinary_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbinary_after_br_if() int32 {
+func (m *Module) Xbinary응2Dafter응2Dbr_if() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -302,7 +302,7 @@ func (m *Module) Xbinary_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbinary_after_br_table() int32 {
+func (m *Module) Xbinary응2Dafter응2Dbr_table() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -315,13 +315,13 @@ func (m *Module) Xbinary_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbinary_after_return() int32 {
+func (m *Module) Xbinary응2Dafter응2Dreturn() int32 {
 	return int32(9)
 }
-func (m *Module) Xselect_after_unreachable() int32 {
+func (m *Module) Xselect응2Dafter응2Dunreachable() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xselect_after_br() int32 {
+func (m *Module) Xselect응2Dafter응2Dbr() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -331,7 +331,7 @@ func (m *Module) Xselect_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xselect_after_br_if() int32 {
+func (m *Module) Xselect응2Dafter응2Dbr_if() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -349,7 +349,7 @@ func (m *Module) Xselect_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xselect_after_br_table() int32 {
+func (m *Module) Xselect응2Dafter응2Dbr_table() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -362,17 +362,17 @@ func (m *Module) Xselect_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xselect_after_return() int32 {
+func (m *Module) Xselect응2Dafter응2Dreturn() int32 {
 	return int32(9)
 }
-func (m *Module) Xblock_value_after_unreachable() int32 {
+func (m *Module) Xblock응2Dvalue응2Dafter응2Dunreachable() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xblock_value_after_br() int32 {
+func (m *Module) Xblock응2Dvalue응2Dafter응2Dbr() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -382,7 +382,7 @@ func (m *Module) Xblock_value_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_value_after_br_if() int32 {
+func (m *Module) Xblock응2Dvalue응2Dafter응2Dbr_if() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -396,7 +396,7 @@ func (m *Module) Xblock_value_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_value_after_br_table() int32 {
+func (m *Module) Xblock응2Dvalue응2Dafter응2Dbr_table() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -409,21 +409,21 @@ func (m *Module) Xblock_value_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_value_after_return() int32 {
+func (m *Module) Xblock응2Dvalue응2Dafter응2Dreturn() int32 {
 	var p0 int32
 	_ = p0
 	{
 		return int32(9)
 	}
 }
-func (m *Module) Xloop_value_after_unreachable() int32 {
+func (m *Module) Xloop응2Dvalue응2Dafter응2Dunreachable() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xloop_value_after_br() int32 {
+func (m *Module) Xloop응2Dvalue응2Dafter응2Dbr() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -437,7 +437,7 @@ func (m *Module) Xloop_value_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xloop_value_after_br_if() int32 {
+func (m *Module) Xloop응2Dvalue응2Dafter응2Dbr_if() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -456,7 +456,7 @@ func (m *Module) Xloop_value_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xloop_value_after_br_table() int32 {
+func (m *Module) Xloop응2Dvalue응2Dafter응2Dbr_table() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -473,7 +473,7 @@ func (m *Module) Xloop_value_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xloop_value_after_return() int32 {
+func (m *Module) Xloop응2Dvalue응2Dafter응2Dreturn() int32 {
 	var p0 int32
 	_ = p0
 	{

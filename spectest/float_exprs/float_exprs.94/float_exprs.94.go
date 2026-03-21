@@ -11,9 +11,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_silver_means(v0 float32) float32 {
+func (m *Module) Xf32응2Esilver_means(v0 float32) float32 {
 	return float32(float32(0.5) * float32(v0+float32(math.Sqrt(float64(float32(float32(v0*v0)+float32(4)))))))
 }
-func (m *Module) Xf64_silver_means(v0 float64) float64 {
+func (m *Module) Xf64응2Esilver_means(v0 float64) float64 {
 	return float64(float64(0.5) * float64(v0+math.Sqrt(float64(float64(v0*v0)+float64(4)))))
 }

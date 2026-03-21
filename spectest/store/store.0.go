@@ -15,24 +15,24 @@ func New() *Module {
 	m.memory = make([]byte, 65536)
 	return m
 }
-func (m *Module) Xas_block_value() {
+func (m *Module) Xas응2Dblock응2Dvalue() {
 	{
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 	}
 }
-func (m *Module) Xas_loop_value() {
+func (m *Module) Xas응2Dloop응2Dvalue() {
 	{
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 	}
 }
-func (m *Module) Xas_br_value() {
+func (m *Module) Xas응2Dbr응2Dvalue() {
 	{
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 		goto l0
 	}
 l0:
 }
-func (m *Module) Xas_br_if_value() {
+func (m *Module) Xas응2Dbr_if응2Dvalue() {
 	{
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 		if int32(1) != 0 {
@@ -41,7 +41,7 @@ func (m *Module) Xas_br_if_value() {
 	}
 l0:
 }
-func (m *Module) Xas_br_if_value_cond() {
+func (m *Module) Xas응2Dbr_if응2Dvalue응2Dcond() {
 	{
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 		if int32(6) != 0 {
@@ -50,7 +50,7 @@ func (m *Module) Xas_br_if_value_cond() {
 	}
 l0:
 }
-func (m *Module) Xas_br_table_value() {
+func (m *Module) Xas응2Dbr_table응2Dvalue() {
 	{
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 		switch int32(1) {
@@ -60,16 +60,16 @@ func (m *Module) Xas_br_table_value() {
 	}
 l0:
 }
-func (m *Module) Xas_return_value() {
+func (m *Module) Xas응2Dreturn응2Dvalue() {
 	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 	return
 }
-func (m *Module) Xas_if_then() {
+func (m *Module) Xas응2Dif응2Dthen() {
 	if int32(1) != 0 {
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
 	}
 }
-func (m *Module) Xas_if_else() {
+func (m *Module) Xas응2Dif응2Delse() {
 	if i32_const(0) != 0 {
 	} else {
 		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))

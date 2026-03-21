@@ -9,14 +9,14 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_eq_self(v0 float32) int32 {
+func (m *Module) Xf32응2Eno_fold_eq_self(v0 float32) int32 {
 	var p0 int32
 	if v0 == v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_eq_self(v0 float64) int32 {
+func (m *Module) Xf64응2Eno_fold_eq_self(v0 float64) int32 {
 	var p0 int32
 	if v0 == v0 {
 		p0 = 1

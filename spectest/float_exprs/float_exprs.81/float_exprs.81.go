@@ -11,33 +11,33 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_sqrt(v0 float32) float32 {
+func (m *Module) Xf32응2Esqrt(v0 float32) float32 {
 	return float32(math.Sqrt(float64(v0)))
 }
-func (m *Module) Xf32_xkcd_sqrt_2(v0 float32, v1 float32, v2 float32, v3 float32) float32 {
+func (m *Module) Xf32응2Exkcd_sqrt_2(v0 float32, v1 float32, v2 float32, v3 float32) float32 {
 	return float32(float32(v0/v1) + float32(v2/float32(v3-v2)))
 }
-func (m *Module) Xf32_xkcd_sqrt_3(v0 float32, v1 float32, v2 float32) float32 {
+func (m *Module) Xf32응2Exkcd_sqrt_3(v0 float32, v1 float32, v2 float32) float32 {
 	return float32(float32(v0*v1) / v2)
 }
-func (m *Module) Xf32_xkcd_sqrt_5(v0 float32, v1 float32, v2 float32) float32 {
+func (m *Module) Xf32응2Exkcd_sqrt_5(v0 float32, v1 float32, v2 float32) float32 {
 	return float32(float32(v0/v1) + float32(v2/v0))
 }
-func (m *Module) Xf32_xkcd_better_sqrt_5(v0 float32, v1 float32, v2 float32, v3 float32) float32 {
+func (m *Module) Xf32응2Exkcd_better_sqrt_5(v0 float32, v1 float32, v2 float32, v3 float32) float32 {
 	return float32(float32(v0+float32(v1*v2)) / float32(v3-float32(v1*v2)))
 }
-func (m *Module) Xf64_sqrt(v0 float64) float64 {
+func (m *Module) Xf64응2Esqrt(v0 float64) float64 {
 	return math.Sqrt(v0)
 }
-func (m *Module) Xf64_xkcd_sqrt_2(v0 float64, v1 float64, v2 float64, v3 float64) float64 {
+func (m *Module) Xf64응2Exkcd_sqrt_2(v0 float64, v1 float64, v2 float64, v3 float64) float64 {
 	return float64(float64(v0/v1) + float64(v2/float64(v3-v2)))
 }
-func (m *Module) Xf64_xkcd_sqrt_3(v0 float64, v1 float64, v2 float64) float64 {
+func (m *Module) Xf64응2Exkcd_sqrt_3(v0 float64, v1 float64, v2 float64) float64 {
 	return float64(float64(v0*v1) / v2)
 }
-func (m *Module) Xf64_xkcd_sqrt_5(v0 float64, v1 float64, v2 float64) float64 {
+func (m *Module) Xf64응2Exkcd_sqrt_5(v0 float64, v1 float64, v2 float64) float64 {
 	return float64(float64(v0/v1) + float64(v2/v0))
 }
-func (m *Module) Xf64_xkcd_better_sqrt_5(v0 float64, v1 float64, v2 float64, v3 float64) float64 {
+func (m *Module) Xf64응2Exkcd_better_sqrt_5(v0 float64, v1 float64, v2 float64, v3 float64) float64 {
 	return float64(float64(v0+float64(v1*v2)) / float64(v3-float64(v1*v2)))
 }

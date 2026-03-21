@@ -20,87 +20,87 @@ func New() *Module {
 	copy(m.memory[65528:], data1)
 	return m
 }
-func (m *Module) Xi32_load(v0 int64) int32 {
+func (m *Module) Xi32응2Eload(v0 int64) int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[v0:]))
 	return t0
 }
-func (m *Module) Xi64_load(v0 int64) int64 {
+func (m *Module) Xi64응2Eload(v0 int64) int64 {
 	t0 := int64(binary.LittleEndian.Uint64(m.memory[v0:]))
 	return t0
 }
-func (m *Module) Xf32_load(v0 int64) float32 {
+func (m *Module) Xf32응2Eload(v0 int64) float32 {
 	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[v0:]))
 	return t0
 }
-func (m *Module) Xf64_load(v0 int64) float64 {
+func (m *Module) Xf64응2Eload(v0 int64) float64 {
 	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[v0:]))
 	return t0
 }
-func (m *Module) Xi32_load8_s(v0 int64) int32 {
+func (m *Module) Xi32응2Eload8_s(v0 int64) int32 {
 	t0 := int32(int8(m.memory[v0]))
 	return t0
 }
-func (m *Module) Xi32_load8_u(v0 int64) int32 {
+func (m *Module) Xi32응2Eload8_u(v0 int64) int32 {
 	t0 := int32(m.memory[v0])
 	return t0
 }
-func (m *Module) Xi32_load16_s(v0 int64) int32 {
+func (m *Module) Xi32응2Eload16_s(v0 int64) int32 {
 	t0 := int32(int16(binary.LittleEndian.Uint16(m.memory[v0:])))
 	return t0
 }
-func (m *Module) Xi32_load16_u(v0 int64) int32 {
+func (m *Module) Xi32응2Eload16_u(v0 int64) int32 {
 	t0 := int32(binary.LittleEndian.Uint16(m.memory[v0:]))
 	return t0
 }
-func (m *Module) Xi64_load8_s(v0 int64) int64 {
+func (m *Module) Xi64응2Eload8_s(v0 int64) int64 {
 	t0 := int64(int8(m.memory[v0]))
 	return t0
 }
-func (m *Module) Xi64_load8_u(v0 int64) int64 {
+func (m *Module) Xi64응2Eload8_u(v0 int64) int64 {
 	t0 := int64(m.memory[v0])
 	return t0
 }
-func (m *Module) Xi64_load16_s(v0 int64) int64 {
+func (m *Module) Xi64응2Eload16_s(v0 int64) int64 {
 	t0 := int64(int16(binary.LittleEndian.Uint16(m.memory[v0:])))
 	return t0
 }
-func (m *Module) Xi64_load16_u(v0 int64) int64 {
+func (m *Module) Xi64응2Eload16_u(v0 int64) int64 {
 	t0 := int64(binary.LittleEndian.Uint16(m.memory[v0:]))
 	return t0
 }
-func (m *Module) Xi64_load32_s(v0 int64) int64 {
+func (m *Module) Xi64응2Eload32_s(v0 int64) int64 {
 	t0 := int64(int32(binary.LittleEndian.Uint32(m.memory[v0:])))
 	return t0
 }
-func (m *Module) Xi64_load32_u(v0 int64) int64 {
+func (m *Module) Xi64응2Eload32_u(v0 int64) int64 {
 	t0 := int64(binary.LittleEndian.Uint32(m.memory[v0:]))
 	return t0
 }
-func (m *Module) Xi32_store(v0 int64, v1 int32) {
+func (m *Module) Xi32응2Estore(v0 int64, v1 int32) {
 	binary.LittleEndian.PutUint32(m.memory[v0:], uint32(v1))
 }
-func (m *Module) Xi64_store(v0 int64, v1 int64) {
+func (m *Module) Xi64응2Estore(v0 int64, v1 int64) {
 	binary.LittleEndian.PutUint64(m.memory[v0:], uint64(v1))
 }
-func (m *Module) Xf32_store(v0 int64, v1 float32) {
+func (m *Module) Xf32응2Estore(v0 int64, v1 float32) {
 	binary.LittleEndian.PutUint32(m.memory[v0:], math.Float32bits(v1))
 }
-func (m *Module) Xf64_store(v0 int64, v1 float64) {
+func (m *Module) Xf64응2Estore(v0 int64, v1 float64) {
 	binary.LittleEndian.PutUint64(m.memory[v0:], math.Float64bits(v1))
 }
-func (m *Module) Xi32_store8(v0 int64, v1 int32) {
+func (m *Module) Xi32응2Estore8(v0 int64, v1 int32) {
 	m.memory[v0] = byte(v1)
 }
-func (m *Module) Xi32_store16(v0 int64, v1 int32) {
+func (m *Module) Xi32응2Estore16(v0 int64, v1 int32) {
 	binary.LittleEndian.PutUint16(m.memory[v0:], uint16(v1))
 }
-func (m *Module) Xi64_store8(v0 int64, v1 int64) {
+func (m *Module) Xi64응2Estore8(v0 int64, v1 int64) {
 	m.memory[v0] = byte(v1)
 }
-func (m *Module) Xi64_store16(v0 int64, v1 int64) {
+func (m *Module) Xi64응2Estore16(v0 int64, v1 int64) {
 	binary.LittleEndian.PutUint16(m.memory[v0:], uint16(v1))
 }
-func (m *Module) Xi64_store32(v0 int64, v1 int64) {
+func (m *Module) Xi64응2Estore32(v0 int64, v1 int64) {
 	binary.LittleEndian.PutUint32(m.memory[v0:], uint32(v1))
 }
 

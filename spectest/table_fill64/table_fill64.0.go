@@ -16,17 +16,17 @@ func New() *Module {
 func (m *Module) Xfill(v0 int32, v1 any, v2 int32) {
 	table_fill(m.t0, v0, v1, v2)
 }
-func (m *Module) Xfill_abbrev(v0 int32, v1 any, v2 int32) {
+func (m *Module) Xfill응2Dabbrev(v0 int32, v1 any, v2 int32) {
 	table_fill(m.t0, v0, v1, v2)
 }
 func (m *Module) Xget(v0 int32) any {
 	t0 := m.t0[v0]
 	return t0
 }
-func (m *Module) Xfill_t64(v0 int64, v1 any, v2 int64) {
+func (m *Module) Xfill응2Dt64(v0 int64, v1 any, v2 int64) {
 	table_fill(m.t1, v0, v1, v2)
 }
-func (m *Module) Xget_t64(v0 int64) any {
+func (m *Module) Xget응2Dt64(v0 int64) any {
 	t0 := m.t1[v0]
 	return t0
 }

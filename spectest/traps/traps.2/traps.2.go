@@ -11,35 +11,35 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xno_dce_i32_trunc_f32_s(v0 float32) {
+func (m *Module) Xno_dce응2Ei32응2Etrunc_f32_s(v0 float32) {
 	t0 := i32_trunc_f32_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_trunc_f32_u(v0 float32) {
+func (m *Module) Xno_dce응2Ei32응2Etrunc_f32_u(v0 float32) {
 	t0 := i32_trunc_f32_u(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_trunc_f64_s(v0 float64) {
+func (m *Module) Xno_dce응2Ei32응2Etrunc_f64_s(v0 float64) {
 	t0 := i32_trunc_f64_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_trunc_f64_u(v0 float64) {
+func (m *Module) Xno_dce응2Ei32응2Etrunc_f64_u(v0 float64) {
 	t0 := i32_trunc_f64_u(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f32_s(v0 float32) {
+func (m *Module) Xno_dce응2Ei64응2Etrunc_f32_s(v0 float32) {
 	t0 := i64_trunc_f32_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f32_u(v0 float32) {
+func (m *Module) Xno_dce응2Ei64응2Etrunc_f32_u(v0 float32) {
 	t0 := i64_trunc_f32_u(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f64_s(v0 float64) {
+func (m *Module) Xno_dce응2Ei64응2Etrunc_f64_s(v0 float64) {
 	t0 := i64_trunc_f64_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f64_u(v0 float64) {
+func (m *Module) Xno_dce응2Ei64응2Etrunc_f64_u(v0 float64) {
 	t0 := i64_trunc_f64_u(v0)
 	_ = t0
 }

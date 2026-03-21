@@ -14,298 +14,298 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_nan() int32 {
+func (m *Module) Xf32응2Enan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7fc00000)))
 }
-func (m *Module) Xf32_positive_nan() int32 {
+func (m *Module) Xf32응2Epositive_nan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7fc00000)))
 }
-func (m *Module) Xf32_negative_nan() int32 {
+func (m *Module) Xf32응2Enegative_nan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0xffc00000)))
 }
-func (m *Module) Xf32_plain_nan() int32 {
+func (m *Module) Xf32응2Eplain_nan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7fc00000)))
 }
-func (m *Module) Xf32_informally_known_as_plain_snan() int32 {
+func (m *Module) Xf32응2Einformally_known_as_plain_snan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7fa00000)))
 }
-func (m *Module) Xf32_all_ones_nan() int32 {
+func (m *Module) Xf32응2Eall_ones_nan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0xffffffff)))
 }
-func (m *Module) Xf32_misc_nan() int32 {
+func (m *Module) Xf32응2Emisc_nan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7f812345)))
 }
-func (m *Module) Xf32_misc_positive_nan() int32 {
+func (m *Module) Xf32응2Emisc_positive_nan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7fb04050)))
 }
-func (m *Module) Xf32_misc_negative_nan() int32 {
+func (m *Module) Xf32응2Emisc_negative_nan() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0xffaabcde)))
 }
-func (m *Module) Xf32_infinity() int32 {
+func (m *Module) Xf32응2Einfinity() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7f800000)))
 }
-func (m *Module) Xf32_positive_infinity() int32 {
+func (m *Module) Xf32응2Epositive_infinity() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x7f800000)))
 }
-func (m *Module) Xf32_negative_infinity() int32 {
+func (m *Module) Xf32응2Enegative_infinity() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0xff800000)))
 }
-func (m *Module) Xf32_zero() int32 {
+func (m *Module) Xf32응2Ezero() int32 {
 	return int32(math.Float32bits(f32_const(0)))
 }
-func (m *Module) Xf32_positive_zero() int32 {
+func (m *Module) Xf32응2Epositive_zero() int32 {
 	return int32(math.Float32bits(f32_const(0)))
 }
-func (m *Module) Xf32_negative_zero() int32 {
+func (m *Module) Xf32응2Enegative_zero() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x80000000)))
 }
-func (m *Module) Xf32_misc() int32 {
+func (m *Module) Xf32응2Emisc() int32 {
 	return int32(math.Float32bits(float32(6.2831855)))
 }
-func (m *Module) Xf32_min_positive() int32 {
+func (m *Module) Xf32응2Emin_positive() int32 {
 	return int32(math.Float32bits(float32(1e-45)))
 }
-func (m *Module) Xf32_min_normal() int32 {
+func (m *Module) Xf32응2Emin_normal() int32 {
 	return int32(math.Float32bits(float32(0x1p-126)))
 }
-func (m *Module) Xf32_max_finite() int32 {
+func (m *Module) Xf32응2Emax_finite() int32 {
 	return int32(math.Float32bits(float32(0x1.fffffep+127)))
 }
-func (m *Module) Xf32_max_subnormal() int32 {
+func (m *Module) Xf32응2Emax_subnormal() int32 {
 	return int32(math.Float32bits(float32(0x1.fffffcp-127)))
 }
-func (m *Module) Xf32_trailing_dot() int32 {
+func (m *Module) Xf32응2Etrailing_dot() int32 {
 	return int32(math.Float32bits(float32(1024)))
 }
-func (m *Module) Xf32_misc_int() int32 {
+func (m *Module) Xf32응2Emisc_int() int32 {
 	return int32(math.Float32bits(float32(74565)))
 }
-func (m *Module) Xf32_large_int() int32 {
+func (m *Module) Xf32응2Elarge_int() int32 {
 	return int32(math.Float32bits(float32(0x1p+80)))
 }
-func (m *Module) Xf32_min_int32() int32 {
+func (m *Module) Xf32응2Emin_int32() int32 {
 	return int32(math.Float32bits(float32(-0x1p+31)))
 }
-func (m *Module) Xf32_min_int64() int32 {
+func (m *Module) Xf32응2Emin_int64() int32 {
 	return int32(math.Float32bits(float32(-0x1p+63)))
 }
-func (m *Module) Xf32_dec_zero() int32 {
+func (m *Module) Xf32_dec응2Ezero() int32 {
 	return int32(math.Float32bits(f32_const(0)))
 }
-func (m *Module) Xf32_dec_positive_zero() int32 {
+func (m *Module) Xf32_dec응2Epositive_zero() int32 {
 	return int32(math.Float32bits(f32_const(0)))
 }
-func (m *Module) Xf32_dec_negative_zero() int32 {
+func (m *Module) Xf32_dec응2Enegative_zero() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x80000000)))
 }
-func (m *Module) Xf32_dec_misc() int32 {
+func (m *Module) Xf32_dec응2Emisc() int32 {
 	return int32(math.Float32bits(float32(6.2831855)))
 }
-func (m *Module) Xf32_dec_min_positive() int32 {
+func (m *Module) Xf32_dec응2Emin_positive() int32 {
 	return int32(math.Float32bits(float32(1e-45)))
 }
-func (m *Module) Xf32_dec_min_normal() int32 {
+func (m *Module) Xf32_dec응2Emin_normal() int32 {
 	return int32(math.Float32bits(float32(0x1p-126)))
 }
-func (m *Module) Xf32_dec_max_subnormal() int32 {
+func (m *Module) Xf32_dec응2Emax_subnormal() int32 {
 	return int32(math.Float32bits(float32(0x1.fffffcp-127)))
 }
-func (m *Module) Xf32_dec_max_finite() int32 {
+func (m *Module) Xf32_dec응2Emax_finite() int32 {
 	return int32(math.Float32bits(float32(0x1.fffffep+127)))
 }
-func (m *Module) Xf32_dec_trailing_dot() int32 {
+func (m *Module) Xf32_dec응2Etrailing_dot() int32 {
 	return int32(math.Float32bits(float32(1e+10)))
 }
-func (m *Module) Xf32_dec_misc_int() int32 {
+func (m *Module) Xf32_dec응2Emisc_int() int32 {
 	return int32(math.Float32bits(float32(12345)))
 }
-func (m *Module) Xf32_dec_large_int() int32 {
+func (m *Module) Xf32_dec응2Elarge_int() int32 {
 	return int32(math.Float32bits(float32(1e+20)))
 }
-func (m *Module) Xf32_dec_min_int32() int32 {
+func (m *Module) Xf32_dec응2Emin_int32() int32 {
 	return int32(math.Float32bits(float32(-0x1p+31)))
 }
-func (m *Module) Xf32_dec_min_int64() int32 {
+func (m *Module) Xf32_dec응2Emin_int64() int32 {
 	return int32(math.Float32bits(float32(-0x1p+63)))
 }
-func (m *Module) Xf32_dec_root_beer_float() int32 {
+func (m *Module) Xf32_dec응2Eroot_beer_float() int32 {
 	return int32(math.Float32bits(float32(1.0000001)))
 }
-func (m *Module) Xf64_nan() int64 {
+func (m *Module) Xf64응2Enan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff8000000000000)))
 }
-func (m *Module) Xf64_positive_nan() int64 {
+func (m *Module) Xf64응2Epositive_nan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff8000000000000)))
 }
-func (m *Module) Xf64_negative_nan() int64 {
+func (m *Module) Xf64응2Enegative_nan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0xfff8000000000000)))
 }
-func (m *Module) Xf64_plain_nan() int64 {
+func (m *Module) Xf64응2Eplain_nan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff8000000000000)))
 }
-func (m *Module) Xf64_informally_known_as_plain_snan() int64 {
+func (m *Module) Xf64응2Einformally_known_as_plain_snan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff4000000000000)))
 }
-func (m *Module) Xf64_all_ones_nan() int64 {
+func (m *Module) Xf64응2Eall_ones_nan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0xffffffffffffffff)))
 }
-func (m *Module) Xf64_misc_nan() int64 {
+func (m *Module) Xf64응2Emisc_nan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff0123456789abc)))
 }
-func (m *Module) Xf64_misc_positive_nan() int64 {
+func (m *Module) Xf64응2Emisc_positive_nan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff3040506070809)))
 }
-func (m *Module) Xf64_misc_negative_nan() int64 {
+func (m *Module) Xf64응2Emisc_negative_nan() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0xfff2abcdef012345)))
 }
-func (m *Module) Xf64_infinity() int64 {
+func (m *Module) Xf64응2Einfinity() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff0000000000000)))
 }
-func (m *Module) Xf64_positive_infinity() int64 {
+func (m *Module) Xf64응2Epositive_infinity() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x7ff0000000000000)))
 }
-func (m *Module) Xf64_negative_infinity() int64 {
+func (m *Module) Xf64응2Enegative_infinity() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0xfff0000000000000)))
 }
-func (m *Module) Xf64_zero() int64 {
+func (m *Module) Xf64응2Ezero() int64 {
 	return int64(math.Float64bits(f64_const(0)))
 }
-func (m *Module) Xf64_positive_zero() int64 {
+func (m *Module) Xf64응2Epositive_zero() int64 {
 	return int64(math.Float64bits(f64_const(0)))
 }
-func (m *Module) Xf64_negative_zero() int64 {
+func (m *Module) Xf64응2Enegative_zero() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x8000000000000000)))
 }
-func (m *Module) Xf64_misc() int64 {
+func (m *Module) Xf64응2Emisc() int64 {
 	return int64(math.Float64bits(float64(6.283185307179586)))
 }
-func (m *Module) Xf64_min_positive() int64 {
+func (m *Module) Xf64응2Emin_positive() int64 {
 	return int64(math.Float64bits(float64(5e-324)))
 }
-func (m *Module) Xf64_min_normal() int64 {
+func (m *Module) Xf64응2Emin_normal() int64 {
 	return int64(math.Float64bits(float64(0x1p-1022)))
 }
-func (m *Module) Xf64_max_subnormal() int64 {
+func (m *Module) Xf64응2Emax_subnormal() int64 {
 	return int64(math.Float64bits(float64(0x1.ffffffffffffep-1023)))
 }
-func (m *Module) Xf64_max_finite() int64 {
+func (m *Module) Xf64응2Emax_finite() int64 {
 	return int64(math.Float64bits(float64(0x1.fffffffffffffp+1023)))
 }
-func (m *Module) Xf64_trailing_dot() int64 {
+func (m *Module) Xf64응2Etrailing_dot() int64 {
 	return int64(math.Float64bits(float64(0x1p+100)))
 }
-func (m *Module) Xf64_misc_int() int64 {
+func (m *Module) Xf64응2Emisc_int() int64 {
 	return int64(math.Float64bits(float64(74565)))
 }
-func (m *Module) Xf64_large_int() int64 {
+func (m *Module) Xf64응2Elarge_int() int64 {
 	return int64(math.Float64bits(float64(0x1p+80)))
 }
-func (m *Module) Xf64_min_int32() int64 {
+func (m *Module) Xf64응2Emin_int32() int64 {
 	return int64(math.Float64bits(float64(-0x1p+31)))
 }
-func (m *Module) Xf64_min_int64() int64 {
+func (m *Module) Xf64응2Emin_int64() int64 {
 	return int64(math.Float64bits(float64(-0x1p+63)))
 }
-func (m *Module) Xf64_dec_zero() int64 {
+func (m *Module) Xf64_dec응2Ezero() int64 {
 	return int64(math.Float64bits(f64_const(0)))
 }
-func (m *Module) Xf64_dec_positive_zero() int64 {
+func (m *Module) Xf64_dec응2Epositive_zero() int64 {
 	return int64(math.Float64bits(f64_const(0)))
 }
-func (m *Module) Xf64_dec_negative_zero() int64 {
+func (m *Module) Xf64_dec응2Enegative_zero() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x8000000000000000)))
 }
-func (m *Module) Xf64_dec_misc() int64 {
+func (m *Module) Xf64_dec응2Emisc() int64 {
 	return int64(math.Float64bits(float64(6.283185307179586)))
 }
-func (m *Module) Xf64_dec_min_positive() int64 {
+func (m *Module) Xf64_dec응2Emin_positive() int64 {
 	return int64(math.Float64bits(float64(5e-324)))
 }
-func (m *Module) Xf64_dec_min_normal() int64 {
+func (m *Module) Xf64_dec응2Emin_normal() int64 {
 	return int64(math.Float64bits(float64(0x1p-1022)))
 }
-func (m *Module) Xf64_dec_max_subnormal() int64 {
+func (m *Module) Xf64_dec응2Emax_subnormal() int64 {
 	return int64(math.Float64bits(float64(0x1.ffffffffffffep-1023)))
 }
-func (m *Module) Xf64_dec_max_finite() int64 {
+func (m *Module) Xf64_dec응2Emax_finite() int64 {
 	return int64(math.Float64bits(float64(0x1.fffffffffffffp+1023)))
 }
-func (m *Module) Xf64_dec_trailing_dot() int64 {
+func (m *Module) Xf64_dec응2Etrailing_dot() int64 {
 	return int64(math.Float64bits(float64(1e+100)))
 }
-func (m *Module) Xf64_dec_misc_int() int64 {
+func (m *Module) Xf64_dec응2Emisc_int() int64 {
 	return int64(math.Float64bits(float64(12345)))
 }
-func (m *Module) Xf64_dec_large_int() int64 {
+func (m *Module) Xf64_dec응2Elarge_int() int64 {
 	return int64(math.Float64bits(float64(1e+20)))
 }
-func (m *Module) Xf64_dec_min_int32() int64 {
+func (m *Module) Xf64_dec응2Emin_int32() int64 {
 	return int64(math.Float64bits(float64(-0x1p+31)))
 }
-func (m *Module) Xf64_dec_min_int64() int64 {
+func (m *Module) Xf64_dec응2Emin_int64() int64 {
 	return int64(math.Float64bits(float64(-0x1p+63)))
 }
-func (m *Module) Xf64_dec_root_beer_float() int64 {
+func (m *Module) Xf64_dec응2Eroot_beer_float() int64 {
 	return int64(math.Float64bits(float64(1.000000119)))
 }
-func (m *Module) Xf32_dec_sep1() float32 {
+func (m *Module) Xf32응2Ddec응2Dsep1() float32 {
 	return float32(1e+06)
 }
-func (m *Module) Xf32_dec_sep2() float32 {
+func (m *Module) Xf32응2Ddec응2Dsep2() float32 {
 	return float32(1000)
 }
-func (m *Module) Xf32_dec_sep3() float32 {
+func (m *Module) Xf32응2Ddec응2Dsep3() float32 {
 	return float32(1003.1416)
 }
-func (m *Module) Xf32_dec_sep4() float32 {
+func (m *Module) Xf32응2Ddec응2Dsep4() float32 {
 	return float32(9.9e+14)
 }
-func (m *Module) Xf32_dec_sep5() float32 {
+func (m *Module) Xf32응2Ddec응2Dsep5() float32 {
 	return float32(1.2200012e+28)
 }
-func (m *Module) Xf32_hex_sep1() float32 {
+func (m *Module) Xf32응2Dhex응2Dsep1() float32 {
 	return float32(1.6875536e+08)
 }
-func (m *Module) Xf32_hex_sep2() float32 {
+func (m *Module) Xf32응2Dhex응2Dsep2() float32 {
 	return float32(109071)
 }
-func (m *Module) Xf32_hex_sep3() float32 {
+func (m *Module) Xf32응2Dhex응2Dsep3() float32 {
 	return float32(41215.94)
 }
-func (m *Module) Xf32_hex_sep4() float32 {
+func (m *Module) Xf32응2Dhex응2Dsep4() float32 {
 	return float32(0x1.ep+20)
 }
-func (m *Module) Xf32_hex_sep5() float32 {
+func (m *Module) Xf32응2Dhex응2Dsep5() float32 {
 	return float32(2.3605224e+13)
 }
-func (m *Module) Xf64_dec_sep1() float64 {
+func (m *Module) Xf64응2Ddec응2Dsep1() float64 {
 	return float64(1e+06)
 }
-func (m *Module) Xf64_dec_sep2() float64 {
+func (m *Module) Xf64응2Ddec응2Dsep2() float64 {
 	return float64(1000)
 }
-func (m *Module) Xf64_dec_sep3() float64 {
+func (m *Module) Xf64응2Ddec응2Dsep3() float64 {
 	return float64(1003.141592)
 }
-func (m *Module) Xf64_dec_sep4() float64 {
+func (m *Module) Xf64응2Ddec응2Dsep4() float64 {
 	return float64(9.9e-122)
 }
-func (m *Module) Xf64_dec_sep5() float64 {
+func (m *Module) Xf64응2Ddec응2Dsep5() float64 {
 	return float64(1.2200011354e+28)
 }
-func (m *Module) Xf64_hex_sep1() float64 {
+func (m *Module) Xf64응2Dhex응2Dsep1() float64 {
 	return float64(0x1.5e01e00013332p+51)
 }
-func (m *Module) Xf64_hex_sep2() float64 {
+func (m *Module) Xf64응2Dhex응2Dsep2() float64 {
 	return float64(109071)
 }
-func (m *Module) Xf64_hex_sep3() float64 {
+func (m *Module) Xf64응2Dhex응2Dsep3() float64 {
 	return float64(41215.94240794191)
 }
-func (m *Module) Xf64_hex_sep4() float64 {
+func (m *Module) Xf64응2Dhex응2Dsep4() float64 {
 	return float64(0x1.ep+20)
 }
-func (m *Module) Xf64_hex_sep5() float64 {
+func (m *Module) Xf64응2Dhex응2Dsep5() float64 {
 	return float64(0x1.578050f9f7p+44)
 }
 

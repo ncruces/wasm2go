@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 	"unicode"
+	"unicode/utf8"
 )
 
 func Test(t *testing.T, modptr any, data []byte, name string) {
@@ -230,11 +231,23 @@ func exported(name string) string {
 }
 
 func mangle(buf *strings.Builder, name string) {
+	const hexDigits = "0123456789ABCDEF"
+	const escapeChar = '응'
+	var runeBytes [utf8.UTFMax]byte
+
 	for _, r := range name {
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-			r = '_'
+		if (unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_') && r != escapeChar {
+			buf.WriteRune(r)
+			continue
 		}
-		buf.WriteRune(r)
+
+		for i := 0; i < utf8.EncodeRune(runeBytes[:], r); i++ {
+			buf.WriteRune(escapeChar)
+
+			b := runeBytes[i]
+			buf.WriteByte(hexDigits[b>>4])   // High nibble
+			buf.WriteByte(hexDigits[b&0x0F]) // Low nibble
+		}
 	}
 }
 

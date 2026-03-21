@@ -20,7 +20,7 @@ func (m *Module) f0() int32 {
 func (m *Module) f1() {
 	m.t0[uint(i64_const(0))].(func())()
 }
-func (m *Module) Xtype_i32_t64() int32 {
+func (m *Module) Xtype응2Di32응2Dt64() int32 {
 	t0 := m.t0[uint(i64_const(0))].(func() int32)()
 	return t0
 }

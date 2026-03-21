@@ -18,59 +18,59 @@ func New() *Module {
 	m.memory = make([]byte, 65536)
 	return m
 }
-func (m *Module) Xno_dce_i32_load(v0 int32) {
+func (m *Module) Xno_dce응2Ei32응2Eload(v0 int32) {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_load16_s(v0 int32) {
+func (m *Module) Xno_dce응2Ei32응2Eload16_s(v0 int32) {
 	t0 := int32(int16(binary.LittleEndian.Uint16(m.memory[uint32(v0):])))
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_load16_u(v0 int32) {
+func (m *Module) Xno_dce응2Ei32응2Eload16_u(v0 int32) {
 	t0 := int32(binary.LittleEndian.Uint16(m.memory[uint32(v0):]))
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_load8_s(v0 int32) {
+func (m *Module) Xno_dce응2Ei32응2Eload8_s(v0 int32) {
 	t0 := int32(int8(m.memory[uint32(v0)]))
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_load8_u(v0 int32) {
+func (m *Module) Xno_dce응2Ei32응2Eload8_u(v0 int32) {
 	t0 := int32(m.memory[uint32(v0)])
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_load(v0 int32) {
+func (m *Module) Xno_dce응2Ei64응2Eload(v0 int32) {
 	t0 := int64(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_load32_s(v0 int32) {
+func (m *Module) Xno_dce응2Ei64응2Eload32_s(v0 int32) {
 	t0 := int64(int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):])))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_load32_u(v0 int32) {
+func (m *Module) Xno_dce응2Ei64응2Eload32_u(v0 int32) {
 	t0 := int64(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_load16_s(v0 int32) {
+func (m *Module) Xno_dce응2Ei64응2Eload16_s(v0 int32) {
 	t0 := int64(int16(binary.LittleEndian.Uint16(m.memory[uint32(v0):])))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_load16_u(v0 int32) {
+func (m *Module) Xno_dce응2Ei64응2Eload16_u(v0 int32) {
 	t0 := int64(binary.LittleEndian.Uint16(m.memory[uint32(v0):]))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_load8_s(v0 int32) {
+func (m *Module) Xno_dce응2Ei64응2Eload8_s(v0 int32) {
 	t0 := int64(int8(m.memory[uint32(v0)]))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_load8_u(v0 int32) {
+func (m *Module) Xno_dce응2Ei64응2Eload8_u(v0 int32) {
 	t0 := int64(m.memory[uint32(v0)])
 	_ = t0
 }
-func (m *Module) Xno_dce_f32_load(v0 int32) {
+func (m *Module) Xno_dce응2Ef32응2Eload(v0 int32) {
 	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	_ = t0
 }
-func (m *Module) Xno_dce_f64_load(v0 int32) {
+func (m *Module) Xno_dce응2Ef64응2Eload(v0 int32) {
 	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
 	_ = t0
 }

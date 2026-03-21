@@ -9,19 +9,19 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xno_dce_i32_rem_s(v0 int32, v1 int32) {
+func (m *Module) Xno_dce응2Ei32응2Erem_s(v0 int32, v1 int32) {
 	t0 := v0 % v1
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_rem_u(v0 int32, v1 int32) {
+func (m *Module) Xno_dce응2Ei32응2Erem_u(v0 int32, v1 int32) {
 	t0 := int32(uint32(v0) % uint32(v1))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_rem_s(v0 int64, v1 int64) {
+func (m *Module) Xno_dce응2Ei64응2Erem_s(v0 int64, v1 int64) {
 	t0 := v0 % v1
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_rem_u(v0 int64, v1 int64) {
+func (m *Module) Xno_dce응2Ei64응2Erem_u(v0 int64, v1 int64) {
 	t0 := int64(uint64(v0) % uint64(v1))
 	_ = t0
 }

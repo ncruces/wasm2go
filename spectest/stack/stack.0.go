@@ -11,7 +11,7 @@ func New() *Module {
 	m.g0 = i32_const(0)
 	return m
 }
-func (m *Module) Xfac_expr(v0 int64) int64 {
+func (m *Module) Xfac응2Dexpr(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	v1 = v0
@@ -31,7 +31,7 @@ func (m *Module) Xfac_expr(v0 int64) int64 {
 l0:
 	return v2
 }
-func (m *Module) Xfac_stack(v0 int64) int64 {
+func (m *Module) Xfac응2Dstack(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	v1 = v0
@@ -51,7 +51,7 @@ func (m *Module) Xfac_stack(v0 int64) int64 {
 l0:
 	return v2
 }
-func (m *Module) Xfac_stack_raw(v0 int64) int64 {
+func (m *Module) Xfac응2Dstack응2Draw(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	v1 = v0
@@ -71,7 +71,7 @@ func (m *Module) Xfac_stack_raw(v0 int64) int64 {
 l0:
 	return v2
 }
-func (m *Module) Xfac_mixed(v0 int64) int64 {
+func (m *Module) Xfac응2Dmixed(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	v1 = v0
@@ -91,7 +91,7 @@ func (m *Module) Xfac_mixed(v0 int64) int64 {
 l0:
 	return v2
 }
-func (m *Module) Xfac_mixed_raw(v0 int64) int64 {
+func (m *Module) Xfac응2Dmixed응2Draw(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	v1 = v0
@@ -123,7 +123,7 @@ func (m *Module) f6() {
 	t0 := m.f5()
 	_ = t0
 }
-func (m *Module) Xnot_quite_a_tree() int32 {
+func (m *Module) Xnot응2Dquite응2Da응2Dtree() int32 {
 	t0 := m.f5()
 	t1 := m.f5()
 	m.f6()

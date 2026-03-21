@@ -9,14 +9,14 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_extended_precision_div(v0 float32, v1 float32, v2 float32) int32 {
+func (m *Module) Xf32응2Eno_extended_precision_div(v0 float32, v1 float32, v2 float32) int32 {
 	var p0 int32
 	if float32(v0/v1) == v2 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xf64_no_extended_precision_div(v0 float64, v1 float64, v2 float64) int32 {
+func (m *Module) Xf64응2Eno_extended_precision_div(v0 float64, v1 float64, v2 float64) int32 {
 	var p0 int32
 	if float64(v0/v1) == v2 {
 		p0 = 1

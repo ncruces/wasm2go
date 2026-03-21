@@ -11,7 +11,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_epsilon() float32 {
+func (m *Module) Xf32응2Eepsilon() float32 {
 	var v0, v1 float32
 	_, _ = v0, v1
 	v0 = f32_const(1)
@@ -25,7 +25,7 @@ l0:
 	}
 	return v1
 }
-func (m *Module) Xf64_epsilon() float64 {
+func (m *Module) Xf64응2Eepsilon() float64 {
 	var v0, v1 float64
 	_, _ = v0, v1
 	v0 = f64_const(1)

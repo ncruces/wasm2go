@@ -11,67 +11,67 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_i32_no_fold_trunc_s_convert_s(v0 float32) float32 {
+func (m *Module) Xf32응2Ei32응2Eno_fold_trunc_s_convert_s(v0 float32) float32 {
 	t0 := i32_trunc_f32_s(v0)
 	return float32(t0)
 }
-func (m *Module) Xf32_i32_no_fold_trunc_u_convert_s(v0 float32) float32 {
+func (m *Module) Xf32응2Ei32응2Eno_fold_trunc_u_convert_s(v0 float32) float32 {
 	t0 := i32_trunc_f32_u(v0)
 	return float32(t0)
 }
-func (m *Module) Xf32_i32_no_fold_trunc_s_convert_u(v0 float32) float32 {
+func (m *Module) Xf32응2Ei32응2Eno_fold_trunc_s_convert_u(v0 float32) float32 {
 	t0 := i32_trunc_f32_s(v0)
 	return float32(uint32(t0))
 }
-func (m *Module) Xf32_i32_no_fold_trunc_u_convert_u(v0 float32) float32 {
+func (m *Module) Xf32응2Ei32응2Eno_fold_trunc_u_convert_u(v0 float32) float32 {
 	t0 := i32_trunc_f32_u(v0)
 	return float32(uint32(t0))
 }
-func (m *Module) Xf64_i32_no_fold_trunc_s_convert_s(v0 float64) float64 {
+func (m *Module) Xf64응2Ei32응2Eno_fold_trunc_s_convert_s(v0 float64) float64 {
 	t0 := i32_trunc_f64_s(v0)
 	return float64(t0)
 }
-func (m *Module) Xf64_i32_no_fold_trunc_u_convert_s(v0 float64) float64 {
+func (m *Module) Xf64응2Ei32응2Eno_fold_trunc_u_convert_s(v0 float64) float64 {
 	t0 := i32_trunc_f64_u(v0)
 	return float64(t0)
 }
-func (m *Module) Xf64_i32_no_fold_trunc_s_convert_u(v0 float64) float64 {
+func (m *Module) Xf64응2Ei32응2Eno_fold_trunc_s_convert_u(v0 float64) float64 {
 	t0 := i32_trunc_f64_s(v0)
 	return float64(uint32(t0))
 }
-func (m *Module) Xf64_i32_no_fold_trunc_u_convert_u(v0 float64) float64 {
+func (m *Module) Xf64응2Ei32응2Eno_fold_trunc_u_convert_u(v0 float64) float64 {
 	t0 := i32_trunc_f64_u(v0)
 	return float64(uint32(t0))
 }
-func (m *Module) Xf32_i64_no_fold_trunc_s_convert_s(v0 float32) float32 {
+func (m *Module) Xf32응2Ei64응2Eno_fold_trunc_s_convert_s(v0 float32) float32 {
 	t0 := i64_trunc_f32_s(v0)
 	return float32(t0)
 }
-func (m *Module) Xf32_i64_no_fold_trunc_u_convert_s(v0 float32) float32 {
+func (m *Module) Xf32응2Ei64응2Eno_fold_trunc_u_convert_s(v0 float32) float32 {
 	t0 := i64_trunc_f32_u(v0)
 	return float32(t0)
 }
-func (m *Module) Xf32_i64_no_fold_trunc_s_convert_u(v0 float32) float32 {
+func (m *Module) Xf32응2Ei64응2Eno_fold_trunc_s_convert_u(v0 float32) float32 {
 	t0 := i64_trunc_f32_s(v0)
 	return float32(uint64(t0))
 }
-func (m *Module) Xf32_i64_no_fold_trunc_u_convert_u(v0 float32) float32 {
+func (m *Module) Xf32응2Ei64응2Eno_fold_trunc_u_convert_u(v0 float32) float32 {
 	t0 := i64_trunc_f32_u(v0)
 	return float32(uint64(t0))
 }
-func (m *Module) Xf64_i64_no_fold_trunc_s_convert_s(v0 float64) float64 {
+func (m *Module) Xf64응2Ei64응2Eno_fold_trunc_s_convert_s(v0 float64) float64 {
 	t0 := i64_trunc_f64_s(v0)
 	return float64(t0)
 }
-func (m *Module) Xf64_i64_no_fold_trunc_u_convert_s(v0 float64) float64 {
+func (m *Module) Xf64응2Ei64응2Eno_fold_trunc_u_convert_s(v0 float64) float64 {
 	t0 := i64_trunc_f64_u(v0)
 	return float64(t0)
 }
-func (m *Module) Xf64_i64_no_fold_trunc_s_convert_u(v0 float64) float64 {
+func (m *Module) Xf64응2Ei64응2Eno_fold_trunc_s_convert_u(v0 float64) float64 {
 	t0 := i64_trunc_f64_s(v0)
 	return float64(uint64(t0))
 }
-func (m *Module) Xf64_i64_no_fold_trunc_u_convert_u(v0 float64) float64 {
+func (m *Module) Xf64응2Ei64응2Eno_fold_trunc_u_convert_u(v0 float64) float64 {
 	t0 := i64_trunc_f64_u(v0)
 	return float64(uint64(t0))
 }

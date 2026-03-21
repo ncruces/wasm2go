@@ -9,94 +9,94 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xi32_test() int32 {
+func (m *Module) Xi32응2Etest() int32 {
 	return i32_const(0xbadd00d)
 }
-func (m *Module) Xi32_umax() int32 {
+func (m *Module) Xi32응2Eumax() int32 {
 	return i32_const(-1)
 }
-func (m *Module) Xi32_smax() int32 {
+func (m *Module) Xi32응2Esmax() int32 {
 	return i32_const(0x7fffffff)
 }
-func (m *Module) Xi32_neg_smax() int32 {
+func (m *Module) Xi32응2Eneg_smax() int32 {
 	return i32_const(-0x7fffffff)
 }
-func (m *Module) Xi32_smin() int32 {
+func (m *Module) Xi32응2Esmin() int32 {
 	return i32_const(-0x80000000)
 }
-func (m *Module) Xi32_alt_smin() int32 {
+func (m *Module) Xi32응2Ealt_smin() int32 {
 	return i32_const(-0x80000000)
 }
-func (m *Module) Xi32_inc_smin() int32 {
+func (m *Module) Xi32응2Einc_smin() int32 {
 	return i32_const(-0x80000000) + int32(1)
 }
-func (m *Module) Xi32_neg_zero() int32 {
+func (m *Module) Xi32응2Eneg_zero() int32 {
 	return i32_const(0)
 }
-func (m *Module) Xi32_not_octal() int32 {
+func (m *Module) Xi32응2Enot_octal() int32 {
 	return int32(10)
 }
-func (m *Module) Xi32_unsigned_decimal() int32 {
+func (m *Module) Xi32응2Eunsigned_decimal() int32 {
 	return i32_const(-1)
 }
-func (m *Module) Xi32_plus_sign() int32 {
+func (m *Module) Xi32응2Eplus_sign() int32 {
 	return int32(42)
 }
-func (m *Module) Xi64_test() int64 {
+func (m *Module) Xi64응2Etest() int64 {
 	return i64_const(0xcabba6e0ba66a6e)
 }
-func (m *Module) Xi64_umax() int64 {
+func (m *Module) Xi64응2Eumax() int64 {
 	return i64_const(-1)
 }
-func (m *Module) Xi64_smax() int64 {
+func (m *Module) Xi64응2Esmax() int64 {
 	return i64_const(0x7fffffffffffffff)
 }
-func (m *Module) Xi64_neg_smax() int64 {
+func (m *Module) Xi64응2Eneg_smax() int64 {
 	return i64_const(-0x7fffffffffffffff)
 }
-func (m *Module) Xi64_smin() int64 {
+func (m *Module) Xi64응2Esmin() int64 {
 	return i64_const(-0x8000000000000000)
 }
-func (m *Module) Xi64_alt_smin() int64 {
+func (m *Module) Xi64응2Ealt_smin() int64 {
 	return i64_const(-0x8000000000000000)
 }
-func (m *Module) Xi64_inc_smin() int64 {
+func (m *Module) Xi64응2Einc_smin() int64 {
 	return i64_const(-0x8000000000000000) + int64(1)
 }
-func (m *Module) Xi64_neg_zero() int64 {
+func (m *Module) Xi64응2Eneg_zero() int64 {
 	return i64_const(0)
 }
-func (m *Module) Xi64_not_octal() int64 {
+func (m *Module) Xi64응2Enot_octal() int64 {
 	return int64(10)
 }
-func (m *Module) Xi64_unsigned_decimal() int64 {
+func (m *Module) Xi64응2Eunsigned_decimal() int64 {
 	return i64_const(-1)
 }
-func (m *Module) Xi64_plus_sign() int64 {
+func (m *Module) Xi64응2Eplus_sign() int64 {
 	return int64(42)
 }
-func (m *Module) Xi32_dec_sep1() int32 {
+func (m *Module) Xi32응2Ddec응2Dsep1() int32 {
 	return i32_const(1000000)
 }
-func (m *Module) Xi32_dec_sep2() int32 {
+func (m *Module) Xi32응2Ddec응2Dsep2() int32 {
 	return i32_const(1000)
 }
-func (m *Module) Xi32_hex_sep1() int32 {
+func (m *Module) Xi32응2Dhex응2Dsep1() int32 {
 	return i32_const(0xa0f0099)
 }
-func (m *Module) Xi32_hex_sep2() int32 {
+func (m *Module) Xi32응2Dhex응2Dsep2() int32 {
 	return i32_const(109071)
 }
-func (m *Module) Xi64_dec_sep1() int64 {
+func (m *Module) Xi64응2Ddec응2Dsep1() int64 {
 	return i64_const(1000000)
 }
-func (m *Module) Xi64_dec_sep2() int64 {
+func (m *Module) Xi64응2Ddec응2Dsep2() int64 {
 	return i64_const(1000)
 }
-func (m *Module) Xi64_hex_sep1() int64 {
+func (m *Module) Xi64응2Dhex응2Dsep1() int64 {
 	return i64_const(0xaf00f00009999)
 }
-func (m *Module) Xi64_hex_sep2() int64 {
+func (m *Module) Xi64응2Dhex응2Dsep2() int64 {
 	return i64_const(109071)
 }
 

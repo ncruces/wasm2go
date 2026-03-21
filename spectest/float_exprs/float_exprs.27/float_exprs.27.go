@@ -14,10 +14,10 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_approximate_reciprocal_sqrt(v0 float32) float32 {
+func (m *Module) Xf32응2Eno_approximate_reciprocal_sqrt(v0 float32) float32 {
 	return float32(f32_const(1) / float32(math.Sqrt(float64(v0))))
 }
-func (m *Module) Xf64_no_fuse_reciprocal_sqrt(v0 float64) float64 {
+func (m *Module) Xf64응2Eno_fuse_reciprocal_sqrt(v0 float64) float64 {
 	return float64(f64_const(1) / math.Sqrt(v0))
 }
 

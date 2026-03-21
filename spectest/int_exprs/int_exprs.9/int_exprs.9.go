@@ -11,11 +11,11 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xi32_no_fold_div_s_2(v0 int32) int32 {
+func (m *Module) Xi32응2Eno_fold_div_s_2(v0 int32) int32 {
 	t0 := i32_div_s(v0, int32(2))
 	return t0
 }
-func (m *Module) Xi64_no_fold_div_s_2(v0 int64) int64 {
+func (m *Module) Xi64응2Eno_fold_div_s_2(v0 int64) int64 {
 	t0 := i64_div_s(v0, int64(2))
 	return t0
 }

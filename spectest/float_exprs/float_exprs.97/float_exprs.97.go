@@ -11,14 +11,14 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_conditional_inc(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Eno_fold_conditional_inc(v0 float32, v1 float32) float32 {
 	p0 := float32(v0 + f32_const(1))
 	if v1 < f32_const(0) {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_conditional_inc(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Eno_fold_conditional_inc(v0 float64, v1 float64) float64 {
 	p0 := float64(v0 + f64_const(1))
 	if v1 < f64_const(0) {
 		p0 = v0

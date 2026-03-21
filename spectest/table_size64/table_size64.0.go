@@ -15,35 +15,35 @@ func New() *Module {
 	m.t3 = make([]any, 3)
 	return m
 }
-func (m *Module) Xsize_t0() int64 {
+func (m *Module) Xsize응2Dt0() int64 {
 	t0 := int64(len(m.t0))
 	return t0
 }
-func (m *Module) Xsize_t1() int64 {
+func (m *Module) Xsize응2Dt1() int64 {
 	t0 := int64(len(m.t1))
 	return t0
 }
-func (m *Module) Xsize_t2() int64 {
+func (m *Module) Xsize응2Dt2() int64 {
 	t0 := int64(len(m.t2))
 	return t0
 }
-func (m *Module) Xsize_t3() int64 {
+func (m *Module) Xsize응2Dt3() int64 {
 	t0 := int64(len(m.t3))
 	return t0
 }
-func (m *Module) Xgrow_t0(v0 int64) {
+func (m *Module) Xgrow응2Dt0(v0 int64) {
 	t0 := table_grow(&m.t0, nil, v0, 281474976710656)
 	_ = t0
 }
-func (m *Module) Xgrow_t1(v0 int64) {
+func (m *Module) Xgrow응2Dt1(v0 int64) {
 	t0 := table_grow(&m.t1, nil, v0, 281474976710656)
 	_ = t0
 }
-func (m *Module) Xgrow_t2(v0 int64) {
+func (m *Module) Xgrow응2Dt2(v0 int64) {
 	t0 := table_grow(&m.t2, nil, v0, 2)
 	_ = t0
 }
-func (m *Module) Xgrow_t3(v0 int64) {
+func (m *Module) Xgrow응2Dt3(v0 int64) {
 	t0 := table_grow(&m.t3, nil, v0, 8)
 	_ = t0
 }

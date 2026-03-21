@@ -11,7 +11,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_compute_radix(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Ecompute_radix(v0 float32, v1 float32) float32 {
 l0:
 	{
 		v0 = float32(v0 + v0)
@@ -29,7 +29,7 @@ l1:
 	}
 	return v1
 }
-func (m *Module) Xf64_compute_radix(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Ecompute_radix(v0 float64, v1 float64) float64 {
 l0:
 	{
 		v0 = float64(v0 + v0)

@@ -9,6 +9,6 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xi64_no_fold_wrap_extend_s(v0 int64) int64 {
+func (m *Module) Xi64응2Eno_fold_wrap_extend_s(v0 int64) int64 {
 	return int64(int32(v0))
 }

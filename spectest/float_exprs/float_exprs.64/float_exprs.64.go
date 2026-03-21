@@ -19,7 +19,7 @@ func New() *Module {
 	copy(m.memory[0:], data0)
 	return m
 }
-func (m *Module) Xf64_kahan_sum(v0 int32, v1 int32) float64 {
+func (m *Module) Xf64응2Ekahan_sum(v0 int32, v1 int32) float64 {
 	var v2, v3, v4 float64
 	_, _, _ = v2, v3, v4
 	{
@@ -40,7 +40,7 @@ func (m *Module) Xf64_kahan_sum(v0 int32, v1 int32) float64 {
 	}
 	return v2
 }
-func (m *Module) Xf64_plain_sum(v0 int32, v1 int32) float64 {
+func (m *Module) Xf64응2Eplain_sum(v0 int32, v1 int32) float64 {
 	var v2 float64
 	_ = v2
 	{

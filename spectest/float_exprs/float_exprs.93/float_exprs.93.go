@@ -11,9 +11,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_golden_ratio(v0 float32, v1 float32, v2 float32) float32 {
+func (m *Module) Xf32응2Egolden_ratio(v0 float32, v1 float32, v2 float32) float32 {
 	return float32(v0 * float32(v1+float32(math.Sqrt(float64(v2)))))
 }
-func (m *Module) Xf64_golden_ratio(v0 float64, v1 float64, v2 float64) float64 {
+func (m *Module) Xf64응2Egolden_ratio(v0 float64, v1 float64, v2 float64) float64 {
 	return float64(v0 * float64(v1+math.Sqrt(v2)))
 }

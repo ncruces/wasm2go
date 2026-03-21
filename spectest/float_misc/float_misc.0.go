@@ -11,88 +11,88 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_add(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Eadd(v0 float32, v1 float32) float32 {
 	return float32(v0 + v1)
 }
-func (m *Module) Xf32_sub(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Esub(v0 float32, v1 float32) float32 {
 	return float32(v0 - v1)
 }
-func (m *Module) Xf32_mul(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Emul(v0 float32, v1 float32) float32 {
 	return float32(v0 * v1)
 }
-func (m *Module) Xf32_div(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Ediv(v0 float32, v1 float32) float32 {
 	return float32(v0 / v1)
 }
-func (m *Module) Xf32_sqrt(v0 float32) float32 {
+func (m *Module) Xf32응2Esqrt(v0 float32) float32 {
 	return float32(math.Sqrt(float64(v0)))
 }
-func (m *Module) Xf32_abs(v0 float32) float32 {
+func (m *Module) Xf32응2Eabs(v0 float32) float32 {
 	return f32_abs(v0)
 }
-func (m *Module) Xf32_neg(v0 float32) float32 {
+func (m *Module) Xf32응2Eneg(v0 float32) float32 {
 	return -v0
 }
-func (m *Module) Xf32_copysign(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Ecopysign(v0 float32, v1 float32) float32 {
 	return f32_copysign(v0, v1)
 }
-func (m *Module) Xf32_ceil(v0 float32) float32 {
+func (m *Module) Xf32응2Eceil(v0 float32) float32 {
 	return float32(math.Ceil(float64(v0)))
 }
-func (m *Module) Xf32_floor(v0 float32) float32 {
+func (m *Module) Xf32응2Efloor(v0 float32) float32 {
 	return float32(math.Floor(float64(v0)))
 }
-func (m *Module) Xf32_trunc(v0 float32) float32 {
+func (m *Module) Xf32응2Etrunc(v0 float32) float32 {
 	return float32(math.Trunc(float64(v0)))
 }
-func (m *Module) Xf32_nearest(v0 float32) float32 {
+func (m *Module) Xf32응2Enearest(v0 float32) float32 {
 	return float32(math.RoundToEven(float64(v0)))
 }
-func (m *Module) Xf32_min(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Emin(v0 float32, v1 float32) float32 {
 	return f32_min(v0, v1)
 }
-func (m *Module) Xf32_max(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32응2Emax(v0 float32, v1 float32) float32 {
 	return f32_max(v0, v1)
 }
-func (m *Module) Xf64_add(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Eadd(v0 float64, v1 float64) float64 {
 	return float64(v0 + v1)
 }
-func (m *Module) Xf64_sub(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Esub(v0 float64, v1 float64) float64 {
 	return float64(v0 - v1)
 }
-func (m *Module) Xf64_mul(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Emul(v0 float64, v1 float64) float64 {
 	return float64(v0 * v1)
 }
-func (m *Module) Xf64_div(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Ediv(v0 float64, v1 float64) float64 {
 	return float64(v0 / v1)
 }
-func (m *Module) Xf64_sqrt(v0 float64) float64 {
+func (m *Module) Xf64응2Esqrt(v0 float64) float64 {
 	return math.Sqrt(v0)
 }
-func (m *Module) Xf64_abs(v0 float64) float64 {
+func (m *Module) Xf64응2Eabs(v0 float64) float64 {
 	return math.Abs(v0)
 }
-func (m *Module) Xf64_neg(v0 float64) float64 {
+func (m *Module) Xf64응2Eneg(v0 float64) float64 {
 	return -v0
 }
-func (m *Module) Xf64_copysign(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Ecopysign(v0 float64, v1 float64) float64 {
 	return math.Copysign(v0, v1)
 }
-func (m *Module) Xf64_ceil(v0 float64) float64 {
+func (m *Module) Xf64응2Eceil(v0 float64) float64 {
 	return math.Ceil(v0)
 }
-func (m *Module) Xf64_floor(v0 float64) float64 {
+func (m *Module) Xf64응2Efloor(v0 float64) float64 {
 	return math.Floor(v0)
 }
-func (m *Module) Xf64_trunc(v0 float64) float64 {
+func (m *Module) Xf64응2Etrunc(v0 float64) float64 {
 	return math.Trunc(v0)
 }
-func (m *Module) Xf64_nearest(v0 float64) float64 {
+func (m *Module) Xf64응2Enearest(v0 float64) float64 {
 	return math.RoundToEven(v0)
 }
-func (m *Module) Xf64_min(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Emin(v0 float64, v1 float64) float64 {
 	return f64_min(v0, v1)
 }
-func (m *Module) Xf64_max(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64응2Emax(v0 float64, v1 float64) float64 {
 	return f64_max(v0, v1)
 }
 

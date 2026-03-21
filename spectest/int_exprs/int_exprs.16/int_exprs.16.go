@@ -9,19 +9,19 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xi32_rem_s_5(v0 int32) int32 {
+func (m *Module) Xi32응2Erem_s_5(v0 int32) int32 {
 	t0 := v0 % int32(5)
 	return t0
 }
-func (m *Module) Xi32_rem_u_5(v0 int32) int32 {
+func (m *Module) Xi32응2Erem_u_5(v0 int32) int32 {
 	t0 := int32(uint32(v0) % uint32(int32(5)))
 	return t0
 }
-func (m *Module) Xi64_rem_s_5(v0 int64) int64 {
+func (m *Module) Xi64응2Erem_s_5(v0 int64) int64 {
 	t0 := v0 % int64(5)
 	return t0
 }
-func (m *Module) Xi64_rem_u_5(v0 int64) int64 {
+func (m *Module) Xi64응2Erem_u_5(v0 int64) int64 {
 	t0 := int64(uint64(v0) % uint64(int64(5)))
 	return t0
 }

@@ -18,27 +18,27 @@ func New() *Module {
 }
 func (m *Module) f0() {
 }
-func (m *Module) Xget_externref(v0 int64) any {
+func (m *Module) Xget응2Dexternref(v0 int64) any {
 	t0 := m.t0[v0]
 	return t0
 }
-func (m *Module) Xget_funcref(v0 int64) any {
+func (m *Module) Xget응2Dfuncref(v0 int64) any {
 	t0 := m.t1[v0]
 	return t0
 }
-func (m *Module) Xset_externref(v0 int64, v1 any) {
+func (m *Module) Xset응2Dexternref(v0 int64, v1 any) {
 	m.t0[v0] = v1
 }
-func (m *Module) Xset_funcref(v0 int64, v1 any) {
+func (m *Module) Xset응2Dfuncref(v0 int64, v1 any) {
 	m.t1[v0] = v1
 }
-func (m *Module) Xset_funcref_from(v0 int64, v1 int64) {
+func (m *Module) Xset응2Dfuncref응2Dfrom(v0 int64, v1 int64) {
 	t1 := v0
 	t0 := m.t1[v1]
 	m.t1[t1] = t0
 }
-func (m *Module) Xis_null_funcref(v0 int64) int32 {
-	t0 := m.Xget_funcref(v0)
+func (m *Module) Xis_null응2Dfuncref(v0 int64) int32 {
+	t0 := m.Xget응2Dfuncref(v0)
 	var p1 int32
 	if t0 == nil {
 		p1 = 1

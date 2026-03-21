@@ -19,7 +19,7 @@ func New() *Module {
 	copy(m.memory[0:], data0)
 	return m
 }
-func (m *Module) Xf64_simple_x4_sum(v0 int32, v1 int32, v2 int32) {
+func (m *Module) Xf64응2Esimple_x4_sum(v0 int32, v1 int32, v2 int32) {
 	var v3, v4, v5, v6, v7, v8, v9, v10 float64
 	_, _, _, _, _, _, _, _ = v3, v4, v5, v6, v7, v8, v9, v10
 	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
@@ -43,7 +43,7 @@ func (m *Module) Xf64_simple_x4_sum(v0 int32, v1 int32, v2 int32) {
 	binary.LittleEndian.PutUint64(m.memory[int64(uint32(v2))+16:], math.Float64bits(float64(v5+v9)))
 	binary.LittleEndian.PutUint64(m.memory[int64(uint32(v2))+24:], math.Float64bits(float64(v6+v10)))
 }
-func (m *Module) Xf64_load(v0 int32) float64 {
+func (m *Module) Xf64응2Eload(v0 int32) float64 {
 	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
 	return t0
 }
