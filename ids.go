@@ -44,10 +44,9 @@ func mangle(buf *strings.Builder, name string) {
 			continue
 		}
 
-		for i := 0; i < utf8.EncodeRune(runeBytes[:], r); i++ {
-			buf.WriteRune(escapeChar)
-
+		for i := range utf8.EncodeRune(runeBytes[:], r) {
 			b := runeBytes[i]
+			buf.WriteRune(escapeChar)
 			buf.WriteByte(hexDigits[b>>4])   // High nibble
 			buf.WriteByte(hexDigits[b&0x0F]) // Low nibble
 		}
