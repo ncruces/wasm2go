@@ -10,18 +10,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_distribute_exact(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(float32(-8) * t0)
-	t2 := v0
-	t3 := float32(float32(8) * t2)
-	t4 := float32(t1 + t3)
-	return t4
+	return float32(float32(float32(-8)*v0) + float32(float32(8)*v0))
 }
 func (m *Module) Xf64_no_distribute_exact(v0 float64) float64 {
-	t0 := v0
-	t1 := float64(float64(-8) * t0)
-	t2 := v0
-	t3 := float64(float64(8) * t2)
-	t4 := float64(t1 + t3)
-	return t4
+	return float64(float64(float64(-8)*v0) + float64(float64(8)*v0))
 }

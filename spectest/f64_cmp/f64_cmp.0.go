@@ -10,56 +10,44 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xeq(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 == t1 {
-		p2 = 1
+	var p0 int32
+	if v0 == v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xne(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 != t1 {
-		p2 = 1
+	var p0 int32
+	if v0 != v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xlt(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 < t1 {
-		p2 = 1
+	var p0 int32
+	if v0 < v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xle(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 <= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 <= v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xgt(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 > t1 {
-		p2 = 1
+	var p0 int32
+	if v0 > v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xge(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 >= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 >= v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }

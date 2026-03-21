@@ -14,151 +14,110 @@ func New() *Module {
 func (m *Module) Xfac_expr(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
-	t0 := v0
-	v1 = t0
+	v1 = v0
 	v2 = int64(1)
 	{
 	l1:
 		{
-			t1 := v1
-			if t1 == i64_const(0) {
+			if v1 == i64_const(0) {
 				goto l0
 			} else {
-				t3 := v1
-				t4 := v2
-				t5 := t3 * t4
-				v2 = t5
-				t6 := v1
-				t7 := t6 - int64(1)
-				v1 = t7
+				v2 = v1 * v2
+				v1 = v1 - int64(1)
 			}
 			goto l1
 		}
 	}
 l0:
-	t8 := v2
-	return t8
+	return v2
 }
 func (m *Module) Xfac_stack(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
-	t0 := v0
-	v1 = t0
+	v1 = v0
 	v2 = int64(1)
 	{
 	l1:
 		{
-			t1 := v1
-			if t1 == i64_const(0) {
+			if v1 == i64_const(0) {
 				goto l0
 			} else {
-				t3 := v1
-				t4 := v2
-				t5 := t3 * t4
-				v2 = t5
-				t6 := v1
-				t7 := t6 - int64(1)
-				v1 = t7
+				v2 = v1 * v2
+				v1 = v1 - int64(1)
 			}
 			goto l1
 		}
 	}
 l0:
-	t8 := v2
-	return t8
+	return v2
 }
 func (m *Module) Xfac_stack_raw(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
-	t0 := v0
-	v1 = t0
+	v1 = v0
 	v2 = int64(1)
 	{
 	l1:
 		{
-			t1 := v1
-			if t1 == i64_const(0) {
+			if v1 == i64_const(0) {
 				goto l0
 			} else {
-				t3 := v1
-				t4 := v2
-				t5 := t3 * t4
-				v2 = t5
-				t6 := v1
-				t7 := t6 - int64(1)
-				v1 = t7
+				v2 = v1 * v2
+				v1 = v1 - int64(1)
 			}
 			goto l1
 		}
 	}
 l0:
-	t8 := v2
-	return t8
+	return v2
 }
 func (m *Module) Xfac_mixed(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
-	t0 := v0
-	v1 = t0
+	v1 = v0
 	v2 = int64(1)
 	{
 	l1:
 		{
-			t1 := v1
-			if t1 == i64_const(0) {
+			if v1 == i64_const(0) {
 				goto l0
 			} else {
-				t3 := v1
-				t4 := v2
-				t5 := t3 * t4
-				v2 = t5
-				t6 := v1
-				t7 := t6 - int64(1)
-				v1 = t7
+				v2 = v1 * v2
+				v1 = v1 - int64(1)
 			}
 			goto l1
 		}
 	}
 l0:
-	t8 := v2
-	return t8
+	return v2
 }
 func (m *Module) Xfac_mixed_raw(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
-	t0 := v0
-	v1 = t0
+	v1 = v0
 	v2 = int64(1)
 	{
 	l1:
 		{
-			t1 := v1
-			if t1 == i64_const(0) {
+			if v1 == i64_const(0) {
 				goto l0
 			} else {
-				t3 := v1
-				t4 := v2
-				t5 := t3 * t4
-				v2 = t5
-				t6 := v1
-				t7 := t6 - int64(1)
-				v1 = t7
+				v2 = v1 * v2
+				v1 = v1 - int64(1)
 			}
 			goto l1
 		}
 	}
 l0:
-	t8 := v2
-	return t8
+	return v2
 }
 func (m *Module) f5() int32 {
 	var v0 int32
 	_ = v0
 	t0 := m.g0
-	t1 := int32(1) + t0
-	m.g0 = t1
-	t2 := m.g0
-	return t2
+	m.g0 = int32(1) + t0
+	t1 := m.g0
+	return t1
 }
 func (m *Module) f6() {
 	t0 := m.f5()
@@ -168,8 +127,7 @@ func (m *Module) Xnot_quite_a_tree() int32 {
 	t0 := m.f5()
 	t1 := m.f5()
 	m.f6()
-	t2 := t0 + t1
-	return t2
+	return t0 + t1
 }
 
 //go:nosplit

@@ -37,12 +37,10 @@ func (m *Module) f2() int32 {
 	return int32(5)
 }
 func (m *Module) Xcall_Mt_call(v0 int32) int32 {
-	t0 := v0
-	t1 := m.XMt_call(t0)
-	return t1
+	t0 := m.XMt_call(v0)
+	return t0
 }
 func (m *Module) Xcall(v0 int32) int32 {
-	t0 := v0
-	t1 := m.t0[uint(t0)].(func() int32)()
-	return t1
+	t0 := m.t0[uint(v0)].(func() int32)()
+	return t0
 }

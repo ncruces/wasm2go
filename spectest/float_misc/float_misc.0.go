@@ -12,158 +12,88 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_add(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 + t1)
-	return t2
+	return float32(v0 + v1)
 }
 func (m *Module) Xf32_sub(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 - t1)
-	return t2
+	return float32(v0 - v1)
 }
 func (m *Module) Xf32_mul(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 * t1)
-	return t2
+	return float32(v0 * v1)
 }
 func (m *Module) Xf32_div(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 / t1)
-	return t2
+	return float32(v0 / v1)
 }
 func (m *Module) Xf32_sqrt(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(math.Sqrt(float64(t0)))
-	return t1
+	return float32(math.Sqrt(float64(v0)))
 }
 func (m *Module) Xf32_abs(v0 float32) float32 {
-	t0 := v0
-	t1 := f32_abs(t0)
-	return t1
+	return f32_abs(v0)
 }
 func (m *Module) Xf32_neg(v0 float32) float32 {
-	t0 := v0
-	t1 := -t0
-	return t1
+	return -v0
 }
 func (m *Module) Xf32_copysign(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := f32_copysign(t0, t1)
-	return t2
+	return f32_copysign(v0, v1)
 }
 func (m *Module) Xf32_ceil(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(math.Ceil(float64(t0)))
-	return t1
+	return float32(math.Ceil(float64(v0)))
 }
 func (m *Module) Xf32_floor(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(math.Floor(float64(t0)))
-	return t1
+	return float32(math.Floor(float64(v0)))
 }
 func (m *Module) Xf32_trunc(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(math.Trunc(float64(t0)))
-	return t1
+	return float32(math.Trunc(float64(v0)))
 }
 func (m *Module) Xf32_nearest(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(math.RoundToEven(float64(t0)))
-	return t1
+	return float32(math.RoundToEven(float64(v0)))
 }
 func (m *Module) Xf32_min(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := f32_min(t0, t1)
-	return t2
+	return f32_min(v0, v1)
 }
 func (m *Module) Xf32_max(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := f32_max(t0, t1)
-	return t2
+	return f32_max(v0, v1)
 }
 func (m *Module) Xf64_add(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 + t1)
-	return t2
+	return float64(v0 + v1)
 }
 func (m *Module) Xf64_sub(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 - t1)
-	return t2
+	return float64(v0 - v1)
 }
 func (m *Module) Xf64_mul(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	return t2
+	return float64(v0 * v1)
 }
 func (m *Module) Xf64_div(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 / t1)
-	return t2
+	return float64(v0 / v1)
 }
 func (m *Module) Xf64_sqrt(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Sqrt(t0)
-	return t1
+	return math.Sqrt(v0)
 }
 func (m *Module) Xf64_abs(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Abs(t0)
-	return t1
+	return math.Abs(v0)
 }
 func (m *Module) Xf64_neg(v0 float64) float64 {
-	t0 := v0
-	t1 := -t0
-	return t1
+	return -v0
 }
 func (m *Module) Xf64_copysign(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := math.Copysign(t0, t1)
-	return t2
+	return math.Copysign(v0, v1)
 }
 func (m *Module) Xf64_ceil(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Ceil(t0)
-	return t1
+	return math.Ceil(v0)
 }
 func (m *Module) Xf64_floor(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Floor(t0)
-	return t1
+	return math.Floor(v0)
 }
 func (m *Module) Xf64_trunc(v0 float64) float64 {
-	t0 := v0
-	t1 := math.Trunc(t0)
-	return t1
+	return math.Trunc(v0)
 }
 func (m *Module) Xf64_nearest(v0 float64) float64 {
-	t0 := v0
-	t1 := math.RoundToEven(t0)
-	return t1
+	return math.RoundToEven(v0)
 }
 func (m *Module) Xf64_min(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := f64_min(t0, t1)
-	return t2
+	return f64_min(v0, v1)
 }
 func (m *Module) Xf64_max(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := f64_max(t0, t1)
-	return t2
+	return f64_max(v0, v1)
 }
 
 //go:nosplit

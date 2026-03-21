@@ -10,12 +10,9 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xpoint_four(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 / t1)
-	var p3 int32
-	if t2 < float64(0.4) {
-		p3 = 1
+	var p0 int32
+	if float64(v0/v1) < float64(0.4) {
+		p0 = 1
 	}
-	return p3
+	return p0
 }

@@ -17,8 +17,7 @@ func New() *Module {
 }
 func (m *Module) Xinc() {
 	t0 := int32(m.memory[uint32(i32_const(0))])
-	t1 := t0 + int32(1)
-	m.memory[uint32(i32_const(0))] = byte(t1)
+	m.memory[uint32(i32_const(0))] = byte(t0 + int32(1))
 }
 func (m *Module) Xget() int32 {
 	t0 := int32(m.memory[uint32(i32_const(0))])

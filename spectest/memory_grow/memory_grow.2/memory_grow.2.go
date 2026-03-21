@@ -14,9 +14,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xgrow(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
-	return t1
+	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
+	return t0
 }
 func (m *Module) Xcheck_memory_zero(v0 int32, v1 int32) int32 {
 	var v2 int32
@@ -25,31 +24,22 @@ func (m *Module) Xcheck_memory_zero(v0 int32, v1 int32) int32 {
 	{
 	l1:
 		{
-			t0 := v0
-			t1 := int32(m.memory[uint32(t0)])
-			v2 = t1
-			t2 := v2
-			if t2 != i32_const(0) {
+			t0 := int32(m.memory[uint32(v0)])
+			v2 = t0
+			if v2 != i32_const(0) {
 				goto l0
 			}
-			t4 := v0
-			t5 := v1
-			if uint32(t4) >= uint32(t5) {
+			if uint32(v0) >= uint32(v1) {
 				goto l0
 			}
-			t7 := v0
-			t8 := t7 + int32(1)
-			v0 = t8
-			t9 := v0
-			t10 := v1
-			if uint32(t9) <= uint32(t10) {
+			v0 = v0 + int32(1)
+			if uint32(v0) <= uint32(v1) {
 				goto l1
 			}
 		}
 	}
 l0:
-	t12 := v2
-	return t12
+	return v2
 }
 
 //go:nosplit

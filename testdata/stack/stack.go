@@ -10,49 +10,35 @@ func New() *Module {
 	return m
 }
 func (m *Module) f0(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 - t1
-	return t2
+	return v0 - v1
 }
 func (m *Module) Xstack_func_call() int32 {
 	t0 := m.f0(int32(91), int32(23))
 	return t0
 }
 func (m *Module) Xgreater(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p3 int32
-	_ = p3
-	if t0 > t1 {
-		p3 = int32(1)
+	var p0 int32
+	_ = p0
+	if v0 > v1 {
+		p0 = int32(1)
 	} else {
-		p3 = i32_const(0)
+		p0 = i32_const(0)
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xtwo_a_plus_b(v0 int32, v1 int32) int32 {
 	var v2 int32
 	_ = v2
 	t0 := v1
-	t1 := v0
-	v2 = t1
-	t2 := t0 + t1
-	t3 := v2
-	t4 := t2 + t3
-	return t4
+	v2 = v0
+	return t0 + v2 + v2
 }
 func (m *Module) Xtee_for_two(v0 int32, v1 int32) (int32, int32) {
 	var v2 int32
 	_ = v2
 	t0 := v0
-	t1 := v0
-	t2 := v1
-	t3 := t1 + t2
-	v2 = t3
-	t4 := t0 + t3
-	t5 := v2
-	return t4, t5
+	v2 = v0 + v1
+	return t0 + v2, v2
 }
 
 //go:nosplit

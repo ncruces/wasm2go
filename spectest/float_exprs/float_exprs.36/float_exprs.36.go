@@ -10,8 +10,5 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xno_fold_promote_demote(v0 float32) float32 {
-	t0 := v0
-	t1 := float64(t0)
-	t2 := float32(t1)
-	return t2
+	return float32(float64(v0))
 }

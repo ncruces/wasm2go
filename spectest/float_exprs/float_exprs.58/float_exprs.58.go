@@ -12,16 +12,10 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_recip_recip(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(f32_const(1) / t0)
-	t2 := float32(f32_const(1) / t1)
-	return t2
+	return float32(f32_const(1) / float32(f32_const(1)/v0))
 }
 func (m *Module) Xf64_no_fold_recip_recip(v0 float64) float64 {
-	t0 := v0
-	t1 := float64(f64_const(1) / t0)
-	t2 := float64(f64_const(1) / t1)
-	return t2
+	return float64(f64_const(1) / float64(f64_const(1)/v0))
 }
 
 //go:nosplit

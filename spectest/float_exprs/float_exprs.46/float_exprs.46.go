@@ -10,114 +10,98 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_lt_if(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	var p3 float32
-	_ = p3
-	if t0 < t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float32
+	_ = p0
+	if v0 < v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xf32_no_fold_le_if(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	var p3 float32
-	_ = p3
-	if t0 <= t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float32
+	_ = p0
+	if v0 <= v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xf32_no_fold_gt_if(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	var p3 float32
-	_ = p3
-	if t0 > t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float32
+	_ = p0
+	if v0 > v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xf32_no_fold_ge_if(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v1
-	var p3 float32
-	_ = p3
-	if t0 >= t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float32
+	_ = p0
+	if v0 >= v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xf64_no_fold_lt_if(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	var p3 float64
-	_ = p3
-	if t0 < t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float64
+	_ = p0
+	if v0 < v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xf64_no_fold_le_if(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	var p3 float64
-	_ = p3
-	if t0 <= t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float64
+	_ = p0
+	if v0 <= v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xf64_no_fold_gt_if(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	var p3 float64
-	_ = p3
-	if t0 > t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float64
+	_ = p0
+	if v0 > v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xf64_no_fold_ge_if(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v1
-	var p3 float64
-	_ = p3
-	if t0 >= t1 {
-		t4 := v0
-		p3 = t4
+	var p0 float64
+	_ = p0
+	if v0 >= v1 {
+		t1 := v0
+		p0 = t1
 	} else {
-		t5 := v1
-		p3 = t5
+		t2 := v1
+		p0 = t2
 	}
-	return p3
+	return p0
 }

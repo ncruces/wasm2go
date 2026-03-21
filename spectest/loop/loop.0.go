@@ -391,8 +391,8 @@ func (m *Module) Xas_br_if_first() int32 {
 		{
 			p1 = int32(1)
 		}
-		p0 = p1
 		if int32(2) != 0 {
+			p0 = p1
 			goto l0
 		}
 		p0 = p1
@@ -409,8 +409,8 @@ func (m *Module) Xas_br_if_last() int32 {
 		{
 			p1 = int32(1)
 		}
-		p0 = int32(2)
 		if p1 != 0 {
+			p0 = int32(2)
 			goto l0
 		}
 		p0 = int32(2)
@@ -427,9 +427,9 @@ func (m *Module) Xas_br_table_first() int32 {
 		{
 			p1 = int32(1)
 		}
-		p0 = p1
 		switch int32(2) {
 		default:
+			p0 = p1
 			goto l0
 		}
 	}
@@ -445,9 +445,9 @@ func (m *Module) Xas_br_table_last() int32 {
 		{
 			p1 = int32(1)
 		}
-		p0 = int32(2)
 		switch p1 {
 		default:
+			p0 = int32(2)
 			goto l0
 		}
 	}
@@ -455,8 +455,7 @@ l0:
 	return p0
 }
 func (m *Module) f16(v0 int32, v1 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xas_call_indirect_first() int32 {
 	var p0 int32
@@ -526,8 +525,7 @@ func (m *Module) Xas_memory_grow_value() int32 {
 	return t1
 }
 func (m *Module) f23(v0 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xas_call_value() int32 {
 	var p0 int32
@@ -578,8 +576,7 @@ func (m *Module) Xas_local_set_value() int32 {
 		p0 = int32(1)
 	}
 	v0 = p0
-	t1 := v0
-	return t1
+	return v0
 }
 func (m *Module) Xas_local_tee_value() int32 {
 	var v0 int32
@@ -590,7 +587,7 @@ func (m *Module) Xas_local_tee_value() int32 {
 		p0 = int32(1)
 	}
 	v0 = p0
-	return p0
+	return v0
 }
 func (m *Module) Xas_global_set_value() int32 {
 	var p0 int32
@@ -618,8 +615,7 @@ func (m *Module) Xas_unary_operand() int32 {
 		m.f0()
 		p0 = int32(13)
 	}
-	t1 := int32(bits.TrailingZeros32(uint32(p0)))
-	return t1
+	return int32(bits.TrailingZeros32(uint32(p0)))
 }
 func (m *Module) Xas_binary_operand() int32 {
 	var p0 int32
@@ -634,8 +630,7 @@ func (m *Module) Xas_binary_operand() int32 {
 		m.f0()
 		p1 = int32(4)
 	}
-	t2 := p0 * p1
-	return t2
+	return p0 * p1
 }
 func (m *Module) Xas_test_operand() int32 {
 	var p0 int32
@@ -678,8 +673,7 @@ func (m *Module) Xas_binary_operands() int32 {
 		m.f0()
 		p0, p1 = int32(3), int32(4)
 	}
-	t2 := p0 * p1
-	return t2
+	return p0 * p1
 }
 func (m *Module) Xas_compare_operands() int32 {
 	var p0 float32
@@ -705,9 +699,7 @@ func (m *Module) Xas_mixed_operands() int32 {
 		m.f0()
 		p0, p1 = int32(3), int32(4)
 	}
-	t2 := p1 + int32(5)
-	t3 := p0 * t2
-	return t3
+	return p0 * (p1 + int32(5))
 }
 func (m *Module) Xbreak_bare() int32 {
 	{
@@ -795,9 +787,9 @@ func (m *Module) Xbreak_inner() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
-	t0 := v0
-	var p1 int32
-	_ = p1
+	t1 := v0
+	var p0 int32
+	_ = p0
 	{
 		var p2 int32
 		_ = p2
@@ -805,98 +797,92 @@ func (m *Module) Xbreak_inner() int32 {
 			var p3 int32
 			_ = p3
 			{
-				p1 = int32(1)
+				p0 = int32(1)
 				goto l0
 			}
 		}
 	}
 l0:
-	t4 := t0 + p1
-	v0 = t4
+	v0 = t1 + p0
 	t5 := v0
-	var p6 int32
-	_ = p6
+	var p4 int32
+	_ = p4
 	{
-		var p7 int32
-		_ = p7
+		var p6 int32
+		_ = p6
 		{
-			var p8 int32
-			_ = p8
+			var p7 int32
+			_ = p7
 			{
-				p6 = int32(2)
+				p4 = int32(2)
 				goto l1
 			}
 		}
 	}
 l1:
-	t9 := t5 + p6
-	v0 = t9
-	t10 := v0
-	var p11 int32
-	_ = p11
+	v0 = t5 + p4
+	t9 := v0
+	var p8 int32
+	_ = p8
 	{
-		var p12 int32
-		_ = p12
+		var p10 int32
+		_ = p10
 		{
-			var p13 int32
-			_ = p13
+			var p11 int32
+			_ = p11
 			{
-				var p14 int32
-				_ = p14
+				var p12 int32
+				_ = p12
 				{
-					p13 = int32(4)
+					p11 = int32(4)
 					goto l2
 				}
 			}
 		l2:
-			p12 = p13
+			p10 = p11
 		}
-		p11 = p12
+		p8 = p10
 	}
-	t15 := t10 + p11
-	v0 = t15
-	t16 := v0
-	var p17 int32
-	_ = p17
+	v0 = t9 + p8
+	t14 := v0
+	var p13 int32
+	_ = p13
 	{
-		var p18 int32
-		_ = p18
+		var p15 int32
+		_ = p15
 		{
-			p17 = int32(8)
+			p13 = int32(8)
 			goto l3
 		}
 	}
 l3:
-	t19 := t16 + p17
-	v0 = t19
-	t20 := v0
-	var p21 int32
-	_ = p21
+	v0 = t14 + p13
+	t17 := v0
+	var p16 int32
+	_ = p16
 	{
-		var p22 int32
-		_ = p22
+		var p18 int32
+		_ = p18
 		{
-			var p23 int32
-			_ = p23
+			var p19 int32
+			_ = p19
 			{
-				p21 = int32(16)
+				p16 = int32(16)
 				goto l4
 			}
 		}
 	}
 l4:
-	t24 := t20 + p21
-	v0 = t24
-	t25 := v0
-	return t25
+	v0 = t17 + p16
+	return v0
 }
 func (m *Module) Xcont_inner() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32_const(0)
 	_ = v0
-	var p1 int32
-	_ = p1
+	var p0 int32
+	_ = p0
 l0:
 	{
 		var p2 int32
@@ -934,8 +920,7 @@ func (m *Module) Xparams_id() int32 {
 	{
 		p0, p1 = p3, p2
 	}
-	t4 := p0 + p1
-	return t4
+	return p0 + p1
 }
 func (m *Module) Xparam_break() int32 {
 	var v0 int32
@@ -945,11 +930,10 @@ func (m *Module) Xparam_break() int32 {
 	p1 := int32(1)
 l0:
 	{
-		t2 := p1 + int32(4)
-		v0 = t2
-		t3 := v0
-		p1 = t2
-		if uint32(t3) < uint32(int32(10)) {
+		v0 = p1 + int32(4)
+		t2 := v0
+		if uint32(v0) < uint32(int32(10)) {
+			p1 = t2
 			goto l0
 		}
 		p0 = t2
@@ -964,11 +948,10 @@ func (m *Module) Xparams_break() int32 {
 	p2, p1 := int32(1), int32(2)
 l0:
 	{
-		t3 := p2 + p1
-		v0 = t3
-		t4 := v0
-		p2, p1 = t3, int32(3)
-		if uint32(t4) < uint32(int32(10)) {
+		v0 = p2 + p1
+		t3 := v0
+		if uint32(v0) < uint32(int32(10)) {
+			p2, p1 = t3, int32(3)
 			goto l0
 		}
 		_ = int32(3)
@@ -986,17 +969,13 @@ func (m *Module) Xparams_id_break() int32 {
 	p3, p2 := int32(1), int32(2)
 l0:
 	{
-		t4 := v0
-		t5 := t4 + int32(1)
-		v0 = t5
-		t6 := v0
-		if uint32(t6) < uint32(int32(10)) {
+		v0 = v0 + int32(1)
+		if uint32(v0) < uint32(int32(10)) {
 			goto l0
 		}
 		p0, p1 = p3, p2
 	}
-	t8 := p0 + p1
-	return t8
+	return p0 + p1
 }
 func (m *Module) Xeffects() int32 {
 	var v0 int32
@@ -1004,25 +983,19 @@ func (m *Module) Xeffects() int32 {
 	{
 		{
 			v0 = int32(1)
-			t0 := v0
-			t1 := t0 * int32(3)
-			v0 = t1
-			t2 := v0
-			t3 := t2 - int32(5)
-			v0 = t3
-			t4 := v0
-			t5 := t4 * int32(7)
-			v0 = t5
+			v0 = v0 * int32(3)
+			v0 = v0 - int32(5)
+			v0 = v0 * int32(7)
 			goto l0
 		}
 	}
 l0:
-	t6 := v0
-	var p7 int32
-	if t6 == i32_const(-14) {
-		p7 = 1
+	;
+	var p0 int32
+	if v0 == i32_const(-14) {
+		p0 = 1
 	}
-	return p7
+	return p0
 }
 func (m *Module) Xwhile(v0 int64) int64 {
 	var v1 int64
@@ -1031,23 +1004,16 @@ func (m *Module) Xwhile(v0 int64) int64 {
 	{
 	l1:
 		{
-			t0 := v0
-			if t0 == 0 {
+			if v0 == 0 {
 				goto l0
 			}
-			t2 := v0
-			t3 := v1
-			t4 := t2 * t3
-			v1 = t4
-			t5 := v0
-			t6 := t5 - int64(1)
-			v0 = t6
+			v1 = v0 * v1
+			v0 = v0 - int64(1)
 			goto l1
 		}
 	}
 l0:
-	t7 := v1
-	return t7
+	return v1
 }
 func (m *Module) Xfor(v0 int64) int64 {
 	var v1, v2 int64
@@ -1057,24 +1023,16 @@ func (m *Module) Xfor(v0 int64) int64 {
 	{
 	l1:
 		{
-			t0 := v2
-			t1 := v0
-			if uint64(t0) > uint64(t1) {
+			if uint64(v2) > uint64(v0) {
 				goto l0
 			}
-			t3 := v1
-			t4 := v2
-			t5 := t3 * t4
-			v1 = t5
-			t6 := v2
-			t7 := t6 + int64(1)
-			v2 = t7
+			v1 = v1 * v2
+			v2 = v2 + int64(1)
 			goto l1
 		}
 	}
 l0:
-	t8 := v1
-	return t8
+	return v1
 }
 func (m *Module) Xnesting(v0 float32, v1 float32) float32 {
 	var v2, v3 float32
@@ -1082,47 +1040,32 @@ func (m *Module) Xnesting(v0 float32, v1 float32) float32 {
 	{
 	l3:
 		{
-			t0 := v0
-			if t0 == f32_const(0) {
+			if v0 == f32_const(0) {
 				goto l0
 			}
-			t2 := v1
-			v2 = t2
+			v2 = v1
 			{
 			l2:
 				{
-					t3 := v2
-					if t3 == f32_const(0) {
+					if v2 == f32_const(0) {
 						goto l1
 					}
-					t5 := v2
-					if t5 < f32_const(0) {
+					if v2 < f32_const(0) {
 						goto l0
 					}
-					t7 := v3
-					t8 := v2
-					t9 := float32(t7 + t8)
-					v3 = t9
-					t10 := v2
-					t11 := float32(t10 - float32(2))
-					v2 = t11
+					v3 = float32(v3 + v2)
+					v2 = float32(v2 - float32(2))
 					goto l2
 				}
 			}
 		l1:
-			t12 := v3
-			t13 := v0
-			t14 := float32(t12 / t13)
-			v3 = t14
-			t15 := v0
-			t16 := float32(t15 - f32_const(1))
-			v0 = t16
+			v3 = float32(v3 / v0)
+			v0 = float32(v0 - f32_const(1))
 			goto l3
 		}
 	}
 l0:
-	t17 := v3
-	return t17
+	return v3
 }
 func (m *Module) Xtype_use() {
 	{
@@ -1173,11 +1116,8 @@ func (m *Module) Xbr_implicit_drop() int32 {
 	_ = v0
 l0:
 	{
-		t0 := v0
-		t1 := t0 + int32(1)
-		v0 = t1
-		t2 := v0
-		if t2 < int32(10) {
+		v0 = v0 + int32(1)
+		if v0 < int32(10) {
 			goto l0
 		}
 		_ = int32(2)

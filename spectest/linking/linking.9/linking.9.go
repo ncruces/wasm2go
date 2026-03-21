@@ -21,9 +21,8 @@ func (m *Module) Xh() int32 {
 	return i32_const(-4)
 }
 func (m *Module) Xcall(v0 int32) int32 {
-	t0 := v0
-	t1 := m.t0[uint(t0)].(func() int32)()
-	return t1
+	t0 := m.t0[uint(v0)].(func() int32)()
+	return t0
 }
 func (m *Module) Xtab() *[]any {
 	return &m.t0

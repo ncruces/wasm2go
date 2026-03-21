@@ -16,12 +16,9 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xstore(v0 int32, v1 int64) {
-	t0 := v0
-	t1 := v1
-	binary.LittleEndian.PutUint64(m.memory[uint32(t0):], uint64(t1))
+	binary.LittleEndian.PutUint64(m.memory[uint32(v0):], uint64(v1))
 }
 func (m *Module) Xload(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(t0):]))
-	return t1
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
+	return t0
 }

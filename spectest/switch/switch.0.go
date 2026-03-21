@@ -23,8 +23,7 @@ func (m *Module) Xstmt(v0 int32) int32 {
 								{
 									{
 										{
-											t0 := v0
-											switch t0 {
+											switch v0 {
 											case 0:
 												goto l0
 											case 1:
@@ -46,17 +45,14 @@ func (m *Module) Xstmt(v0 int32) int32 {
 											}
 										}
 									l0:
-										t1 := v0
-										return t1
+										return v0
 									}
 								l1:
 								}
 							l2:
 							}
 						l3:
-							t2 := v0
-							t3 := i32_const(0) - t2
-							v1 = t3
+							v1 = i32_const(0) - v0
 							goto l9
 						}
 					l4:
@@ -75,8 +71,7 @@ func (m *Module) Xstmt(v0 int32) int32 {
 	l7:
 	}
 l9:
-	t4 := v1
-	return t4
+	return v1
 }
 func (m *Module) Xexpr(v0 int64) int64 {
 	var v1 int64
@@ -94,9 +89,7 @@ func (m *Module) Xexpr(v0 int64) int64 {
 								{
 									{
 										{
-											t1 := v0
-											t2 := int32(t1)
-											switch t2 {
+											switch int32(v0) {
 											case 0:
 												goto l0
 											case 1:
@@ -118,17 +111,15 @@ func (m *Module) Xexpr(v0 int64) int64 {
 											}
 										}
 									l0:
-										t3 := v0
-										return t3
+										return v0
 									}
 								l1:
 								}
 							l2:
 							}
 						l3:
-							t4 := v0
-							t5 := i64_const(0) - t4
-							p0 = t5
+							t1 := i64_const(0) - v0
+							p0 = t1
 							goto l9
 						}
 					l6:
@@ -139,8 +130,8 @@ func (m *Module) Xexpr(v0 int64) int64 {
 			l4:
 			}
 		l8:
-			t6 := v1
-			p0 = t6
+			t2 := v1
+			p0 = t2
 			goto l9
 		}
 	l7:
@@ -162,36 +153,33 @@ func (m *Module) Xarg(v0 int32) int32 {
 				var p3 int32
 				_ = p3
 				{
-					t4 := v0
-					t5 := int32(2) * t4
-					t6 := v0
-					t7 := int32(3) & t6
-					p2 = t5
-					p1 = t5
-					p0 = t5
-					p3 = t5
-					switch t7 {
+					t4 := int32(2) * v0
+					switch int32(3) & v0 {
 					case 0:
+						p2 = t4
 						goto l0
 					case 1:
+						p1 = t4
 						goto l1
 					case 2:
+						p0 = t4
 						goto l2
 					default:
+						p3 = t4
 						goto l3
 					}
 				}
 			l3:
-				t8 := i32_const(1000) + p3
-				p2 = t8
+				t5 := i32_const(1000) + p3
+				p2 = t5
 			}
 		l0:
-			t9 := int32(100) + p2
-			p1 = t9
+			t6 := int32(100) + p2
+			p1 = t6
 		}
 	l1:
-		t10 := int32(10) + p1
-		p0 = t10
+		t7 := int32(10) + p1
+		p0 = t7
 	}
 l2:
 	return p0

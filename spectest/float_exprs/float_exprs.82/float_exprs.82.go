@@ -14,68 +14,38 @@ func New() *Module {
 func (m *Module) Xf32_compute_radix(v0 float32, v1 float32) float32 {
 l0:
 	{
-		t0 := v0
-		t1 := v0
-		t2 := float32(t0 + t1)
-		v0 = t2
-		t3 := float32(t2 + f32_const(1))
-		t4 := v0
-		t5 := float32(t3 - t4)
-		t6 := float32(t5 + f32_const(-1))
-		if t6 == f32_const(0) {
+		v0 = float32(v0 + v0)
+		if float32(float32(float32(v0+f32_const(1))-v0)+f32_const(-1)) == f32_const(0) {
 			goto l0
 		}
 	}
 l1:
 	{
-		t8 := v0
-		t9 := v1
-		t10 := float32(t9 + f32_const(1))
-		v1 = t10
-		t11 := float32(t8 + t10)
-		t12 := v0
-		t13 := float32(t11 - t12)
-		t14 := v1
-		t15 := float32(t13 - t14)
-		if t15 != f32_const(0) {
+		t0 := v0
+		v1 = float32(v1 + f32_const(1))
+		if float32(float32(float32(t0+v1)-v0)-v1) != f32_const(0) {
 			goto l1
 		}
 	}
-	t17 := v1
-	return t17
+	return v1
 }
 func (m *Module) Xf64_compute_radix(v0 float64, v1 float64) float64 {
 l0:
 	{
-		t0 := v0
-		t1 := v0
-		t2 := float64(t0 + t1)
-		v0 = t2
-		t3 := float64(t2 + f64_const(1))
-		t4 := v0
-		t5 := float64(t3 - t4)
-		t6 := float64(t5 + f64_const(-1))
-		if t6 == f64_const(0) {
+		v0 = float64(v0 + v0)
+		if float64(float64(float64(v0+f64_const(1))-v0)+f64_const(-1)) == f64_const(0) {
 			goto l0
 		}
 	}
 l1:
 	{
-		t8 := v0
-		t9 := v1
-		t10 := float64(t9 + f64_const(1))
-		v1 = t10
-		t11 := float64(t8 + t10)
-		t12 := v0
-		t13 := float64(t11 - t12)
-		t14 := v1
-		t15 := float64(t13 - t14)
-		if t15 != f64_const(0) {
+		t0 := v0
+		v1 = float64(v1 + f64_const(1))
+		if float64(float64(float64(t0+v1)-v0)-v1) != f64_const(0) {
 			goto l1
 		}
 	}
-	t17 := v1
-	return t17
+	return v1
 }
 
 //go:nosplit

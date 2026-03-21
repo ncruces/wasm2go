@@ -12,14 +12,10 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_mul_one(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(t0 * f32_const(1))
-	return t1
+	return float32(v0 * f32_const(1))
 }
 func (m *Module) Xf64_no_fold_mul_one(v0 float64) float64 {
-	t0 := v0
-	t1 := float64(t0 * f64_const(1))
-	return t1
+	return float64(v0 * f64_const(1))
 }
 
 //go:nosplit

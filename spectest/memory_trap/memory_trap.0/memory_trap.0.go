@@ -17,27 +17,20 @@ func New() *Module {
 }
 func (m *Module) f0() int32 {
 	t0 := int32(len(m.memory) >> 16)
-	t1 := t0 * i32_const(65536)
-	return t1
+	return t0 * i32_const(65536)
 }
 func (m *Module) Xstore(v0 int32, v1 int32) {
 	t0 := m.f0()
-	t1 := v0
-	t2 := t0 + t1
-	t3 := v1
-	binary.LittleEndian.PutUint32(m.memory[uint32(t2):], uint32(t3))
+	binary.LittleEndian.PutUint32(m.memory[uint32(t0+v0):], uint32(v1))
 }
 func (m *Module) Xload(v0 int32) int32 {
 	t0 := m.f0()
-	t1 := v0
-	t2 := t0 + t1
-	t3 := int32(binary.LittleEndian.Uint32(m.memory[uint32(t2):]))
-	return t3
+	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(t0+v0):]))
+	return t1
 }
 func (m *Module) Xmemory_grow(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
-	return t1
+	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
+	return t0
 }
 
 //go:nosplit

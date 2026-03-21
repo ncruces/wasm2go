@@ -24,15 +24,11 @@ func (m *Module) f2() int32 {
 	return int32(2)
 }
 func (m *Module) Xcopy(v0 int32, v1 int32, v2 int32) {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	table_copy(m.t0, m.t0, t0, t1, t2)
+	table_copy(m.t0, m.t0, v0, v1, v2)
 }
 func (m *Module) Xcall(v0 int32) int32 {
-	t0 := v0
-	t1 := m.t0[uint(t0)].(func() int32)()
-	return t1
+	t0 := m.t0[uint(v0)].(func() int32)()
+	return t0
 }
 
 //go:nosplit

@@ -28,44 +28,32 @@ func New() *Module {
 func (m *Module) f0() {
 }
 func (m *Module) Xselect_i32(v0 int32, v1 int32, v2 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	p3 := t1
-	if t2 != 0 {
-		p3 = t0
+	p0 := v1
+	if v2 != 0 {
+		p0 = v0
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xselect_i64(v0 int64, v1 int64, v2 int32) int64 {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	p3 := t1
-	if t2 != 0 {
-		p3 = t0
+	p0 := v1
+	if v2 != 0 {
+		p0 = v0
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xselect_f32(v0 float32, v1 float32, v2 int32) float32 {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	p3 := t1
-	if t2 != 0 {
-		p3 = t0
+	p0 := v1
+	if v2 != 0 {
+		p0 = v0
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xselect_f64(v0 float64, v1 float64, v2 int32) float64 {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	p3 := t1
-	if t2 != 0 {
-		p3 = t0
+	p0 := v1
+	if v2 != 0 {
+		p0 = v0
 	}
-	return p3
+	return p0
 }
 func (m *Module) Xselect_trap_l(v0 int32) int32 {
 	panic("unreachable")
@@ -77,53 +65,49 @@ func (m *Module) Xselect_unreached() {
 	panic("unreachable")
 }
 func (m *Module) Xas_select_first(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(1)
-	if t0 != 0 {
-		p1 = i32_const(0)
+	p0 := int32(1)
+	if v0 != 0 {
+		p0 = i32_const(0)
 	}
-	p2 := int32(2)
+	p1 := int32(2)
 	if int32(3) != 0 {
-		p2 = p1
+		p1 = p0
 	}
-	return p2
+	return p1
 }
 func (m *Module) Xas_select_mid(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(1)
-	if t0 != 0 {
-		p1 = i32_const(0)
+	p0 := int32(1)
+	if v0 != 0 {
+		p0 = i32_const(0)
 	}
-	p2 := p1
+	p1 := p0
 	if int32(3) != 0 {
-		p2 = int32(2)
+		p1 = int32(2)
 	}
-	return p2
+	return p1
 }
 func (m *Module) Xas_select_last(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(1)
-	if t0 != 0 {
-		p1 = i32_const(0)
+	p0 := int32(1)
+	if v0 != 0 {
+		p0 = i32_const(0)
 	}
-	p2 := int32(3)
-	if p1 != 0 {
-		p2 = int32(2)
+	p1 := int32(3)
+	if p0 != 0 {
+		p1 = int32(2)
 	}
-	return p2
+	return p1
 }
 func (m *Module) Xas_loop_first(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
 		m.f0()
 		m.f0()
-		p0 = p2
+		p0 = p1
 	}
 	return p0
 }
@@ -132,13 +116,12 @@ func (m *Module) Xas_loop_mid(v0 int32) int32 {
 	_ = p0
 	{
 		m.f0()
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
 		m.f0()
-		p0 = p2
+		p0 = p1
 	}
 	return p0
 }
@@ -148,22 +131,20 @@ func (m *Module) Xas_loop_last(v0 int32) int32 {
 	{
 		m.f0()
 		m.f0()
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		p0 = p2
+		p0 = p1
 	}
 	return p0
 }
 func (m *Module) Xas_if_condition(v0 int32) {
-	t0 := v0
-	p1 := int32(3)
-	if t0 != 0 {
-		p1 = int32(2)
+	p0 := int32(3)
+	if v0 != 0 {
+		p0 = int32(2)
 	}
-	if p1 != 0 {
+	if p0 != 0 {
 		m.f0()
 	}
 }
@@ -171,12 +152,11 @@ func (m *Module) Xas_if_then(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	if int32(1) != 0 {
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		p0 = p2
+		p0 = p1
 	} else {
 		p0 = int32(4)
 	}
@@ -188,12 +168,11 @@ func (m *Module) Xas_if_else(v0 int32) int32 {
 	if i32_const(0) != 0 {
 		p0 = int32(2)
 	} else {
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		p0 = p2
+		p0 = p1
 	}
 	return p0
 }
@@ -201,16 +180,15 @@ func (m *Module) Xas_br_if_first(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		p0 = p2
 		if int32(4) != 0 {
+			p0 = p1
 			goto l0
 		}
-		p0 = p2
+		p0 = p1
 	}
 l0:
 	return p0
@@ -219,13 +197,12 @@ func (m *Module) Xas_br_if_last(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		p0 = int32(2)
-		if p2 != 0 {
+		if p1 != 0 {
+			p0 = int32(2)
 			goto l0
 		}
 		p0 = int32(2)
@@ -237,14 +214,13 @@ func (m *Module) Xas_br_table_first(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		p0 = p2
 		switch int32(2) {
 		default:
+			p0 = p1
 			goto l0
 		}
 	}
@@ -255,14 +231,13 @@ func (m *Module) Xas_br_table_last(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		p0 = int32(2)
-		switch p2 {
+		switch p1 {
 		default:
+			p0 = int32(2)
 			goto l0
 		}
 	}
@@ -270,20 +245,18 @@ l0:
 	return p0
 }
 func (m *Module) f21(v0 int32, v1 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xas_call_indirect_first(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		t3 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(p2, int32(1))
-		p0 = t3
+		t2 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(p1, int32(1))
+		p0 = t2
 	}
 	return p0
 }
@@ -291,13 +264,12 @@ func (m *Module) Xas_call_indirect_mid(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		t3 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), p2)
-		p0 = t3
+		t2 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), p1)
+		p0 = t2
 	}
 	return p0
 }
@@ -305,80 +277,71 @@ func (m *Module) Xas_call_indirect_last(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(3)
-		if t1 != 0 {
-			p2 = int32(2)
+		p1 := int32(3)
+		if v0 != 0 {
+			p1 = int32(2)
 		}
-		t3 := m.t0[uint(p2)].(func(v0 int32, v1 int32) int32)(int32(1), int32(4))
-		p0 = t3
+		t2 := m.t0[uint(p1)].(func(v0 int32, v1 int32) int32)(int32(1), int32(4))
+		p0 = t2
 	}
 	return p0
 }
 func (m *Module) Xas_store_first(v0 int32) {
-	t0 := v0
-	p1 := int32(4)
-	if t0 != 0 {
-		p1 = i32_const(0)
+	p0 := int32(4)
+	if v0 != 0 {
+		p0 = i32_const(0)
 	}
-	binary.LittleEndian.PutUint32(m.memory[uint32(p1):], uint32(int32(1)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(p0):], uint32(int32(1)))
 }
 func (m *Module) Xas_store_last(v0 int32) {
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(p1))
+	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(p0))
 }
 func (m *Module) Xas_memory_grow_value(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	t2 := int32(memory_grow(&m.memory, int64(p1), m.maxMem))
-	return t2
+	t1 := int32(memory_grow(&m.memory, int64(p0), m.maxMem))
+	return t1
 }
 func (m *Module) f28(v0 int32) int32 {
-	t0 := v0
-	return t0
+	return v0
 }
 func (m *Module) Xas_call_value(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	t2 := m.f28(p1)
-	return t2
+	t1 := m.f28(p0)
+	return t1
 }
 func (m *Module) Xas_return_value(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xas_drop_operand(v0 int32) {
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	_ = p1
+	_ = p0
 }
 func (m *Module) Xas_br_value(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(2)
-		if t1 != 0 {
-			p2 = int32(1)
+		p1 := int32(2)
+		if v0 != 0 {
+			p1 = int32(1)
 		}
-		p0 = p2
+		p0 = p1
 		goto l0
 	}
 l0:
@@ -387,83 +350,73 @@ l0:
 func (m *Module) Xas_local_set_value(v0 int32) int32 {
 	var v1 int32
 	_ = v1
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	v0 = p1
-	t2 := v0
-	return t2
+	v0 = p0
+	return v0
 }
 func (m *Module) Xas_local_tee_value(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	v0 = p1
-	return p1
+	v0 = p0
+	return v0
 }
 func (m *Module) Xas_global_set_value(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(2)
-	if t0 != 0 {
-		p1 = int32(1)
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
 	}
-	m.g0 = p1
-	t2 := m.g0
-	return t2
+	m.g0 = p0
+	t1 := m.g0
+	return t1
 }
 func (m *Module) Xas_load_operand(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(4)
-	if t0 != 0 {
-		p1 = i32_const(0)
+	p0 := int32(4)
+	if v0 != 0 {
+		p0 = i32_const(0)
 	}
-	t2 := int32(binary.LittleEndian.Uint32(m.memory[uint32(p1):]))
-	return t2
+	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(p0):]))
+	return t1
 }
 func (m *Module) Xas_unary_operand(v0 int32) int32 {
-	t0 := v0
-	p1 := int32(1)
-	if t0 != 0 {
-		p1 = i32_const(0)
+	p0 := int32(1)
+	if v0 != 0 {
+		p0 = i32_const(0)
 	}
-	var p2 int32
-	if p1 == 0 {
-		p2 = 1
+	var p1 int32
+	if p0 == 0 {
+		p1 = 1
 	}
-	return p2
+	return p1
 }
 func (m *Module) Xas_binary_operand(v0 int32) int32 {
-	t0 := v0
+	p0 := int32(2)
+	if v0 != 0 {
+		p0 = int32(1)
+	}
 	p1 := int32(2)
-	if t0 != 0 {
+	if v0 != 0 {
 		p1 = int32(1)
 	}
-	t2 := v0
-	p3 := int32(2)
-	if t2 != 0 {
-		p3 = int32(1)
-	}
-	t4 := p1 * p3
-	return t4
+	return p0 * p1
 }
 func (m *Module) Xas_test_operand(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(1)
-		if t1 != 0 {
-			p2 = i32_const(0)
+		p1 := int32(1)
+		if v0 != 0 {
+			p1 = i32_const(0)
 		}
-		var p3 int32
-		if p2 == 0 {
-			p3 = 1
+		var p2 int32
+		if p1 == 0 {
+			p2 = 1
 		}
-		p0 = p3
+		p0 = p2
 	}
 	return p0
 }
@@ -471,16 +424,15 @@ func (m *Module) Xas_compare_left(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(2)
-		if t1 != 0 {
-			p2 = int32(1)
+		p1 := int32(2)
+		if v0 != 0 {
+			p1 = int32(1)
 		}
-		var p3 int32
-		if p2 <= int32(1) {
-			p3 = 1
+		var p2 int32
+		if p1 <= int32(1) {
+			p2 = 1
 		}
-		p0 = p3
+		p0 = p2
 	}
 	return p0
 }
@@ -488,16 +440,15 @@ func (m *Module) Xas_compare_right(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := int32(1)
-		if t1 != 0 {
-			p2 = i32_const(0)
+		p1 := int32(1)
+		if v0 != 0 {
+			p1 = i32_const(0)
 		}
-		var p3 int32
-		if int32(1) != p2 {
-			p3 = 1
+		var p2 int32
+		if int32(1) != p1 {
+			p2 = 1
 		}
-		p0 = p3
+		p0 = p2
 	}
 	return p0
 }
@@ -505,13 +456,12 @@ func (m *Module) Xas_convert_operand(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		p2 := i64_const(0)
-		if t1 != 0 {
-			p2 = int64(1)
+		p1 := i64_const(0)
+		if v0 != 0 {
+			p1 = int64(1)
 		}
-		t3 := int32(p2)
-		p0 = t3
+		t2 := int32(p1)
+		p0 = t2
 	}
 	return p0
 }

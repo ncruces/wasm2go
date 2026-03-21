@@ -15,217 +15,145 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xadd(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 + t1
-	return t2
+	return v0 + v1
 }
 func (m *Module) Xsub(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 - t1
-	return t2
+	return v0 - v1
 }
 func (m *Module) Xmul(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 * t1
-	return t2
+	return v0 * v1
 }
 func (m *Module) Xdiv_s(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := i32_div_s(t0, t1)
-	return t2
+	t0 := i32_div_s(v0, v1)
+	return t0
 }
 func (m *Module) Xdiv_u(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := int32(uint32(t0) / uint32(t1))
-	return t2
+	t0 := int32(uint32(v0) / uint32(v1))
+	return t0
 }
 func (m *Module) Xrem_s(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 % t1
-	return t2
+	t0 := v0 % v1
+	return t0
 }
 func (m *Module) Xrem_u(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := int32(uint32(t0) % uint32(t1))
-	return t2
+	t0 := int32(uint32(v0) % uint32(v1))
+	return t0
 }
 func (m *Module) Xand(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 & t1
-	return t2
+	return v0 & v1
 }
 func (m *Module) Xor(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 | t1
-	return t2
+	return v0 | v1
 }
 func (m *Module) Xxor(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := t0 ^ t1
-	return t2
+	return v0 ^ v1
 }
 func (m *Module) Xshl(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := i32_shl(t0, t1)
-	return t2
+	return i32_shl(v0, v1)
 }
 func (m *Module) Xshr_s(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := i32_shr_s(t0, t1)
-	return t2
+	return i32_shr_s(v0, v1)
 }
 func (m *Module) Xshr_u(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := i32_shr_u(t0, t1)
-	return t2
+	return i32_shr_u(v0, v1)
 }
 func (m *Module) Xrotl(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := i32_rotl(t0, t1)
-	return t2
+	return i32_rotl(v0, v1)
 }
 func (m *Module) Xrotr(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := i32_rotr(t0, t1)
-	return t2
+	return i32_rotr(v0, v1)
 }
 func (m *Module) Xclz(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(bits.LeadingZeros32(uint32(t0)))
-	return t1
+	return int32(bits.LeadingZeros32(uint32(v0)))
 }
 func (m *Module) Xctz(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(bits.TrailingZeros32(uint32(t0)))
-	return t1
+	return int32(bits.TrailingZeros32(uint32(v0)))
 }
 func (m *Module) Xpopcnt(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(bits.OnesCount32(uint32(t0)))
-	return t1
+	return int32(bits.OnesCount32(uint32(v0)))
 }
 func (m *Module) Xextend8_s(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(int8(t0))
-	return t1
+	return int32(int8(v0))
 }
 func (m *Module) Xextend16_s(v0 int32) int32 {
-	t0 := v0
-	t1 := int32(int16(t0))
-	return t1
+	return int32(int16(v0))
 }
 func (m *Module) Xeqz(v0 int32) int32 {
-	t0 := v0
-	var p1 int32
-	if t0 == 0 {
-		p1 = 1
+	var p0 int32
+	if v0 == 0 {
+		p0 = 1
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xeq(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 == t1 {
-		p2 = 1
+	var p0 int32
+	if v0 == v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xne(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 != t1 {
-		p2 = 1
+	var p0 int32
+	if v0 != v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xlt_s(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 < t1 {
-		p2 = 1
+	var p0 int32
+	if v0 < v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xlt_u(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if uint32(t0) < uint32(t1) {
-		p2 = 1
+	var p0 int32
+	if uint32(v0) < uint32(v1) {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xle_s(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 <= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 <= v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xle_u(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if uint32(t0) <= uint32(t1) {
-		p2 = 1
+	var p0 int32
+	if uint32(v0) <= uint32(v1) {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xgt_s(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 > t1 {
-		p2 = 1
+	var p0 int32
+	if v0 > v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xgt_u(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if uint32(t0) > uint32(t1) {
-		p2 = 1
+	var p0 int32
+	if uint32(v0) > uint32(v1) {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xge_s(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if t0 >= t1 {
-		p2 = 1
+	var p0 int32
+	if v0 >= v1 {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 func (m *Module) Xge_u(v0 int32, v1 int32) int32 {
-	t0 := v0
-	t1 := v1
-	var p2 int32
-	if uint32(t0) >= uint32(t1) {
-		p2 = 1
+	var p0 int32
+	if uint32(v0) >= uint32(v1) {
+		p0 = 1
 	}
-	return p2
+	return p0
 }
 
 //go:nosplit

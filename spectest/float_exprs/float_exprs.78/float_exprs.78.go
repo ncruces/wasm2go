@@ -10,75 +10,47 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_recoding_eq(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 * t1)
-	t3 := v0
-	var p4 int32
-	if t2 == t3 {
-		p4 = 1
+	var p0 int32
+	if float32(v0*v1) == v0 {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xf32_recoding_le(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 * t1)
-	t3 := v0
-	var p4 int32
-	if t2 <= t3 {
-		p4 = 1
+	var p0 int32
+	if float32(v0*v1) <= v0 {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xf32_recoding_lt(v0 float32, v1 float32) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := float32(t0 * t1)
-	t3 := v0
-	var p4 int32
-	if t2 < t3 {
-		p4 = 1
+	var p0 int32
+	if float32(v0*v1) < v0 {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xf64_recoding_eq(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	t3 := v0
-	var p4 int32
-	if t2 == t3 {
-		p4 = 1
+	var p0 int32
+	if float64(v0*v1) == v0 {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xf64_recoding_le(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	t3 := v0
-	var p4 int32
-	if t2 <= t3 {
-		p4 = 1
+	var p0 int32
+	if float64(v0*v1) <= v0 {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xf64_recoding_lt(v0 float64, v1 float64) int32 {
-	t0 := v0
-	t1 := v1
-	t2 := float64(t0 * t1)
-	t3 := v0
-	var p4 int32
-	if t2 < t3 {
-		p4 = 1
+	var p0 int32
+	if float64(v0*v1) < v0 {
+		p0 = 1
 	}
-	return p4
+	return p0
 }
 func (m *Module) Xrecoding_demote(v0 float64, v1 float32) float32 {
-	t0 := v0
-	t1 := float32(t0)
-	t2 := v1
-	t3 := float32(t1 * t2)
-	return t3
+	return float32(float32(v0) * v1)
 }

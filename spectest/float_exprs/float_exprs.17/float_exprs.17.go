@@ -10,22 +10,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_factor(v0 float32, v1 float32, v2 float32) float32 {
-	t0 := v0
-	t1 := v2
-	t2 := float32(t0 * t1)
-	t3 := v1
-	t4 := v2
-	t5 := float32(t3 * t4)
-	t6 := float32(t2 + t5)
-	return t6
+	return float32(float32(v0*v2) + float32(v1*v2))
 }
 func (m *Module) Xf64_no_factor(v0 float64, v1 float64, v2 float64) float64 {
-	t0 := v0
-	t1 := v2
-	t2 := float64(t0 * t1)
-	t3 := v1
-	t4 := v2
-	t5 := float64(t3 * t4)
-	t6 := float64(t2 + t5)
-	return t6
+	return float64(float64(v0*v2) + float64(v1*v2))
 }

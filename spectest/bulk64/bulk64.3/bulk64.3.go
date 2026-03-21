@@ -16,15 +16,11 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xinit(v0 int64, v1 int32, v2 int32) {
-	t0 := v0
-	t1 := v1
-	t2 := v2
-	memory_init(m.memory, data0, uint64(t0), uint32(t1), uint32(t2))
+	memory_init(m.memory, data0, uint64(v0), uint32(v1), uint32(v2))
 }
 func (m *Module) Xload8_u(v0 int64) int32 {
-	t0 := v0
-	t1 := int32(m.memory[t0])
-	return t1
+	t0 := int32(m.memory[v0])
+	return t0
 }
 
 func memory_init[T uint32 | uint64](mem []byte, data string, dest T, src, n uint32) {

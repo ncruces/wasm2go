@@ -10,14 +10,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_div2_mul2(v0 float32) float32 {
-	t0 := v0
-	t1 := float32(t0 / float32(2))
-	t2 := float32(t1 * float32(2))
-	return t2
+	return float32(float32(v0/float32(2)) * float32(2))
 }
 func (m *Module) Xf64_no_fold_div2_mul2(v0 float64) float64 {
-	t0 := v0
-	t1 := float64(t0 / float64(2))
-	t2 := float64(t1 * float64(2))
-	return t2
+	return float64(float64(v0/float64(2)) * float64(2))
 }

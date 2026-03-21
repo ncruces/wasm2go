@@ -10,14 +10,7 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xllvm_pr27036(v0 int32, v1 int32) float32 {
-	t0 := v0
-	t1 := t0 | i32_const(-25034805)
-	t2 := float32(t1)
-	t3 := v1
-	t4 := t3 & i32_const(0xe40000)
-	t5 := float32(t4)
-	t6 := float32(t2 + t5)
-	return t6
+	return float32(float32(v0|i32_const(-25034805)) + float32(v1&i32_const(0xe40000)))
 }
 
 //go:nosplit

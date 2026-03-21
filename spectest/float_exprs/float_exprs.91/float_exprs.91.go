@@ -12,24 +12,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_contract2fma(v0 float32, v1 float32) float32 {
-	t0 := v0
-	t1 := v0
-	t2 := float32(t0 * t1)
-	t3 := v1
-	t4 := v1
-	t5 := float32(t3 * t4)
-	t6 := float32(t2 - t5)
-	t7 := float32(math.Sqrt(float64(t6)))
-	return t7
+	return float32(math.Sqrt(float64(float32(float32(v0*v0) - float32(v1*v1)))))
 }
 func (m *Module) Xf64_contract2fma(v0 float64, v1 float64) float64 {
-	t0 := v0
-	t1 := v0
-	t2 := float64(t0 * t1)
-	t3 := v1
-	t4 := v1
-	t5 := float64(t3 * t4)
-	t6 := float64(t2 - t5)
-	t7 := math.Sqrt(t6)
-	return t7
+	return math.Sqrt(float64(float64(v0*v0) - float64(v1*v1)))
 }

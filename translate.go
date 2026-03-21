@@ -20,6 +20,18 @@ import (
 //go:embed helpers/helpers.go
 var helpersSrc string
 
+// These helpers can never trap.
+var pureHelpers = set[string]{
+	"i32_shl": {}, "i32_shr_s": {}, "i32_shr_u": {}, "i32_rotl": {}, "i32_rotr": {},
+	"i64_shl": {}, "i64_shr_s": {}, "i64_shr_u": {}, "i64_rotl": {}, "i64_rotr": {},
+	"f32_abs": {}, "f32_copysign": {}, "f32_min": {}, "f32_max": {},
+	"f64_min": {}, "f64_max": {}, "min": {}, "max": {},
+	"i32_trunc_sat_f32_s": {}, "i32_trunc_sat_f32_u": {},
+	"i32_trunc_sat_f64_s": {}, "i32_trunc_sat_f64_u": {},
+	"i64_trunc_sat_f32_s": {}, "i64_trunc_sat_f32_u": {},
+	"i64_trunc_sat_f64_s": {}, "i64_trunc_sat_f64_u": {},
+}
+
 // Standard library packages used by generated code.
 var stdlib = map[string]string{
 	"runtime": "runtime",
@@ -950,7 +962,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x05: // else
 			// Set the results of the if branch.
-			blk.setResults(fn)
+			fn.emit(blk.resultStmts(fn)...)
 			fn.stack = fn.stack[:blk.stackPos]
 			// Push the if's arguments again.
 			for _, p := range blk.params {
@@ -966,8 +978,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x0b: // end
 			if len(fn.blocks) == 1 { // End of the function body.
 				if n := len(fn.typ.results); n > 0 && !blk.unreachable {
-					ret := &ast.ReturnStmt{}
-					ret.Results = append(ret.Results, fn.stack.last(n)...)
+					ret := &ast.ReturnStmt{Results: make([]ast.Expr, n)}
+					for i := n - 1; i >= 0; i-- {
+						ret.Results[i] = fn.pop()
+					}
 					fn.emit(ret)
 				}
 				fn.cleanup()
@@ -987,7 +1001,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			// Set block results, but push them again
 			// so they're available to the parent block.
-			blk.setResults(fn)
+			fn.emit(blk.resultStmts(fn)...)
 			fn.stack = fn.stack[:blk.stackPos]
 			for _, tmp := range blk.results {
 				fn.pushConst(tmp)
@@ -1178,9 +1192,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x0f: // return
 			if !blk.unreachable {
-				ret := &ast.ReturnStmt{}
-				if n := len(fn.typ.results); n > 0 {
-					ret.Results = append(ret.Results, fn.stack.last(n)...)
+				n := len(fn.typ.results)
+				ret := &ast.ReturnStmt{Results: make([]ast.Expr, n)}
+				for i := n - 1; i >= 0; i-- {
+					ret.Results[i] = fn.pop()
 				}
 				fn.emit(ret)
 				blk.unreachable = true // After an uncoditional return.
@@ -1266,7 +1281,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.push(localVar(i))
+			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
 
 		case 0x21: // local.set
 			i, err := readLEB128(t.in)
@@ -1283,12 +1298,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			tmp := fn.pop()
 			fn.emit(&ast.AssignStmt{
 				Lhs: []ast.Expr{localVar(i)},
-				Rhs: []ast.Expr{tmp},
+				Rhs: []ast.Expr{fn.pop()},
 				Tok: token.ASSIGN})
-			fn.pushConst(tmp)
+			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
 
 		case 0x23: // global.get
 			e, err := t.globalGet()
@@ -1662,7 +1676,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x8b: // f32.abs
 			fn.uniHelper("f32_abs")
 		case 0x8c: // f32.neg
-			fn.push(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
 		case 0x8d: // f32.ceil
 			fn.uniMath32("Ceil")
 		case 0x8e: // f32.floor
@@ -1699,7 +1713,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x99: // f64.abs
 			fn.uniMath64("Abs")
 		case 0x9a: // f64.neg
-			fn.push(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
 		case 0x9b: // f64.ceil
 			fn.uniMath64("Ceil")
 		case 0x9c: // f64.floor

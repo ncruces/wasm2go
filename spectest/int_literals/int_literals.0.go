@@ -28,8 +28,7 @@ func (m *Module) Xi32_alt_smin() int32 {
 	return i32_const(-0x80000000)
 }
 func (m *Module) Xi32_inc_smin() int32 {
-	t0 := i32_const(-0x80000000) + int32(1)
-	return t0
+	return i32_const(-0x80000000) + int32(1)
 }
 func (m *Module) Xi32_neg_zero() int32 {
 	return i32_const(0)
@@ -62,8 +61,7 @@ func (m *Module) Xi64_alt_smin() int64 {
 	return i64_const(-0x8000000000000000)
 }
 func (m *Module) Xi64_inc_smin() int64 {
-	t0 := i64_const(-0x8000000000000000) + int64(1)
-	return t0
+	return i64_const(-0x8000000000000000) + int64(1)
 }
 func (m *Module) Xi64_neg_zero() int64 {
 	return i64_const(0)

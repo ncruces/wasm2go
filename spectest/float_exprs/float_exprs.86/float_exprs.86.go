@@ -12,18 +12,10 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_epsilon() float32 {
-	t0 := float32(float32(4) / float32(3))
-	t1 := float32(t0 - f32_const(1))
-	t2 := float32(float32(3) * t1)
-	t3 := float32(f32_const(1) - t2)
-	return t3
+	return float32(f32_const(1) - float32(float32(3)*float32(float32(float32(4)/float32(3))-f32_const(1))))
 }
 func (m *Module) Xf64_epsilon() float64 {
-	t0 := float64(float64(4) / float64(3))
-	t1 := float64(t0 - f64_const(1))
-	t2 := float64(float64(3) * t1)
-	t3 := float64(f64_const(1) - t2)
-	return t3
+	return float64(f64_const(1) - float64(float64(3)*float64(float64(float64(4)/float64(3))-f64_const(1))))
 }
 
 //go:nosplit

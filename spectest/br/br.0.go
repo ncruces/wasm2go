@@ -292,17 +292,16 @@ func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		var p2 int32
-		_ = p2
-		if t1 != 0 {
+		var p1 int32
+		_ = p1
+		if v0 != 0 {
 			p0 = int32(3)
 			goto l0
 		} else {
-			t3 := v1
-			p2 = t3
+			t2 := v1
+			p1 = t2
 		}
-		p0 = p2
+		p0 = p1
 	}
 l0:
 	return p0
@@ -311,17 +310,16 @@ func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := v0
-		var p2 int32
-		_ = p2
-		if t1 != 0 {
-			t3 := v1
-			p2 = t3
+		var p1 int32
+		_ = p1
+		if v0 != 0 {
+			t2 := v1
+			p1 = t2
 		} else {
 			p0 = int32(4)
 			goto l0
 		}
-		p0 = p2
+		p0 = p1
 	}
 l0:
 	return p0
@@ -683,8 +681,7 @@ func (m *Module) Xnested_block_value() int32 {
 		goto l0
 	}
 l0:
-	t1 := int32(1) + p0
-	return t1
+	return int32(1) + p0
 }
 func (m *Module) Xnested_br_value() int32 {
 	var p0 int32
@@ -700,8 +697,7 @@ func (m *Module) Xnested_br_value() int32 {
 		}
 	}
 l0:
-	t2 := int32(1) + p0
-	return t2
+	return int32(1) + p0
 }
 func (m *Module) Xnested_br_if_value() int32 {
 	var p0 int32
@@ -717,8 +713,7 @@ func (m *Module) Xnested_br_if_value() int32 {
 		}
 	}
 l0:
-	t2 := int32(1) + p0
-	return t2
+	return int32(1) + p0
 }
 func (m *Module) Xnested_br_if_value_cond() int32 {
 	var p0 int32
@@ -729,8 +724,7 @@ func (m *Module) Xnested_br_if_value_cond() int32 {
 		goto l0
 	}
 l0:
-	t1 := int32(1) + p0
-	return t1
+	return int32(1) + p0
 }
 func (m *Module) Xnested_br_table_value() int32 {
 	var p0 int32
@@ -746,8 +740,7 @@ func (m *Module) Xnested_br_table_value() int32 {
 		}
 	}
 l0:
-	t2 := int32(1) + p0
-	return t2
+	return int32(1) + p0
 }
 func (m *Module) Xnested_br_table_value_index() int32 {
 	var p0 int32
@@ -758,8 +751,7 @@ func (m *Module) Xnested_br_table_value_index() int32 {
 		goto l0
 	}
 l0:
-	t1 := int32(1) + p0
-	return t1
+	return int32(1) + p0
 }
 
 //go:nosplit

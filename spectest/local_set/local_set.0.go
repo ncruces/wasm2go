@@ -72,32 +72,8 @@ func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) in
 	v5 = float32(5.5)
 	v6 = int64(6)
 	v8 = float64(8)
-	t0 := v0
-	t1 := float64(uint64(t0))
-	t2 := v1
-	t3 := float64(t2)
-	t4 := v2
-	t5 := v3
-	t6 := float64(uint32(t5))
-	t7 := v4
-	t8 := float64(t7)
-	t9 := v5
-	t10 := float64(t9)
-	t11 := v6
-	t12 := float64(uint64(t11))
-	t13 := v7
-	t14 := float64(uint64(t13))
-	t15 := v8
-	t16 := float64(t14 + t15)
-	t17 := float64(t12 + t16)
-	t18 := float64(t10 + t17)
-	t19 := float64(t8 + t18)
-	t20 := float64(t6 + t19)
-	t21 := float64(t4 + t20)
-	t22 := float64(t3 + t21)
-	t23 := float64(t1 + t22)
-	t24 := i64_trunc_f64_s(t23)
-	return t24
+	t0 := i64_trunc_f64_s(float64(float64(uint64(v0)) + float64(float64(v1)+float64(v2+float64(float64(uint32(v3))+float64(float64(v4)+float64(float64(v5)+float64(float64(uint64(v6))+float64(float64(uint64(v7))+v8)))))))))
+	return t0
 }
 func (m *Module) Xas_block_value(v0 int32) {
 	{
@@ -149,14 +125,12 @@ func (m *Module) Xas_return_value(v0 int32) {
 	return
 }
 func (m *Module) Xas_if_then(v0 int32) {
-	t0 := v0
-	if t0 != 0 {
+	if v0 != 0 {
 		v0 = int32(3)
 	}
 }
 func (m *Module) Xas_if_else(v0 int32) {
-	t0 := v0
-	if t0 != 0 {
+	if v0 != 0 {
 	} else {
 		v0 = int32(1)
 	}

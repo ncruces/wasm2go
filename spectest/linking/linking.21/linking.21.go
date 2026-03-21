@@ -33,9 +33,8 @@ type Memory = interface {
 }
 
 func (m *Module) Xload(v0 int32) int32 {
-	t0 := v0
-	t1 := int32((*m.memory)[uint32(t0)])
-	return t1
+	t0 := int32((*m.memory)[uint32(v0)])
+	return t0
 }
 
 const data0 = "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"

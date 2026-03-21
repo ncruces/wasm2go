@@ -12,16 +12,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_sqrt_square(v0 float32) float32 {
-	t0 := v0
-	t1 := v0
-	t2 := float32(t0 * t1)
-	t3 := float32(math.Sqrt(float64(t2)))
-	return t3
+	return float32(math.Sqrt(float64(float32(v0 * v0))))
 }
 func (m *Module) Xf64_no_fold_sqrt_square(v0 float64) float64 {
-	t0 := v0
-	t1 := v0
-	t2 := float64(t0 * t1)
-	t3 := math.Sqrt(t2)
-	return t3
+	return math.Sqrt(float64(v0 * v0))
 }

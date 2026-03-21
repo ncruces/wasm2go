@@ -10,30 +10,8 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_6x_via_add(v0 float32) float32 {
-	t0 := v0
-	t1 := v0
-	t2 := float32(t0 + t1)
-	t3 := v0
-	t4 := float32(t2 + t3)
-	t5 := v0
-	t6 := float32(t4 + t5)
-	t7 := v0
-	t8 := float32(t6 + t7)
-	t9 := v0
-	t10 := float32(t8 + t9)
-	return t10
+	return float32(float32(float32(float32(float32(v0+v0)+v0)+v0)+v0) + v0)
 }
 func (m *Module) Xf64_no_fold_6x_via_add(v0 float64) float64 {
-	t0 := v0
-	t1 := v0
-	t2 := float64(t0 + t1)
-	t3 := v0
-	t4 := float64(t2 + t3)
-	t5 := v0
-	t6 := float64(t4 + t5)
-	t7 := v0
-	t8 := float64(t6 + t7)
-	t9 := v0
-	t10 := float64(t8 + t9)
-	return t10
+	return float64(float64(float64(float64(float64(v0+v0)+v0)+v0)+v0) + v0)
 }

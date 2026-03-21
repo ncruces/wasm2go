@@ -183,28 +183,26 @@ func (m *Module) Xas_if_cond() int32 {
 	return int32(2)
 }
 func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
-	t0 := v0
-	var p1 int32
-	_ = p1
-	if t0 != 0 {
+	var p0 int32
+	_ = p0
+	if v0 != 0 {
 		return int32(3)
 	} else {
-		t2 := v1
-		p1 = t2
+		t1 := v1
+		p0 = t1
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
-	t0 := v0
-	var p1 int32
-	_ = p1
-	if t0 != 0 {
-		t2 := v1
-		p1 = t2
+	var p0 int32
+	_ = p0
+	if v0 != 0 {
+		t1 := v1
+		p0 = t1
 	} else {
 		return int32(4)
 	}
-	return p1
+	return p0
 }
 func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
 	return int32(5)

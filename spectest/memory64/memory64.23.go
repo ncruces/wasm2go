@@ -23,125 +23,110 @@ func New() *Module {
 }
 func (m *Module) Xdata() int32 {
 	t0 := int32(m.memory[i64_const(0)])
-	var p1 int32
+	var p2 int32
 	if t0 == int32(65) {
-		p1 = 1
+		p2 = 1
 	}
-	t2 := int32(m.memory[int64(3)])
+	t1 := int32(m.memory[int64(3)])
 	var p3 int32
-	if t2 == i32_const(167) {
+	if t1 == i32_const(167) {
 		p3 = 1
 	}
-	t4 := p1 & p3
-	t5 := int32(m.memory[int64(6)])
-	var p6 int32
-	if t5 == i32_const(0) {
-		p6 = 1
+	t5 := p2 & p3
+	t4 := int32(m.memory[int64(6)])
+	var p7 int32
+	if t4 == i32_const(0) {
+		p7 = 1
 	}
-	t7 := int32(m.memory[int64(19)])
+	t6 := int32(m.memory[int64(19)])
 	var p8 int32
-	if t7 == i32_const(0) {
+	if t6 == i32_const(0) {
 		p8 = 1
 	}
-	t9 := p6 & p8
-	t10 := t4 & t9
-	t11 := int32(m.memory[int64(20)])
+	t10 := t5 & (p7 & p8)
+	t9 := int32(m.memory[int64(20)])
 	var p12 int32
-	if t11 == int32(87) {
+	if t9 == int32(87) {
 		p12 = 1
 	}
-	t13 := int32(m.memory[int64(23)])
-	var p14 int32
-	if t13 == int32(77) {
-		p14 = 1
+	t11 := int32(m.memory[int64(23)])
+	var p13 int32
+	if t11 == int32(77) {
+		p13 = 1
 	}
-	t15 := p12 & p14
-	t16 := int32(m.memory[int64(24)])
+	t15 := p12 & p13
+	t14 := int32(m.memory[int64(24)])
 	var p17 int32
-	if t16 == i32_const(0) {
+	if t14 == i32_const(0) {
 		p17 = 1
 	}
-	t18 := int32(m.memory[i64_const(1023)])
-	var p19 int32
-	if t18 == i32_const(0) {
-		p19 = 1
+	t16 := int32(m.memory[i64_const(1023)])
+	var p18 int32
+	if t16 == i32_const(0) {
+		p18 = 1
 	}
-	t20 := p17 & p19
-	t21 := t15 & t20
-	t22 := t10 & t21
-	return t22
+	return t10 & (t15 & (p17 & p18))
 }
 func (m *Module) Xcast() float64 {
 	binary.LittleEndian.PutUint64(m.memory[int64(8):], uint64(i64_const(-12345)))
 	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[int64(8):]))
-	t1 := math.Float64frombits(uint64(i64_const(-12345)))
-	if t0 == t1 {
+	if t0 == math.Float64frombits(uint64(i64_const(-12345))) {
 		return f64_const(0)
 	}
 	binary.LittleEndian.PutUint64(m.memory[int64(9):], uint64(i64_const(0)))
 	binary.LittleEndian.PutUint16(m.memory[int64(15):], uint16(i32_const(16453)))
-	t3 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[int64(9):]))
-	return t3
+	t1 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[int64(9):]))
+	return t1
 }
 func (m *Module) Xi32_load8_s(v0 int32) int32 {
-	t0 := v0
-	m.memory[int64(8)] = byte(t0)
-	t1 := int32(int8(m.memory[int64(8)]))
-	return t1
+	m.memory[int64(8)] = byte(v0)
+	t0 := int32(int8(m.memory[int64(8)]))
+	return t0
 }
 func (m *Module) Xi32_load8_u(v0 int32) int32 {
-	t0 := v0
-	m.memory[int64(8)] = byte(t0)
-	t1 := int32(m.memory[int64(8)])
-	return t1
+	m.memory[int64(8)] = byte(v0)
+	t0 := int32(m.memory[int64(8)])
+	return t0
 }
 func (m *Module) Xi32_load16_s(v0 int32) int32 {
-	t0 := v0
-	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(t0))
-	t1 := int32(int16(binary.LittleEndian.Uint16(m.memory[int64(8):])))
-	return t1
+	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(v0))
+	t0 := int32(int16(binary.LittleEndian.Uint16(m.memory[int64(8):])))
+	return t0
 }
 func (m *Module) Xi32_load16_u(v0 int32) int32 {
-	t0 := v0
-	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(t0))
-	t1 := int32(binary.LittleEndian.Uint16(m.memory[int64(8):]))
-	return t1
+	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(v0))
+	t0 := int32(binary.LittleEndian.Uint16(m.memory[int64(8):]))
+	return t0
 }
 func (m *Module) Xi64_load8_s(v0 int64) int64 {
-	t0 := v0
-	m.memory[int64(8)] = byte(t0)
-	t1 := int64(int8(m.memory[int64(8)]))
-	return t1
+	m.memory[int64(8)] = byte(v0)
+	t0 := int64(int8(m.memory[int64(8)]))
+	return t0
 }
 func (m *Module) Xi64_load8_u(v0 int64) int64 {
-	t0 := v0
-	m.memory[int64(8)] = byte(t0)
-	t1 := int64(m.memory[int64(8)])
-	return t1
+	m.memory[int64(8)] = byte(v0)
+	t0 := int64(m.memory[int64(8)])
+	return t0
 }
 func (m *Module) Xi64_load16_s(v0 int64) int64 {
-	t0 := v0
-	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(t0))
-	t1 := int64(int16(binary.LittleEndian.Uint16(m.memory[int64(8):])))
-	return t1
+	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(v0))
+	t0 := int64(int16(binary.LittleEndian.Uint16(m.memory[int64(8):])))
+	return t0
 }
 func (m *Module) Xi64_load16_u(v0 int64) int64 {
-	t0 := v0
-	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(t0))
-	t1 := int64(binary.LittleEndian.Uint16(m.memory[int64(8):]))
-	return t1
+	binary.LittleEndian.PutUint16(m.memory[int64(8):], uint16(v0))
+	t0 := int64(binary.LittleEndian.Uint16(m.memory[int64(8):]))
+	return t0
 }
 func (m *Module) Xi64_load32_s(v0 int64) int64 {
-	t0 := v0
-	binary.LittleEndian.PutUint32(m.memory[int64(8):], uint32(t0))
-	t1 := int64(int32(binary.LittleEndian.Uint32(m.memory[int64(8):])))
-	return t1
+	binary.LittleEndian.PutUint32(m.memory[int64(8):], uint32(v0))
+	t0 := int64(int32(binary.LittleEndian.Uint32(m.memory[int64(8):])))
+	return t0
 }
 func (m *Module) Xi64_load32_u(v0 int64) int64 {
-	t0 := v0
-	binary.LittleEndian.PutUint32(m.memory[int64(8):], uint32(t0))
-	t1 := int64(binary.LittleEndian.Uint32(m.memory[int64(8):]))
-	return t1
+	binary.LittleEndian.PutUint32(m.memory[int64(8):], uint32(v0))
+	t0 := int64(binary.LittleEndian.Uint32(m.memory[int64(8):]))
+	return t0
 }
 
 //go:nosplit

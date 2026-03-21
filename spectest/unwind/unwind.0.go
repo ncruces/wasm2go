@@ -87,8 +87,8 @@ func (m *Module) Xblock_unwind_by_br_if_value() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		if int32(1) != 0 {
+			p0 = int32(9)
 			goto l0
 		}
 		_ = int32(9)
@@ -112,9 +112,9 @@ func (m *Module) Xblock_unwind_by_br_table_value() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		switch i32_const(0) {
 		default:
+			p0 = int32(9)
 			goto l0
 		}
 	}
@@ -176,8 +176,8 @@ func (m *Module) Xblock_nested_unwind_by_br_if_value() int32 {
 	_ = p0
 	{
 		{
-			p0 = int32(9)
 			if int32(1) != 0 {
+				p0 = int32(9)
 				goto l0
 			}
 			_ = int32(9)
@@ -205,9 +205,9 @@ func (m *Module) Xblock_nested_unwind_by_br_table_value() int32 {
 	_ = p0
 	{
 		{
-			p0 = int32(9)
 			switch int32(1) {
 			default:
+				p0 = int32(9)
 				goto l0
 			}
 		}
@@ -241,8 +241,8 @@ func (m *Module) Xunary_after_br_if() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		if int32(1) != 0 {
+			p0 = int32(9)
 			goto l0
 		}
 		_ = int32(9)
@@ -259,9 +259,9 @@ func (m *Module) Xunary_after_br_table() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		switch i32_const(0) {
 		default:
+			p0 = int32(9)
 			goto l0
 		}
 	}
@@ -288,8 +288,8 @@ func (m *Module) Xbinary_after_br_if() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		if int32(1) != 0 {
+			p0 = int32(9)
 			goto l0
 		}
 		_ = int32(9)
@@ -306,9 +306,9 @@ func (m *Module) Xbinary_after_br_table() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		switch i32_const(0) {
 		default:
+			p0 = int32(9)
 			goto l0
 		}
 	}
@@ -335,8 +335,8 @@ func (m *Module) Xselect_after_br_if() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		if int32(1) != 0 {
+			p0 = int32(9)
 			goto l0
 		}
 		_ = int32(9)
@@ -353,9 +353,9 @@ func (m *Module) Xselect_after_br_table() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		switch i32_const(0) {
 		default:
+			p0 = int32(9)
 			goto l0
 		}
 	}
@@ -386,8 +386,8 @@ func (m *Module) Xblock_value_after_br_if() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		if int32(1) != 0 {
+			p0 = int32(9)
 			goto l0
 		}
 		_ = int32(9)
@@ -400,9 +400,9 @@ func (m *Module) Xblock_value_after_br_table() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(9)
 		switch i32_const(0) {
 		default:
+			p0 = int32(9)
 			goto l0
 		}
 	}
@@ -444,8 +444,8 @@ func (m *Module) Xloop_value_after_br_if() int32 {
 		var p1 int32
 		_ = p1
 		{
-			p0 = int32(9)
 			if int32(1) != 0 {
+				p0 = int32(9)
 				goto l0
 			}
 			_ = int32(9)
@@ -463,9 +463,9 @@ func (m *Module) Xloop_value_after_br_table() int32 {
 		var p1 int32
 		_ = p1
 		{
-			p0 = int32(9)
 			switch i32_const(0) {
 			default:
+				p0 = int32(9)
 				goto l0
 			}
 		}

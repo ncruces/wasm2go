@@ -12,37 +12,28 @@ func New() *Module {
 func (m *Module) Xis_prime(v0 int32) int32 {
 	var v1 int32
 	_ = v1
-	t0 := v0
-	if uint32(t0) < uint32(int32(2)) {
+	if uint32(v0) < uint32(int32(2)) {
 		return i32_const(0)
 	}
-	t2 := v0
-	if t2 == int32(2) {
+	if v0 == int32(2) {
 		return int32(1)
 	}
-	t4 := v0
-	t5 := int32(uint32(t4) % uint32(int32(2)))
-	if t5 == i32_const(0) {
+	t0 := int32(uint32(v0) % uint32(int32(2)))
+	if t0 == i32_const(0) {
 		return i32_const(0)
 	}
 	v1 = int32(3)
 l1:
 	{
 		{
-			t7 := v1
-			t8 := v0
-			if uint32(t7) >= uint32(t8) {
+			if uint32(v1) >= uint32(v0) {
 				goto l0
 			}
-			t10 := v0
-			t11 := v1
-			t12 := int32(uint32(t10) % uint32(t11))
-			if t12 == i32_const(0) {
+			t1 := int32(uint32(v0) % uint32(v1))
+			if t1 == i32_const(0) {
 				return i32_const(0)
 			}
-			t14 := v1
-			t15 := t14 + int32(2)
-			v1 = t15
+			v1 = v1 + int32(2)
 			goto l1
 		}
 	l0:
