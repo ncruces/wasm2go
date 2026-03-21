@@ -5,13 +5,10 @@ import (
 	"go/token"
 	"slices"
 	"strconv"
+	"strings"
 )
 
-var modRecvList = &ast.FieldList{List: []*ast.Field{{
-	Names: []*ast.Ident{newID("m")},
-	Type:  &ast.StarExpr{X: newID("Module")}}}}
-
-func (t *translator) createModuleStruct() ast.Decl {
+func (t *translator) createModuleStruct(hostInterfaces []*ast.GenDecl) (*ast.GenDecl, *ast.TypeSpec) {
 	var fields []*ast.Field
 	// Tables: owned are []any; imported *[]any.
 	for _, tab := range t.tables {
@@ -66,13 +63,54 @@ func (t *translator) createModuleStruct() ast.Decl {
 				Type:  ast.NewIdent(exported(imp.module))})
 		}
 	}
-	return &ast.GenDecl{
-		Tok: token.TYPE,
-		Specs: []ast.Spec{
-			&ast.TypeSpec{
-				Name: newID("Module"),
-				Type: &ast.StructType{Fields: &ast.FieldList{List: fields}}}},
+
+	// If host module imports are provided,
+	// use these to generate generic type
+	// parameters for the module struct.
+	var typeParams *ast.FieldList
+	if len(hostInterfaces) > 0 {
+		seen := set[string]{}
+		typeParams = new(ast.FieldList)
+		for _, decl := range hostInterfaces {
+			typeSpec := decl.Specs[0].(*ast.TypeSpec)
+			var paramName string
+
+			// Use shortest possible prefix
+			// of the type parameter for
+			// the generic parameter name.
+			typeName := typeSpec.Name.Name
+			typeName = strings.TrimPrefix(typeName, "X")
+			for i := 1; i < len(typeName); i++ {
+				if seen.has(typeName[:i]) {
+					continue
+				}
+				paramName = typeName[:i]
+				seen.add(paramName)
+				break
+			}
+
+			if paramName == "" {
+				panic("could not determine type param prefix for: " + typeName)
+			}
+
+			// Append type parameter with shorted name to list.
+			typeParams.List = append(typeParams.List, &ast.Field{
+				Names: []*ast.Ident{ast.NewIdent(strings.ToUpper(paramName))},
+				Type:  newID(typeSpec.Name.Name),
+			})
+		}
 	}
+
+	typeSpec := &ast.TypeSpec{
+		Name:       newID("Module"),
+		Type:       &ast.StructType{Fields: &ast.FieldList{List: fields}},
+		TypeParams: typeParams,
+	}
+
+	return &ast.GenDecl{
+		Tok:   token.TYPE,
+		Specs: []ast.Spec{typeSpec},
+	}, typeSpec
 }
 
 func (t *translator) createNewFunc() ast.Decl {
@@ -84,7 +122,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Lhs: []ast.Expr{newID("m")},
 				Rhs: []ast.Expr{&ast.UnaryExpr{
 					Op: token.AND,
-					X:  &ast.CompositeLit{Type: newID("Module")}}}}},
+					X:  &ast.CompositeLit{Type: t.modRecv.Type.(*ast.StarExpr).X}}}}},
 	}
 
 	// Create the params, and initialize fields.
@@ -284,14 +322,16 @@ func (t *translator) createNewFunc() ast.Decl {
 	body.List = append(body.List, &ast.ReturnStmt{Results: []ast.Expr{newID("m")}})
 
 	return &ast.FuncDecl{
-		Name: newID("New"),
-		Type: &ast.FuncType{
-			Params:  &ast.FieldList{List: params},
-			Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: newID("Module")}}}}},
-		Body: body}
+		Name: newID("New"), Type: &ast.FuncType{
+			Params:     &ast.FieldList{List: params},
+			TypeParams: t.modType.TypeParams,
+			Results:    &ast.FieldList{List: []*ast.Field{{Type: t.modRecv.Type}}},
+		},
+		Body: body,
+	}
 }
 
-func (t *translator) createHostInterfaces() []ast.Decl {
+func (t *translator) createHostInterfaces() []*ast.GenDecl {
 	ifaces := map[string][]*ast.Field{}
 
 	for _, imp := range t.imports {
@@ -312,7 +352,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 			Type:  typ})
 	}
 
-	decls := make([]ast.Decl, 0, len(ifaces))
+	decls := make([]*ast.GenDecl, 0, len(ifaces))
 	for name, methods := range ifaces {
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
@@ -321,6 +361,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 				Name:   ast.NewIdent(exported(name)),
 				Type:   &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
 	}
+
 	return decls
 }
 
@@ -429,7 +470,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 		}
 
 		decls = append(decls, &ast.FuncDecl{
-			Recv: modRecvList,
+			Recv: &ast.FieldList{List: []*ast.Field{t.modRecv}},
 			Name: methodName,
 			Type: &ast.FuncType{Results: results},
 			Body: &ast.BlockStmt{List: body}})
