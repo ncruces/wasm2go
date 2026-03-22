@@ -11,35 +11,35 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xno_dce_i32_trunc_f32_s(v0 float32) {
+func (m *Module) Xno_dce_i32_trunc_f32_s_1vb1bz5(v0 float32) {
 	t0 := i32_trunc_f32_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_trunc_f32_u(v0 float32) {
+func (m *Module) Xno_dce_i32_trunc_f32_u_1mvkemh(v0 float32) {
 	t0 := i32_trunc_f32_u(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_trunc_f64_s(v0 float64) {
+func (m *Module) Xno_dce_i32_trunc_f64_s_10z7tml(v0 float64) {
 	t0 := i32_trunc_f64_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_trunc_f64_u(v0 float64) {
+func (m *Module) Xno_dce_i32_trunc_f64_u_19h2g5x(v0 float64) {
 	t0 := i32_trunc_f64_u(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f32_s(v0 float32) {
+func (m *Module) Xno_dce_i64_trunc_f32_s_mmfswg(v0 float32) {
 	t0 := i64_trunc_f32_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f32_u(v0 float32) {
+func (m *Module) Xno_dce_i64_trunc_f32_u_x28z5k(v0 float32) {
 	t0 := i64_trunc_f32_u(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f64_s(v0 float64) {
+func (m *Module) Xno_dce_i64_trunc_f64_s_anadsc(v0 float64) {
 	t0 := i64_trunc_f64_s(v0)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_trunc_f64_u(v0 float64) {
+func (m *Module) Xno_dce_i64_trunc_f64_u_9xoro(v0 float64) {
 	t0 := i64_trunc_f64_u(v0)
 	_ = t0
 }

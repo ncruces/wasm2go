@@ -9,33 +9,33 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xfac_rec(v0 int64) int64 {
+func (m *Module) Xfac_rec_1fbj6q6(v0 int64) int64 {
 	var p0 int64
 	_ = p0
 	if v0 == i64_const(0) {
 		p0 = int64(1)
 	} else {
 		t2 := v0
-		t1 := m.Xfac_rec(v0 - int64(1))
+		t1 := m.Xfac_rec_1fbj6q6(v0 - int64(1))
 		t3 := t2 * t1
 		p0 = t3
 	}
 	return p0
 }
-func (m *Module) Xfac_rec_named(v0 int64) int64 {
+func (m *Module) Xfac_rec_named_1b9t6xp(v0 int64) int64 {
 	var p0 int64
 	_ = p0
 	if v0 == i64_const(0) {
 		p0 = int64(1)
 	} else {
 		t2 := v0
-		t1 := m.Xfac_rec_named(v0 - int64(1))
+		t1 := m.Xfac_rec_named_1b9t6xp(v0 - int64(1))
 		t3 := t2 * t1
 		p0 = t3
 	}
 	return p0
 }
-func (m *Module) Xfac_iter(v0 int64) int64 {
+func (m *Module) Xfac_iter_u670pf(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	v1 = v0
@@ -55,7 +55,7 @@ func (m *Module) Xfac_iter(v0 int64) int64 {
 l0:
 	return v2
 }
-func (m *Module) Xfac_iter_named(v0 int64) int64 {
+func (m *Module) Xfac_iter_named_1yyaicc(v0 int64) int64 {
 	var v1, v2 int64
 	_, _ = v1, v2
 	v1 = v0
@@ -75,7 +75,7 @@ func (m *Module) Xfac_iter_named(v0 int64) int64 {
 l0:
 	return v2
 }
-func (m *Module) Xfac_opt(v0 int64) int64 {
+func (m *Module) Xfac_opt_uhnu4r(v0 int64) int64 {
 	var v1 int64
 	_ = v1
 	v1 = int64(1)
@@ -101,7 +101,7 @@ func (m *Module) f5(v0 int64) (int64, int64) {
 func (m *Module) f6(v0 int64, v1 int64) (int64, int64, int64) {
 	return v0, v1, v0
 }
-func (m *Module) Xfac_ssa(v0 int64) int64 {
+func (m *Module) Xfac_ssa_1bbbw1g(v0 int64) int64 {
 	t1 := v0
 	var p0 int64
 	_ = p0

@@ -26,55 +26,41 @@ func (m *Module) f0() {
 }
 func (m *Module) f1(v0 int32, v1 int32, v2 int32) {
 }
-func (m *Module) Xtype_i32() int32 {
+func (m *Module) Xtype_i32_1rrgb77() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xtype_i64() int64 {
+func (m *Module) Xtype_i64_17wwo34() int64 {
 	panic("unreachable")
 }
-func (m *Module) Xtype_f32() float32 {
+func (m *Module) Xtype_f32_1b0c0f3() float32 {
 	panic("unreachable")
 }
-func (m *Module) Xtype_f64() float64 {
+func (m *Module) Xtype_f64_1milen0() float64 {
 	panic("unreachable")
 }
-func (m *Module) Xas_func_first() int32 {
+func (m *Module) Xas_func_first_1n8qpq7() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_func_mid() int32 {
+func (m *Module) Xas_func_mid_aecmm3() int32 {
 	m.f0()
 	panic("unreachable")
 }
-func (m *Module) Xas_func_last() {
+func (m *Module) Xas_func_last_1bzq4u7() {
 	m.f0()
 	panic("unreachable")
 }
-func (m *Module) Xas_func_value() int32 {
+func (m *Module) Xas_func_value_1gti5qk() int32 {
 	m.f0()
 	panic("unreachable")
 }
-func (m *Module) Xas_block_first() int32 {
+func (m *Module) Xas_block_first_dfe99y() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_block_mid() int32 {
-	var p0 int32
-	_ = p0
-	{
-		m.f0()
-		panic("unreachable")
-	}
-}
-func (m *Module) Xas_block_last() {
-	{
-		m.f0()
-		panic("unreachable")
-	}
-}
-func (m *Module) Xas_block_value() int32 {
+func (m *Module) Xas_block_mid_x96mur() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -82,7 +68,21 @@ func (m *Module) Xas_block_value() int32 {
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_block_broke() int32 {
+func (m *Module) Xas_block_last_sl4im1() {
+	{
+		m.f0()
+		panic("unreachable")
+	}
+}
+func (m *Module) Xas_block_value_pg8qbp() int32 {
+	var p0 int32
+	_ = p0
+	{
+		m.f0()
+		panic("unreachable")
+	}
+}
+func (m *Module) Xas_block_broke_180w4m2() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -93,14 +93,14 @@ func (m *Module) Xas_block_broke() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_loop_first() int32 {
+func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_loop_mid() int32 {
+func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -108,13 +108,13 @@ func (m *Module) Xas_loop_mid() int32 {
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_loop_last() {
+func (m *Module) Xas_loop_last_dr7k79() {
 	{
 		m.f0()
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_loop_broke() int32 {
+func (m *Module) Xas_loop_broke_1r32ml2() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -129,45 +129,45 @@ func (m *Module) Xas_loop_broke() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_value() int32 {
+func (m *Module) Xas_br_value_1sx9dl7() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_br_if_cond() {
+func (m *Module) Xas_br_if_cond_p6cjb3() {
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_br_if_value() int32 {
+func (m *Module) Xas_br_if_value_1tlgvkk() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_br_if_value_cond() int32 {
+func (m *Module) Xas_br_if_value_cond_pzz0yu() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_br_table_index() {
+func (m *Module) Xas_br_table_index_sdkzon() {
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_br_table_value() int32 {
+func (m *Module) Xas_br_table_value_1ic2jxx() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_br_table_value_2() int32 {
+func (m *Module) Xas_br_table_value_2_1g4mq6r() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -178,27 +178,27 @@ func (m *Module) Xas_br_table_value_2() int32 {
 		}
 	}
 }
-func (m *Module) Xas_br_table_value_index() int32 {
+func (m *Module) Xas_br_table_value_index_fupi8r() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_br_table_value_and_index() int32 {
+func (m *Module) Xas_br_table_value_and_index_1r5k2vh() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xas_return_value() int64 {
+func (m *Module) Xas_return_value_1wph1uy() int64 {
 	panic("unreachable")
 }
-func (m *Module) Xas_if_cond() int32 {
+func (m *Module) Xas_if_cond_ok3ah4() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_if_then_8by7gv(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	if v0 != 0 {
@@ -209,7 +209,7 @@ func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_if_else_y9fza0(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	if v0 != 0 {
@@ -220,96 +220,96 @@ func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_then_no_else(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_if_then_no_else_lmoaig(v0 int32, v1 int32) int32 {
 	if v0 != 0 {
 		panic("unreachable")
 	}
 	return v1
 }
-func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_select_first_1p4pbiq(v0 int32, v1 int32) int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_select_second(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_select_second_og5yck(v0 int32, v1 int32) int32 {
 	_ = v0
 	panic("unreachable")
 }
-func (m *Module) Xas_select_cond() int32 {
+func (m *Module) Xas_select_cond_1gi9cp1() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_call_first() {
+func (m *Module) Xas_call_first_oczht1() {
 	panic("unreachable")
 }
-func (m *Module) Xas_call_mid() {
+func (m *Module) Xas_call_mid_1hypaa8() {
 	panic("unreachable")
 }
-func (m *Module) Xas_call_last() {
+func (m *Module) Xas_call_last_5v6w73() {
 	panic("unreachable")
 }
-func (m *Module) Xas_call_indirect_func() {
+func (m *Module) Xas_call_indirect_func_1ismjqv() {
 	panic("unreachable")
 }
-func (m *Module) Xas_call_indirect_first() {
+func (m *Module) Xas_call_indirect_first_1kls7bs() {
 	panic("unreachable")
 }
-func (m *Module) Xas_call_indirect_mid() {
+func (m *Module) Xas_call_indirect_mid_1u5vulp() {
 	panic("unreachable")
 }
-func (m *Module) Xas_call_indirect_last() {
+func (m *Module) Xas_call_indirect_last_os2e8m() {
 	panic("unreachable")
 }
-func (m *Module) Xas_local_set_value() {
+func (m *Module) Xas_local_set_value_1e0q6mz() {
 	var v0 float32
 	_ = v0
 	panic("unreachable")
 }
-func (m *Module) Xas_local_tee_value() float32 {
+func (m *Module) Xas_local_tee_value_11lf5v3() float32 {
 	var v0 float32
 	_ = v0
 	panic("unreachable")
 }
-func (m *Module) Xas_global_set_value() float32 {
+func (m *Module) Xas_global_set_value_p447yq() float32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_load_address() float32 {
+func (m *Module) Xas_load_address_1s1elxs() float32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_loadN_address() int64 {
+func (m *Module) Xas_loadN_address_xz9je7() int64 {
 	panic("unreachable")
 }
-func (m *Module) Xas_store_address() {
+func (m *Module) Xas_store_address_374rd1() {
 	panic("unreachable")
 }
-func (m *Module) Xas_store_value() {
+func (m *Module) Xas_store_value_1bx4mta() {
 	panic("unreachable")
 }
-func (m *Module) Xas_storeN_address() {
+func (m *Module) Xas_storeN_address_qez1rh() {
 	panic("unreachable")
 }
-func (m *Module) Xas_storeN_value() {
+func (m *Module) Xas_storeN_value_7lcb3d() {
 	panic("unreachable")
 }
-func (m *Module) Xas_unary_operand() float32 {
+func (m *Module) Xas_unary_operand_kr3bi8() float32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_binary_left() int32 {
+func (m *Module) Xas_binary_left_mz7no() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_binary_right() int64 {
+func (m *Module) Xas_binary_right_1h2yoyv() int64 {
 	panic("unreachable")
 }
-func (m *Module) Xas_test_operand() int32 {
+func (m *Module) Xas_test_operand_khoiq6() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_compare_left() int32 {
+func (m *Module) Xas_compare_left_afzngt() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_compare_right() int32 {
+func (m *Module) Xas_compare_right_1jgames() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_convert_operand() int32 {
+func (m *Module) Xas_convert_operand_127wpsd() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xas_memory_grow_size() int32 {
+func (m *Module) Xas_memory_grow_size_7te2ha() int32 {
 	panic("unreachable")
 }
 

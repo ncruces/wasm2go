@@ -39,12 +39,12 @@ func (m *Module) Xdeinit() {
 	m.t0[int32(1)] = nil
 	m.t1[int32(1)] = nil
 }
-func (m *Module) Xfuncref_elem(v0 int32) int32 {
+func (m *Module) Xfuncref_elem_m4wk1v(v0 int32) int32 {
 	t0 := m.t0[v0]
 	t1 := m.Xfuncref(t0)
 	return t1
 }
-func (m *Module) Xexternref_elem(v0 int32) int32 {
+func (m *Module) Xexternref_elem_cgiebg(v0 int32) int32 {
 	t0 := m.t1[v0]
 	t1 := m.Xexternref(t0)
 	return t1

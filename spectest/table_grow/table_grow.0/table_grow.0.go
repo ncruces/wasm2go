@@ -21,7 +21,7 @@ func (m *Module) Xgrow(v0 int32, v1 any) int32 {
 	t0 := table_grow(&m.t0, v1, v0, 65536)
 	return t0
 }
-func (m *Module) Xgrow_abbrev(v0 int32, v1 any) int32 {
+func (m *Module) Xgrow_abbrev_ltdh9w(v0 int32, v1 any) int32 {
 	t0 := table_grow(&m.t0, v1, v0, 65536)
 	return t0
 }

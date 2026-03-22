@@ -11,7 +11,7 @@ type Module struct {
 func New(v0 Xmodule1) *Module {
 	m := &Module{}
 	m._module1 = v0
-	m.t0 = v0.Xshared_table()
+	m.t0 = v0.Xshared_table_1d64st1()
 	m.elements = [][]any{{m.f0}, {m.f1}}
 	copy((*m.t0)[8:], m.elements[0])
 	copy((*m.t0)[9:], m.elements[1])
@@ -24,7 +24,7 @@ func New(v0 Xmodule1) *Module {
 }
 
 type Xmodule1 = interface {
-	Xshared_table() *[]any
+	Xshared_table_1d64st1() *[]any
 }
 
 func (m *Module) f0() int32 {

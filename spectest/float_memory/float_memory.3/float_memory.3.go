@@ -19,18 +19,18 @@ func New() *Module {
 	copy(m.memory[0:], data0)
 	return m
 }
-func (m *Module) Xf64_load() float64 {
+func (m *Module) Xf64_load_1t7qcva() float64 {
 	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(int32(1)):]))
 	return t0
 }
-func (m *Module) Xi64_load() int64 {
+func (m *Module) Xi64_load_n59qig() int64 {
 	t0 := int64(binary.LittleEndian.Uint64(m.memory[uint32(int32(1)):]))
 	return t0
 }
-func (m *Module) Xf64_store() {
+func (m *Module) Xf64_store_193toh6() {
 	binary.LittleEndian.PutUint64(m.memory[uint32(int32(1)):], math.Float64bits(math.Float64frombits(0x7ff4000000000000)))
 }
-func (m *Module) Xi64_store() {
+func (m *Module) Xi64_store_1pgnj53() {
 	binary.LittleEndian.PutUint64(m.memory[uint32(int32(1)):], uint64(i64_const(0x7ff4000000000000)))
 }
 func (m *Module) Xreset() {

@@ -23,16 +23,16 @@ func (m *Module) Xinit(v0 any) {
 	t0 := m.t1[int32(1)]
 	m.t1[int32(2)] = t0
 }
-func (m *Module) Xget_externref(v0 int32) any {
+func (m *Module) Xget_externref_10hed4g(v0 int32) any {
 	t0 := m.t0[v0]
 	return t0
 }
-func (m *Module) Xget_funcref(v0 int32) any {
+func (m *Module) Xget_funcref_ennd70(v0 int32) any {
 	t0 := m.t1[v0]
 	return t0
 }
-func (m *Module) Xis_null_funcref(v0 int32) int32 {
-	t0 := m.Xget_funcref(v0)
+func (m *Module) Xis_null_funcref_1nlxkck(v0 int32) int32 {
+	t0 := m.Xget_funcref_ennd70(v0)
 	var p1 int32
 	if t0 == nil {
 		p1 = 1

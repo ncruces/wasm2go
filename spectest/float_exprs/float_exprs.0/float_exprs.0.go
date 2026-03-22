@@ -9,6 +9,6 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf64_no_contraction(v0 float64, v1 float64, v2 float64) float64 {
+func (m *Module) Xf64_no_contraction_ceyfr5(v0 float64, v1 float64, v2 float64) float64 {
 	return float64(float64(v0*v1) + v2)
 }

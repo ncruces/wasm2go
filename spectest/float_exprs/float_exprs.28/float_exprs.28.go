@@ -14,7 +14,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_approximate_sqrt_reciprocal(v0 float32) float32 {
+func (m *Module) Xf32_no_approximate_sqrt_reciprocal_vyqwmq(v0 float32) float32 {
 	return float32(math.Sqrt(float64(float32(f32_const(1) / v0))))
 }
 

@@ -67,22 +67,22 @@ func (m *Module) f18(v0 int32, v1 float32, v2 int64, v3 int32, v4 float64) {
 func (m *Module) f19() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xtype_use_1() {
+func (m *Module) Xtype_use_1_9borg1() {
 }
-func (m *Module) Xtype_use_2() int32 {
+func (m *Module) Xtype_use_2_e3dvk5() int32 {
 	return i32_const(0)
 }
-func (m *Module) Xtype_use_3(v0 int32) {
+func (m *Module) Xtype_use_3_1hg34sm(v0 int32) {
 }
-func (m *Module) Xtype_use_4(v0 int32, v1 float64, v2 int32) int32 {
+func (m *Module) Xtype_use_4_5nxa0d(v0 int32, v1 float64, v2 int32) int32 {
 	return i32_const(0)
 }
-func (m *Module) Xtype_use_5() int32 {
+func (m *Module) Xtype_use_5_1rth7fy() int32 {
 	return i32_const(0)
 }
-func (m *Module) Xtype_use_6(v0 int32) {
+func (m *Module) Xtype_use_6_1w2eja2(v0 int32) {
 }
-func (m *Module) Xtype_use_7(v0 int32, v1 float64, v2 int32) int32 {
+func (m *Module) Xtype_use_7_207jtl(v0 int32, v1 float64, v2 int32) int32 {
 	return i32_const(0)
 }
 func (m *Module) f27() {
@@ -109,47 +109,47 @@ func (m *Module) f30() {
 	_, _, _, _, _, _ = v0, v1, v2, v3, v4, v5
 	panic("unreachable")
 }
-func (m *Module) Xlocal_first_i32() int32 {
+func (m *Module) Xlocal_first_i32_kyhew0() int32 {
 	var v0, v1 int32
 	_, _ = v0, v1
 	return v0
 }
-func (m *Module) Xlocal_first_i64() int64 {
+func (m *Module) Xlocal_first_i64_dbio6b() int64 {
 	var v0, v1 int64
 	_, _ = v0, v1
 	return v0
 }
-func (m *Module) Xlocal_first_f32() float32 {
+func (m *Module) Xlocal_first_f32_1zjvgs() float32 {
 	var v0, v1 float32
 	_, _ = v0, v1
 	return v0
 }
-func (m *Module) Xlocal_first_f64() float64 {
+func (m *Module) Xlocal_first_f64_ykvk27() float64 {
 	var v0, v1 float64
 	_, _ = v0, v1
 	return v0
 }
-func (m *Module) Xlocal_second_i32() int32 {
+func (m *Module) Xlocal_second_i32_bpmo3m() int32 {
 	var v0, v1 int32
 	_, _ = v0, v1
 	return v1
 }
-func (m *Module) Xlocal_second_i64() int64 {
+func (m *Module) Xlocal_second_i64_mogji9() int64 {
 	var v0, v1 int64
 	_, _ = v0, v1
 	return v1
 }
-func (m *Module) Xlocal_second_f32() float32 {
+func (m *Module) Xlocal_second_f32_sgnga6() float32 {
 	var v0, v1 float32
 	_, _ = v0, v1
 	return v1
 }
-func (m *Module) Xlocal_second_f64() float64 {
+func (m *Module) Xlocal_second_f64_82twml() float64 {
 	var v0, v1 float64
 	_, _ = v0, v1
 	return v1
 }
-func (m *Module) Xlocal_mixed() float64 {
+func (m *Module) Xlocal_mixed_17orp2a() float64 {
 	var v0 float32
 	var v1 int32
 	var v2 int64
@@ -181,31 +181,31 @@ func (m *Module) Xlocal_mixed() float64 {
 	_ = p3
 	return v4
 }
-func (m *Module) Xparam_first_i32(v0 int32, v1 int32) int32 {
+func (m *Module) Xparam_first_i32_w8pe7c(v0 int32, v1 int32) int32 {
 	return v0
 }
-func (m *Module) Xparam_first_i64(v0 int64, v1 int64) int64 {
+func (m *Module) Xparam_first_i64_4d3w4r(v0 int64, v1 int64) int64 {
 	return v0
 }
-func (m *Module) Xparam_first_f32(v0 float32, v1 float32) float32 {
+func (m *Module) Xparam_first_f32_fp3fk4(v0 float32, v1 float32) float32 {
 	return v0
 }
-func (m *Module) Xparam_first_f64(v0 float64, v1 float64) float64 {
+func (m *Module) Xparam_first_f64_imbwsn(v0 float64, v1 float64) float64 {
 	return v0
 }
-func (m *Module) Xparam_second_i32(v0 int32, v1 int32) int32 {
+func (m *Module) Xparam_second_i32_9h2fjy(v0 int32, v1 int32) int32 {
 	return v1
 }
-func (m *Module) Xparam_second_i64(v0 int64, v1 int64) int64 {
+func (m *Module) Xparam_second_i64_ovppx9(v0 int64, v1 int64) int64 {
 	return v1
 }
-func (m *Module) Xparam_second_f32(v0 float32, v1 float32) float32 {
+func (m *Module) Xparam_second_f32_unxc42(v0 float32, v1 float32) float32 {
 	return v1
 }
-func (m *Module) Xparam_second_f64(v0 float64, v1 float64) float64 {
+func (m *Module) Xparam_second_f64_5uadht(v0 float64, v1 float64) float64 {
 	return v1
 }
-func (m *Module) Xparam_mixed(v0 float32, v1 int32, v2 int64, v3 int32, v4 float64, v5 int32) float64 {
+func (m *Module) Xparam_mixed_a9rouk(v0 float32, v1 int32, v2 int64, v3 int32, v4 float64, v5 int32) float64 {
 	_ = -v0
 	var p0 int32
 	if v1 == 0 {
@@ -232,28 +232,28 @@ func (m *Module) Xparam_mixed(v0 float32, v1 int32, v2 int64, v3 int32, v4 float
 }
 func (m *Module) Xempty() {
 }
-func (m *Module) Xvalue_void() {
+func (m *Module) Xvalue_void_5gkqi3() {
 	m.f0()
 }
-func (m *Module) Xvalue_i32() int32 {
+func (m *Module) Xvalue_i32_m3qqrv() int32 {
 	return int32(77)
 }
-func (m *Module) Xvalue_i64() int64 {
+func (m *Module) Xvalue_i64_egs760() int64 {
 	return i64_const(7777)
 }
-func (m *Module) Xvalue_f32() float32 {
+func (m *Module) Xvalue_f32_ueraf() float32 {
 	return float32(77.7)
 }
-func (m *Module) Xvalue_f64() float64 {
+func (m *Module) Xvalue_f64_xfq8ro() float64 {
 	return float64(77.77)
 }
-func (m *Module) Xvalue_block_void() {
+func (m *Module) Xvalue_block_void_mb6bpk() {
 	{
 		m.f0()
 		m.f0()
 	}
 }
-func (m *Module) Xvalue_block_i32() int32 {
+func (m *Module) Xvalue_block_i32_1xce015() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -262,22 +262,22 @@ func (m *Module) Xvalue_block_i32() int32 {
 	}
 	return p0
 }
-func (m *Module) Xreturn_empty() {
+func (m *Module) Xreturn_empty_nrn036() {
 	return
 }
-func (m *Module) Xreturn_i32() int32 {
+func (m *Module) Xreturn_i32_7m8uyq() int32 {
 	return int32(78)
 }
-func (m *Module) Xreturn_i64() int64 {
+func (m *Module) Xreturn_i64_qwtg1t() int64 {
 	return i64_const(7878)
 }
-func (m *Module) Xreturn_f32() float32 {
+func (m *Module) Xreturn_f32_odd8q6() float32 {
 	return float32(78.7)
 }
-func (m *Module) Xreturn_f64() float64 {
+func (m *Module) Xreturn_f64_cb4m5p() float64 {
 	return float64(78.78)
 }
-func (m *Module) Xreturn_block_i32() int32 {
+func (m *Module) Xreturn_block_i32_1i3e75p() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -286,22 +286,22 @@ func (m *Module) Xreturn_block_i32() int32 {
 	}
 	return p0
 }
-func (m *Module) Xbreak_empty() {
+func (m *Module) Xbreak_empty_j24vzx() {
 	return
 }
-func (m *Module) Xbreak_i32() int32 {
+func (m *Module) Xbreak_i32_1frcadt() int32 {
 	return int32(79)
 }
-func (m *Module) Xbreak_i64() int64 {
+func (m *Module) Xbreak_i64_1hjx3v6() int64 {
 	return i64_const(7979)
 }
-func (m *Module) Xbreak_f32() float32 {
+func (m *Module) Xbreak_f32_1wavfwd() float32 {
 	return float32(79.9)
 }
-func (m *Module) Xbreak_f64() float64 {
+func (m *Module) Xbreak_f64_13arwce() float64 {
 	return float64(79.79)
 }
-func (m *Module) Xbreak_block_i32() int32 {
+func (m *Module) Xbreak_block_i32_6d9z2b() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -310,31 +310,31 @@ func (m *Module) Xbreak_block_i32() int32 {
 	}
 	return p0
 }
-func (m *Module) Xbreak_br_if_empty(v0 int32) {
+func (m *Module) Xbreak_br_if_empty_1uiee2i(v0 int32) {
 	if v0 != 0 {
 		return
 	}
 }
-func (m *Module) Xbreak_br_if_num(v0 int32) int32 {
+func (m *Module) Xbreak_br_if_num_1259pbg(v0 int32) int32 {
 	if v0 != 0 {
 		return int32(50)
 	}
 	_ = int32(50)
 	return int32(51)
 }
-func (m *Module) Xbreak_br_table_empty(v0 int32) {
+func (m *Module) Xbreak_br_table_empty_1vz6wh8(v0 int32) {
 	switch v0 {
 	default:
 		return
 	}
 }
-func (m *Module) Xbreak_br_table_num(v0 int32) int32 {
+func (m *Module) Xbreak_br_table_num_1tx772w(v0 int32) int32 {
 	switch v0 {
 	default:
 		return int32(50)
 	}
 }
-func (m *Module) Xbreak_br_table_nested_empty(v0 int32) {
+func (m *Module) Xbreak_br_table_nested_empty_15t57ld(v0 int32) {
 	{
 		switch v0 {
 		case 1:
@@ -345,7 +345,7 @@ func (m *Module) Xbreak_br_table_nested_empty(v0 int32) {
 	}
 l0:
 }
-func (m *Module) Xbreak_br_table_nested_num(v0 int32) int32 {
+func (m *Module) Xbreak_br_table_nested_num_cnhrir(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -360,22 +360,22 @@ func (m *Module) Xbreak_br_table_nested_num(v0 int32) int32 {
 l0:
 	return p0 + int32(2)
 }
-func (m *Module) Xinit_local_i32() int32 {
+func (m *Module) Xinit_local_i32_b6k6t3() int32 {
 	var v0 int32
 	_ = v0
 	return v0
 }
-func (m *Module) Xinit_local_i64() int64 {
+func (m *Module) Xinit_local_i64_n8pvec() int64 {
 	var v0 int64
 	_ = v0
 	return v0
 }
-func (m *Module) Xinit_local_f32() float32 {
+func (m *Module) Xinit_local_f32_s03hln() float32 {
 	var v0 float32
 	_ = v0
 	return v0
 }
-func (m *Module) Xinit_local_f64() float64 {
+func (m *Module) Xinit_local_f64_8plxg8() float64 {
 	var v0 float64
 	_ = v0
 	return v0

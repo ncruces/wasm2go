@@ -9,7 +9,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_lt_if(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_lt_if_1vxdmyp(v0 float32, v1 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 < v1 {
@@ -21,7 +21,7 @@ func (m *Module) Xf32_no_fold_lt_if(v0 float32, v1 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_le_if(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_le_if_1hj9890(v0 float32, v1 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 <= v1 {
@@ -33,7 +33,7 @@ func (m *Module) Xf32_no_fold_le_if(v0 float32, v1 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_gt_if(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_gt_if_xpthb8(v0 float32, v1 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 > v1 {
@@ -45,7 +45,7 @@ func (m *Module) Xf32_no_fold_gt_if(v0 float32, v1 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_ge_if(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_ge_if_ljlkkh(v0 float32, v1 float32) float32 {
 	var p0 float32
 	_ = p0
 	if v0 >= v1 {
@@ -57,7 +57,7 @@ func (m *Module) Xf32_no_fold_ge_if(v0 float32, v1 float32) float32 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_lt_if(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_lt_if_15327vn(v0 float64, v1 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 < v1 {
@@ -69,7 +69,7 @@ func (m *Module) Xf64_no_fold_lt_if(v0 float64, v1 float64) float64 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_le_if(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_le_if_18g7jza(v0 float64, v1 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 <= v1 {
@@ -81,7 +81,7 @@ func (m *Module) Xf64_no_fold_le_if(v0 float64, v1 float64) float64 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_gt_if(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_gt_if_70g6bq(v0 float64, v1 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 > v1 {
@@ -93,7 +93,7 @@ func (m *Module) Xf64_no_fold_gt_if(v0 float64, v1 float64) float64 {
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_ge_if(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_ge_if_clik5f(v0 float64, v1 float64) float64 {
 	var p0 float64
 	_ = p0
 	if v0 >= v1 {

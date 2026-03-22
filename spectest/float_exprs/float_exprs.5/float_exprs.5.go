@@ -11,10 +11,10 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_mul_zero(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_mul_zero_1d375is(v0 float32) float32 {
 	return float32(v0 * f32_const(0))
 }
-func (m *Module) Xf64_no_fold_mul_zero(v0 float64) float64 {
+func (m *Module) Xf64_no_fold_mul_zero_1itjjyv(v0 float64) float64 {
 	return float64(v0 * f64_const(0))
 }
 

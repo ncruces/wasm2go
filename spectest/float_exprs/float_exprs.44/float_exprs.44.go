@@ -9,7 +9,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_ult(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_ult_vlhhqq(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 >= v1 {
 		p0 = 1
@@ -20,7 +20,7 @@ func (m *Module) Xf32_ult(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf32_ule(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_ule_150okfy(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 > v1 {
 		p0 = 1
@@ -31,7 +31,7 @@ func (m *Module) Xf32_ule(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf32_ugt(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_ugt_1nycaib(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 <= v1 {
 		p0 = 1
@@ -42,7 +42,7 @@ func (m *Module) Xf32_ugt(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf32_uge(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_uge_g4urfj(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 < v1 {
 		p0 = 1
@@ -53,7 +53,7 @@ func (m *Module) Xf32_uge(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_ult(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_ult_1g8hdw4(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 >= v1 {
 		p0 = 1
@@ -64,7 +64,7 @@ func (m *Module) Xf64_ult(v0 float64, v1 float64) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_ule(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_ule_q7mdiw(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 > v1 {
 		p0 = 1
@@ -75,7 +75,7 @@ func (m *Module) Xf64_ule(v0 float64, v1 float64) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_ugt(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_ugt_60p9dh(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 <= v1 {
 		p0 = 1
@@ -86,7 +86,7 @@ func (m *Module) Xf64_ugt(v0 float64, v1 float64) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_uge(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_uge_1wodyhl(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 < v1 {
 		p0 = 1

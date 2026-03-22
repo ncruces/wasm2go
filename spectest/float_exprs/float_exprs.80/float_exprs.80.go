@@ -9,9 +9,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_distribute_exact(v0 float32) float32 {
+func (m *Module) Xf32_no_distribute_exact_unejz1(v0 float32) float32 {
 	return float32(float32(float32(-8)*v0) + float32(float32(8)*v0))
 }
-func (m *Module) Xf64_no_distribute_exact(v0 float64) float64 {
+func (m *Module) Xf64_no_distribute_exact_tdpu1y(v0 float64) float64 {
 	return float64(float64(float64(-8)*v0) + float64(float64(8)*v0))
 }

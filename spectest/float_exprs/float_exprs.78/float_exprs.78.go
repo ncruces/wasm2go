@@ -9,42 +9,42 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_recoding_eq(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_recoding_eq_12tn9wo(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if float32(v0*v1) == v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xf32_recoding_le(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_recoding_le_1mfsx1z(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if float32(v0*v1) <= v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xf32_recoding_lt(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_recoding_lt_di5a9n(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if float32(v0*v1) < v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xf64_recoding_eq(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_recoding_eq_bd6d5l(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if float64(v0*v1) == v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xf64_recoding_le(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_recoding_le_vhwn8m(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if float64(v0*v1) <= v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xf64_recoding_lt(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_recoding_lt_14z9pze(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if float64(v0*v1) < v0 {
 		p0 = 1

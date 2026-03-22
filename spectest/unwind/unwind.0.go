@@ -11,23 +11,23 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xfunc_unwind_by_unreachable() {
+func (m *Module) Xfunc_unwind_by_unreachable_b0c4b4() {
 	panic("unreachable")
 }
-func (m *Module) Xfunc_unwind_by_br() {
+func (m *Module) Xfunc_unwind_by_br_1xdk0bc() {
 	return
 }
-func (m *Module) Xfunc_unwind_by_br_value() int32 {
+func (m *Module) Xfunc_unwind_by_br_value_1xih067() int32 {
 	return int32(9)
 }
-func (m *Module) Xfunc_unwind_by_br_if() {
+func (m *Module) Xfunc_unwind_by_br_if_kmjzi1() {
 	if int32(1) != 0 {
 		return
 	}
 	_ = int64(1)
 	_ = int32(3)
 }
-func (m *Module) Xfunc_unwind_by_br_if_value() int32 {
+func (m *Module) Xfunc_unwind_by_br_if_value_1xur0wy() int32 {
 	if int32(1) != 0 {
 		return int32(9)
 	}
@@ -35,34 +35,34 @@ func (m *Module) Xfunc_unwind_by_br_if_value() int32 {
 	_ = int64(1)
 	return int32(3)
 }
-func (m *Module) Xfunc_unwind_by_br_table() {
+func (m *Module) Xfunc_unwind_by_br_table_ie0l6o() {
 	switch i32_const(0) {
 	default:
 		return
 	}
 }
-func (m *Module) Xfunc_unwind_by_br_table_value() int32 {
+func (m *Module) Xfunc_unwind_by_br_table_value_1i8t238() int32 {
 	switch i32_const(0) {
 	default:
 		return int32(9)
 	}
 }
-func (m *Module) Xfunc_unwind_by_return() int32 {
+func (m *Module) Xfunc_unwind_by_return_15kuc3k() int32 {
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_unreachable() {
+func (m *Module) Xblock_unwind_by_unreachable_k7fi3t() {
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xblock_unwind_by_br() int32 {
+func (m *Module) Xblock_unwind_by_br_173i0ct() int32 {
 	{
 		goto l0
 	}
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_br_value() int32 {
+func (m *Module) Xblock_unwind_by_br_value_yzb9yc() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -72,7 +72,7 @@ func (m *Module) Xblock_unwind_by_br_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_unwind_by_br_if() int32 {
+func (m *Module) Xblock_unwind_by_br_if_1f3d6k1() int32 {
 	{
 		if int32(1) != 0 {
 			goto l0
@@ -83,7 +83,7 @@ func (m *Module) Xblock_unwind_by_br_if() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_br_if_value() int32 {
+func (m *Module) Xblock_unwind_by_br_if_value_159ovrv() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -98,7 +98,7 @@ func (m *Module) Xblock_unwind_by_br_if_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_unwind_by_br_table() int32 {
+func (m *Module) Xblock_unwind_by_br_table_1j60yuz() int32 {
 	{
 		switch i32_const(0) {
 		default:
@@ -108,7 +108,7 @@ func (m *Module) Xblock_unwind_by_br_table() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_unwind_by_br_table_value() int32 {
+func (m *Module) Xblock_unwind_by_br_table_value_dpu5ik() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -121,14 +121,14 @@ func (m *Module) Xblock_unwind_by_br_table_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_unwind_by_return() int32 {
+func (m *Module) Xblock_unwind_by_return_8v2fj2() int32 {
 	var p0 int32
 	_ = p0
 	{
 		return int32(9)
 	}
 }
-func (m *Module) Xblock_nested_unwind_by_unreachable() int32 {
+func (m *Module) Xblock_nested_unwind_by_unreachable_3xsms() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -137,7 +137,7 @@ func (m *Module) Xblock_nested_unwind_by_unreachable() int32 {
 		}
 	}
 }
-func (m *Module) Xblock_nested_unwind_by_br() int32 {
+func (m *Module) Xblock_nested_unwind_by_br_12v85r7() int32 {
 	{
 		{
 			goto l0
@@ -146,7 +146,7 @@ func (m *Module) Xblock_nested_unwind_by_br() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_nested_unwind_by_br_value() int32 {
+func (m *Module) Xblock_nested_unwind_by_br_value_18gvu86() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -158,7 +158,7 @@ func (m *Module) Xblock_nested_unwind_by_br_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_nested_unwind_by_br_if() int32 {
+func (m *Module) Xblock_nested_unwind_by_br_if_1r3fct0() int32 {
 	{
 		{
 			if int32(1) != 0 {
@@ -171,7 +171,7 @@ func (m *Module) Xblock_nested_unwind_by_br_if() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_nested_unwind_by_br_if_value() int32 {
+func (m *Module) Xblock_nested_unwind_by_br_if_value_1p1y7wm() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -188,7 +188,7 @@ func (m *Module) Xblock_nested_unwind_by_br_if_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_nested_unwind_by_br_table() int32 {
+func (m *Module) Xblock_nested_unwind_by_br_table_6sxu3d() int32 {
 	{
 		{
 			switch int32(1) {
@@ -200,7 +200,7 @@ func (m *Module) Xblock_nested_unwind_by_br_table() int32 {
 l0:
 	return int32(9)
 }
-func (m *Module) Xblock_nested_unwind_by_br_table_value() int32 {
+func (m *Module) Xblock_nested_unwind_by_br_table_value_zcvzvk() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -215,7 +215,7 @@ func (m *Module) Xblock_nested_unwind_by_br_table_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_nested_unwind_by_return() int32 {
+func (m *Module) Xblock_nested_unwind_by_return_1jvxl8k() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -224,10 +224,10 @@ func (m *Module) Xblock_nested_unwind_by_return() int32 {
 		}
 	}
 }
-func (m *Module) Xunary_after_unreachable() int32 {
+func (m *Module) Xunary_after_unreachable_besty6() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xunary_after_br() int32 {
+func (m *Module) Xunary_after_br_1xo853b() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -237,7 +237,7 @@ func (m *Module) Xunary_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xunary_after_br_if() int32 {
+func (m *Module) Xunary_after_br_if_aooa5a() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -255,7 +255,7 @@ func (m *Module) Xunary_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xunary_after_br_table() int32 {
+func (m *Module) Xunary_after_br_table_e0oppk() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -268,13 +268,13 @@ func (m *Module) Xunary_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xunary_after_return() int32 {
+func (m *Module) Xunary_after_return_r4g5b0() int32 {
 	return int32(9)
 }
-func (m *Module) Xbinary_after_unreachable() int32 {
+func (m *Module) Xbinary_after_unreachable_1gy9sro() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xbinary_after_br() int32 {
+func (m *Module) Xbinary_after_br_1r5scun() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -284,7 +284,7 @@ func (m *Module) Xbinary_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbinary_after_br_if() int32 {
+func (m *Module) Xbinary_after_br_if_wnmcwl() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -302,7 +302,7 @@ func (m *Module) Xbinary_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbinary_after_br_table() int32 {
+func (m *Module) Xbinary_after_br_table_1bfjmgh() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -315,13 +315,13 @@ func (m *Module) Xbinary_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xbinary_after_return() int32 {
+func (m *Module) Xbinary_after_return_y3wo8n() int32 {
 	return int32(9)
 }
-func (m *Module) Xselect_after_unreachable() int32 {
+func (m *Module) Xselect_after_unreachable_1h9jpid() int32 {
 	panic("unreachable")
 }
-func (m *Module) Xselect_after_br() int32 {
+func (m *Module) Xselect_after_br_1pu0fpp() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -331,7 +331,7 @@ func (m *Module) Xselect_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xselect_after_br_if() int32 {
+func (m *Module) Xselect_after_br_if_3x7c4a() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -349,7 +349,7 @@ func (m *Module) Xselect_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xselect_after_br_table() int32 {
+func (m *Module) Xselect_after_br_table_mm9swq() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -362,17 +362,17 @@ func (m *Module) Xselect_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xselect_after_return() int32 {
+func (m *Module) Xselect_after_return_1s3pzrk() int32 {
 	return int32(9)
 }
-func (m *Module) Xblock_value_after_unreachable() int32 {
+func (m *Module) Xblock_value_after_unreachable_rqm3bf() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xblock_value_after_br() int32 {
+func (m *Module) Xblock_value_after_br_jjlj3s() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -382,7 +382,7 @@ func (m *Module) Xblock_value_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_value_after_br_if() int32 {
+func (m *Module) Xblock_value_after_br_if_1pny9t1() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -396,7 +396,7 @@ func (m *Module) Xblock_value_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_value_after_br_table() int32 {
+func (m *Module) Xblock_value_after_br_table_156xog3() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -409,21 +409,21 @@ func (m *Module) Xblock_value_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xblock_value_after_return() int32 {
+func (m *Module) Xblock_value_after_return_1220mvm() int32 {
 	var p0 int32
 	_ = p0
 	{
 		return int32(9)
 	}
 }
-func (m *Module) Xloop_value_after_unreachable() int32 {
+func (m *Module) Xloop_value_after_unreachable_1fw38ej() int32 {
 	var p0 int32
 	_ = p0
 	{
 		panic("unreachable")
 	}
 }
-func (m *Module) Xloop_value_after_br() int32 {
+func (m *Module) Xloop_value_after_br_gbgm7a() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -437,7 +437,7 @@ func (m *Module) Xloop_value_after_br() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xloop_value_after_br_if() int32 {
+func (m *Module) Xloop_value_after_br_if_7o1mpx() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -456,7 +456,7 @@ func (m *Module) Xloop_value_after_br_if() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xloop_value_after_br_table() int32 {
+func (m *Module) Xloop_value_after_br_table_i3ca0c() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -473,7 +473,7 @@ func (m *Module) Xloop_value_after_br_table() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xloop_value_after_return() int32 {
+func (m *Module) Xloop_value_after_return_1sf27ss() int32 {
 	var p0 int32
 	_ = p0
 	{

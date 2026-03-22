@@ -36,53 +36,53 @@ func New() *Module {
 	m.g7 = i64_const(-15)
 	return m
 }
-func (m *Module) Xget_a() int32 {
+func (m *Module) Xget_a_1yusnlu() int32 {
 	t0 := m.g0
 	return t0
 }
-func (m *Module) Xget_b() int64 {
+func (m *Module) Xget_b_1thx5km() int64 {
 	t0 := m.g3
 	return t0
 }
-func (m *Module) Xget_x() int32 {
+func (m *Module) Xget_x_1638pwh() int32 {
 	t0 := m.g4
 	return t0
 }
-func (m *Module) Xget_y() int64 {
+func (m *Module) Xget_y_s9cisi() int64 {
 	t0 := m.g7
 	return t0
 }
-func (m *Module) Xset_x(v0 int32) {
+func (m *Module) Xset_x_1x1jpz6(v0 int32) {
 	m.g4 = v0
 }
-func (m *Module) Xset_y(v0 int64) {
+func (m *Module) Xset_y_2zbby9(v0 int64) {
 	m.g7 = v0
 }
-func (m *Module) Xget_1() float32 {
+func (m *Module) Xget_1_1cev7m9() float32 {
 	t0 := m.g1
 	return t0
 }
-func (m *Module) Xget_2() float64 {
+func (m *Module) Xget_2_1ghjycl() float64 {
 	t0 := m.g2
 	return t0
 }
-func (m *Module) Xget_5() float32 {
+func (m *Module) Xget_5_tdlv0u() float32 {
 	t0 := m.g5
 	return t0
 }
-func (m *Module) Xget_6() float64 {
+func (m *Module) Xget_6_y1jzcq() float64 {
 	t0 := m.g6
 	return t0
 }
-func (m *Module) Xset_5(v0 float32) {
+func (m *Module) Xset_5_1t6kh9(v0 float32) {
 	m.g5 = v0
 }
-func (m *Module) Xset_6(v0 float64) {
+func (m *Module) Xset_6_624rfd(v0 float64) {
 	m.g6 = v0
 }
 func (m *Module) f12() {
 }
-func (m *Module) Xas_select_first() int32 {
+func (m *Module) Xas_select_first_1p4pbiq() int32 {
 	t0 := m.g4
 	p1 := int32(2)
 	if int32(3) != 0 {
@@ -90,7 +90,7 @@ func (m *Module) Xas_select_first() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_select_mid() int32 {
+func (m *Module) Xas_select_mid_19eybyo() int32 {
 	t0 := m.g4
 	p1 := t0
 	if int32(3) != 0 {
@@ -98,7 +98,7 @@ func (m *Module) Xas_select_mid() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_select_last() int32 {
+func (m *Module) Xas_select_last_ndhg92() int32 {
 	t0 := m.g4
 	p1 := int32(3)
 	if t0 != 0 {
@@ -106,7 +106,7 @@ func (m *Module) Xas_select_last() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_loop_first() int32 {
+func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -117,7 +117,7 @@ func (m *Module) Xas_loop_first() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_mid() int32 {
+func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -128,7 +128,7 @@ func (m *Module) Xas_loop_mid() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_last() int32 {
+func (m *Module) Xas_loop_last_dr7k79() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -139,7 +139,7 @@ func (m *Module) Xas_loop_last() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_condition() int32 {
+func (m *Module) Xas_if_condition_mme5rn() int32 {
 	t0 := m.g4
 	var p1 int32
 	_ = p1
@@ -152,7 +152,7 @@ func (m *Module) Xas_if_condition() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_if_then() int32 {
+func (m *Module) Xas_if_then_8by7gv() int32 {
 	var p0 int32
 	_ = p0
 	if int32(1) != 0 {
@@ -163,7 +163,7 @@ func (m *Module) Xas_if_then() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_else() int32 {
+func (m *Module) Xas_if_else_y9fza0() int32 {
 	var p0 int32
 	_ = p0
 	if i32_const(0) != 0 {
@@ -174,7 +174,7 @@ func (m *Module) Xas_if_else() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_br_if_first() int32 {
+func (m *Module) Xas_br_if_first_11nmxnr() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -188,7 +188,7 @@ func (m *Module) Xas_br_if_first() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_last() int32 {
+func (m *Module) Xas_br_if_last_1dvgji4() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -202,7 +202,7 @@ func (m *Module) Xas_br_if_last() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_first() int32 {
+func (m *Module) Xas_br_table_first_1ammix2() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -216,7 +216,7 @@ func (m *Module) Xas_br_table_first() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_last() int32 {
+func (m *Module) Xas_br_table_last_10cg6o3() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -233,7 +233,7 @@ l0:
 func (m *Module) f26(v0 int32, v1 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_call_indirect_first() int32 {
+func (m *Module) Xas_call_indirect_first_1kls7bs() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -243,7 +243,7 @@ func (m *Module) Xas_call_indirect_first() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_mid() int32 {
+func (m *Module) Xas_call_indirect_mid_1u5vulp() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -253,7 +253,7 @@ func (m *Module) Xas_call_indirect_mid() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_last() int32 {
+func (m *Module) Xas_call_indirect_last_os2e8m() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -263,20 +263,20 @@ func (m *Module) Xas_call_indirect_last() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_store_first() {
+func (m *Module) Xas_store_first_1jby9fx() {
 	t0 := m.g4
 	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], uint32(int32(1)))
 }
-func (m *Module) Xas_store_last() {
+func (m *Module) Xas_store_last_4x4vf1() {
 	t0 := m.g4
 	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t0))
 }
-func (m *Module) Xas_load_operand() int32 {
+func (m *Module) Xas_load_operand_dz3ecr() int32 {
 	t0 := m.g4
 	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(t0):]))
 	return t1
 }
-func (m *Module) Xas_memory_grow_value() int32 {
+func (m *Module) Xas_memory_grow_value_7gs2mr() int32 {
 	t0 := m.g4
 	t1 := int32(memory_grow(&m.memory, int64(t0), m.maxMem))
 	return t1
@@ -284,20 +284,20 @@ func (m *Module) Xas_memory_grow_value() int32 {
 func (m *Module) f34(v0 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_call_value() int32 {
+func (m *Module) Xas_call_value_go1q6u() int32 {
 	t0 := m.g4
 	t1 := m.f34(t0)
 	return t1
 }
-func (m *Module) Xas_return_value() int32 {
+func (m *Module) Xas_return_value_1wph1uy() int32 {
 	t0 := m.g4
 	return t0
 }
-func (m *Module) Xas_drop_operand() {
+func (m *Module) Xas_drop_operand_1m7m2py() {
 	t0 := m.g4
 	_ = t0
 }
-func (m *Module) Xas_br_value() int32 {
+func (m *Module) Xas_br_value_1sx9dl7() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -308,23 +308,23 @@ func (m *Module) Xas_br_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_local_set_value(v0 int32) int32 {
+func (m *Module) Xas_local_set_value_1e0q6mz(v0 int32) int32 {
 	t0 := m.g4
 	v0 = t0
 	return v0
 }
-func (m *Module) Xas_local_tee_value(v0 int32) int32 {
+func (m *Module) Xas_local_tee_value_11lf5v3(v0 int32) int32 {
 	t0 := m.g4
 	v0 = t0
 	return v0
 }
-func (m *Module) Xas_global_set_value() int32 {
+func (m *Module) Xas_global_set_value_p447yq() int32 {
 	t0 := m.g4
 	m.g4 = t0
 	t1 := m.g4
 	return t1
 }
-func (m *Module) Xas_unary_operand() int32 {
+func (m *Module) Xas_unary_operand_kr3bi8() int32 {
 	t0 := m.g4
 	var p1 int32
 	if t0 == 0 {
@@ -332,12 +332,12 @@ func (m *Module) Xas_unary_operand() int32 {
 	}
 	return p1
 }
-func (m *Module) Xas_binary_operand() int32 {
+func (m *Module) Xas_binary_operand_zlxanv() int32 {
 	t0 := m.g4
 	t1 := m.g4
 	return t0 * t1
 }
-func (m *Module) Xas_compare_operand() int32 {
+func (m *Module) Xas_compare_operand_1atwg6r() int32 {
 	t0 := m.g0
 	var p1 int32
 	if uint32(t0) > uint32(int32(1)) {

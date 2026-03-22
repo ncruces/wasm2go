@@ -17,7 +17,7 @@ func (m *Module) Xgrow(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }
-func (m *Module) Xcheck_memory_zero(v0 int32, v1 int32) int32 {
+func (m *Module) Xcheck_memory_zero_ivkcjo(v0 int32, v1 int32) int32 {
 	var v2 int32
 	_ = v2
 	v2 = int32(1)

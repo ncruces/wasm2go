@@ -395,44 +395,57 @@ func (t *translator) createExportMethods() []ast.Decl {
 		exp := t.exports[name]
 		methodName := ast.NewIdent(exported(name))
 
-		var results *ast.FieldList
-		var body []ast.Stmt
+		var decl = &ast.FuncDecl{
+			Recv: modRecvList,
+			Name: methodName,
+			Type: &ast.FuncType{},
+			Body: &ast.BlockStmt{}}
 
 		switch exp.kind {
 		case externFunction:
-			continue
+			fn := t.functions[exp.index]
+			if fn.decl.Name.Name == methodName.Name {
+				continue
+			}
+
+			decl.Type = fn.typ.toAST()
+			call := &ast.CallExpr{Fun: &ast.SelectorExpr{X: newID("m"), Sel: fn.decl.Name}}
+			for i := range fn.typ.params {
+				call.Args = append(call.Args, localVar(i))
+			}
+			if len(fn.typ.results) == 0 {
+				decl.Body.List = []ast.Stmt{&ast.ExprStmt{X: call}}
+			} else {
+				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{call}}}
+			}
 		case externTable:
 			tab := t.tables[exp.index]
-			results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}
+			decl.Type.Results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}
 			var ret ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: tab.id}
 			if !tab.imported {
 				ret = &ast.UnaryExpr{Op: token.AND, X: ret}
 			}
-			body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}
+			decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}
 		case externGlobal:
 			g := t.globals[exp.index]
-			results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: g.typ.ident()}}}}
+			decl.Type.Results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: g.typ.ident()}}}}
 			var ret ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: g.id}
 			if !g.imported {
 				ret = &ast.UnaryExpr{Op: token.AND, X: ret}
 			}
-			body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}
+			decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}
 		case externMemory:
-			results = &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}
+			decl.Type.Results = &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}
 			if t.memory.imported {
-				body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}}}}
+				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}}}}
 			} else {
-				body = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
+				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
 					Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: newID("wasmMemory")}},
 					Args: []ast.Expr{&ast.UnaryExpr{Op: token.AND, X: &ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}}}}}}}
 			}
 		}
 
-		decls = append(decls, &ast.FuncDecl{
-			Recv: modRecvList,
-			Name: methodName,
-			Type: &ast.FuncType{Results: results},
-			Body: &ast.BlockStmt{List: body}})
+		decls = append(decls, decl)
 	}
 	return decls
 }

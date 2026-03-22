@@ -15,41 +15,28 @@ and a `New` function to initialize it.
 The methods of the `Module` structure are the Wasm module's exports,
 whereas imports are interfaces `New` consumes.
 
-Only a subset of the Wasm specification will be supported,
-as the goal is to translate specific Wasm modules to Go.
-
-For example, we don't need to implement SIMD,
-as we can ask (e.g.) LLVM not to emit it.
-
-We also assume the input Wasm modules can be trusted.
+We assume the input Wasm modules can be trusted.
 At a minimum, you should run Wasm modules through a verifier
 before attempting to convert an untrusted module.
 
-The current target is a useful subset of Wasm produced by `clang`.
-
-This includes most Wasm 1.0 features, with the following exceptions:
-- export conflicts (name collisions after the trivial mangling we apply);
-- export aliasing (exporting the same function under multiple names).
-
-It also supports a subset of Wasm 2.0 and 3.0 features:
+The current target is a useful subset of Wasm produced by `clang`,
+including the following features:
 - bulk memory instructions and reference types;
 - non-trapping float-to-int conversions;
 - sign-extension instructions;
 - multi-value results;
 - 64-bit address space.
 
-The goal is not to produce particularly readable Go code:
-- because Go makes a distinction between statements and expresions,
-  we use a stack-to-register approach to translate Wasm to Go;
+Generating human readable Go code is a non-goal:
+- Wasm names must be mangled into Go identifiers;
 - Wasm control flow is implemented with `goto` and labels;
 - Go's distinction between `bool` and `int32` requires
   spurious control flow and type conversions;
 - Go's untyped numeric literals require explicit type conversions;
-- Go's constant evaluator does not preserve Wasm semantics,
-  requiring workaround to avoid constant folding/propagation;
+- Go's constant evaluator does not match Wasm semantics,
+  requiring workarounds to avoid constant folding/propagation;
 - float operations require type conversions to avoid being combined;
-- float literals can't represent negative zero, infinities, or `NaN`,
-  often requiring `Float64frombits`;
+- float literals can't represent negative zero, infinities, or `NaN`;
 - Go forbids unused variables/labels/etc.
 
 Many of these introduce unnecessary verbosity,

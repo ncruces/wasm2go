@@ -9,7 +9,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_not_lt(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_not_lt_1o38sw4(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 < v1 {
 		p0 = 1
@@ -20,7 +20,7 @@ func (m *Module) Xf32_not_lt(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf32_not_le(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_not_le_g9rz1k(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 <= v1 {
 		p0 = 1
@@ -31,7 +31,7 @@ func (m *Module) Xf32_not_le(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf32_not_gt(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_not_gt_vgl5r9(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 > v1 {
 		p0 = 1
@@ -42,7 +42,7 @@ func (m *Module) Xf32_not_gt(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf32_not_ge(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_not_ge_14vrj0p(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 >= v1 {
 		p0 = 1
@@ -53,7 +53,7 @@ func (m *Module) Xf32_not_ge(v0 float32, v1 float32) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_not_lt(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_not_lt_i1i0bg(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 < v1 {
 		p0 = 1
@@ -64,7 +64,7 @@ func (m *Module) Xf64_not_lt(v0 float64, v1 float64) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_not_le(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_not_le_19a2agg(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 <= v1 {
 		p0 = 1
@@ -75,7 +75,7 @@ func (m *Module) Xf64_not_le(v0 float64, v1 float64) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_not_gt(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_not_gt_1sn04zh(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 > v1 {
 		p0 = 1
@@ -86,7 +86,7 @@ func (m *Module) Xf64_not_gt(v0 float64, v1 float64) int32 {
 	}
 	return p1
 }
-func (m *Module) Xf64_not_ge(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_not_ge_2zj0i9(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 >= v1 {
 		p0 = 1

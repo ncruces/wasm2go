@@ -11,9 +11,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_div_sqrts(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_div_sqrts_62k5ai(v0 float32, v1 float32) float32 {
 	return float32(float32(math.Sqrt(float64(v0))) / float32(math.Sqrt(float64(v1))))
 }
-func (m *Module) Xf64_no_fold_div_sqrts(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_div_sqrts_skxkg2(v0 float64, v1 float64) float64 {
 	return float64(math.Sqrt(v0) / math.Sqrt(v1))
 }

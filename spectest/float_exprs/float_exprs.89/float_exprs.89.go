@@ -14,58 +14,58 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_arithmetic_nan_bitpattern(v0 int32, v1 int32) int32 {
+func (m *Module) Xf32_arithmetic_nan_bitpattern_g50rjs(v0 int32, v1 int32) int32 {
 	return int32(math.Float32bits(float32(math.Float32frombits(uint32(v0))/math.Float32frombits(uint32(v1))))) & i32_const(0x7fc00000)
 }
-func (m *Module) Xf32_canonical_nan_bitpattern(v0 int32, v1 int32) int32 {
+func (m *Module) Xf32_canonical_nan_bitpattern_mbglsu(v0 int32, v1 int32) int32 {
 	return int32(math.Float32bits(float32(math.Float32frombits(uint32(v0))/math.Float32frombits(uint32(v1))))) & i32_const(0x7fffffff)
 }
-func (m *Module) Xf32_nonarithmetic_nan_bitpattern(v0 int32) int32 {
+func (m *Module) Xf32_nonarithmetic_nan_bitpattern_r0z127(v0 int32) int32 {
 	return int32(math.Float32bits(-math.Float32frombits(uint32(v0))))
 }
-func (m *Module) Xf64_arithmetic_nan_bitpattern(v0 int64, v1 int64) int64 {
+func (m *Module) Xf64_arithmetic_nan_bitpattern_1oq2lhr(v0 int64, v1 int64) int64 {
 	return int64(math.Float64bits(float64(math.Float64frombits(uint64(v0))/math.Float64frombits(uint64(v1))))) & i64_const(0x7ff8000000000000)
 }
-func (m *Module) Xf64_canonical_nan_bitpattern(v0 int64, v1 int64) int64 {
+func (m *Module) Xf64_canonical_nan_bitpattern_180h50t(v0 int64, v1 int64) int64 {
 	return int64(math.Float64bits(float64(math.Float64frombits(uint64(v0))/math.Float64frombits(uint64(v1))))) & i64_const(0x7fffffffffffffff)
 }
-func (m *Module) Xf64_nonarithmetic_nan_bitpattern(v0 int64) int64 {
+func (m *Module) Xf64_nonarithmetic_nan_bitpattern_10dz1b5(v0 int64) int64 {
 	return int64(math.Float64bits(-math.Float64frombits(uint64(v0))))
 }
-func (m *Module) Xf32_no_fold_sub_zero(v0 int32) int32 {
+func (m *Module) Xf32_no_fold_sub_zero_1kt25aq(v0 int32) int32 {
 	return int32(math.Float32bits(float32(math.Float32frombits(uint32(v0))-f32_const(0)))) & i32_const(0x7fc00000)
 }
-func (m *Module) Xf32_no_fold_neg0_sub(v0 int32) int32 {
+func (m *Module) Xf32_no_fold_neg0_sub_1wq6ogp(v0 int32) int32 {
 	return int32(math.Float32bits(float32(math.Float32frombits(0x80000000)-math.Float32frombits(uint32(v0))))) & i32_const(0x7fc00000)
 }
-func (m *Module) Xf32_no_fold_mul_one(v0 int32) int32 {
+func (m *Module) Xf32_no_fold_mul_one_10x8qph(v0 int32) int32 {
 	return int32(math.Float32bits(float32(math.Float32frombits(uint32(v0))*f32_const(1)))) & i32_const(0x7fc00000)
 }
-func (m *Module) Xf32_no_fold_neg1_mul(v0 int32) int32 {
+func (m *Module) Xf32_no_fold_neg1_mul_1xj6jd6(v0 int32) int32 {
 	return int32(math.Float32bits(float32(f32_const(-1)*math.Float32frombits(uint32(v0))))) & i32_const(0x7fc00000)
 }
-func (m *Module) Xf32_no_fold_div_one(v0 int32) int32 {
+func (m *Module) Xf32_no_fold_div_one_12qvyea(v0 int32) int32 {
 	return int32(math.Float32bits(float32(math.Float32frombits(uint32(v0))/f32_const(1)))) & i32_const(0x7fc00000)
 }
-func (m *Module) Xf32_no_fold_div_neg1(v0 int32) int32 {
+func (m *Module) Xf32_no_fold_div_neg1_1fmb89r(v0 int32) int32 {
 	return int32(math.Float32bits(float32(math.Float32frombits(uint32(v0))/f32_const(-1)))) & i32_const(0x7fc00000)
 }
-func (m *Module) Xf64_no_fold_sub_zero(v0 int64) int64 {
+func (m *Module) Xf64_no_fold_sub_zero_1fjkilt(v0 int64) int64 {
 	return int64(math.Float64bits(float64(math.Float64frombits(uint64(v0))-f64_const(0)))) & i64_const(0x7ff8000000000000)
 }
-func (m *Module) Xf64_no_fold_neg0_sub(v0 int64) int64 {
+func (m *Module) Xf64_no_fold_neg0_sub_10af8ze(v0 int64) int64 {
 	return int64(math.Float64bits(float64(math.Float64frombits(0x8000000000000000)-math.Float64frombits(uint64(v0))))) & i64_const(0x7ff8000000000000)
 }
-func (m *Module) Xf64_no_fold_mul_one(v0 int64) int64 {
+func (m *Module) Xf64_no_fold_mul_one_vqsuip(v0 int64) int64 {
 	return int64(math.Float64bits(float64(math.Float64frombits(uint64(v0))*f64_const(1)))) & i64_const(0x7ff8000000000000)
 }
-func (m *Module) Xf64_no_fold_neg1_mul(v0 int64) int64 {
+func (m *Module) Xf64_no_fold_neg1_mul_13x6fhl(v0 int64) int64 {
 	return int64(math.Float64bits(float64(f64_const(-1)*math.Float64frombits(uint64(v0))))) & i64_const(0x7ff8000000000000)
 }
-func (m *Module) Xf64_no_fold_div_one(v0 int64) int64 {
+func (m *Module) Xf64_no_fold_div_one_ynakba(v0 int64) int64 {
 	return int64(math.Float64bits(float64(math.Float64frombits(uint64(v0))/f64_const(1)))) & i64_const(0x7ff8000000000000)
 }
-func (m *Module) Xf64_no_fold_div_neg1(v0 int64) int64 {
+func (m *Module) Xf64_no_fold_div_neg1_1lk4930(v0 int64) int64 {
 	return int64(math.Float64bits(float64(math.Float64frombits(uint64(v0))/f64_const(-1)))) & i64_const(0x7ff8000000000000)
 }
 func (m *Module) Xno_fold_promote_demote(v0 int32) int32 {

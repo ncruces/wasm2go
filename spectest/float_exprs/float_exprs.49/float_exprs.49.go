@@ -9,9 +9,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_incorrect_correction() float32 {
+func (m *Module) Xf32_incorrect_correction_v7bjte() float32 {
 	return float32(float32(float32(float32(1.333)+float32(1.225))-float32(1.333)) - float32(1.225))
 }
-func (m *Module) Xf64_incorrect_correction() float64 {
+func (m *Module) Xf64_incorrect_correction_7diz5e() float64 {
 	return float64(float64(float64(float64(1.333)+float64(1.225))-float64(1.333)) - float64(1.225))
 }

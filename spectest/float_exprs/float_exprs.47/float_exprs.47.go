@@ -14,56 +14,56 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_lt_select_to_abs(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_lt_select_to_abs_1mpqddd(v0 float32) float32 {
 	p0 := v0
 	if v0 < f32_const(0) {
 		p0 = -v0
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_le_select_to_abs(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_le_select_to_abs_1lvggsm(v0 float32) float32 {
 	p0 := v0
 	if v0 <= math.Float32frombits(0x80000000) {
 		p0 = -v0
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_gt_select_to_abs(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_gt_select_to_abs_ke8u79(v0 float32) float32 {
 	p0 := -v0
 	if v0 > math.Float32frombits(0x80000000) {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_ge_select_to_abs(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_ge_select_to_abs_kojqaa(v0 float32) float32 {
 	p0 := -v0
 	if v0 >= f32_const(0) {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_lt_select_to_abs(v0 float64) float64 {
+func (m *Module) Xf64_no_fold_lt_select_to_abs_84wwqq(v0 float64) float64 {
 	p0 := v0
 	if v0 < f64_const(0) {
 		p0 = -v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_le_select_to_abs(v0 float64) float64 {
+func (m *Module) Xf64_no_fold_le_select_to_abs_8f7pbp(v0 float64) float64 {
 	p0 := v0
 	if v0 <= math.Float64frombits(0x8000000000000000) {
 		p0 = -v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_gt_select_to_abs(v0 float64) float64 {
+func (m *Module) Xf64_no_fold_gt_select_to_abs_11jj9jq(v0 float64) float64 {
 	p0 := -v0
 	if v0 > math.Float64frombits(0x8000000000000000) {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_ge_select_to_abs(v0 float64) float64 {
+func (m *Module) Xf64_no_fold_ge_select_to_abs_10p93xd(v0 float64) float64 {
 	p0 := -v0
 	if v0 >= f64_const(0) {
 		p0 = v0

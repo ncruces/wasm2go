@@ -11,19 +11,19 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xno_dce_i32_div_s(v0 int32, v1 int32) {
+func (m *Module) Xno_dce_i32_div_s_wxpxw0(v0 int32, v1 int32) {
 	t0 := i32_div_s(v0, v1)
 	_ = t0
 }
-func (m *Module) Xno_dce_i32_div_u(v0 int32, v1 int32) {
+func (m *Module) Xno_dce_i32_div_u_m7xjco(v0 int32, v1 int32) {
 	t0 := int32(uint32(v0) / uint32(v1))
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_div_s(v0 int64, v1 int64) {
+func (m *Module) Xno_dce_i64_div_s_ttbaor(v0 int64, v1 int64) {
 	t0 := i64_div_s(v0, v1)
 	_ = t0
 }
-func (m *Module) Xno_dce_i64_div_u(v0 int64, v1 int64) {
+func (m *Module) Xno_dce_i64_div_u_llc1mb(v0 int64, v1 int64) {
 	t0 := int64(uint64(v0) / uint64(v1))
 	_ = t0
 }

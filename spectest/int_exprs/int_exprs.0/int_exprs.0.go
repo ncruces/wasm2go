@@ -9,28 +9,28 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xi32_no_fold_cmp_s_offset(v0 int32, v1 int32) int32 {
+func (m *Module) Xi32_no_fold_cmp_s_offset_1r36os4(v0 int32, v1 int32) int32 {
 	var p0 int32
 	if v0+int32(1) < v1+int32(1) {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xi32_no_fold_cmp_u_offset(v0 int32, v1 int32) int32 {
+func (m *Module) Xi32_no_fold_cmp_u_offset_m7b7iv(v0 int32, v1 int32) int32 {
 	var p0 int32
 	if uint32(v0+int32(1)) < uint32(v1+int32(1)) {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xi64_no_fold_cmp_s_offset(v0 int64, v1 int64) int32 {
+func (m *Module) Xi64_no_fold_cmp_s_offset_125gn84(v0 int64, v1 int64) int32 {
 	var p0 int32
 	if v0+int64(1) < v1+int64(1) {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xi64_no_fold_cmp_u_offset(v0 int64, v1 int64) int32 {
+func (m *Module) Xi64_no_fold_cmp_u_offset_gcadh3(v0 int64, v1 int64) int32 {
 	var p0 int32
 	if uint64(v0+int64(1)) < uint64(v1+int64(1)) {
 		p0 = 1

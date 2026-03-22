@@ -9,39 +9,39 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xtype_local_i32() int32 {
+func (m *Module) Xtype_local_i32_cmmy8t() int32 {
 	var v0 int32
 	_ = v0
 	return v0
 }
-func (m *Module) Xtype_local_i64() int64 {
+func (m *Module) Xtype_local_i64_nvg71a() int64 {
 	var v0 int64
 	_ = v0
 	return v0
 }
-func (m *Module) Xtype_local_f32() float32 {
+func (m *Module) Xtype_local_f32_qy93zl() float32 {
 	var v0 float32
 	_ = v0
 	return v0
 }
-func (m *Module) Xtype_local_f64() float64 {
+func (m *Module) Xtype_local_f64_7eeh4i() float64 {
 	var v0 float64
 	_ = v0
 	return v0
 }
-func (m *Module) Xtype_param_i32(v0 int32) int32 {
+func (m *Module) Xtype_param_i32_vcyvx(v0 int32) int32 {
 	return v0
 }
-func (m *Module) Xtype_param_i64(v0 int64) int64 {
+func (m *Module) Xtype_param_i64_xhaz1a(v0 int64) int64 {
 	return v0
 }
-func (m *Module) Xtype_param_f32(v0 float32) float32 {
+func (m *Module) Xtype_param_f32_m27rch(v0 float32) float32 {
 	return v0
 }
-func (m *Module) Xtype_param_f64(v0 float64) float64 {
+func (m *Module) Xtype_param_f64_efvqeq(v0 float64) float64 {
 	return v0
 }
-func (m *Module) Xtype_mixed(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) {
+func (m *Module) Xtype_mixed_1gr773l(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) {
 	var v5 float32
 	var v6, v7 int64
 	var v8 float64
@@ -86,7 +86,7 @@ func (m *Module) Xread(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) flo
 	v8 = float64(8)
 	return float64(float64(uint64(v0)) + float64(float64(v1)+float64(v2+float64(float64(uint32(v3))+float64(float64(v4)+float64(float64(v5)+float64(float64(uint64(v6))+float64(float64(uint64(v7))+v8))))))))
 }
-func (m *Module) Xas_block_value(v0 int32) int32 {
+func (m *Module) Xas_block_value_pg8qbp(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -95,7 +95,7 @@ func (m *Module) Xas_block_value(v0 int32) int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_value(v0 int32) int32 {
+func (m *Module) Xas_loop_value_amjtft(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -104,7 +104,7 @@ func (m *Module) Xas_loop_value(v0 int32) int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_br_value(v0 int32) int32 {
+func (m *Module) Xas_br_value_1sx9dl7(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -115,7 +115,7 @@ func (m *Module) Xas_br_value(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_value(v0 int32) int32 {
+func (m *Module) Xas_br_if_value_1tlgvkk(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -129,7 +129,7 @@ func (m *Module) Xas_br_if_value(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
+func (m *Module) Xas_br_if_value_cond_pzz0yu(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -143,7 +143,7 @@ func (m *Module) Xas_br_if_value_cond(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_value(v0 int32) int32 {
+func (m *Module) Xas_br_table_value_1ic2jxx(v0 int32) int32 {
 	{
 		{
 			{
@@ -165,10 +165,10 @@ func (m *Module) Xas_br_table_value(v0 int32) int32 {
 l2:
 	return int32(3)
 }
-func (m *Module) Xas_return_value(v0 int32) int32 {
+func (m *Module) Xas_return_value_1wph1uy(v0 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_if_then(v0 int32) int32 {
+func (m *Module) Xas_if_then_8by7gv(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	if v0 != 0 {
@@ -179,7 +179,7 @@ func (m *Module) Xas_if_then(v0 int32) int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_else(v0 int32) int32 {
+func (m *Module) Xas_if_else_y9fza0(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	if v0 != 0 {

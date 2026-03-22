@@ -9,16 +9,16 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xi32_no_fold_shr_s_shl(v0 int32) int32 {
+func (m *Module) Xi32_no_fold_shr_s_shl_1qs00d9(v0 int32) int32 {
 	return i32_shl(i32_shr_s(v0, int32(1)), int32(1))
 }
-func (m *Module) Xi32_no_fold_shr_u_shl(v0 int32) int32 {
+func (m *Module) Xi32_no_fold_shr_u_shl_vo7dit(v0 int32) int32 {
 	return i32_shl(i32_shr_u(v0, int32(1)), int32(1))
 }
-func (m *Module) Xi64_no_fold_shr_s_shl(v0 int64) int64 {
+func (m *Module) Xi64_no_fold_shr_s_shl_144pihh(v0 int64) int64 {
 	return i64_shl(i64_shr_s(v0, int64(1)), int64(1))
 }
-func (m *Module) Xi64_no_fold_shr_u_shl(v0 int64) int64 {
+func (m *Module) Xi64_no_fold_shr_u_shl_7oym5(v0 int64) int64 {
 	return i64_shl(i64_shr_u(v0, int64(1)), int64(1))
 }
 

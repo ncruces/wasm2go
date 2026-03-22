@@ -26,7 +26,7 @@ type XMm = interface {
 	Xload(v0 int32) int32
 }
 
-func (m *Module) XMm_load(v0 int32) int32 {
+func (m *Module) XMm_load_5sbr74(v0 int32) int32 {
 	return m._Mm.Xload(v0)
 }
 func (m *Module) Xload(v0 int32) int32 {

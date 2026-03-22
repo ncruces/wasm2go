@@ -22,7 +22,7 @@ func New() *Module {
 }
 func (m *Module) f0() {
 }
-func (m *Module) Xtype_i32() {
+func (m *Module) Xtype_i32_1rrgb77() {
 	{
 		switch i32_const(0) {
 		default:
@@ -31,7 +31,7 @@ func (m *Module) Xtype_i32() {
 	}
 l0:
 }
-func (m *Module) Xtype_i64() {
+func (m *Module) Xtype_i64_17wwo34() {
 	{
 		switch i32_const(0) {
 		default:
@@ -40,7 +40,7 @@ func (m *Module) Xtype_i64() {
 	}
 l0:
 }
-func (m *Module) Xtype_f32() {
+func (m *Module) Xtype_f32_1b0c0f3() {
 	{
 		switch i32_const(0) {
 		default:
@@ -49,7 +49,7 @@ func (m *Module) Xtype_f32() {
 	}
 l0:
 }
-func (m *Module) Xtype_f64() {
+func (m *Module) Xtype_f64_1milen0() {
 	{
 		switch i32_const(0) {
 		default:
@@ -58,7 +58,7 @@ func (m *Module) Xtype_f64() {
 	}
 l0:
 }
-func (m *Module) Xtype_i32_value() int32 {
+func (m *Module) Xtype_i32_value_17cbvya() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -71,7 +71,7 @@ func (m *Module) Xtype_i32_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xtype_i64_value() int64 {
+func (m *Module) Xtype_i64_value_1020uq1() int64 {
 	var p0 int64
 	_ = p0
 	{
@@ -84,7 +84,7 @@ func (m *Module) Xtype_i64_value() int64 {
 l0:
 	return p0
 }
-func (m *Module) Xtype_f32_value() float32 {
+func (m *Module) Xtype_f32_value_1r0y6mn() float32 {
 	var p0 float32
 	_ = p0
 	{
@@ -97,7 +97,7 @@ func (m *Module) Xtype_f32_value() float32 {
 l0:
 	return p0
 }
-func (m *Module) Xtype_f64_value() float64 {
+func (m *Module) Xtype_f64_value_1ypy29w() float64 {
 	var p0 float64
 	_ = p0
 	{
@@ -120,7 +120,7 @@ func (m *Module) Xempty(v0 int32) int32 {
 l0:
 	return int32(22)
 }
-func (m *Module) Xempty_value(v0 int32) int32 {
+func (m *Module) Xempty_value_edjn4x(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -149,7 +149,7 @@ func (m *Module) Xsingleton(v0 int32) int32 {
 l0:
 	return int32(22)
 }
-func (m *Module) Xsingleton_value(v0 int32) int32 {
+func (m *Module) Xsingleton_value_16xah3h(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -206,7 +206,7 @@ func (m *Module) Xmultiple(v0 int32) int32 {
 l4:
 	return int32(104)
 }
-func (m *Module) Xmultiple_value(v0 int32) int32 {
+func (m *Module) Xmultiple_value_5fseu4(v0 int32) int32 {
 	var v1 int32
 	_ = v1
 	var p0 int32
@@ -278,7 +278,7 @@ func (m *Module) Xlarge(v0 int32) int32 {
 l1:
 	return int32(1)
 }
-func (m *Module) Xas_block_first() {
+func (m *Module) Xas_block_first_dfe99y() {
 	{
 		switch i32_const(0) {
 		default:
@@ -287,17 +287,7 @@ func (m *Module) Xas_block_first() {
 	}
 l0:
 }
-func (m *Module) Xas_block_mid() {
-	{
-		m.f0()
-		switch i32_const(0) {
-		default:
-			goto l0
-		}
-	}
-l0:
-}
-func (m *Module) Xas_block_last() {
+func (m *Module) Xas_block_mid_x96mur() {
 	{
 		m.f0()
 		switch i32_const(0) {
@@ -307,7 +297,17 @@ func (m *Module) Xas_block_last() {
 	}
 l0:
 }
-func (m *Module) Xas_block_value() int32 {
+func (m *Module) Xas_block_last_sl4im1() {
+	{
+		m.f0()
+		switch i32_const(0) {
+		default:
+			goto l0
+		}
+	}
+l0:
+}
+func (m *Module) Xas_block_value_pg8qbp() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -321,7 +321,7 @@ func (m *Module) Xas_block_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_loop_first() int32 {
+func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -331,7 +331,7 @@ func (m *Module) Xas_loop_first() int32 {
 		}
 	}
 }
-func (m *Module) Xas_loop_mid() int32 {
+func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -342,7 +342,7 @@ func (m *Module) Xas_loop_mid() int32 {
 		}
 	}
 }
-func (m *Module) Xas_loop_last() int32 {
+func (m *Module) Xas_loop_last_dr7k79() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -353,7 +353,7 @@ func (m *Module) Xas_loop_last() int32 {
 		}
 	}
 }
-func (m *Module) Xas_br_value() int32 {
+func (m *Module) Xas_br_value_1sx9dl7() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -366,7 +366,7 @@ func (m *Module) Xas_br_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_cond() {
+func (m *Module) Xas_br_if_cond_p6cjb3() {
 	{
 		switch int32(1) {
 		default:
@@ -375,7 +375,7 @@ func (m *Module) Xas_br_if_cond() {
 	}
 l0:
 }
-func (m *Module) Xas_br_if_value() int32 {
+func (m *Module) Xas_br_if_value_1tlgvkk() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -388,7 +388,7 @@ func (m *Module) Xas_br_if_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_value_cond() int32 {
+func (m *Module) Xas_br_if_value_cond_pzz0yu() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -401,7 +401,7 @@ func (m *Module) Xas_br_if_value_cond() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_index() {
+func (m *Module) Xas_br_table_index_sdkzon() {
 	{
 		switch int32(1) {
 		default:
@@ -410,7 +410,7 @@ func (m *Module) Xas_br_table_index() {
 	}
 l0:
 }
-func (m *Module) Xas_br_table_value() int32 {
+func (m *Module) Xas_br_table_value_1ic2jxx() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -423,7 +423,7 @@ func (m *Module) Xas_br_table_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_value_index() int32 {
+func (m *Module) Xas_br_table_value_index_fupi8r() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -436,7 +436,7 @@ func (m *Module) Xas_br_table_value_index() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_return_value() int64 {
+func (m *Module) Xas_return_value_1wph1uy() int64 {
 	var p0 int64
 	_ = p0
 	{
@@ -449,7 +449,7 @@ func (m *Module) Xas_return_value() int64 {
 l0:
 	return p0
 }
-func (m *Module) Xas_if_cond() int32 {
+func (m *Module) Xas_if_cond_ok3ah4() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -462,7 +462,7 @@ func (m *Module) Xas_if_cond() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_if_then_8by7gv(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -483,7 +483,7 @@ func (m *Module) Xas_if_then(v0 int32, v1 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_if_else_y9fza0(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -508,7 +508,7 @@ func (m *Module) Xas_if_else(v0 int32, v1 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_select_first_1p4pbiq(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -521,7 +521,7 @@ func (m *Module) Xas_select_first(v0 int32, v1 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_select_second(v0 int32, v1 int32) int32 {
+func (m *Module) Xas_select_second_og5yck(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -535,7 +535,7 @@ func (m *Module) Xas_select_second(v0 int32, v1 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_select_cond() int32 {
+func (m *Module) Xas_select_cond_1gi9cp1() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -551,7 +551,7 @@ l0:
 func (m *Module) f37(v0 int32, v1 int32, v2 int32) int32 {
 	return i32_const(-1)
 }
-func (m *Module) Xas_call_first() int32 {
+func (m *Module) Xas_call_first_oczht1() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -564,7 +564,7 @@ func (m *Module) Xas_call_first() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_call_mid() int32 {
+func (m *Module) Xas_call_mid_1hypaa8() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -577,7 +577,7 @@ func (m *Module) Xas_call_mid() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_call_last() int32 {
+func (m *Module) Xas_call_last_5v6w73() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -590,7 +590,7 @@ func (m *Module) Xas_call_last() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_call_indirect_first() int32 {
+func (m *Module) Xas_call_indirect_first_1kls7bs() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -603,7 +603,7 @@ func (m *Module) Xas_call_indirect_first() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_call_indirect_mid() int32 {
+func (m *Module) Xas_call_indirect_mid_1u5vulp() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -616,7 +616,7 @@ func (m *Module) Xas_call_indirect_mid() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_call_indirect_last() int32 {
+func (m *Module) Xas_call_indirect_last_os2e8m() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -629,7 +629,7 @@ func (m *Module) Xas_call_indirect_last() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_call_indirect_func() int32 {
+func (m *Module) Xas_call_indirect_func_1ismjqv() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -642,7 +642,7 @@ func (m *Module) Xas_call_indirect_func() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_local_set_value() int32 {
+func (m *Module) Xas_local_set_value_1e0q6mz() int32 {
 	var v0 float32
 	_ = v0
 	var p0 int32
@@ -657,7 +657,7 @@ func (m *Module) Xas_local_set_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_local_tee_value() int32 {
+func (m *Module) Xas_local_tee_value_11lf5v3() int32 {
 	var v0 int32
 	_ = v0
 	var p0 int32
@@ -672,7 +672,7 @@ func (m *Module) Xas_local_tee_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_global_set_value() int32 {
+func (m *Module) Xas_global_set_value_p447yq() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -685,7 +685,7 @@ func (m *Module) Xas_global_set_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_load_address() float32 {
+func (m *Module) Xas_load_address_1s1elxs() float32 {
 	var p0 float32
 	_ = p0
 	{
@@ -698,7 +698,7 @@ func (m *Module) Xas_load_address() float32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_loadN_address() int64 {
+func (m *Module) Xas_loadN_address_xz9je7() int64 {
 	var p0 int64
 	_ = p0
 	{
@@ -711,7 +711,7 @@ func (m *Module) Xas_loadN_address() int64 {
 l0:
 	return p0
 }
-func (m *Module) Xas_store_address() int32 {
+func (m *Module) Xas_store_address_374rd1() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -724,7 +724,7 @@ func (m *Module) Xas_store_address() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_store_value() int32 {
+func (m *Module) Xas_store_value_1bx4mta() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -737,7 +737,7 @@ func (m *Module) Xas_store_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_storeN_address() int32 {
+func (m *Module) Xas_storeN_address_qez1rh() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -750,7 +750,7 @@ func (m *Module) Xas_storeN_address() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_storeN_value() int32 {
+func (m *Module) Xas_storeN_value_7lcb3d() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -763,7 +763,7 @@ func (m *Module) Xas_storeN_value() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_unary_operand() float32 {
+func (m *Module) Xas_unary_operand_kr3bi8() float32 {
 	var p0 float32
 	_ = p0
 	{
@@ -776,7 +776,7 @@ func (m *Module) Xas_unary_operand() float32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_binary_left() int32 {
+func (m *Module) Xas_binary_left_mz7no() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -789,7 +789,7 @@ func (m *Module) Xas_binary_left() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_binary_right() int64 {
+func (m *Module) Xas_binary_right_1h2yoyv() int64 {
 	var p0 int64
 	_ = p0
 	{
@@ -802,7 +802,7 @@ func (m *Module) Xas_binary_right() int64 {
 l0:
 	return p0
 }
-func (m *Module) Xas_test_operand() int32 {
+func (m *Module) Xas_test_operand_khoiq6() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -815,7 +815,7 @@ func (m *Module) Xas_test_operand() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_compare_left() int32 {
+func (m *Module) Xas_compare_left_afzngt() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -828,7 +828,7 @@ func (m *Module) Xas_compare_left() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_compare_right() int32 {
+func (m *Module) Xas_compare_right_1jgames() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -841,7 +841,7 @@ func (m *Module) Xas_compare_right() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_convert_operand() int32 {
+func (m *Module) Xas_convert_operand_127wpsd() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -854,7 +854,7 @@ func (m *Module) Xas_convert_operand() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_memory_grow_size() int32 {
+func (m *Module) Xas_memory_grow_size_7te2ha() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -867,7 +867,7 @@ func (m *Module) Xas_memory_grow_size() int32 {
 l0:
 	return p0
 }
-func (m *Module) Xnested_block_value(v0 int32) int32 {
+func (m *Module) Xnested_block_value_1mb979j(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -902,7 +902,7 @@ func (m *Module) Xnested_block_value(v0 int32) int32 {
 l2:
 	return p0
 }
-func (m *Module) Xnested_br_value(v0 int32) int32 {
+func (m *Module) Xnested_br_value_1dhs4ly(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -937,7 +937,7 @@ func (m *Module) Xnested_br_value(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xnested_br_if_value(v0 int32) int32 {
+func (m *Module) Xnested_br_if_value_samgly(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -972,7 +972,7 @@ func (m *Module) Xnested_br_if_value(v0 int32) int32 {
 l2:
 	return p0
 }
-func (m *Module) Xnested_br_if_value_cond(v0 int32) int32 {
+func (m *Module) Xnested_br_if_value_cond_1ihcle8(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -996,7 +996,7 @@ func (m *Module) Xnested_br_if_value_cond(v0 int32) int32 {
 l1:
 	return p0
 }
-func (m *Module) Xnested_br_table_value(v0 int32) int32 {
+func (m *Module) Xnested_br_table_value_6t9639(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -1031,7 +1031,7 @@ func (m *Module) Xnested_br_table_value(v0 int32) int32 {
 l2:
 	return p0
 }
-func (m *Module) Xnested_br_table_value_index(v0 int32) int32 {
+func (m *Module) Xnested_br_table_value_index_1y77qa9(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -1055,7 +1055,7 @@ func (m *Module) Xnested_br_table_value_index(v0 int32) int32 {
 l1:
 	return p0
 }
-func (m *Module) Xnested_br_table_loop_block(v0 int32) int32 {
+func (m *Module) Xnested_br_table_loop_block_cyh8kh(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 l0:

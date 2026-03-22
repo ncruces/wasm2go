@@ -9,9 +9,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_neg_add(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_neg_add_1m5fg6p(v0 float32, v1 float32) float32 {
 	return -float32(v0 + v1)
 }
-func (m *Module) Xf64_no_fold_neg_add(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_neg_add_asxngl(v0 float64, v1 float64) float64 {
 	return -float64(v0 + v1)
 }

@@ -30,66 +30,66 @@ func (m *Module) f0() {
 func (m *Module) f1(v0 int32, v1 int32, v2 int32) int32 {
 	return v0 + (v1 - v2)
 }
-func (m *Module) Xas_func_first() int32 {
+func (m *Module) Xas_func_first_1n8qpq7() int32 {
 	return int32(1)
 }
-func (m *Module) Xas_func_mid() int32 {
+func (m *Module) Xas_func_mid_aecmm3() int32 {
 	m.f0()
 	return int32(2)
 }
-func (m *Module) Xas_func_last() int32 {
+func (m *Module) Xas_func_last_1bzq4u7() int32 {
 	m.f0()
 	return int32(3)
 }
-func (m *Module) Xas_func_everywhere() int32 {
+func (m *Module) Xas_func_everywhere_7abu0z() int32 {
 	m.f0()
 	return int32(4)
 }
-func (m *Module) Xas_drop_first(v0 int32) {
+func (m *Module) Xas_drop_first_1tovu13(v0 int32) {
 	_ = v0
 }
-func (m *Module) Xas_drop_last(v0 int32) {
+func (m *Module) Xas_drop_last_az1sja(v0 int32) {
 	_ = v0
 }
-func (m *Module) Xas_drop_everywhere(v0 int32) {
+func (m *Module) Xas_drop_everywhere_1w12v8(v0 int32) {
 	_ = v0
 }
-func (m *Module) Xas_select_first(v0 int32) int32 {
+func (m *Module) Xas_select_first_1p4pbiq(v0 int32) int32 {
 	p0 := v0
 	if v0 != 0 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xas_select_mid1(v0 int32) int32 {
+func (m *Module) Xas_select_mid1_ziwl27(v0 int32) int32 {
 	p0 := v0
 	if v0 != 0 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xas_select_mid2(v0 int32) int32 {
+func (m *Module) Xas_select_mid2_14vrxwr(v0 int32) int32 {
 	p0 := v0
 	if v0 != 0 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xas_select_last(v0 int32) int32 {
+func (m *Module) Xas_select_last_ndhg92(v0 int32) int32 {
 	p0 := v0
 	if v0 != 0 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xas_select_everywhere(v0 int32) int32 {
+func (m *Module) Xas_select_everywhere_13ehyla(v0 int32) int32 {
 	p0 := v0
 	if v0 != 0 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xas_block_first() int32 {
+func (m *Module) Xas_block_first_dfe99y() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -97,7 +97,7 @@ func (m *Module) Xas_block_first() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_block_mid() int32 {
+func (m *Module) Xas_block_mid_x96mur() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -106,7 +106,7 @@ func (m *Module) Xas_block_mid() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_block_last() int32 {
+func (m *Module) Xas_block_last_sl4im1() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -115,7 +115,7 @@ func (m *Module) Xas_block_last() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_block_everywhere() int32 {
+func (m *Module) Xas_block_everywhere_190t9dd() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -124,7 +124,7 @@ func (m *Module) Xas_block_everywhere() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_first() int32 {
+func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -132,7 +132,7 @@ func (m *Module) Xas_loop_first() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_mid() int32 {
+func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -141,7 +141,7 @@ func (m *Module) Xas_loop_mid() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_last() int32 {
+func (m *Module) Xas_loop_last_dr7k79() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -150,7 +150,7 @@ func (m *Module) Xas_loop_last() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_loop_everywhere() int32 {
+func (m *Module) Xas_loop_everywhere_1kskoaf() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -159,24 +159,24 @@ func (m *Module) Xas_loop_everywhere() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_if_condition(v0 int32) {
+func (m *Module) Xas_if_condition_mme5rn(v0 int32) {
 	if v0 != 0 {
 		m.f0()
 	}
 }
-func (m *Module) Xas_if_then(v0 int32) {
+func (m *Module) Xas_if_then_8by7gv(v0 int32) {
 	if v0 != 0 {
 	} else {
 		m.f0()
 	}
 }
-func (m *Module) Xas_if_else(v0 int32) {
+func (m *Module) Xas_if_else_y9fza0(v0 int32) {
 	if v0 != 0 {
 		m.f0()
 	} else {
 	}
 }
-func (m *Module) Xas_br_first(v0 int32) int32 {
+func (m *Module) Xas_br_first_103xhyw(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -187,7 +187,7 @@ func (m *Module) Xas_br_first(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_last(v0 int32) int32 {
+func (m *Module) Xas_br_last_esk22x(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -198,7 +198,7 @@ func (m *Module) Xas_br_last(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_everywhere(v0 int32) int32 {
+func (m *Module) Xas_br_everywhere_17uq9aa(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -209,7 +209,7 @@ func (m *Module) Xas_br_everywhere(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_first(v0 int32) int32 {
+func (m *Module) Xas_br_if_first_11nmxnr(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -223,7 +223,7 @@ func (m *Module) Xas_br_if_first(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_mid(v0 int32) int32 {
+func (m *Module) Xas_br_if_mid_1gwldg(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -237,7 +237,7 @@ func (m *Module) Xas_br_if_mid(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_last(v0 int32) int32 {
+func (m *Module) Xas_br_if_last_1dvgji4(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -251,7 +251,7 @@ func (m *Module) Xas_br_if_last(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_if_everywhere(v0 int32) int32 {
+func (m *Module) Xas_br_if_everywhere_1l7w7ba(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -265,7 +265,7 @@ func (m *Module) Xas_br_if_everywhere(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_first(v0 int32) int32 {
+func (m *Module) Xas_br_table_first_1ammix2(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -279,7 +279,7 @@ func (m *Module) Xas_br_table_first(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_mid(v0 int32) int32 {
+func (m *Module) Xas_br_table_mid_1925xx1(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -293,7 +293,7 @@ func (m *Module) Xas_br_table_mid(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_last(v0 int32) int32 {
+func (m *Module) Xas_br_table_last_10cg6o3(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -307,7 +307,7 @@ func (m *Module) Xas_br_table_last(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_br_table_everywhere(v0 int32) int32 {
+func (m *Module) Xas_br_table_everywhere_12aupi6(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -321,121 +321,121 @@ func (m *Module) Xas_br_table_everywhere(v0 int32) int32 {
 l0:
 	return p0
 }
-func (m *Module) Xas_return_first(v0 int32) int32 {
+func (m *Module) Xas_return_first_17f6s2h(v0 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_return_last(v0 int32) int32 {
+func (m *Module) Xas_return_last_1k64hj(v0 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_return_everywhere(v0 int32) int32 {
+func (m *Module) Xas_return_everywhere_5dsg2l(v0 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_call_first(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) Xas_call_first_oczht1(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := m.f1(v0, v1, v2)
 	return t0
 }
-func (m *Module) Xas_call_mid1(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) Xas_call_mid1_1hkj9eu(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := m.f1(v0, v1, v2)
 	return t0
 }
-func (m *Module) Xas_call_mid2(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) Xas_call_mid2_1mc8kgi(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := m.f1(v0, v1, v2)
 	return t0
 }
-func (m *Module) Xas_call_last(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) Xas_call_last_5v6w73(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := m.f1(v0, v1, v2)
 	return t0
 }
-func (m *Module) Xas_call_everywhere(v0 int32, v1 int32, v2 int32) int32 {
+func (m *Module) Xas_call_everywhere_169et9c(v0 int32, v1 int32, v2 int32) int32 {
 	t0 := m.f1(v0, v1, v2)
 	return t0
 }
-func (m *Module) Xas_unary_first(v0 int32) int32 {
+func (m *Module) Xas_unary_first_8l0ivk(v0 int32) int32 {
 	return int32(bits.TrailingZeros32(uint32(v0)))
 }
-func (m *Module) Xas_unary_last(v0 int32) int32 {
+func (m *Module) Xas_unary_last_rflayf(v0 int32) int32 {
 	return int32(bits.TrailingZeros32(uint32(v0)))
 }
-func (m *Module) Xas_unary_everywhere(v0 int32) int32 {
+func (m *Module) Xas_unary_everywhere_1czvhme(v0 int32) int32 {
 	return int32(bits.TrailingZeros32(uint32(v0)))
 }
-func (m *Module) Xas_binary_first(v0 int32) int32 {
+func (m *Module) Xas_binary_first_3n95fu(v0 int32) int32 {
 	return v0 + v0
 }
-func (m *Module) Xas_binary_mid(v0 int32) int32 {
+func (m *Module) Xas_binary_mid_11ah4qg(v0 int32) int32 {
 	return v0 + v0
 }
-func (m *Module) Xas_binary_last(v0 int32) int32 {
+func (m *Module) Xas_binary_last_1ym3oac(v0 int32) int32 {
 	return v0 + v0
 }
-func (m *Module) Xas_binary_everywhere(v0 int32) int32 {
+func (m *Module) Xas_binary_everywhere_18xbdqc(v0 int32) int32 {
 	return v0 + v0
 }
-func (m *Module) Xas_test_first(v0 int32) int32 {
+func (m *Module) Xas_test_first_14f7ufg(v0 int32) int32 {
 	var p0 int32
 	if v0 == 0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xas_test_last(v0 int32) int32 {
+func (m *Module) Xas_test_last_1svbqtm(v0 int32) int32 {
 	var p0 int32
 	if v0 == 0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xas_test_everywhere(v0 int32) int32 {
+func (m *Module) Xas_test_everywhere_8qi1je(v0 int32) int32 {
 	var p0 int32
 	if v0 == 0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xas_compare_first(v0 int32) int32 {
+func (m *Module) Xas_compare_first_wntbdl(v0 int32) int32 {
 	var p0 int32
 	if v0 != v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xas_compare_mid(v0 int32) int32 {
+func (m *Module) Xas_compare_mid_1k8oxjj(v0 int32) int32 {
 	var p0 int32
 	if v0 != v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xas_compare_last(v0 int32) int32 {
+func (m *Module) Xas_compare_last_1odgt6l(v0 int32) int32 {
 	var p0 int32
 	if uint32(v0) < uint32(v0) {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xas_compare_everywhere(v0 int32) int32 {
+func (m *Module) Xas_compare_everywhere_1o5o9z2(v0 int32) int32 {
 	var p0 int32
 	if v0 <= v0 {
 		p0 = 1
 	}
 	return p0
 }
-func (m *Module) Xas_memory_grow_first(v0 int32) int32 {
+func (m *Module) Xas_memory_grow_first_veu7a8(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }
-func (m *Module) Xas_memory_grow_last(v0 int32) int32 {
+func (m *Module) Xas_memory_grow_last_lvmhrt(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }
-func (m *Module) Xas_memory_grow_everywhere(v0 int32) int32 {
+func (m *Module) Xas_memory_grow_everywhere_dxwksm(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }
 func (m *Module) f61(v0 int32, v1 int32) int32 {
 	return v0
 }
-func (m *Module) Xas_call_indirect_first() int32 {
+func (m *Module) Xas_call_indirect_first_1kls7bs() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -444,7 +444,7 @@ func (m *Module) Xas_call_indirect_first() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_mid1() int32 {
+func (m *Module) Xas_call_indirect_mid1_1393fdb() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -453,7 +453,7 @@ func (m *Module) Xas_call_indirect_mid1() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_mid2() int32 {
+func (m *Module) Xas_call_indirect_mid2_17vtapn() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -462,7 +462,7 @@ func (m *Module) Xas_call_indirect_mid2() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_last() int32 {
+func (m *Module) Xas_call_indirect_last_os2e8m() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -471,7 +471,7 @@ func (m *Module) Xas_call_indirect_last() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_call_indirect_everywhere() int32 {
+func (m *Module) Xas_call_indirect_everywhere_icu59l() int32 {
 	var p0 int32
 	_ = p0
 	{
@@ -480,67 +480,67 @@ func (m *Module) Xas_call_indirect_everywhere() int32 {
 	}
 	return p0
 }
-func (m *Module) Xas_local_set_first(v0 int32) int32 {
+func (m *Module) Xas_local_set_first_1q1f1go(v0 int32) int32 {
 	v0 = int32(2)
 	return v0
 }
-func (m *Module) Xas_local_set_last(v0 int32) int32 {
+func (m *Module) Xas_local_set_last_14yd9qt(v0 int32) int32 {
 	v0 = int32(2)
 	return v0
 }
-func (m *Module) Xas_local_set_everywhere(v0 int32) int32 {
+func (m *Module) Xas_local_set_everywhere_185epkl(v0 int32) int32 {
 	v0 = int32(2)
 	return v0
 }
-func (m *Module) Xas_local_tee_first(v0 int32) int32 {
+func (m *Module) Xas_local_tee_first_1tnl1lo(v0 int32) int32 {
 	v0 = int32(2)
 	return v0
 }
-func (m *Module) Xas_local_tee_last(v0 int32) int32 {
+func (m *Module) Xas_local_tee_last_jp601i(v0 int32) int32 {
 	v0 = int32(2)
 	return v0
 }
-func (m *Module) Xas_local_tee_everywhere(v0 int32) int32 {
+func (m *Module) Xas_local_tee_everywhere_8j2vat(v0 int32) int32 {
 	v0 = int32(2)
 	return v0
 }
-func (m *Module) Xas_global_set_first() int32 {
+func (m *Module) Xas_global_set_first_dp2z4x() int32 {
 	m.g0 = int32(2)
 	t0 := m.g0
 	return t0
 }
-func (m *Module) Xas_global_set_last() int32 {
+func (m *Module) Xas_global_set_last_pakzbc() int32 {
 	m.g0 = int32(2)
 	t0 := m.g0
 	return t0
 }
-func (m *Module) Xas_global_set_everywhere() int32 {
+func (m *Module) Xas_global_set_everywhere_1p2vhgt() int32 {
 	m.g0 = int32(2)
 	t0 := m.g0
 	return t0
 }
-func (m *Module) Xas_load_first(v0 int32) int32 {
+func (m *Module) Xas_load_first_11165x0(v0 int32) int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	return t0
 }
-func (m *Module) Xas_load_last(v0 int32) int32 {
+func (m *Module) Xas_load_last_xgylwe(v0 int32) int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	return t0
 }
-func (m *Module) Xas_load_everywhere(v0 int32) int32 {
+func (m *Module) Xas_load_everywhere_dtjqub(v0 int32) int32 {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	return t0
 }
-func (m *Module) Xas_store_first(v0 int32, v1 int32) {
+func (m *Module) Xas_store_first_1jby9fx(v0 int32, v1 int32) {
 	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(v1))
 }
-func (m *Module) Xas_store_mid(v0 int32, v1 int32) {
+func (m *Module) Xas_store_mid_kpdaj8(v0 int32, v1 int32) {
 	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(v1))
 }
-func (m *Module) Xas_store_last(v0 int32, v1 int32) {
+func (m *Module) Xas_store_last_4x4vf1(v0 int32, v1 int32) {
 	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(v1))
 }
-func (m *Module) Xas_store_everywhere(v0 int32, v1 int32) {
+func (m *Module) Xas_store_everywhere_2tq23u(v0 int32, v1 int32) {
 	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(v1))
 }
 

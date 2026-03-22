@@ -15,6 +15,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/ncruces/wasm2go/util"
 )
 
 //go:embed helpers/helpers.go
@@ -2180,7 +2182,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 			}
 			name := buf.String()
 			buf.Reset()
-			mangle(&buf, string(name))
+			util.Mangle(&buf, string(name))
 			t.out.Name = ast.NewIdent(buf.String())
 
 		case nameFunction, nameGlobal, nameTable:

@@ -9,9 +9,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_algebraic_factoring(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_algebraic_factoring_13ol5l5(v0 float32, v1 float32) float32 {
 	return float32(float32(v0*v0) - float32(v1*v1))
 }
-func (m *Module) Xf64_no_algebraic_factoring(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_algebraic_factoring_12f2vdj(v0 float64, v1 float64) float64 {
 	return float64(float64(v0*v0) - float64(v1*v1))
 }

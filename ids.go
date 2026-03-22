@@ -4,7 +4,8 @@ import (
 	"go/ast"
 	"strconv"
 	"strings"
-	"unicode"
+
+	"github.com/ncruces/wasm2go/util"
 )
 
 var idCache = map[string]*ast.Ident{}
@@ -21,24 +22,15 @@ func newID(name string) *ast.Ident {
 func exported(name string) string {
 	var buf strings.Builder
 	buf.WriteByte('X')
-	mangle(&buf, name)
+	util.Mangle(&buf, name)
 	return buf.String()
 }
 
 func internal(name string) string {
 	var buf strings.Builder
 	buf.WriteByte('_')
-	mangle(&buf, name)
+	util.Mangle(&buf, name)
 	return buf.String()
-}
-
-func mangle(buf *strings.Builder, name string) {
-	for _, r := range name {
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-			r = '_'
-		}
-		buf.WriteRune(r)
-	}
 }
 
 func dataID[T interface{ int | uint64 }](i T) *ast.Ident {

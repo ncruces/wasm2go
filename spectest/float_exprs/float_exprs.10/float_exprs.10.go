@@ -11,9 +11,9 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_neg0_sub(v0 float32) float32 {
+func (m *Module) Xf32_no_fold_neg0_sub_1wq6ogp(v0 float32) float32 {
 	return float32(math.Float32frombits(0x80000000) - v0)
 }
-func (m *Module) Xf64_no_fold_neg0_sub(v0 float64) float64 {
+func (m *Module) Xf64_no_fold_neg0_sub_10af8ze(v0 float64) float64 {
 	return float64(math.Float64frombits(0x8000000000000000) - v0)
 }

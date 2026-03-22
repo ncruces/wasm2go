@@ -9,56 +9,56 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_fold_lt_select(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_lt_select_ym0nvh(v0 float32, v1 float32) float32 {
 	p0 := v1
 	if v0 < v1 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_le_select(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_le_select_1ddjeq6(v0 float32, v1 float32) float32 {
 	p0 := v1
 	if v0 <= v1 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_gt_select(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_gt_select_1pfd74z(v0 float32, v1 float32) float32 {
 	p0 := v1
 	if v0 > v1 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf32_no_fold_ge_select(v0 float32, v1 float32) float32 {
+func (m *Module) Xf32_no_fold_ge_select_4heju8(v0 float32, v1 float32) float32 {
 	p0 := v1
 	if v0 >= v1 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_lt_select(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_lt_select_3zh13p(v0 float64, v1 float64) float64 {
 	p0 := v1
 	if v0 < v1 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_le_select(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_le_select_1i4psue(v0 float64, v1 float64) float64 {
 	p0 := v1
 	if v0 <= v1 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_gt_select(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_gt_select_1cp3gq3(v0 float64, v1 float64) float64 {
 	p0 := v1
 	if v0 > v1 {
 		p0 = v0
 	}
 	return p0
 }
-func (m *Module) Xf64_no_fold_ge_select(v0 float64, v1 float64) float64 {
+func (m *Module) Xf64_no_fold_ge_select_reu320(v0 float64, v1 float64) float64 {
 	p0 := v1
 	if v0 >= v1 {
 		p0 = v0

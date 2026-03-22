@@ -9,7 +9,7 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) Xf32_no_trichotomy_lt(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_no_trichotomy_lt_1h5i1ui(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 < v1 {
 		p0 = 1
@@ -20,7 +20,7 @@ func (m *Module) Xf32_no_trichotomy_lt(v0 float32, v1 float32) int32 {
 	}
 	return p0 | p1
 }
-func (m *Module) Xf32_no_trichotomy_le(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_no_trichotomy_le_pzf0dy(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 <= v1 {
 		p0 = 1
@@ -31,7 +31,7 @@ func (m *Module) Xf32_no_trichotomy_le(v0 float32, v1 float32) int32 {
 	}
 	return p0 | p1
 }
-func (m *Module) Xf32_no_trichotomy_gt(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_no_trichotomy_gt_67mz23(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 > v1 {
 		p0 = 1
@@ -42,7 +42,7 @@ func (m *Module) Xf32_no_trichotomy_gt(v0 float32, v1 float32) int32 {
 	}
 	return p0 | p1
 }
-func (m *Module) Xf32_no_trichotomy_ge(v0 float32, v1 float32) int32 {
+func (m *Module) Xf32_no_trichotomy_ge_1vsmxzr(v0 float32, v1 float32) int32 {
 	var p0 int32
 	if v0 >= v1 {
 		p0 = 1
@@ -53,7 +53,7 @@ func (m *Module) Xf32_no_trichotomy_ge(v0 float32, v1 float32) int32 {
 	}
 	return p0 | p1
 }
-func (m *Module) Xf64_no_trichotomy_lt(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_no_trichotomy_lt_1kasgjd(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 < v1 {
 		p0 = 1
@@ -64,7 +64,7 @@ func (m *Module) Xf64_no_trichotomy_lt(v0 float64, v1 float64) int32 {
 	}
 	return p0 | p1
 }
-func (m *Module) Xf64_no_trichotomy_le(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_no_trichotomy_le_bc6evp(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 <= v1 {
 		p0 = 1
@@ -75,7 +75,7 @@ func (m *Module) Xf64_no_trichotomy_le(v0 float64, v1 float64) int32 {
 	}
 	return p0 | p1
 }
-func (m *Module) Xf64_no_trichotomy_gt(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_no_trichotomy_gt_rhxrq0(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 > v1 {
 		p0 = 1
@@ -86,7 +86,7 @@ func (m *Module) Xf64_no_trichotomy_gt(v0 float64, v1 float64) int32 {
 	}
 	return p0 | p1
 }
-func (m *Module) Xf64_no_trichotomy_ge(v0 float64, v1 float64) int32 {
+func (m *Module) Xf64_no_trichotomy_ge_zuclx0(v0 float64, v1 float64) int32 {
 	var p0 int32
 	if v0 >= v1 {
 		p0 = 1
