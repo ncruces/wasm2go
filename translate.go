@@ -597,60 +597,9 @@ func (t *translator) readGlobalSection() error {
 			return err
 		}
 
-		opcode, err := t.in.ReadByte()
+		g.init, err = t.readConstExpr()
 		if err != nil {
 			return err
-		}
-
-		switch opcode {
-		case 0x23: // global.get
-			g.init, err = t.globalGet()
-			if err != nil {
-				return err
-			}
-		case 0x41: // i32.const
-			g.init, err = t.constI32()
-			if err != nil {
-				return err
-			}
-		case 0x42: // i64.const
-			g.init, err = t.constI64()
-			if err != nil {
-				return err
-			}
-		case 0x43: // f32.const
-			g.init, err = t.constF32()
-			if err != nil {
-				return err
-			}
-		case 0x44: // f64.const
-			g.init, err = t.constF64()
-			if err != nil {
-				return err
-			}
-		case 0xd0: // ref.null
-			_, err := t.in.ReadByte()
-			if err != nil {
-				return err
-			}
-			g.init = newID("nil")
-
-		case 0xd2: // ref.func
-			i, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			g.init = &ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.functions[i].decl.Name}
-		default:
-			return fmt.Errorf("unsupported global init opcode: %x", opcode)
-		}
-
-		if end, err := t.in.ReadByte(); err != nil {
-			return err
-		} else if end != 0x0b { // end
-			return fmt.Errorf("expected end of init expr, got %x", end)
 		}
 	}
 	return nil
@@ -669,47 +618,40 @@ func (t *translator) readElementSection() error {
 			return err
 		}
 
-		var readKind bool
-		switch tag {
-		case 0: // active segment for table 0
-			t.elements[i].index = 0
-		case 1: // passive segment
-			t.elements[i].passive = true
-			readKind = true
-		case 2: // active segment with table index
-			readKind = true
-			if idx, err := readLEB128(t.in); err != nil {
-				return err
-			} else {
-				t.elements[i].index = uint32(idx)
-			}
-		default:
+		if tag > 7 {
 			return fmt.Errorf("unsupported element segment tag: %d", tag)
 		}
 
-		if !t.elements[i].passive {
-			if opcode, err := t.in.ReadByte(); err != nil {
-				return err
-			} else if opcode != 0x41 && opcode != 0x42 { // i32.const, i64.const
-				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
-			}
-			offset, err := readSignedLEB128(t.in)
+		isPassive := tag&1 != 0
+		hasIndex := tag&3 == 2
+		hasType := tag&3 != 0
+		hasExpr := tag&4 != 0
+
+		t.elements[i].passive = isPassive
+
+		if hasIndex {
+			idx, err := readLEB128(t.in)
 			if err != nil {
 				return err
 			}
-			t.elements[i].offset = uint32(offset)
-			if end, err := t.in.ReadByte(); err != nil {
-				return err
-			} else if end != 0x0b {
-				return fmt.Errorf("expected end of expression, got %x", end)
-			}
+			t.elements[i].index = uint32(idx)
 		}
 
-		if readKind {
-			if kind, err := t.in.ReadByte(); err != nil {
+		if !isPassive {
+			expr, err := t.readConstExpr()
+			if err != nil {
 				return err
-			} else if kind != 0x00 {
-				return fmt.Errorf("unsupported element kind: %x", kind)
+			}
+			t.elements[i].offset = expr
+		}
+
+		if hasType {
+			typ, err := t.in.ReadByte()
+			if err != nil {
+				return err
+			}
+			if hasExpr && !wasmType(typ).ref() || !hasExpr && typ != 0x00 {
+				return fmt.Errorf("unsupported element type: %x", typ)
 			}
 		}
 
@@ -717,13 +659,23 @@ func (t *translator) readElementSection() error {
 		if err != nil {
 			return err
 		}
-		t.elements[i].init = make([]uint32, numElems)
+		t.elements[i].init = make([]ast.Expr, numElems)
 		for j := range t.elements[i].init {
-			idx, err := readLEB128(t.in)
-			if err != nil {
-				return err
+			if hasExpr {
+				expr, err := t.readConstExpr()
+				if err != nil {
+					return err
+				}
+				t.elements[i].init[j] = expr
+			} else {
+				idx, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
+				t.elements[i].init[j] = &ast.SelectorExpr{
+					X:   newID("m"),
+					Sel: t.functions[idx].decl.Name}
 			}
-			t.elements[i].init[j] = uint32(idx)
 		}
 	}
 	return nil
@@ -2060,6 +2012,75 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 	}
 }
 
+func (t *translator) readConstExpr() (ast.Expr, error) {
+	var stack stack[ast.Expr]
+
+	for {
+		opcode, err := t.in.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+
+		switch opcode {
+		case 0x41: // i32.const
+			expr, err := t.constI32()
+			if err != nil {
+				return nil, err
+			}
+			stack.append(expr)
+		case 0x42: // i64.const
+			expr, err := t.constI64()
+			if err != nil {
+				return nil, err
+			}
+			stack.append(expr)
+		case 0x43: // f32.const
+			expr, err := t.constF32()
+			if err != nil {
+				return nil, err
+			}
+			stack.append(expr)
+		case 0x44: // f64.const
+			expr, err := t.constF64()
+			if err != nil {
+				return nil, err
+			}
+			stack.append(expr)
+		case 0x23: // global.get
+			expr, err := t.globalGet()
+			if err != nil {
+				return nil, err
+			}
+			stack.append(expr)
+		case 0xd0: // ref.null
+			_, err := t.in.ReadByte()
+			if err != nil {
+				return nil, err
+			}
+			stack.append(newID("nil"))
+		case 0xd2: // ref.func
+			index, err := readLEB128(t.in)
+			if err != nil {
+				return nil, err
+			}
+			stack.append(&ast.SelectorExpr{X: newID("m"), Sel: t.functions[index].decl.Name})
+
+		case 0x6a, 0x7c: // i32.add, i64.add
+			stack.append(&ast.BinaryExpr{Y: stack.pop(), X: stack.pop(), Op: token.ADD})
+		case 0x6b, 0x7d: // i32.sub, i64.sub
+			stack.append(&ast.BinaryExpr{Y: stack.pop(), X: stack.pop(), Op: token.SUB})
+		case 0x6c, 0x7e: // i32.mul, i64.mul
+			stack.append(&ast.BinaryExpr{Y: stack.pop(), X: stack.pop(), Op: token.MUL})
+
+		case 0x0b: // end
+			return stack[0], nil
+
+		default:
+			return nil, fmt.Errorf("unsupported opcode in constant expression: %x", opcode)
+		}
+	}
+}
+
 func (t *translator) readBlockType() (typ funcType, err error) {
 	i, err := readSignedLEB128(t.in)
 	if err != nil {
@@ -2098,21 +2119,11 @@ func (t *translator) readDataSection() error {
 		}
 
 		if !t.data[i].passive {
-			if opcode, err := t.in.ReadByte(); err != nil {
-				return err
-			} else if opcode != 0x41 && opcode != 0x42 { // i32.const, i64.const
-				return fmt.Errorf("unsupported offset expression opcode: %x", opcode)
-			}
-			offset, err := readSignedLEB128(t.in)
+			expr, err := t.readConstExpr()
 			if err != nil {
 				return err
 			}
-			t.data[i].offset = uint64(offset)
-			if end, err := t.in.ReadByte(); err != nil {
-				return err
-			} else if end != 0x0b {
-				return fmt.Errorf("expected end of expression, got %x", end)
-			}
+			t.data[i].offset = expr
 		}
 
 		numElems, err := readLEB128(t.in)

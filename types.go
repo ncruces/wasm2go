@@ -135,15 +135,15 @@ type export struct {
 }
 
 type elemSegment struct {
-	init    []uint32
+	init    []ast.Expr
 	index   uint32
-	offset  uint32
+	offset  ast.Expr
 	passive bool
 }
 
 type dataSegment struct {
 	init    []byte
-	offset  uint64
+	offset  ast.Expr
 	passive bool
 }
 

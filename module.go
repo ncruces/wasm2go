@@ -190,11 +190,7 @@ func (t *translator) createNewFunc() ast.Decl {
 	if len(t.elements) > 0 {
 		elts := make([]ast.Expr, len(t.elements))
 		for i, elem := range t.elements {
-			inner := make([]ast.Expr, len(elem.init))
-			for j, idx := range elem.init {
-				inner[j] = &ast.SelectorExpr{X: newID("m"), Sel: t.functions[idx].decl.Name}
-			}
-			elts[i] = &ast.CompositeLit{Elts: inner}
+			elts[i] = &ast.CompositeLit{Elts: elem.init}
 		}
 		body.List = append(body.List, &ast.AssignStmt{
 			Tok: token.ASSIGN,
@@ -215,9 +211,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				X: &ast.CallExpr{
 					Fun: newID("copy"),
 					Args: []ast.Expr{
-						&ast.SliceExpr{
-							X:   tab,
-							Low: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(int(elem.offset))}},
+						&ast.SliceExpr{X: tab, Low: elem.offset},
 						&ast.IndexExpr{
 							X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
 							Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}}}})
@@ -234,7 +228,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Args: []ast.Expr{
 					&ast.SliceExpr{
 						X:   t.memory.selector,
-						Low: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(seg.offset, 10)}},
+						Low: convert(seg.offset, t.memory.utype())},
 					dataID(i)}}})
 	}
 	// Create and initialize owned globals.
