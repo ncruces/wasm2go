@@ -25,7 +25,8 @@ including the following features:
 - non-trapping float-to-int conversions;
 - sign-extension instructions;
 - multi-value results;
-- 64-bit address space.
+- 64-bit address space;
+- extended constant expressions.
 
 Generating human readable Go code is a non-goal:
 - Wasm names must be mangled into Go identifiers;
