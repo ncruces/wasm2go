@@ -12,28 +12,28 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_conditional_inc_1y52hme(v0 float32, v1 float32) float32 {
-	p0 := float32(v0 + f32_const(1))
-	if v1 < f32_const(0) {
+	p0 := float32(v0 + f32(1))
+	if v1 < f32(0) {
 		p0 = v0
 	}
 	return p0
 }
 func (m *Module) Xf64_no_fold_conditional_inc_10gglaj(v0 float64, v1 float64) float64 {
-	p0 := float64(v0 + f64_const(1))
-	if v1 < f64_const(0) {
+	p0 := float64(v0 + f64(1))
+	if v1 < f64(0) {
 		p0 = v0
 	}
 	return p0
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

@@ -13,7 +13,7 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
+	copy(m.memory[uint32(i32(0)):], data0)
 	return m
 }
 func (m *Module) X8u_good1(v0 int32) int32 {
@@ -136,5 +136,8 @@ func (m *Module) X32_bad(v0 int32) {
 	t0 := int32(binary.LittleEndian.Uint32(m.memory[int64(uint32(v0))+4294967295:]))
 	_ = t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
 
 const data0 = "abcdefghijklmnopqrstuvwxyz"

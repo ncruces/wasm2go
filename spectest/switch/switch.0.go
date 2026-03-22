@@ -12,7 +12,7 @@ func New() *Module {
 func (m *Module) Xstmt(v0 int32) int32 {
 	var v1 int32
 	_ = v1
-	v1 = int32(100)
+	v1 = i32(100)
 	{
 		{
 			{
@@ -52,21 +52,21 @@ func (m *Module) Xstmt(v0 int32) int32 {
 							l2:
 							}
 						l3:
-							v1 = i32_const(0) - v0
+							v1 = i32(0) - v0
 							goto l9
 						}
 					l4:
 						goto l9
 					}
 				l5:
-					v1 = int32(101)
+					v1 = i32(101)
 					goto l9
 				}
 			l6:
-				v1 = int32(101)
+				v1 = i32(101)
 			}
 		l8:
-			v1 = int32(102)
+			v1 = i32(102)
 		}
 	l7:
 	}
@@ -76,7 +76,7 @@ l9:
 func (m *Module) Xexpr(v0 int64) int64 {
 	var v1 int64
 	_ = v1
-	v1 = int64(100)
+	v1 = i64(100)
 	var p0 int64
 	_ = p0
 	{
@@ -118,12 +118,12 @@ func (m *Module) Xexpr(v0 int64) int64 {
 							l2:
 							}
 						l3:
-							t1 := i64_const(0) - v0
+							t1 := i64(0) - v0
 							p0 = t1
 							goto l9
 						}
 					l6:
-						v1 = int64(101)
+						v1 = i64(101)
 					}
 				l5:
 				}
@@ -135,7 +135,7 @@ func (m *Module) Xexpr(v0 int64) int64 {
 			goto l9
 		}
 	l7:
-		p0 = i64_const(-5)
+		p0 = i64(-5)
 	}
 l9:
 	return p0
@@ -153,8 +153,8 @@ func (m *Module) Xarg(v0 int32) int32 {
 				var p3 int32
 				_ = p3
 				{
-					t4 := int32(2) * v0
-					switch int32(3) & v0 {
+					t4 := i32(2) * v0
+					switch i32(3) & v0 {
 					case 0:
 						p2 = t4
 						goto l0
@@ -170,15 +170,15 @@ func (m *Module) Xarg(v0 int32) int32 {
 					}
 				}
 			l3:
-				t5 := i32_const(1000) + p3
+				t5 := i32(1000) + p3
 				p2 = t5
 			}
 		l0:
-			t6 := int32(100) + p2
+			t6 := i32(100) + p2
 			p1 = t6
 		}
 	l1:
-		t7 := int32(10) + p1
+		t7 := i32(10) + p1
 		p0 = t7
 	}
 l2:
@@ -186,17 +186,17 @@ l2:
 }
 func (m *Module) Xcorner() int32 {
 	{
-		switch i32_const(0) {
+		switch i32(0) {
 		default:
 			goto l0
 		}
 	}
 l0:
-	return int32(1)
+	return i32(1)
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }

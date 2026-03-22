@@ -13,7 +13,7 @@ func New(v0 XMt) *Module {
 	m._Mt = v0
 	m.t0 = make([]any, 5)
 	m.elements = [][]any{{m.f2, m.f2, m.f2, m.f1, m.XMt_call_6jzka2}}
-	copy(m.t0[0:], m.elements[0])
+	copy(m.t0[i32(0):], m.elements[0])
 	if i, ok := any(v0).(interface {
 		Init(any)
 	}); ok {
@@ -34,7 +34,7 @@ func (m *Module) f1() int32 {
 	return m._Mt.Xh()
 }
 func (m *Module) f2() int32 {
-	return int32(5)
+	return i32(5)
 }
 func (m *Module) Xcall_Mt_call_1kdm7ei(v0 int32) int32 {
 	t0 := m.XMt_call_6jzka2(v0)
@@ -44,3 +44,6 @@ func (m *Module) Xcall(v0 int32) int32 {
 	t0 := m.t0[uint(v0)].(func() int32)()
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }

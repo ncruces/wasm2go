@@ -11,16 +11,16 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 1
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
+	copy(m.memory[uint32(i32(0)):], data0)
 	m.f2()
 	return m
 }
 func (m *Module) Xinc() {
-	t0 := int32(m.memory[uint32(i32_const(0))])
-	m.memory[uint32(i32_const(0))] = byte(t0 + int32(1))
+	t0 := int32(m.memory[uint32(i32(0))])
+	m.memory[uint32(i32(0))] = byte(t0 + i32(1))
 }
 func (m *Module) Xget() int32 {
-	t0 := int32(m.memory[uint32(i32_const(0))])
+	t0 := int32(m.memory[uint32(i32(0))])
 	return t0
 }
 func (m *Module) f2() {
@@ -30,6 +30,6 @@ func (m *Module) f2() {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 const data0 = "A"

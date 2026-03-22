@@ -11,7 +11,7 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 5
 	m.memory = make([]byte, 65536)
-	copy(m.memory[10:], data0)
+	copy(m.memory[uint32(i32(10)):], data0)
 	return m
 }
 
@@ -34,6 +34,9 @@ func (m *Module) Xload(v0 int32) int32 {
 func (m *Module) Xmem() Memory {
 	return (*wasmMemory)(&m.memory)
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

@@ -16,7 +16,7 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 281474976710656
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
+	copy(m.memory[uint64(i64(0)):], data0)
 	return m
 }
 func (m *Module) X32_good1(v0 int64) float32 {
@@ -43,5 +43,8 @@ func (m *Module) X32_bad(v0 int64) {
 	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[v0+4294967295|v0>>63:]))
 	_ = t0
 }
+
+//go:nosplit
+func i64(x int64) int64 { return x }
 
 const data0 = "\x00\x00\x00\x00\x00\x00\xa0\x7f\x01\x00\xd0\x7f"

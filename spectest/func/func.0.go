@@ -70,20 +70,20 @@ func (m *Module) f19() int32 {
 func (m *Module) Xtype_use_1_9borg1() {
 }
 func (m *Module) Xtype_use_2_e3dvk5() int32 {
-	return i32_const(0)
+	return i32(0)
 }
 func (m *Module) Xtype_use_3_1hg34sm(v0 int32) {
 }
 func (m *Module) Xtype_use_4_5nxa0d(v0 int32, v1 float64, v2 int32) int32 {
-	return i32_const(0)
+	return i32(0)
 }
 func (m *Module) Xtype_use_5_1rth7fy() int32 {
-	return i32_const(0)
+	return i32(0)
 }
 func (m *Module) Xtype_use_6_1w2eja2(v0 int32) {
 }
 func (m *Module) Xtype_use_7_207jtl(v0 int32, v1 float64, v2 int32) int32 {
-	return i32_const(0)
+	return i32(0)
 }
 func (m *Module) f27() {
 }
@@ -236,10 +236,10 @@ func (m *Module) Xvalue_void_5gkqi3() {
 	m.f0()
 }
 func (m *Module) Xvalue_i32_m3qqrv() int32 {
-	return int32(77)
+	return i32(77)
 }
 func (m *Module) Xvalue_i64_egs760() int64 {
-	return i64_const(7777)
+	return i64(7777)
 }
 func (m *Module) Xvalue_f32_ueraf() float32 {
 	return float32(77.7)
@@ -258,7 +258,7 @@ func (m *Module) Xvalue_block_i32_1xce015() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(77)
+		p0 = i32(77)
 	}
 	return p0
 }
@@ -266,10 +266,10 @@ func (m *Module) Xreturn_empty_nrn036() {
 	return
 }
 func (m *Module) Xreturn_i32_7m8uyq() int32 {
-	return int32(78)
+	return i32(78)
 }
 func (m *Module) Xreturn_i64_qwtg1t() int64 {
-	return i64_const(7878)
+	return i64(7878)
 }
 func (m *Module) Xreturn_f32_odd8q6() float32 {
 	return float32(78.7)
@@ -282,7 +282,7 @@ func (m *Module) Xreturn_block_i32_1i3e75p() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(77)
+		p0 = i32(77)
 	}
 	return p0
 }
@@ -290,10 +290,10 @@ func (m *Module) Xbreak_empty_j24vzx() {
 	return
 }
 func (m *Module) Xbreak_i32_1frcadt() int32 {
-	return int32(79)
+	return i32(79)
 }
 func (m *Module) Xbreak_i64_1hjx3v6() int64 {
-	return i64_const(7979)
+	return i64(7979)
 }
 func (m *Module) Xbreak_f32_1wavfwd() float32 {
 	return float32(79.9)
@@ -306,7 +306,7 @@ func (m *Module) Xbreak_block_i32_6d9z2b() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(77)
+		p0 = i32(77)
 	}
 	return p0
 }
@@ -317,10 +317,10 @@ func (m *Module) Xbreak_br_if_empty_1uiee2i(v0 int32) {
 }
 func (m *Module) Xbreak_br_if_num_1259pbg(v0 int32) int32 {
 	if v0 != 0 {
-		return int32(50)
+		return i32(50)
 	}
-	_ = int32(50)
-	return int32(51)
+	_ = i32(50)
+	return i32(51)
 }
 func (m *Module) Xbreak_br_table_empty_1vz6wh8(v0 int32) {
 	switch v0 {
@@ -331,7 +331,7 @@ func (m *Module) Xbreak_br_table_empty_1vz6wh8(v0 int32) {
 func (m *Module) Xbreak_br_table_num_1tx772w(v0 int32) int32 {
 	switch v0 {
 	default:
-		return int32(50)
+		return i32(50)
 	}
 }
 func (m *Module) Xbreak_br_table_nested_empty_15t57ld(v0 int32) {
@@ -351,14 +351,14 @@ func (m *Module) Xbreak_br_table_nested_num_cnhrir(v0 int32) int32 {
 	{
 		switch v0 {
 		case 1:
-			return int32(50)
+			return i32(50)
 		default:
-			p0 = int32(50)
+			p0 = i32(50)
 			goto l0
 		}
 	}
 l0:
-	return p0 + int32(2)
+	return p0 + i32(2)
 }
 func (m *Module) Xinit_local_i32_b6k6t3() int32 {
 	var v0 int32
@@ -382,7 +382,7 @@ func (m *Module) Xinit_local_f64_8plxg8() float64 {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }

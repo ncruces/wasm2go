@@ -14,7 +14,7 @@ func New(v0 XMg) *Module {
 	m._Mg = v0
 	m.g0 = v0.Xglob()
 	m.g1 = v0.Xmut_glob()
-	m.g2 = int32(43)
+	m.g2 = i32(43)
 	if i, ok := any(v0).(interface {
 		Init(any)
 	}); ok {
@@ -53,3 +53,6 @@ func (m *Module) XMg_mut_glob_1203k69() *int32 {
 func (m *Module) Xglob() *int32 {
 	return &m.g2
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }

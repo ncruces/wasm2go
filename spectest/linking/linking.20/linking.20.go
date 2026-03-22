@@ -13,7 +13,7 @@ func New(v0 XMm) *Module {
 	m._Mm = v0
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	copy(m.memory[10:], data0)
+	copy(m.memory[uint32(i32(10)):], data0)
 	if i, ok := any(v0).(interface {
 		Init(any)
 	}); ok {
@@ -33,5 +33,8 @@ func (m *Module) Xload(v0 int32) int32 {
 	t0 := int32(m.memory[uint32(v0)])
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
 
 const data0 = "\xf0\xf1\xf2\xf3\xf4\xf5"

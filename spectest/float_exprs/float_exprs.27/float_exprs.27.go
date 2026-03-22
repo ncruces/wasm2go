@@ -15,20 +15,20 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_approximate_reciprocal_sqrt_ydibpr(v0 float32) float32 {
-	return float32(f32_const(1) / float32(math.Sqrt(float64(v0))))
+	return float32(f32(1) / float32(math.Sqrt(float64(v0))))
 }
 func (m *Module) Xf64_no_fuse_reciprocal_sqrt_smgzfm(v0 float64) float64 {
-	return float64(f64_const(1) / math.Sqrt(v0))
+	return float64(f64(1) / math.Sqrt(v0))
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

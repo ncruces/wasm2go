@@ -12,19 +12,19 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_no_fold_div_neg1_zuimr9(v0 int32) int32 {
-	t0 := i32_div_s(v0, i32_const(-1))
+	t0 := i32_div_s(v0, i32(-1))
 	return t0
 }
 func (m *Module) Xi64_no_fold_div_neg1_1vs4zbq(v0 int64) int64 {
-	t0 := i64_div_s(v0, i64_const(-1))
+	t0 := i64_div_s(v0, i64(-1))
 	return t0
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }
 
 //go:nosplit
 func i32_div_s(x, y int32) int32 {

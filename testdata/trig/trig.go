@@ -14,7 +14,7 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	m.___stack_pointer = i32_const(65536)
+	m.___stack_pointer = i32(65536)
 	return m
 }
 
@@ -45,7 +45,7 @@ func (m *Module) Xsin(v0 float64) float64 {
 l0:
 	v1 = math.Float64frombits(0x7ff8000000000000)
 	{
-		if int64(math.Float64bits(v0))&i64_const(0x7fffffffffffffff) > i64_const(0x7fefffffffffffff) {
+		if int64(math.Float64bits(v0))&i64(0x7fffffffffffffff) > i64(0x7fefffffffffffff) {
 			goto l1
 		}
 		{
@@ -63,11 +63,11 @@ l0:
 				goto l3
 			}
 		l2:
-			v2 = i64_const(-0x8000000000000000)
+			v2 = i64(-0x8000000000000000)
 		}
 	l3:
 		v1 = float64(v0 + float64(float64(v2)*float64(-1.5707963267948966)))
-		v3 = i32_const(0)
+		v3 = i32(0)
 	l10:
 		{
 			{
@@ -84,7 +84,7 @@ l0:
 									if v3 != 0 {
 										goto l5
 									}
-									switch int32(v2) & int32(3) {
+									switch int32(v2) & i32(3) {
 									case 1:
 										goto l6
 									case 2:
@@ -96,7 +96,7 @@ l0:
 									}
 								}
 							l5:
-								v3 = v3 + i32_const(-1)
+								v3 = v3 + i32(-1)
 								v0 = float64(v1 * v1)
 								v1 = float64(v4 * v1)
 								v1 = float64(v1 + v1)
@@ -115,7 +115,7 @@ l0:
 				goto l1
 			}
 		l4:
-			v3 = v3 + int32(1)
+			v3 = v3 + i32(1)
 			v1 = float64(v1 * float64(0.5))
 			goto l10
 		}
@@ -128,10 +128,10 @@ func (m *Module) Xmemory() Memory {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }
 
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)

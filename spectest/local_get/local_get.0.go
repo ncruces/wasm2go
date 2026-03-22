@@ -82,7 +82,7 @@ func (m *Module) Xread(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) flo
 	var v8 float64
 	_, _, _, _ = v5, v6, v7, v8
 	v5 = float32(5.5)
-	v6 = int64(6)
+	v6 = i64(6)
 	v8 = float64(8)
 	return float64(float64(uint64(v0)) + float64(float64(v1)+float64(v2+float64(float64(uint32(v3))+float64(float64(v4)+float64(float64(v5)+float64(float64(uint64(v6))+float64(float64(uint64(v7))+v8))))))))
 }
@@ -120,7 +120,7 @@ func (m *Module) Xas_br_if_value_1tlgvkk(v0 int32) int32 {
 	_ = p0
 	{
 		t1 := v0
-		if int32(1) != 0 {
+		if i32(1) != 0 {
 			p0 = t1
 			goto l0
 		}
@@ -157,13 +157,13 @@ func (m *Module) Xas_br_table_value_1ic2jxx(v0 int32) int32 {
 				}
 			}
 		l0:
-			return int32(1)
+			return i32(1)
 		}
 	l1:
-		return int32(2)
+		return i32(2)
 	}
 l2:
-	return int32(3)
+	return i32(3)
 }
 func (m *Module) Xas_return_value_1wph1uy(v0 int32) int32 {
 	return v0
@@ -175,7 +175,7 @@ func (m *Module) Xas_if_then_8by7gv(v0 int32) int32 {
 		t1 := v0
 		p0 = t1
 	} else {
-		p0 = i32_const(0)
+		p0 = i32(0)
 	}
 	return p0
 }
@@ -183,7 +183,7 @@ func (m *Module) Xas_if_else_y9fza0(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	if v0 != 0 {
-		p0 = int32(1)
+		p0 = i32(1)
 	} else {
 		t1 := v0
 		p0 = t1
@@ -192,4 +192,7 @@ func (m *Module) Xas_if_else_y9fza0(v0 int32) int32 {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
+
+//go:nosplit
+func i64(x int64) int64 { return x }

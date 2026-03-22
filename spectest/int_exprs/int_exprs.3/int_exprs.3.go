@@ -10,17 +10,23 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_no_fold_shl_shr_s_1dvg5ba(v0 int32) int32 {
-	return i32_shr_s(i32_shl(v0, int32(1)), int32(1))
+	return i32_shr_s(i32_shl(v0, i32(1)), i32(1))
 }
 func (m *Module) Xi32_no_fold_shl_shr_u_15didji(v0 int32) int32 {
-	return i32_shr_u(i32_shl(v0, int32(1)), int32(1))
+	return i32_shr_u(i32_shl(v0, i32(1)), i32(1))
 }
 func (m *Module) Xi64_no_fold_shl_shr_s_1hnfj72(v0 int64) int64 {
-	return i64_shr_s(i64_shl(v0, int64(1)), int64(1))
+	return i64_shr_s(i64_shl(v0, i64(1)), i64(1))
 }
 func (m *Module) Xi64_no_fold_shl_shr_u_1sdagau(v0 int64) int64 {
-	return i64_shr_u(i64_shl(v0, int64(1)), int64(1))
+	return i64_shr_u(i64_shl(v0, i64(1)), i64(1))
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
+
+//go:nosplit
+func i64(x int64) int64 { return x }
 
 //go:nosplit
 func i32_shl(x, y int32) int32 {

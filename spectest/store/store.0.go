@@ -17,25 +17,25 @@ func New() *Module {
 }
 func (m *Module) Xas_block_value_pg8qbp() {
 	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 	}
 }
 func (m *Module) Xas_loop_value_amjtft() {
 	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 	}
 }
 func (m *Module) Xas_br_value_1sx9dl7() {
 	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 		goto l0
 	}
 l0:
 }
 func (m *Module) Xas_br_if_value_1tlgvkk() {
 	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
-		if int32(1) != 0 {
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+		if i32(1) != 0 {
 			goto l0
 		}
 	}
@@ -43,8 +43,8 @@ l0:
 }
 func (m *Module) Xas_br_if_value_cond_pzz0yu() {
 	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
-		if int32(6) != 0 {
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+		if i32(6) != 0 {
 			goto l0
 		}
 	}
@@ -52,8 +52,8 @@ l0:
 }
 func (m *Module) Xas_br_table_value_1ic2jxx() {
 	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
-		switch int32(1) {
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+		switch i32(1) {
 		default:
 			goto l0
 		}
@@ -61,20 +61,20 @@ func (m *Module) Xas_br_table_value_1ic2jxx() {
 l0:
 }
 func (m *Module) Xas_return_value_1wph1uy() {
-	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 	return
 }
 func (m *Module) Xas_if_then_8by7gv() {
-	if int32(1) != 0 {
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
+	if i32(1) != 0 {
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 	}
 }
 func (m *Module) Xas_if_else_y9fza0() {
-	if i32_const(0) != 0 {
+	if i32(0) != 0 {
 	} else {
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(int32(1)))
+		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 	}
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }

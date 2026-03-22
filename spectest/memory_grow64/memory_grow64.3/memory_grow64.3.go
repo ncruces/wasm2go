@@ -20,19 +20,19 @@ func (m *Module) Xgrow(v0 int64) int64 {
 func (m *Module) Xcheck_memory_zero_ivkcjo(v0 int64, v1 int64) int32 {
 	var v2 int32
 	_ = v2
-	v2 = int32(1)
+	v2 = i32(1)
 	{
 	l1:
 		{
 			t0 := int32(m.memory[v0])
 			v2 = t0
-			if v2 != i32_const(0) {
+			if v2 != i32(0) {
 				goto l0
 			}
 			if uint64(v0) >= uint64(v1) {
 				goto l0
 			}
-			v0 = v0 + int64(1)
+			v0 = v0 + i64(1)
 			if uint64(v0) <= uint64(v1) {
 				goto l1
 			}
@@ -43,7 +43,10 @@ l0:
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
+
+//go:nosplit
+func i64(x int64) int64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

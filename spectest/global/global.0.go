@@ -25,15 +25,15 @@ func New() *Module {
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
 	m.elements = [][]any{{m.f26}}
-	copy(m.t0[0:], m.elements[0])
-	m.g0 = i32_const(-2)
+	copy(m.t0[i32(0):], m.elements[0])
+	m.g0 = i32(-2)
 	m.g1 = float32(-3)
 	m.g2 = float64(-4)
-	m.g3 = i64_const(-5)
-	m.g4 = i32_const(-12)
+	m.g3 = i64(-5)
+	m.g4 = i32(-12)
 	m.g5 = float32(-13)
 	m.g6 = float64(-14)
-	m.g7 = i64_const(-15)
+	m.g7 = i64(-15)
 	return m
 }
 func (m *Module) Xget_a_1yusnlu() int32 {
@@ -84,8 +84,8 @@ func (m *Module) f12() {
 }
 func (m *Module) Xas_select_first_1p4pbiq() int32 {
 	t0 := m.g4
-	p1 := int32(2)
-	if int32(3) != 0 {
+	p1 := i32(2)
+	if i32(3) != 0 {
 		p1 = t0
 	}
 	return p1
@@ -93,16 +93,16 @@ func (m *Module) Xas_select_first_1p4pbiq() int32 {
 func (m *Module) Xas_select_mid_19eybyo() int32 {
 	t0 := m.g4
 	p1 := t0
-	if int32(3) != 0 {
-		p1 = int32(2)
+	if i32(3) != 0 {
+		p1 = i32(2)
 	}
 	return p1
 }
 func (m *Module) Xas_select_last_ndhg92() int32 {
 	t0 := m.g4
-	p1 := int32(3)
+	p1 := i32(3)
 	if t0 != 0 {
-		p1 = int32(2)
+		p1 = i32(2)
 	}
 	return p1
 }
@@ -145,29 +145,29 @@ func (m *Module) Xas_if_condition_mme5rn() int32 {
 	_ = p1
 	if t0 != 0 {
 		m.f12()
-		p1 = int32(2)
+		p1 = i32(2)
 	} else {
 		m.f12()
-		p1 = int32(3)
+		p1 = i32(3)
 	}
 	return p1
 }
 func (m *Module) Xas_if_then_8by7gv() int32 {
 	var p0 int32
 	_ = p0
-	if int32(1) != 0 {
+	if i32(1) != 0 {
 		t1 := m.g4
 		p0 = t1
 	} else {
-		p0 = int32(2)
+		p0 = i32(2)
 	}
 	return p0
 }
 func (m *Module) Xas_if_else_y9fza0() int32 {
 	var p0 int32
 	_ = p0
-	if i32_const(0) != 0 {
-		p0 = int32(2)
+	if i32(0) != 0 {
+		p0 = i32(2)
 	} else {
 		t1 := m.g4
 		p0 = t1
@@ -179,11 +179,11 @@ func (m *Module) Xas_br_if_first_11nmxnr() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		if int32(2) != 0 {
+		if i32(2) != 0 {
 			p0 = t1
 			goto l0
 		}
-		return int32(3)
+		return i32(3)
 	}
 l0:
 	return p0
@@ -194,10 +194,10 @@ func (m *Module) Xas_br_if_last_1dvgji4() int32 {
 	{
 		t1 := m.g4
 		if t1 != 0 {
-			p0 = int32(2)
+			p0 = i32(2)
 			goto l0
 		}
-		return int32(3)
+		return i32(3)
 	}
 l0:
 	return p0
@@ -207,7 +207,7 @@ func (m *Module) Xas_br_table_first_1ammix2() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		switch int32(2) {
+		switch i32(2) {
 		default:
 			p0 = t1
 			goto l0
@@ -223,7 +223,7 @@ func (m *Module) Xas_br_table_last_10cg6o3() int32 {
 		t1 := m.g4
 		switch t1 {
 		default:
-			p0 = int32(2)
+			p0 = i32(2)
 			goto l0
 		}
 	}
@@ -238,7 +238,7 @@ func (m *Module) Xas_call_indirect_first_1kls7bs() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		t2 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(t1, int32(2))
+		t2 := m.t0[uint(i32(0))].(func(v0 int32, v1 int32) int32)(t1, i32(2))
 		p0 = t2
 	}
 	return p0
@@ -248,7 +248,7 @@ func (m *Module) Xas_call_indirect_mid_1u5vulp() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		t2 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(2), t1)
+		t2 := m.t0[uint(i32(0))].(func(v0 int32, v1 int32) int32)(i32(2), t1)
 		p0 = t2
 	}
 	return p0
@@ -258,18 +258,18 @@ func (m *Module) Xas_call_indirect_last_os2e8m() int32 {
 	_ = p0
 	{
 		t1 := m.g4
-		t2 := m.t0[uint(t1)].(func(v0 int32, v1 int32) int32)(int32(2), i32_const(0))
+		t2 := m.t0[uint(t1)].(func(v0 int32, v1 int32) int32)(i32(2), i32(0))
 		p0 = t2
 	}
 	return p0
 }
 func (m *Module) Xas_store_first_1jby9fx() {
 	t0 := m.g4
-	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], uint32(int32(1)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(t0):], uint32(i32(1)))
 }
 func (m *Module) Xas_store_last_4x4vf1() {
 	t0 := m.g4
-	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(t0))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(t0))
 }
 func (m *Module) Xas_load_operand_dz3ecr() int32 {
 	t0 := m.g4
@@ -340,17 +340,17 @@ func (m *Module) Xas_binary_operand_zlxanv() int32 {
 func (m *Module) Xas_compare_operand_1atwg6r() int32 {
 	t0 := m.g0
 	var p1 int32
-	if uint32(t0) > uint32(int32(1)) {
+	if uint32(t0) > uint32(i32(1)) {
 		p1 = 1
 	}
 	return p1
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

@@ -9,8 +9,8 @@ type Module struct {
 
 func New() *Module {
 	m := &Module{}
-	m.g0 = int32(42)
-	m.g1 = i32_const(142)
+	m.g0 = i32(42)
+	m.g1 = i32(142)
 	return m
 }
 func (m *Module) Xget() int32 {
@@ -32,4 +32,4 @@ func (m *Module) Xmut_glob() *int32 {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }

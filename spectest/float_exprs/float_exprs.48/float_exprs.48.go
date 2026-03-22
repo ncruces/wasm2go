@@ -17,7 +17,7 @@ func New() *Module {
 func (m *Module) Xf32_no_fold_lt_if_to_abs_1xjs6jd(v0 float32) float32 {
 	var p0 float32
 	_ = p0
-	if v0 < f32_const(0) {
+	if v0 < f32(0) {
 		t1 := -v0
 		p0 = t1
 	} else {
@@ -53,7 +53,7 @@ func (m *Module) Xf32_no_fold_gt_if_to_abs_ax21bs(v0 float32) float32 {
 func (m *Module) Xf32_no_fold_ge_if_to_abs_1tyjekw(v0 float32) float32 {
 	var p0 float32
 	_ = p0
-	if v0 >= f32_const(0) {
+	if v0 >= f32(0) {
 		t1 := v0
 		p0 = t1
 	} else {
@@ -65,7 +65,7 @@ func (m *Module) Xf32_no_fold_ge_if_to_abs_1tyjekw(v0 float32) float32 {
 func (m *Module) Xf64_no_fold_lt_if_to_abs_1418lmh(v0 float64) float64 {
 	var p0 float64
 	_ = p0
-	if v0 < f64_const(0) {
+	if v0 < f64(0) {
 		t1 := -v0
 		p0 = t1
 	} else {
@@ -101,7 +101,7 @@ func (m *Module) Xf64_no_fold_gt_if_to_abs_lkdpp4(v0 float64) float64 {
 func (m *Module) Xf64_no_fold_ge_if_to_abs_11jxib4(v0 float64) float64 {
 	var p0 float64
 	_ = p0
-	if v0 >= f64_const(0) {
+	if v0 >= f64(0) {
 		t1 := v0
 		p0 = t1
 	} else {
@@ -112,13 +112,13 @@ func (m *Module) Xf64_no_fold_ge_if_to_abs_11jxib4(v0 float64) float64 {
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }
