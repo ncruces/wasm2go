@@ -16,7 +16,7 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 1
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
+	copy(m.memory[uint32(i32(0)):], data0)
 	return m
 }
 func (m *Module) Xf32_simple_x4_sum_16tg4bv(v0 int32, v1 int32, v2 int32) {
@@ -47,5 +47,8 @@ func (m *Module) Xf32_load_m2vdhn(v0 int32) float32 {
 	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
 
 const data0 = "\x01\x00\x00\x00\x01\x00\x00\x80\x01\x00\x00\x00\x01\x00\x00\x80\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"

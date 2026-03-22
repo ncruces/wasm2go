@@ -16,8 +16,8 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 100
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
-	copy(m.memory[32:], data1)
+	copy(m.memory[uint32(i32(0)):], data0)
+	copy(m.memory[uint32(i32(32)):], data1)
 	return m
 }
 
@@ -55,6 +55,9 @@ func (m *Module) Xread_as_i8u(v0 int32) int32 {
 func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

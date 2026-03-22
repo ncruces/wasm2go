@@ -12,20 +12,20 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_no_fold_zero_sub_7c5xtk(v0 float32) float32 {
-	return float32(f32_const(0) - v0)
+	return float32(f32(0) - v0)
 }
 func (m *Module) Xf64_no_fold_zero_sub_ut66mz(v0 float64) float64 {
-	return float64(f64_const(0) - v0)
+	return float64(f64(0) - v0)
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

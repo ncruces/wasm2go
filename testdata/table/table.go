@@ -13,8 +13,8 @@ func New(v0 Xenv) *Module {
 	m._env = v0
 	m.t0 = make([]any, 32)
 	m.elements = [][]any{{m.f1}, {m.f0}}
-	copy(m.t0[16:], m.elements[0])
-	copy(m.t0[17:], m.elements[1])
+	copy(m.t0[i32(16):], m.elements[0])
+	copy(m.t0[i32(17):], m.elements[1])
 	if i, ok := any(v0).(interface {
 		Init(any)
 	}); ok {
@@ -34,10 +34,13 @@ func (m *Module) f1(v0 int32) int32 {
 	return v0 + v0
 }
 func (m *Module) Xtimes2(v0 int32) int32 {
-	t0 := m.t0[uint(int32(16))].(func(v0 int32) int32)(v0)
+	t0 := m.t0[uint(i32(16))].(func(v0 int32) int32)(v0)
 	return t0
 }
 func (m *Module) Xtimes3(v0 int32) int32 {
-	t0 := m.t0[uint(int32(17))].(func(v0 int32) int32)(v0)
+	t0 := m.t0[uint(i32(17))].(func(v0 int32) int32)(v0)
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }

@@ -18,8 +18,8 @@ func New() *Module {
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
 	m.elements = [][]any{{m.f1}}
-	copy(m.t0[0:], m.elements[0])
-	m.g0 = f32_const(0)
+	copy(m.t0[i32(0):], m.elements[0])
+	m.g0 = f32(0)
 	return m
 }
 func (m *Module) f0() {
@@ -87,7 +87,7 @@ func (m *Module) Xas_block_broke_180w4m2() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(1)
+		p0 = i32(1)
 		goto l0
 	}
 l0:
@@ -122,7 +122,7 @@ func (m *Module) Xas_loop_broke_1r32ml2() int32 {
 		_ = p1
 		{
 			m.f0()
-			p0 = int32(1)
+			p0 = i32(1)
 			goto l0
 		}
 	}
@@ -314,10 +314,13 @@ func (m *Module) Xas_memory_grow_size_7te2ha() int32 {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func i64(x int64) int64 { return x }
+
+//go:nosplit
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }

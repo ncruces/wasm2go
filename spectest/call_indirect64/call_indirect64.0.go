@@ -11,22 +11,22 @@ func New() *Module {
 	m := &Module{}
 	m.t0 = make([]any, 1)
 	m.elements = [][]any{{m.f0}}
-	copy(m.t0[0:], m.elements[0])
+	copy(m.t0[i64(0):], m.elements[0])
 	return m
 }
 func (m *Module) f0() int32 {
-	return i32_const(306)
+	return i32(306)
 }
 func (m *Module) f1() {
-	m.t0[uint(i64_const(0))].(func())()
+	m.t0[uint(i64(0))].(func())()
 }
 func (m *Module) Xtype_i32_t64_1vbor64() int32 {
-	t0 := m.t0[uint(i64_const(0))].(func() int32)()
+	t0 := m.t0[uint(i64(0))].(func() int32)()
 	return t0
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }

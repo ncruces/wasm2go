@@ -13,7 +13,7 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 1
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
+	copy(m.memory[uint32(i32(0)):], data0)
 	return m
 }
 func (m *Module) Xcopy(v0 int32, v1 int32, v2 int32) {
@@ -23,6 +23,9 @@ func (m *Module) Xload8_u(v0 int32) int32 {
 	t0 := int32(m.memory[uint32(v0)])
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
 
 func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
 	x := uint(min(uint64(dest), math.MaxUint))

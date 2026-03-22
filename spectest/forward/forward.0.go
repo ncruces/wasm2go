@@ -12,10 +12,10 @@ func New() *Module {
 func (m *Module) Xeven(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	if v0 == i32_const(0) {
-		p0 = int32(1)
+	if v0 == i32(0) {
+		p0 = i32(1)
 	} else {
-		t1 := m.Xodd(v0 - int32(1))
+		t1 := m.Xodd(v0 - i32(1))
 		p0 = t1
 	}
 	return p0
@@ -23,14 +23,14 @@ func (m *Module) Xeven(v0 int32) int32 {
 func (m *Module) Xodd(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	if v0 == i32_const(0) {
-		p0 = i32_const(0)
+	if v0 == i32(0) {
+		p0 = i32(0)
 	} else {
-		t1 := m.Xeven(v0 - int32(1))
+		t1 := m.Xeven(v0 - i32(1))
 		p0 = t1
 	}
 	return p0
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }

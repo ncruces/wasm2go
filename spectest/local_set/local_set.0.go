@@ -17,28 +17,28 @@ func New() *Module {
 func (m *Module) Xtype_local_i32_cmmy8t() {
 	var v0 int32
 	_ = v0
-	v0 = i32_const(0)
+	v0 = i32(0)
 }
 func (m *Module) Xtype_local_i64_nvg71a() {
 	var v0 int64
 	_ = v0
-	v0 = i64_const(0)
+	v0 = i64(0)
 }
 func (m *Module) Xtype_local_f32_qy93zl() {
 	var v0 float32
 	_ = v0
-	v0 = f32_const(0)
+	v0 = f32(0)
 }
 func (m *Module) Xtype_local_f64_7eeh4i() {
 	var v0 float64
 	_ = v0
-	v0 = f64_const(0)
+	v0 = f64(0)
 }
 func (m *Module) Xtype_param_i32_vcyvx(v0 int32) {
-	v0 = int32(10)
+	v0 = i32(10)
 }
 func (m *Module) Xtype_param_i64_xhaz1a(v0 int64) {
-	v0 = int64(11)
+	v0 = i64(11)
 }
 func (m *Module) Xtype_param_f32_m27rch(v0 float32) {
 	v0 = float32(11.1)
@@ -51,15 +51,15 @@ func (m *Module) Xtype_mixed_1gr773l(v0 int64, v1 float32, v2 float64, v3 int32,
 	var v6, v7 int64
 	var v8 float64
 	_, _, _, _ = v5, v6, v7, v8
-	v0 = i64_const(0)
-	v1 = f32_const(0)
-	v2 = f64_const(0)
-	v3 = i32_const(0)
-	v4 = i32_const(0)
-	v5 = f32_const(0)
-	v6 = i64_const(0)
-	v7 = i64_const(0)
-	v8 = f64_const(0)
+	v0 = i64(0)
+	v1 = f32(0)
+	v2 = f64(0)
+	v3 = i32(0)
+	v4 = i32(0)
+	v5 = f32(0)
+	v6 = i64(0)
+	v7 = i64(0)
+	v8 = f64(0)
 }
 func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) int64 {
 	var v5 float32
@@ -67,35 +67,35 @@ func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) in
 	var v8 float64
 	_, _, _, _ = v5, v6, v7, v8
 	v1 = float32(-0.3)
-	v3 = int32(40)
-	v4 = i32_const(-7)
+	v3 = i32(40)
+	v4 = i32(-7)
 	v5 = float32(5.5)
-	v6 = int64(6)
+	v6 = i64(6)
 	v8 = float64(8)
 	t0 := i64_trunc_f64_s(float64(float64(uint64(v0)) + float64(float64(v1)+float64(v2+float64(float64(uint32(v3))+float64(float64(v4)+float64(float64(v5)+float64(float64(uint64(v6))+float64(float64(uint64(v7))+v8)))))))))
 	return t0
 }
 func (m *Module) Xas_block_value_pg8qbp(v0 int32) {
 	{
-		v0 = int32(1)
+		v0 = i32(1)
 	}
 }
 func (m *Module) Xas_loop_value_amjtft(v0 int32) {
 	{
-		v0 = int32(3)
+		v0 = i32(3)
 	}
 }
 func (m *Module) Xas_br_value_1sx9dl7(v0 int32) {
 	{
-		v0 = int32(9)
+		v0 = i32(9)
 		goto l0
 	}
 l0:
 }
 func (m *Module) Xas_br_if_value_1tlgvkk(v0 int32) {
 	{
-		v0 = int32(8)
-		if int32(1) != 0 {
+		v0 = i32(8)
+		if i32(1) != 0 {
 			goto l0
 		}
 	}
@@ -103,8 +103,8 @@ l0:
 }
 func (m *Module) Xas_br_if_value_cond_pzz0yu(v0 int32) {
 	{
-		v0 = int32(9)
-		if int32(6) != 0 {
+		v0 = i32(9)
+		if i32(6) != 0 {
 			goto l0
 		}
 	}
@@ -112,8 +112,8 @@ l0:
 }
 func (m *Module) Xas_br_table_value_1ic2jxx(v0 int32) {
 	{
-		v0 = int32(10)
-		switch int32(1) {
+		v0 = i32(10)
+		switch i32(1) {
 		default:
 			goto l0
 		}
@@ -121,35 +121,35 @@ func (m *Module) Xas_br_table_value_1ic2jxx(v0 int32) {
 l0:
 }
 func (m *Module) Xas_return_value_1wph1uy(v0 int32) {
-	v0 = int32(7)
+	v0 = i32(7)
 	return
 }
 func (m *Module) Xas_if_then_8by7gv(v0 int32) {
 	if v0 != 0 {
-		v0 = int32(3)
+		v0 = i32(3)
 	}
 }
 func (m *Module) Xas_if_else_y9fza0(v0 int32) {
 	if v0 != 0 {
 	} else {
-		v0 = int32(1)
+		v0 = i32(1)
 	}
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

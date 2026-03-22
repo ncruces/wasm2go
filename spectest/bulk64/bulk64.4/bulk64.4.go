@@ -13,25 +13,25 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 281474976710656
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data1)
+	copy(m.memory[uint64(i64(0)):], data1)
 	return m
 }
 func (m *Module) Xdrop_passive() {
 }
 func (m *Module) Xinit_passive() {
-	memory_init(m.memory, data0, uint64(i64_const(0)), uint32(i32_const(0)), uint32(i32_const(0)))
+	memory_init(m.memory, data0, uint64(i64(0)), uint32(i32(0)), uint32(i32(0)))
 }
 func (m *Module) Xdrop_active() {
 }
 func (m *Module) Xinit_active() {
-	memory_init(m.memory, data1, uint64(i64_const(0)), uint32(i32_const(0)), uint32(i32_const(0)))
+	memory_init(m.memory, data1, uint64(i64(0)), uint32(i32(0)), uint32(i32(0)))
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }
 
 func memory_init[T uint32 | uint64](mem []byte, data string, dest T, src, n uint32) {
 	x := uint(min(uint64(dest), math.MaxUint))

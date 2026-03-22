@@ -12,11 +12,11 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xinverse(v0 float32) float32 {
-	return float32(f32_const(1) / v0)
+	return float32(f32(1) / v0)
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }

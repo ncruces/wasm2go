@@ -21,148 +21,148 @@ func New() *Module {
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
 	m.elements = [][]any{{m.f0, m.f1, m.f2, m.f3, m.f4, m.f5, m.f6, m.f7}}
-	copy(m.t0[0:], m.elements[0])
+	copy(m.t0[i32(0):], m.elements[0])
 	return m
 }
 func (m *Module) f0(v0 int32, v1 int32) int32 {
-	return i32_const(-1)
+	return i32(-1)
 }
 func (m *Module) f1(v0 int32, v1 int32) int32 {
-	return i32_const(-2)
+	return i32(-2)
 }
 func (m *Module) f2(v0 int64, v1 int64) int32 {
-	return i32_const(-1)
+	return i32(-1)
 }
 func (m *Module) f3(v0 int64, v1 int64) int32 {
-	return i32_const(-2)
+	return i32(-2)
 }
 func (m *Module) f4(v0 float32, v1 float32) int32 {
-	return i32_const(-1)
+	return i32(-1)
 }
 func (m *Module) f5(v0 float32, v1 float32) int32 {
-	return i32_const(-2)
+	return i32(-2)
 }
 func (m *Module) f6(v0 float64, v1 float64) int32 {
-	return i32_const(-1)
+	return i32(-1)
 }
 func (m *Module) f7(v0 float64, v1 float64) int32 {
-	return i32_const(-2)
+	return i32(-2)
 }
 func (m *Module) f8() {
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(i32_const(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(8)):], uint32(i32(0)))
 }
 func (m *Module) f9() {
-	t0 := int32(m.memory[uint32(int32(10))])
-	m.memory[uint32(int32(11))] = byte(t0)
-	t1 := int32(m.memory[uint32(int32(9))])
-	m.memory[uint32(int32(10))] = byte(t1)
-	t2 := int32(m.memory[uint32(int32(8))])
-	m.memory[uint32(int32(9))] = byte(t2)
-	m.memory[uint32(int32(8))] = byte(i32_const(-3))
+	t0 := int32(m.memory[uint32(i32(10))])
+	m.memory[uint32(i32(11))] = byte(t0)
+	t1 := int32(m.memory[uint32(i32(9))])
+	m.memory[uint32(i32(10))] = byte(t1)
+	t2 := int32(m.memory[uint32(i32(8))])
+	m.memory[uint32(i32(9))] = byte(t2)
+	m.memory[uint32(i32(8))] = byte(i32(-3))
 }
 func (m *Module) f10() int32 {
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32(8)):]))
 	return t0
 }
 func (m *Module) f11() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(1))
-	return i32_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(1))
+	return i32(0)
 }
 func (m *Module) f12() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(2))
-	return int32(1)
+	m.memory[uint32(i32(8))] = byte(i32(2))
+	return i32(1)
 }
 func (m *Module) f13() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(3))
-	return int32(1)
+	m.memory[uint32(i32(8))] = byte(i32(3))
+	return i32(1)
 }
 func (m *Module) f14() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(4))
-	return i32_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(4))
+	return i32(0)
 }
 func (m *Module) f15() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(5))
-	return i32_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(5))
+	return i32(0)
 }
 func (m *Module) f16() int64 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(1))
-	return i64_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(1))
+	return i64(0)
 }
 func (m *Module) f17() int64 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(2))
-	return int64(1)
+	m.memory[uint32(i32(8))] = byte(i32(2))
+	return i64(1)
 }
 func (m *Module) f18() int64 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(3))
-	return int64(1)
+	m.memory[uint32(i32(8))] = byte(i32(3))
+	return i64(1)
 }
 func (m *Module) f19() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(4))
-	return int32(2)
+	m.memory[uint32(i32(8))] = byte(i32(4))
+	return i32(2)
 }
 func (m *Module) f20() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(5))
-	return i32_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(5))
+	return i32(0)
 }
 func (m *Module) f21() float32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(1))
-	return f32_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(1))
+	return f32(0)
 }
 func (m *Module) f22() float32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(2))
-	return f32_const(1)
+	m.memory[uint32(i32(8))] = byte(i32(2))
+	return f32(1)
 }
 func (m *Module) f23() float32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(3))
-	return f32_const(1)
+	m.memory[uint32(i32(8))] = byte(i32(3))
+	return f32(1)
 }
 func (m *Module) f24() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(4))
-	return int32(4)
+	m.memory[uint32(i32(8))] = byte(i32(4))
+	return i32(4)
 }
 func (m *Module) f25() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(5))
-	return i32_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(5))
+	return i32(0)
 }
 func (m *Module) f26() float64 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(1))
-	return f64_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(1))
+	return f64(0)
 }
 func (m *Module) f27() float64 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(2))
-	return f64_const(1)
+	m.memory[uint32(i32(8))] = byte(i32(2))
+	return f64(1)
 }
 func (m *Module) f28() float64 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(3))
-	return f64_const(1)
+	m.memory[uint32(i32(8))] = byte(i32(3))
+	return f64(1)
 }
 func (m *Module) f29() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(4))
-	return int32(6)
+	m.memory[uint32(i32(8))] = byte(i32(4))
+	return i32(6)
 }
 func (m *Module) f30() int32 {
 	m.f9()
-	m.memory[uint32(int32(8))] = byte(int32(5))
-	return i32_const(0)
+	m.memory[uint32(i32(8))] = byte(i32(5))
+	return i32(0)
 }
 func (m *Module) f31(v0 int32, v1 int32) {
 }
@@ -1087,7 +1087,7 @@ func (m *Module) Xbr_if() int32 {
 		m.f8()
 		t1 := m.f11()
 		t2 := m.f12()
-		if t2&i32_const(0) != 0 {
+		if t2&i32(0) != 0 {
 			p0 = t1
 			goto l0
 		}
@@ -1127,19 +1127,19 @@ l0:
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

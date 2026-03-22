@@ -16,18 +16,18 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xload_at_zero() int32 {
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[i64_const(0):]))
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[i64(0):]))
 	return t0
 }
 func (m *Module) Xstore_at_zero() {
-	binary.LittleEndian.PutUint32(m.memory[i64_const(0):], uint32(int32(2)))
+	binary.LittleEndian.PutUint32(m.memory[i64(0):], uint32(i32(2)))
 }
 func (m *Module) Xload_at_page_size() int32 {
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[i64_const(65536):]))
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[i64(65536):]))
 	return t0
 }
 func (m *Module) Xstore_at_page_size() {
-	binary.LittleEndian.PutUint32(m.memory[i64_const(65536):], uint32(int32(3)))
+	binary.LittleEndian.PutUint32(m.memory[i64(65536):], uint32(i32(3)))
 }
 func (m *Module) Xgrow(v0 int64) int64 {
 	t0 := int64(memory_grow(&m.memory, int64(v0), m.maxMem))
@@ -39,7 +39,10 @@ func (m *Module) Xsize() int64 {
 }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i32(x int32) int32 { return x }
+
+//go:nosplit
+func i64(x int64) int64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

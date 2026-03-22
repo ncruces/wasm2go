@@ -8,20 +8,20 @@ import (
 	"testing"
 )
 
-func Test_i32_const(t *testing.T) {
+func Test_i32(t *testing.T) {
 	// Must compile, may panic.
 	defer func() { recover() }()
-	_ = math.MinInt32 / i32_const(-1)
-	_ = uint32(i32_const(-1))
-	_ = int32(1) / i32_const(0)
+	_ = math.MinInt32 / i32(-1)
+	_ = uint32(i32(-1))
+	_ = int32(1) / i32(0)
 }
 
-func Test_i64_const(t *testing.T) {
+func Test_i64(t *testing.T) {
 	// Must compile, may panic.
 	defer func() { recover() }()
-	_ = math.MinInt64 / i64_const(-1)
-	_ = uint64(i64_const(-1))
-	_ = int64(1) / i64_const(0)
+	_ = math.MinInt64 / i64(-1)
+	_ = uint64(i64(-1))
+	_ = int64(1) / i64(0)
 }
 
 func Test_f32_const(t *testing.T) {
@@ -29,7 +29,7 @@ func Test_f32_const(t *testing.T) {
 		t.SkipNow()
 	}
 	t1 := math.Float32frombits(0x7fa00000)
-	t2 := t1 * f32_const(1)
+	t2 := t1 * f32(1)
 	t3 := math.Float32bits(t2)
 	if t3&0x7fc00000 != 0x7fc00000 {
 		t.Errorf("%x", t3)
@@ -41,7 +41,7 @@ func Test_f64_const(t *testing.T) {
 		t.SkipNow()
 	}
 	t1 := math.Float64frombits(0x7ff4000000000000)
-	t2 := t1 * f64_const(1)
+	t2 := t1 * f64(1)
 	t3 := math.Float64bits(t2)
 	if t3&0x7ff8000000000000 != 0x7ff8000000000000 {
 		t.Errorf("%x", t3)

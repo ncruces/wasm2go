@@ -17,7 +17,7 @@ l0:
 }
 func (m *Module) Xbr_if() {
 	{
-		if int32(1) != 0 {
+		if i32(1) != 0 {
 			goto l0
 		}
 	}
@@ -25,7 +25,7 @@ l0:
 }
 func (m *Module) Xbr_table() {
 	{
-		switch i32_const(0) {
+		switch i32(0) {
 		default:
 			goto l0
 		}
@@ -34,4 +34,4 @@ l0:
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }

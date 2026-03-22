@@ -10,98 +10,98 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_test_15y7kjq() int32 {
-	return i32_const(0xbadd00d)
+	return i32(0xbadd00d)
 }
 func (m *Module) Xi32_umax_b2k1l0() int32 {
-	return i32_const(-1)
+	return i32(-1)
 }
 func (m *Module) Xi32_smax_1r5ti0m() int32 {
-	return i32_const(0x7fffffff)
+	return i32(0x7fffffff)
 }
 func (m *Module) Xi32_neg_smax_1wrxagi() int32 {
-	return i32_const(-0x7fffffff)
+	return i32(-0x7fffffff)
 }
 func (m *Module) Xi32_smin_k20fux() int32 {
-	return i32_const(-0x80000000)
+	return i32(-0x80000000)
 }
 func (m *Module) Xi32_alt_smin_f78cz0() int32 {
-	return i32_const(-0x80000000)
+	return i32(-0x80000000)
 }
 func (m *Module) Xi32_inc_smin_1qwc0vp() int32 {
-	return i32_const(-0x80000000) + int32(1)
+	return i32(-0x80000000) + i32(1)
 }
 func (m *Module) Xi32_neg_zero_bzqvxx() int32 {
-	return i32_const(0)
+	return i32(0)
 }
 func (m *Module) Xi32_not_octal_fykvuf() int32 {
-	return int32(10)
+	return i32(10)
 }
 func (m *Module) Xi32_unsigned_decimal_bxhmk() int32 {
-	return i32_const(-1)
+	return i32(-1)
 }
 func (m *Module) Xi32_plus_sign_19xybzy() int32 {
-	return int32(42)
+	return i32(42)
 }
 func (m *Module) Xi64_test_ec457v() int64 {
-	return i64_const(0xcabba6e0ba66a6e)
+	return i64(0xcabba6e0ba66a6e)
 }
 func (m *Module) Xi64_umax_10heai1() int64 {
-	return i64_const(-1)
+	return i64(-1)
 }
 func (m *Module) Xi64_smax_jrgn2z() int64 {
-	return i64_const(0x7fffffffffffffff)
+	return i64(0x7fffffffffffffff)
 }
 func (m *Module) Xi64_neg_smax_11cksvd() int64 {
-	return i64_const(-0x7fffffffffffffff)
+	return i64(-0x7fffffffffffffff)
 }
 func (m *Module) Xi64_smin_1tpjbac() int64 {
-	return i64_const(-0x8000000000000000)
+	return i64(-0x8000000000000000)
 }
 func (m *Module) Xi64_alt_smin_junik7() int64 {
-	return i64_const(-0x8000000000000000)
+	return i64(-0x8000000000000000)
 }
 func (m *Module) Xi64_inc_smin_151u4by() int64 {
-	return i64_const(-0x8000000000000000) + int64(1)
+	return i64(-0x8000000000000000) + i64(1)
 }
 func (m *Module) Xi64_neg_zero_p3qu5q() int64 {
-	return i64_const(0)
+	return i64(0)
 }
 func (m *Module) Xi64_not_octal_1cvf1aq() int64 {
-	return int64(10)
+	return i64(10)
 }
 func (m *Module) Xi64_unsigned_decimal_w9jy1r() int64 {
-	return i64_const(-1)
+	return i64(-1)
 }
 func (m *Module) Xi64_plus_sign_c9hzyz() int64 {
-	return int64(42)
+	return i64(42)
 }
 func (m *Module) Xi32_dec_sep1_vu7gzt() int32 {
-	return i32_const(1000000)
+	return i32(1000000)
 }
 func (m *Module) Xi32_dec_sep2_r2k8xp() int32 {
-	return i32_const(1000)
+	return i32(1000)
 }
 func (m *Module) Xi32_hex_sep1_10zmz5x() int32 {
-	return i32_const(0xa0f0099)
+	return i32(0xa0f0099)
 }
 func (m *Module) Xi32_hex_sep2_15mbyi9() int32 {
-	return i32_const(109071)
+	return i32(109071)
 }
 func (m *Module) Xi64_dec_sep1_z345u() int64 {
-	return i64_const(1000000)
+	return i64(1000000)
 }
 func (m *Module) Xi64_dec_sep2_4o2zom() int64 {
-	return i64_const(1000)
+	return i64(1000)
 }
 func (m *Module) Xi64_hex_sep1_1vq0526() int64 {
-	return i64_const(0xaf00f00009999)
+	return i64(0xaf00f00009999)
 }
 func (m *Module) Xi64_hex_sep2_1s619ii() int64 {
-	return i64_const(109071)
+	return i64(109071)
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }

@@ -12,11 +12,11 @@ func New() *Module {
 func (m *Module) Xfactorial(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	if v0 <= int32(1) {
-		p0 = int32(1)
+	if v0 <= i32(1) {
+		p0 = i32(1)
 	} else {
 		t2 := v0
-		t1 := m.Xfactorial(v0 - int32(1))
+		t1 := m.Xfactorial(v0 - i32(1))
 		t3 := t2 * t1
 		p0 = t3
 	}
@@ -26,9 +26,9 @@ func (m *Module) Xis_even(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	if v0 == 0 {
-		p0 = int32(1)
+		p0 = i32(1)
 	} else {
-		t1 := m.Xis_odd(v0 - int32(1))
+		t1 := m.Xis_odd(v0 - i32(1))
 		p0 = t1
 	}
 	return p0
@@ -37,13 +37,13 @@ func (m *Module) Xis_odd(v0 int32) int32 {
 	var p0 int32
 	_ = p0
 	if v0 == 0 {
-		p0 = i32_const(0)
+		p0 = i32(0)
 	} else {
-		t1 := m.Xis_even(v0 - int32(1))
+		t1 := m.Xis_even(v0 - i32(1))
 		p0 = t1
 	}
 	return p0
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }

@@ -16,28 +16,28 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 1
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
+	copy(m.memory[uint32(i32(0)):], data0)
 	return m
 }
 func (m *Module) Xf32_load_m2vdhn() float32 {
-	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32(0)):]))
 	return t0
 }
 func (m *Module) Xi32_load_1wsn7it() int32 {
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32_const(0)):]))
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32(0)):]))
 	return t0
 }
 func (m *Module) Xf32_store_1h39ogx() {
-	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], math.Float32bits(math.Float32frombits(0x7fa00000)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], math.Float32bits(math.Float32frombits(0x7fa00000)))
 }
 func (m *Module) Xi32_store_1hciawc() {
-	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(i32_const(0x7fa00000)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(0x7fa00000)))
 }
 func (m *Module) Xreset() {
-	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(i32_const(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(0)))
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 const data0 = "\x00\x00\xa0\x7f"

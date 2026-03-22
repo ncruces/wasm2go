@@ -15,11 +15,11 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xllvm_pr26746(v0 float32) float32 {
-	return float32(f32_const(0) - float32(math.Float32frombits(0x80000000)-v0))
+	return float32(f32(0) - float32(math.Float32frombits(0x80000000)-v0))
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }

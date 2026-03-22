@@ -17,7 +17,7 @@ func New() *Module {
 }
 func (m *Module) f0() int64 {
 	t0 := int64(len(m.memory) >> 16)
-	return t0 * i64_const(65536)
+	return t0 * i64(65536)
 }
 func (m *Module) Xstore(v0 int64, v1 int32) {
 	t0 := m.f0()
@@ -34,7 +34,7 @@ func (m *Module) Xmemory_grow_1yca43b(v0 int64) int64 {
 }
 
 //go:nosplit
-func i64_const(x int64) int64 { return x }
+func i64(x int64) int64 { return x }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

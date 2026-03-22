@@ -14,14 +14,10 @@ func (t *translator) constI32() (ast.Expr, error) {
 		return nil, err
 	}
 
-	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: formatInt(v)}}
-	if 0 < v && v < 128 {
-		return &ast.CallExpr{Fun: newID("int32"), Args: a}, nil
-	}
-
-	t.helpers.add("i32_const")
+	t.helpers.add("i32")
 	// This prevents constant folding/propagation.
-	return &ast.CallExpr{Fun: newID("i32_const"), Args: a}, nil
+	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: formatInt(v)}}
+	return &ast.CallExpr{Fun: newID("i32"), Args: a}, nil
 }
 
 func (t *translator) constI64() (ast.Expr, error) {
@@ -30,14 +26,10 @@ func (t *translator) constI64() (ast.Expr, error) {
 		return nil, err
 	}
 
-	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: formatInt(v)}}
-	if 0 < v && v < 128 {
-		return &ast.CallExpr{Fun: newID("int64"), Args: a}, nil
-	}
-
-	t.helpers.add("i64_const")
+	t.helpers.add("i64")
 	// This prevents constant folding/propagation.
-	return &ast.CallExpr{Fun: newID("i64_const"), Args: a}, nil
+	a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: formatInt(v)}}
+	return &ast.CallExpr{Fun: newID("i64"), Args: a}, nil
 }
 
 func (t *translator) constF32() (ast.Expr, error) {
@@ -50,9 +42,9 @@ func (t *translator) constF32() (ast.Expr, error) {
 	if -math.MaxFloat32 <= f && f <= +math.MaxFloat32 && (v == 0 || f != 0) {
 		a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: formatFloat(float64(f), 32)}}
 		if (f == 0 || f == 1 || f == -1) && *nanbox {
-			t.helpers.add("f32_const")
+			t.helpers.add("f32")
 			// This prevents constant folding/propagation.
-			return &ast.CallExpr{Fun: newID("f32_const"), Args: a}, nil
+			return &ast.CallExpr{Fun: newID("f32"), Args: a}, nil
 		}
 		return &ast.CallExpr{Fun: newID("float32"), Args: a}, nil
 	}
@@ -74,9 +66,9 @@ func (t *translator) constF64() (ast.Expr, error) {
 	if -math.MaxFloat64 <= f && f <= +math.MaxFloat64 && (v == 0 || f != 0) {
 		a := []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: formatFloat(f, 64)}}
 		if (f == 0 || f == 1 || f == -1) && *nanbox {
-			t.helpers.add("f64_const")
+			t.helpers.add("f64")
 			// This prevents constant folding/propagation.
-			return &ast.CallExpr{Fun: newID("f64_const"), Args: a}, nil
+			return &ast.CallExpr{Fun: newID("f64"), Args: a}, nil
 		}
 		return &ast.CallExpr{Fun: newID("float64"), Args: a}, nil
 	}

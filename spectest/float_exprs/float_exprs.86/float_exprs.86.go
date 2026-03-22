@@ -12,20 +12,20 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xf32_epsilon_3u62dj() float32 {
-	return float32(f32_const(1) - float32(float32(3)*float32(float32(float32(4)/float32(3))-f32_const(1))))
+	return float32(f32(1) - float32(float32(3)*float32(float32(float32(4)/float32(3))-f32(1))))
 }
 func (m *Module) Xf64_epsilon_1nkgelz() float64 {
-	return float64(f64_const(1) - float64(float64(3)*float64(float64(float64(4)/float64(3))-f64_const(1))))
+	return float64(f64(1) - float64(float64(3)*float64(float64(float64(4)/float64(3))-f64(1))))
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

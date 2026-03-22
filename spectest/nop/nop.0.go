@@ -21,8 +21,8 @@ func New() *Module {
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
 	m.elements = [][]any{{m.f61}}
-	copy(m.t0[0:], m.elements[0])
-	m.g0 = i32_const(0)
+	copy(m.t0[i32(0):], m.elements[0])
+	m.g0 = i32(0)
 	return m
 }
 func (m *Module) f0() {
@@ -31,19 +31,19 @@ func (m *Module) f1(v0 int32, v1 int32, v2 int32) int32 {
 	return v0 + (v1 - v2)
 }
 func (m *Module) Xas_func_first_1n8qpq7() int32 {
-	return int32(1)
+	return i32(1)
 }
 func (m *Module) Xas_func_mid_aecmm3() int32 {
 	m.f0()
-	return int32(2)
+	return i32(2)
 }
 func (m *Module) Xas_func_last_1bzq4u7() int32 {
 	m.f0()
-	return int32(3)
+	return i32(3)
 }
 func (m *Module) Xas_func_everywhere_7abu0z() int32 {
 	m.f0()
-	return int32(4)
+	return i32(4)
 }
 func (m *Module) Xas_drop_first_1tovu13(v0 int32) {
 	_ = v0
@@ -93,7 +93,7 @@ func (m *Module) Xas_block_first_dfe99y() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(2)
+		p0 = i32(2)
 	}
 	return p0
 }
@@ -102,7 +102,7 @@ func (m *Module) Xas_block_mid_x96mur() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(2)
+		p0 = i32(2)
 	}
 	return p0
 }
@@ -111,7 +111,7 @@ func (m *Module) Xas_block_last_sl4im1() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(3)
+		p0 = i32(3)
 	}
 	return p0
 }
@@ -120,7 +120,7 @@ func (m *Module) Xas_block_everywhere_190t9dd() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(4)
+		p0 = i32(4)
 	}
 	return p0
 }
@@ -128,7 +128,7 @@ func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
 	{
-		p0 = int32(2)
+		p0 = i32(2)
 	}
 	return p0
 }
@@ -137,7 +137,7 @@ func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(2)
+		p0 = i32(2)
 	}
 	return p0
 }
@@ -146,7 +146,7 @@ func (m *Module) Xas_loop_last_dr7k79() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(3)
+		p0 = i32(3)
 	}
 	return p0
 }
@@ -155,7 +155,7 @@ func (m *Module) Xas_loop_everywhere_1kskoaf() int32 {
 	_ = p0
 	{
 		m.f0()
-		p0 = int32(4)
+		p0 = i32(4)
 	}
 	return p0
 }
@@ -439,7 +439,7 @@ func (m *Module) Xas_call_indirect_first_1kls7bs() int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
+		t1 := m.t0[uint(i32(0))].(func(v0 int32, v1 int32) int32)(i32(1), i32(2))
 		p0 = t1
 	}
 	return p0
@@ -448,7 +448,7 @@ func (m *Module) Xas_call_indirect_mid1_1393fdb() int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
+		t1 := m.t0[uint(i32(0))].(func(v0 int32, v1 int32) int32)(i32(1), i32(2))
 		p0 = t1
 	}
 	return p0
@@ -457,7 +457,7 @@ func (m *Module) Xas_call_indirect_mid2_17vtapn() int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
+		t1 := m.t0[uint(i32(0))].(func(v0 int32, v1 int32) int32)(i32(1), i32(2))
 		p0 = t1
 	}
 	return p0
@@ -466,7 +466,7 @@ func (m *Module) Xas_call_indirect_last_os2e8m() int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
+		t1 := m.t0[uint(i32(0))].(func(v0 int32, v1 int32) int32)(i32(1), i32(2))
 		p0 = t1
 	}
 	return p0
@@ -475,47 +475,47 @@ func (m *Module) Xas_call_indirect_everywhere_icu59l() int32 {
 	var p0 int32
 	_ = p0
 	{
-		t1 := m.t0[uint(i32_const(0))].(func(v0 int32, v1 int32) int32)(int32(1), int32(2))
+		t1 := m.t0[uint(i32(0))].(func(v0 int32, v1 int32) int32)(i32(1), i32(2))
 		p0 = t1
 	}
 	return p0
 }
 func (m *Module) Xas_local_set_first_1q1f1go(v0 int32) int32 {
-	v0 = int32(2)
+	v0 = i32(2)
 	return v0
 }
 func (m *Module) Xas_local_set_last_14yd9qt(v0 int32) int32 {
-	v0 = int32(2)
+	v0 = i32(2)
 	return v0
 }
 func (m *Module) Xas_local_set_everywhere_185epkl(v0 int32) int32 {
-	v0 = int32(2)
+	v0 = i32(2)
 	return v0
 }
 func (m *Module) Xas_local_tee_first_1tnl1lo(v0 int32) int32 {
-	v0 = int32(2)
+	v0 = i32(2)
 	return v0
 }
 func (m *Module) Xas_local_tee_last_jp601i(v0 int32) int32 {
-	v0 = int32(2)
+	v0 = i32(2)
 	return v0
 }
 func (m *Module) Xas_local_tee_everywhere_8j2vat(v0 int32) int32 {
-	v0 = int32(2)
+	v0 = i32(2)
 	return v0
 }
 func (m *Module) Xas_global_set_first_dp2z4x() int32 {
-	m.g0 = int32(2)
+	m.g0 = i32(2)
 	t0 := m.g0
 	return t0
 }
 func (m *Module) Xas_global_set_last_pakzbc() int32 {
-	m.g0 = int32(2)
+	m.g0 = i32(2)
 	t0 := m.g0
 	return t0
 }
 func (m *Module) Xas_global_set_everywhere_1p2vhgt() int32 {
-	m.g0 = int32(2)
+	m.g0 = i32(2)
 	t0 := m.g0
 	return t0
 }
@@ -545,7 +545,7 @@ func (m *Module) Xas_store_everywhere_2tq23u(v0 int32, v1 int32) {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

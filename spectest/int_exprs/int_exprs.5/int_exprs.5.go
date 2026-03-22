@@ -12,21 +12,27 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_no_fold_div_s_mul_1okkrvo(v0 int32) int32 {
-	t0 := i32_div_s(v0, int32(6))
-	return t0 * int32(6)
+	t0 := i32_div_s(v0, i32(6))
+	return t0 * i32(6)
 }
 func (m *Module) Xi32_no_fold_div_u_mul_kktwwc(v0 int32) int32 {
-	t0 := int32(uint32(v0) / uint32(int32(6)))
-	return t0 * int32(6)
+	t0 := int32(uint32(v0) / uint32(i32(6)))
+	return t0 * i32(6)
 }
 func (m *Module) Xi64_no_fold_div_s_mul_1asxdf0(v0 int64) int64 {
-	t0 := i64_div_s(v0, int64(6))
-	return t0 * int64(6)
+	t0 := i64_div_s(v0, i64(6))
+	return t0 * i64(6)
 }
 func (m *Module) Xi64_no_fold_div_u_mul_fr8lvo(v0 int64) int64 {
-	t0 := int64(uint64(v0) / uint64(int64(6)))
-	return t0 * int64(6)
+	t0 := int64(uint64(v0) / uint64(i64(6)))
+	return t0 * i64(6)
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
+
+//go:nosplit
+func i64(x int64) int64 { return x }
 
 //go:nosplit
 func i32_div_s(x, y int32) int32 {

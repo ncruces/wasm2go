@@ -15,15 +15,15 @@ func (m *Module) Xf32_compute_radix_13zytma(v0 float32, v1 float32) float32 {
 l0:
 	{
 		v0 = float32(v0 + v0)
-		if float32(float32(float32(v0+f32_const(1))-v0)+f32_const(-1)) == f32_const(0) {
+		if float32(float32(float32(v0+f32(1))-v0)+f32(-1)) == f32(0) {
 			goto l0
 		}
 	}
 l1:
 	{
 		t0 := v0
-		v1 = float32(v1 + f32_const(1))
-		if float32(float32(float32(t0+v1)-v0)-v1) != f32_const(0) {
+		v1 = float32(v1 + f32(1))
+		if float32(float32(float32(t0+v1)-v0)-v1) != f32(0) {
 			goto l1
 		}
 	}
@@ -33,15 +33,15 @@ func (m *Module) Xf64_compute_radix_1uufc0g(v0 float64, v1 float64) float64 {
 l0:
 	{
 		v0 = float64(v0 + v0)
-		if float64(float64(float64(v0+f64_const(1))-v0)+f64_const(-1)) == f64_const(0) {
+		if float64(float64(float64(v0+f64(1))-v0)+f64(-1)) == f64(0) {
 			goto l0
 		}
 	}
 l1:
 	{
 		t0 := v0
-		v1 = float64(v1 + f64_const(1))
-		if float64(float64(float64(t0+v1)-v0)-v1) != f64_const(0) {
+		v1 = float64(v1 + f64(1))
+		if float64(float64(float64(t0+v1)-v0)-v1) != f64(0) {
 			goto l1
 		}
 	}
@@ -49,13 +49,13 @@ l1:
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

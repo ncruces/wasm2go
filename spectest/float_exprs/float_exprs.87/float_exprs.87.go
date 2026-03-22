@@ -14,12 +14,12 @@ func New() *Module {
 func (m *Module) Xf32_epsilon_3u62dj() float32 {
 	var v0, v1 float32
 	_, _ = v0, v1
-	v0 = f32_const(1)
+	v0 = f32(1)
 l0:
 	{
 		v1 = v0
 		v0 = float32(v1 * float32(0.5))
-		if float32(v0+f32_const(1)) > f32_const(1) {
+		if float32(v0+f32(1)) > f32(1) {
 			goto l0
 		}
 	}
@@ -28,12 +28,12 @@ l0:
 func (m *Module) Xf64_epsilon_1nkgelz() float64 {
 	var v0, v1 float64
 	_, _ = v0, v1
-	v0 = f64_const(1)
+	v0 = f64(1)
 l0:
 	{
 		v1 = v0
 		v0 = float64(v1 * float64(0.5))
-		if float64(v0+f64_const(1)) > f64_const(1) {
+		if float64(v0+f64(1)) > f64(1) {
 			goto l0
 		}
 	}
@@ -41,13 +41,13 @@ l0:
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

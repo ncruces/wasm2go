@@ -51,10 +51,10 @@ func (m *Module) Xf32_negative_infinity_1382rot() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0xff800000)))
 }
 func (m *Module) Xf32_zero_11i0qsv() int32 {
-	return int32(math.Float32bits(f32_const(0)))
+	return int32(math.Float32bits(f32(0)))
 }
 func (m *Module) Xf32_positive_zero_ij4yo6() int32 {
-	return int32(math.Float32bits(f32_const(0)))
+	return int32(math.Float32bits(f32(0)))
 }
 func (m *Module) Xf32_negative_zero_1hprbv6() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x80000000)))
@@ -90,10 +90,10 @@ func (m *Module) Xf32_min_int64_9afggz() int32 {
 	return int32(math.Float32bits(float32(-0x1p+63)))
 }
 func (m *Module) Xf32_dec_zero_v8gd91() int32 {
-	return int32(math.Float32bits(f32_const(0)))
+	return int32(math.Float32bits(f32(0)))
 }
 func (m *Module) Xf32_dec_positive_zero_1n3yk98() int32 {
-	return int32(math.Float32bits(f32_const(0)))
+	return int32(math.Float32bits(f32(0)))
 }
 func (m *Module) Xf32_dec_negative_zero_nylh7c() int32 {
 	return int32(math.Float32bits(math.Float32frombits(0x80000000)))
@@ -168,10 +168,10 @@ func (m *Module) Xf64_negative_infinity_1yyklnp() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0xfff0000000000000)))
 }
 func (m *Module) Xf64_zero_9x0lqa() int64 {
-	return int64(math.Float64bits(f64_const(0)))
+	return int64(math.Float64bits(f64(0)))
 }
 func (m *Module) Xf64_positive_zero_9fymp0() int64 {
-	return int64(math.Float64bits(f64_const(0)))
+	return int64(math.Float64bits(f64(0)))
 }
 func (m *Module) Xf64_negative_zero_18rqer4() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x8000000000000000)))
@@ -207,10 +207,10 @@ func (m *Module) Xf64_min_int64_1auqe6e() int64 {
 	return int64(math.Float64bits(float64(-0x1p+63)))
 }
 func (m *Module) Xf64_dec_zero_i66tq() int64 {
-	return int64(math.Float64bits(f64_const(0)))
+	return int64(math.Float64bits(f64(0)))
 }
 func (m *Module) Xf64_dec_positive_zero_1al9c04() int64 {
-	return int64(math.Float64bits(f64_const(0)))
+	return int64(math.Float64bits(f64(0)))
 }
 func (m *Module) Xf64_dec_negative_zero_a6sggg() int64 {
 	return int64(math.Float64bits(math.Float64frombits(0x8000000000000000)))
@@ -310,13 +310,13 @@ func (m *Module) Xf64_hex_sep5_c4xpi8() float64 {
 }
 
 //go:nosplit
-func f32_const(x float32) float32 {
+func f32(x float32) float32 {
 	runtime.KeepAlive(&x)
 	return x
 }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

@@ -10,18 +10,24 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xi32_rem_s_3_1rpgw4r(v0 int32) int32 {
-	t0 := v0 % int32(3)
+	t0 := v0 % i32(3)
 	return t0
 }
 func (m *Module) Xi32_rem_u_3_eh36po(v0 int32) int32 {
-	t0 := int32(uint32(v0) % uint32(int32(3)))
+	t0 := int32(uint32(v0) % uint32(i32(3)))
 	return t0
 }
 func (m *Module) Xi64_rem_s_3_hh7opn(v0 int64) int64 {
-	t0 := v0 % int64(3)
+	t0 := v0 % i64(3)
 	return t0
 }
 func (m *Module) Xi64_rem_u_3_1uefb2k(v0 int64) int64 {
-	t0 := int64(uint64(v0) % uint64(int64(3)))
+	t0 := int64(uint64(v0) % uint64(i64(3)))
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
+
+//go:nosplit
+func i64(x int64) int64 { return x }

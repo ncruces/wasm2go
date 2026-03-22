@@ -11,17 +11,17 @@ func New() *Module {
 	m := &Module{}
 	m.t0 = make([]any, 10)
 	m.elements = [][]any{{m.f0, m.f1, m.f2}}
-	copy(m.t0[0:], m.elements[0])
+	copy(m.t0[i32(0):], m.elements[0])
 	return m
 }
 func (m *Module) f0() int32 {
-	return i32_const(0)
+	return i32(0)
 }
 func (m *Module) f1() int32 {
-	return int32(1)
+	return i32(1)
 }
 func (m *Module) f2() int32 {
-	return int32(2)
+	return i32(2)
 }
 func (m *Module) Xcopy(v0 int32, v1 int32, v2 int32) {
 	table_copy(m.t0, m.t0, v0, v1, v2)
@@ -32,7 +32,7 @@ func (m *Module) Xcall(v0 int32) int32 {
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3) {
 	x := uint(dest)

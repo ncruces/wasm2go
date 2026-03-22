@@ -720,7 +720,7 @@ func convert(expr ast.Expr, types ...string) ast.Expr {
 
 func iszero(expr ast.Expr) bool {
 	if call, ok := expr.(*ast.CallExpr); ok {
-		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "i32_const" {
+		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "i32" {
 			if len(call.Args) == 1 {
 				lit, ok := call.Args[0].(*ast.BasicLit)
 				return ok && lit.Kind == token.INT && lit.Value == "0"

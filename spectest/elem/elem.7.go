@@ -11,21 +11,24 @@ func New() *Module {
 	m := &Module{}
 	m.t0 = make([]any, 10)
 	m.elements = [][]any{{m.f0}, {m.f1}}
-	copy(m.t0[7:], m.elements[0])
-	copy(m.t0[9:], m.elements[1])
+	copy(m.t0[i32(7):], m.elements[0])
+	copy(m.t0[i32(9):], m.elements[1])
 	return m
 }
 func (m *Module) f0() int32 {
-	return int32(65)
+	return i32(65)
 }
 func (m *Module) f1() int32 {
-	return int32(66)
+	return i32(66)
 }
 func (m *Module) Xcall_7_1nh5bgj() int32 {
-	t0 := m.t0[uint(int32(7))].(func() int32)()
+	t0 := m.t0[uint(i32(7))].(func() int32)()
 	return t0
 }
 func (m *Module) Xcall_9_xw0ztw() int32 {
-	t0 := m.t0[uint(int32(9))].(func() int32)()
+	t0 := m.t0[uint(i32(9))].(func() int32)()
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }

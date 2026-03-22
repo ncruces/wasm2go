@@ -13,7 +13,7 @@ func New(v0 XMt) *Module {
 	m._Mt = v0
 	m.t0 = v0.Xtab()
 	m.elements = [][]any{{m.f1, m.f0}}
-	copy((*m.t0)[1:], m.elements[0])
+	copy((*m.t0)[i32(1):], m.elements[0])
 	if i, ok := any(v0).(interface {
 		Init(any)
 	}); ok {
@@ -31,9 +31,12 @@ func (m *Module) f0() int32 {
 	return m._Mt.Xh()
 }
 func (m *Module) f1() int32 {
-	return int32(6)
+	return i32(6)
 }
 func (m *Module) Xcall(v0 int32) int32 {
 	t0 := (*m.t0)[uint(v0)].(func() int32)()
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }

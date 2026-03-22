@@ -30,7 +30,7 @@ func (m *Module) Xrun(v0 int32, v1 float64) {
 			t1 := v2
 			t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v2):]))
 			binary.LittleEndian.PutUint64(m.memory[uint32(t1):], math.Float64bits(float64(t0/v1)))
-			v2 = v2 + int32(8)
+			v2 = v2 + i32(8)
 			if uint32(v2) < uint32(v0) {
 				goto l0
 			}
@@ -41,3 +41,6 @@ func (m *Module) Xcheck(v0 int32) float64 {
 	t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
 	return t0
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }

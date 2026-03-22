@@ -19,51 +19,51 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xzero_everything() {
-	binary.LittleEndian.PutUint32(m.memory[uint32(i32_const(0)):], uint32(i32_const(0)))
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(4)):], uint32(i32_const(0)))
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(i32_const(0)))
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(12)):], uint32(i32_const(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(4)):], uint32(i32(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(8)):], uint32(i32(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(12)):], uint32(i32(0)))
 }
 func (m *Module) Xtest_store_to_load() int32 {
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(i32_const(0)))
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(5)):], math.Float32bits(math.Float32frombits(0x80000000)))
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(8)):], uint32(i32(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(5)):], math.Float32bits(math.Float32frombits(0x80000000)))
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32(8)):]))
 	return t0
 }
 func (m *Module) Xtest_redundant_load() int32 {
 	var v0, v1 int32
 	_, _ = v0, v1
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
+	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32(8)):]))
 	v0 = t0
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(5)):], uint32(i32_const(-0x80000000)))
-	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(int32(8)):]))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(5)):], uint32(i32(-0x80000000)))
+	t1 := int32(binary.LittleEndian.Uint32(m.memory[uint32(i32(8)):]))
 	v1 = t1
 	return v0 + v1
 }
 func (m *Module) Xtest_dead_store() float32 {
 	var v0 float32
 	_ = v0
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(i32_const(589505315)))
-	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(int32(11)):]))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(8)):], uint32(i32(589505315)))
+	t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(i32(11)):]))
 	v0 = t0
-	binary.LittleEndian.PutUint32(m.memory[uint32(int32(8)):], uint32(i32_const(0)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(8)):], uint32(i32(0)))
 	return v0
 }
 func (m *Module) Xmalloc(v0 int32) int32 {
-	return int32(16)
+	return i32(16)
 }
 func (m *Module) Xmalloc_aliasing() int32 {
 	var v0, v1 int32
 	_, _ = v0, v1
-	t0 := m.Xmalloc(int32(4))
+	t0 := m.Xmalloc(i32(4))
 	v0 = t0
-	t1 := m.Xmalloc(int32(4))
+	t1 := m.Xmalloc(i32(4))
 	v1 = t1
-	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(int32(42)))
-	binary.LittleEndian.PutUint32(m.memory[uint32(v1):], uint32(int32(43)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(i32(42)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(v1):], uint32(i32(43)))
 	t2 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
 	return t2
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }

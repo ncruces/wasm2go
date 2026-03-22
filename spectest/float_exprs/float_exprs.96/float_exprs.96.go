@@ -14,22 +14,22 @@ func New() *Module {
 func (m *Module) Xtau(v0 int32) float64 {
 	var v1, v2, v3, v4 float64
 	_, _, _, _ = v1, v2, v3, v4
-	v1 = f64_const(0)
+	v1 = f64(0)
 	{
-		if v0 < int32(1) {
+		if v0 < i32(1) {
 			goto l0
 		}
-		v2 = f64_const(1)
-		v3 = f64_const(0)
+		v2 = f64(1)
+		v3 = f64(0)
 	l1:
 		{
 			t0 := v1
 			t1 := v2
 			v4 = float64(v3 * float64(8))
-			v1 = float64(t0 + float64(t1*float64(float64(float64(float64(float64(8)/float64(v4+f64_const(1)))-float64(float64(4)/float64(v4+float64(4))))-float64(float64(2)/float64(v4+float64(5))))-float64(float64(2)/float64(v4+float64(6))))))
-			v3 = float64(v3 + f64_const(1))
+			v1 = float64(t0 + float64(t1*float64(float64(float64(float64(float64(8)/float64(v4+f64(1)))-float64(float64(4)/float64(v4+float64(4))))-float64(float64(2)/float64(v4+float64(5))))-float64(float64(2)/float64(v4+float64(6))))))
+			v3 = float64(v3 + f64(1))
 			v2 = float64(v2 * float64(0.0625))
-			v0 = v0 + i32_const(-1)
+			v0 = v0 + i32(-1)
 			if v0 != 0 {
 				goto l1
 			}
@@ -40,10 +40,10 @@ l0:
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 //go:nosplit
-func f64_const(x float64) float64 {
+func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
 }

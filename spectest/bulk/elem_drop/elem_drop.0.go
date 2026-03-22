@@ -11,7 +11,7 @@ func New() *Module {
 	m := &Module{}
 	m.t0 = make([]any, 1)
 	m.elements = [][]any{{m.f0}, {m.f0}}
-	copy(m.t0[0:], m.elements[1])
+	copy(m.t0[i32(0):], m.elements[1])
 	return m
 }
 func (m *Module) f0() {
@@ -20,17 +20,17 @@ func (m *Module) Xdrop_passive() {
 	m.elements[0] = nil
 }
 func (m *Module) Xinit_passive(v0 int32) {
-	table_init(m.t0, m.elements[0], i32_const(0), i32_const(0), v0)
+	table_init(m.t0, m.elements[0], i32(0), i32(0), v0)
 }
 func (m *Module) Xdrop_active() {
 	m.elements[1] = nil
 }
 func (m *Module) Xinit_active(v0 int32) {
-	table_init(m.t0, m.elements[1], i32_const(0), i32_const(0), v0)
+	table_init(m.t0, m.elements[1], i32(0), i32(0), v0)
 }
 
 //go:nosplit
-func i32_const(x int32) int32 { return x }
+func i32(x int32) int32 { return x }
 
 func table_init[T int32 | int64](tab, elems []any, dest, src, n T) {
 	x := uint(dest)

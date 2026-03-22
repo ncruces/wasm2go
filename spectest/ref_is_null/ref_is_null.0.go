@@ -13,7 +13,7 @@ func New() *Module {
 	m.t0 = make([]any, 2)
 	m.t1 = make([]any, 2)
 	m.elements = [][]any{{m.f2}}
-	copy(m.t0[1:], m.elements[0])
+	copy(m.t0[i32(1):], m.elements[0])
 	return m
 }
 func (m *Module) Xfuncref(v0 any) int32 {
@@ -33,11 +33,11 @@ func (m *Module) Xexternref(v0 any) int32 {
 func (m *Module) f2() {
 }
 func (m *Module) Xinit(v0 any) {
-	m.t1[int32(1)] = v0
+	m.t1[i32(1)] = v0
 }
 func (m *Module) Xdeinit() {
-	m.t0[int32(1)] = nil
-	m.t1[int32(1)] = nil
+	m.t0[i32(1)] = nil
+	m.t1[i32(1)] = nil
 }
 func (m *Module) Xfuncref_elem_m4wk1v(v0 int32) int32 {
 	t0 := m.t0[v0]
@@ -49,3 +49,6 @@ func (m *Module) Xexternref_elem_cgiebg(v0 int32) int32 {
 	t1 := m.Xexternref(t0)
 	return t1
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }

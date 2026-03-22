@@ -16,8 +16,8 @@ func New() *Module {
 	m := &Module{}
 	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	copy(m.memory[0:], data0)
-	copy(m.memory[65528:], data1)
+	copy(m.memory[uint32(i32(0)):], data0)
+	copy(m.memory[uint32(i32(65528)):], data1)
 	return m
 }
 func (m *Module) Xi32_load_1wsn7it(v0 int32) int32 {
@@ -103,6 +103,9 @@ func (m *Module) Xi64_store16_ul9rnr(v0 int32, v1 int64) {
 func (m *Module) Xi64_store32_13kmrw6(v0 int32, v1 int64) {
 	binary.LittleEndian.PutUint32(m.memory[uint32(v0):], uint32(v1))
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
 
 const (
 	data0 = "abcdefgh"

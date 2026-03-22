@@ -14,17 +14,23 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xtest32() {
-	table_copy(m.t0, m.t0, int32(13), int32(2), int32(3))
+	table_copy(m.t0, m.t0, i32(13), i32(2), i32(3))
 }
 func (m *Module) Xtest64() {
-	table_copy(m.t1, m.t1, int64(13), int64(2), int64(3))
+	table_copy(m.t1, m.t1, i64(13), i64(2), i64(3))
 }
 func (m *Module) Xtest_64to32() {
-	table_copy(m.t0, m.t1, int32(13), int64(2), int32(3))
+	table_copy(m.t0, m.t1, i32(13), i64(2), i32(3))
 }
 func (m *Module) Xtest_32to64() {
-	table_copy(m.t1, m.t0, int64(13), int32(2), int32(3))
+	table_copy(m.t1, m.t0, i64(13), i32(2), i32(3))
 }
+
+//go:nosplit
+func i32(x int32) int32 { return x }
+
+//go:nosplit
+func i64(x int64) int64 { return x }
 
 func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3) {
 	x := uint(dest)
