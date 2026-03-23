@@ -144,24 +144,18 @@ l0:
 	return p0
 }
 func (m *Module) Xas_br_table_value_1ic2jxx(v0 int32) int32 {
-	{
-		{
-			{
-				switch v0 {
-				case 0:
-					goto l0
-				case 1:
-					goto l1
-				default:
-					goto l2
-				}
-			}
-		l0:
-			return i32(1)
-		}
-	l1:
-		return i32(2)
+	switch v0 {
+	case 0:
+		goto l0
+	case 1:
+		goto l1
+	default:
+		goto l2
 	}
+l0:
+	return i32(1)
+l1:
+	return i32(2)
 l2:
 	return i32(3)
 }

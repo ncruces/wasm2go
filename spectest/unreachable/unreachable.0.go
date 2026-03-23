@@ -56,63 +56,47 @@ func (m *Module) Xas_func_value_1gti5qk() int32 {
 func (m *Module) Xas_block_first_dfe99y() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_block_mid_x96mur() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		panic("unreachable")
-	}
+	m.f0()
+	panic("unreachable")
 }
 func (m *Module) Xas_block_last_sl4im1() {
-	{
-		m.f0()
-		panic("unreachable")
-	}
+	m.f0()
+	panic("unreachable")
 }
 func (m *Module) Xas_block_value_pg8qbp() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		panic("unreachable")
-	}
+	m.f0()
+	panic("unreachable")
 }
 func (m *Module) Xas_block_broke_180w4m2() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(1)
-		goto l0
-	}
+	m.f0()
+	p0 = i32(1)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		panic("unreachable")
-	}
+	m.f0()
+	panic("unreachable")
 }
 func (m *Module) Xas_loop_last_dr7k79() {
-	{
-		m.f0()
-		panic("unreachable")
-	}
+	m.f0()
+	panic("unreachable")
 }
 func (m *Module) Xas_loop_broke_1r32ml2() int32 {
 	var p0 int32
@@ -120,11 +104,9 @@ func (m *Module) Xas_loop_broke_1r32ml2() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			m.f0()
-			p0 = i32(1)
-			goto l0
-		}
+		m.f0()
+		p0 = i32(1)
+		goto l0
 	}
 l0:
 	return p0
@@ -132,40 +114,28 @@ l0:
 func (m *Module) Xas_br_value_1sx9dl7() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_br_if_cond_p6cjb3() {
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_br_if_value_1tlgvkk() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_br_if_value_cond_pzz0yu() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_br_table_index_sdkzon() {
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_br_table_value_1ic2jxx() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_br_table_value_2_1g4mq6r() int32 {
 	var p0 int32
@@ -173,24 +143,18 @@ func (m *Module) Xas_br_table_value_2_1g4mq6r() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			panic("unreachable")
-		}
+		panic("unreachable")
 	}
 }
 func (m *Module) Xas_br_table_value_index_fupi8r() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_br_table_value_and_index_1r5k2vh() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xas_return_value_1wph1uy() int64 {
 	panic("unreachable")

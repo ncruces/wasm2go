@@ -51,59 +51,47 @@ func (m *Module) Xfunc_unwind_by_return_15kuc3k() int32 {
 	return i32(9)
 }
 func (m *Module) Xblock_unwind_by_unreachable_k7fi3t() {
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xblock_unwind_by_br_173i0ct() int32 {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 	return i32(9)
 }
 func (m *Module) Xblock_unwind_by_br_value_yzb9yc() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(9)
-		goto l0
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xblock_unwind_by_br_if_1f3d6k1() int32 {
-	{
-		if i32(1) != 0 {
-			goto l0
-		}
-		_ = i64(1)
-		_ = i32(3)
+	if i32(1) != 0 {
+		goto l0
 	}
+	_ = i64(1)
+	_ = i32(3)
 l0:
 	return i32(9)
 }
 func (m *Module) Xblock_unwind_by_br_if_value_159ovrv() int32 {
 	var p0 int32
 	_ = p0
-	{
-		if i32(1) != 0 {
-			p0 = i32(9)
-			goto l0
-		}
-		_ = i32(9)
-		_ = i64(1)
-		p0 = i32(3)
+	if i32(1) != 0 {
+		p0 = i32(9)
+		goto l0
 	}
+	_ = i32(9)
+	_ = i64(1)
+	p0 = i32(3)
 l0:
 	return p0
 }
 func (m *Module) Xblock_unwind_by_br_table_1j60yuz() int32 {
-	{
-		switch i32(0) {
-		default:
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		goto l0
 	}
 l0:
 	return i32(9)
@@ -111,12 +99,10 @@ l0:
 func (m *Module) Xblock_unwind_by_br_table_value_dpu5ik() int32 {
 	var p0 int32
 	_ = p0
-	{
-		switch i32(0) {
-		default:
-			p0 = i32(9)
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		p0 = i32(9)
+		goto l0
 	}
 l0:
 	return p0
@@ -124,78 +110,52 @@ l0:
 func (m *Module) Xblock_unwind_by_return_8v2fj2() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(9)
-	}
+	return i32(9)
 }
 func (m *Module) Xblock_nested_unwind_by_unreachable_3xsms() int32 {
 	var p0 int32
 	_ = p0
-	{
-		{
-			panic("unreachable")
-		}
-	}
+	panic("unreachable")
 }
 func (m *Module) Xblock_nested_unwind_by_br_12v85r7() int32 {
-	{
-		{
-			goto l0
-		}
-	}
+	goto l0
 l0:
 	return i32(9)
 }
 func (m *Module) Xblock_nested_unwind_by_br_value_18gvu86() int32 {
 	var p0 int32
 	_ = p0
-	{
-		{
-			p0 = i32(9)
-			goto l0
-		}
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xblock_nested_unwind_by_br_if_1r3fct0() int32 {
-	{
-		{
-			if i32(1) != 0 {
-				goto l0
-			}
-			_ = i64(1)
-		}
-		_ = i32(3)
+	if i32(1) != 0 {
+		goto l0
 	}
+	_ = i64(1)
+	_ = i32(3)
 l0:
 	return i32(9)
 }
 func (m *Module) Xblock_nested_unwind_by_br_if_value_1p1y7wm() int32 {
 	var p0 int32
 	_ = p0
-	{
-		{
-			if i32(1) != 0 {
-				p0 = i32(9)
-				goto l0
-			}
-			_ = i32(9)
-			_ = i64(1)
-		}
-		p0 = i32(3)
+	if i32(1) != 0 {
+		p0 = i32(9)
+		goto l0
 	}
+	_ = i32(9)
+	_ = i64(1)
+	p0 = i32(3)
 l0:
 	return p0
 }
 func (m *Module) Xblock_nested_unwind_by_br_table_6sxu3d() int32 {
-	{
-		{
-			switch i32(1) {
-			default:
-				goto l0
-			}
-		}
+	switch i32(1) {
+	default:
+		goto l0
 	}
 l0:
 	return i32(9)
@@ -203,14 +163,10 @@ l0:
 func (m *Module) Xblock_nested_unwind_by_br_table_value_zcvzvk() int32 {
 	var p0 int32
 	_ = p0
-	{
-		{
-			switch i32(1) {
-			default:
-				p0 = i32(9)
-				goto l0
-			}
-		}
+	switch i32(1) {
+	default:
+		p0 = i32(9)
+		goto l0
 	}
 l0:
 	return p0
@@ -218,11 +174,7 @@ l0:
 func (m *Module) Xblock_nested_unwind_by_return_1jvxl8k() int32 {
 	var p0 int32
 	_ = p0
-	{
-		{
-			return i32(9)
-		}
-	}
+	return i32(9)
 }
 func (m *Module) Xunary_after_unreachable_besty6() int32 {
 	panic("unreachable")
@@ -230,10 +182,8 @@ func (m *Module) Xunary_after_unreachable_besty6() int32 {
 func (m *Module) Xunary_after_br_1xo853b() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(9)
-		goto l0
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
@@ -258,12 +208,10 @@ l0:
 func (m *Module) Xunary_after_br_table_e0oppk() int32 {
 	var p0 int32
 	_ = p0
-	{
-		switch i32(0) {
-		default:
-			p0 = i32(9)
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		p0 = i32(9)
+		goto l0
 	}
 l0:
 	return p0
@@ -277,10 +225,8 @@ func (m *Module) Xbinary_after_unreachable_1gy9sro() int32 {
 func (m *Module) Xbinary_after_br_1r5scun() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(9)
-		goto l0
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
@@ -305,12 +251,10 @@ l0:
 func (m *Module) Xbinary_after_br_table_1bfjmgh() int32 {
 	var p0 int32
 	_ = p0
-	{
-		switch i32(0) {
-		default:
-			p0 = i32(9)
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		p0 = i32(9)
+		goto l0
 	}
 l0:
 	return p0
@@ -324,10 +268,8 @@ func (m *Module) Xselect_after_unreachable_1h9jpid() int32 {
 func (m *Module) Xselect_after_br_1pu0fpp() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(9)
-		goto l0
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
@@ -352,12 +294,10 @@ l0:
 func (m *Module) Xselect_after_br_table_mm9swq() int32 {
 	var p0 int32
 	_ = p0
-	{
-		switch i32(0) {
-		default:
-			p0 = i32(9)
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		p0 = i32(9)
+		goto l0
 	}
 l0:
 	return p0
@@ -368,43 +308,35 @@ func (m *Module) Xselect_after_return_1s3pzrk() int32 {
 func (m *Module) Xblock_value_after_unreachable_rqm3bf() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xblock_value_after_br_jjlj3s() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(9)
-		goto l0
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xblock_value_after_br_if_1pny9t1() int32 {
 	var p0 int32
 	_ = p0
-	{
-		if i32(1) != 0 {
-			p0 = i32(9)
-			goto l0
-		}
-		_ = i32(9)
-		p0 = i32(0)
+	if i32(1) != 0 {
+		p0 = i32(9)
+		goto l0
 	}
+	_ = i32(9)
+	p0 = i32(0)
 l0:
 	return p0
 }
 func (m *Module) Xblock_value_after_br_table_156xog3() int32 {
 	var p0 int32
 	_ = p0
-	{
-		switch i32(0) {
-		default:
-			p0 = i32(9)
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		p0 = i32(9)
+		goto l0
 	}
 l0:
 	return p0
@@ -412,16 +344,12 @@ l0:
 func (m *Module) Xblock_value_after_return_1220mvm() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(9)
-	}
+	return i32(9)
 }
 func (m *Module) Xloop_value_after_unreachable_1fw38ej() int32 {
 	var p0 int32
 	_ = p0
-	{
-		panic("unreachable")
-	}
+	panic("unreachable")
 }
 func (m *Module) Xloop_value_after_br_gbgm7a() int32 {
 	var p0 int32
@@ -429,10 +357,8 @@ func (m *Module) Xloop_value_after_br_gbgm7a() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			p0 = i32(9)
-			goto l0
-		}
+		p0 = i32(9)
+		goto l0
 	}
 l0:
 	return p0
@@ -443,14 +369,12 @@ func (m *Module) Xloop_value_after_br_if_7o1mpx() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			if i32(1) != 0 {
-				p0 = i32(9)
-				goto l0
-			}
-			_ = i32(9)
-			p1 = i32(0)
+		if i32(1) != 0 {
+			p0 = i32(9)
+			goto l0
 		}
+		_ = i32(9)
+		p1 = i32(0)
 		p0 = p1
 	}
 l0:
@@ -462,12 +386,10 @@ func (m *Module) Xloop_value_after_br_table_i3ca0c() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			switch i32(0) {
-			default:
-				p0 = i32(9)
-				goto l0
-			}
+		switch i32(0) {
+		default:
+			p0 = i32(9)
+			goto l0
 		}
 	}
 l0:
@@ -476,9 +398,7 @@ l0:
 func (m *Module) Xloop_value_after_return_1sf27ss() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(9)
-	}
+	return i32(9)
 }
 
 //go:nosplit

@@ -554,6 +554,7 @@ func (fn *funcCompiler) cleanup() {
 	util.CheckMaterialized(fn.decl)
 	util.RemoveUnusedLocals(fn.decl)
 	if !*noopt {
+		util.UnnestBlocks(fn.decl)
 		util.RemoveEmptyStmts(fn.decl)
 		util.RemoveSelfAssign(fn.decl)
 	}

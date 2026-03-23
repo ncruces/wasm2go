@@ -24,16 +24,14 @@ func (m *Module) Xinit(v0 int32, v1 float32) {
 func (m *Module) Xrun(v0 int32, v1 float32) {
 	var v2 int32
 	_ = v2
+l0:
 	{
-	l0:
-		{
-			t1 := v2
-			t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v2):]))
-			binary.LittleEndian.PutUint32(m.memory[uint32(t1):], math.Float32bits(float32(t0/v1)))
-			v2 = v2 + i32(4)
-			if uint32(v2) < uint32(v0) {
-				goto l0
-			}
+		t1 := v2
+		t0 := math.Float32frombits(binary.LittleEndian.Uint32(m.memory[uint32(v2):]))
+		binary.LittleEndian.PutUint32(m.memory[uint32(t1):], math.Float32bits(float32(t0/v1)))
+		v2 = v2 + i32(4)
+		if uint32(v2) < uint32(v0) {
+			goto l0
 		}
 	}
 }

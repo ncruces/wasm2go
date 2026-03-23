@@ -92,71 +92,55 @@ func (m *Module) Xas_select_everywhere_13ehyla(v0 int32) int32 {
 func (m *Module) Xas_block_first_dfe99y() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(2)
-	}
+	p0 = i32(2)
 	return p0
 }
 func (m *Module) Xas_block_mid_x96mur() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(2)
-	}
+	m.f0()
+	p0 = i32(2)
 	return p0
 }
 func (m *Module) Xas_block_last_sl4im1() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(3)
-	}
+	m.f0()
+	p0 = i32(3)
 	return p0
 }
 func (m *Module) Xas_block_everywhere_190t9dd() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(4)
-	}
+	m.f0()
+	p0 = i32(4)
 	return p0
 }
 func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(2)
-	}
+	p0 = i32(2)
 	return p0
 }
 func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(2)
-	}
+	m.f0()
+	p0 = i32(2)
 	return p0
 }
 func (m *Module) Xas_loop_last_dr7k79() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(3)
-	}
+	m.f0()
+	p0 = i32(3)
 	return p0
 }
 func (m *Module) Xas_loop_everywhere_1kskoaf() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(4)
-	}
+	m.f0()
+	p0 = i32(4)
 	return p0
 }
 func (m *Module) Xas_if_condition_mme5rn(v0 int32) {

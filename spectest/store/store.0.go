@@ -16,47 +16,35 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xas_block_value_pg8qbp() {
-	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
-	}
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 }
 func (m *Module) Xas_loop_value_amjtft() {
-	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
-	}
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
 }
 func (m *Module) Xas_br_value_1sx9dl7() {
-	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+	goto l0
+l0:
+}
+func (m *Module) Xas_br_if_value_1tlgvkk() {
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+	if i32(1) != 0 {
 		goto l0
 	}
 l0:
 }
-func (m *Module) Xas_br_if_value_1tlgvkk() {
-	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
-		if i32(1) != 0 {
-			goto l0
-		}
-	}
-l0:
-}
 func (m *Module) Xas_br_if_value_cond_pzz0yu() {
-	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
-		if i32(6) != 0 {
-			goto l0
-		}
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+	if i32(6) != 0 {
+		goto l0
 	}
 l0:
 }
 func (m *Module) Xas_br_table_value_1ic2jxx() {
-	{
-		binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
-		switch i32(1) {
-		default:
-			goto l0
-		}
+	binary.LittleEndian.PutUint32(m.memory[uint32(i32(0)):], uint32(i32(1)))
+	switch i32(1) {
+	default:
+		goto l0
 	}
 l0:
 }

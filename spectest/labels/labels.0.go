@@ -12,10 +12,8 @@ func New() *Module {
 func (m *Module) Xblock() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(1)
-		goto l0
-	}
+	p0 = i32(1)
+	goto l0
 l0:
 	return p0
 }
@@ -119,9 +117,7 @@ l0:
 func (m *Module) Xloop5() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(1)
-	}
+	p0 = i32(1)
 	return p0 + i32(1)
 }
 func (m *Module) Xloop6() int32 {
@@ -140,82 +136,78 @@ func (m *Module) Xif() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32(0)
-	{
-		if i32(1) != 0 {
-			goto l0
-		}
-	l0:
-		v0 = v0 + i32(1)
-		if i32(1) != 0 {
-			goto l1
-		} else {
-			v0 = i32(888)
-		}
-	l1:
-		v0 = v0 + i32(1)
-		if i32(1) != 0 {
-			goto l2
-		} else {
-			v0 = i32(888)
-		}
-	l2:
-		v0 = v0 + i32(1)
-		if i32(0) != 0 {
-			v0 = i32(888)
-		} else {
-			goto l3
-		}
-	l3:
-		v0 = v0 + i32(1)
-		if i32(0) != 0 {
-			v0 = i32(888)
-		} else {
-			goto l4
-		}
-	l4:
-		v0 = v0 + i32(1)
+	if i32(1) != 0 {
+		goto l0
 	}
+l0:
+	v0 = v0 + i32(1)
+	if i32(1) != 0 {
+		goto l1
+	} else {
+		v0 = i32(888)
+	}
+l1:
+	v0 = v0 + i32(1)
+	if i32(1) != 0 {
+		goto l2
+	} else {
+		v0 = i32(888)
+	}
+l2:
+	v0 = v0 + i32(1)
+	if i32(0) != 0 {
+		v0 = i32(888)
+	} else {
+		goto l3
+	}
+l3:
+	v0 = v0 + i32(1)
+	if i32(0) != 0 {
+		v0 = i32(888)
+	} else {
+		goto l4
+	}
+l4:
+	v0 = v0 + i32(1)
 	return v0
 }
 func (m *Module) Xif2() int32 {
 	var v0 int32
 	_ = v0
 	v0 = i32(0)
-	{
-		if i32(1) != 0 {
-			goto l0
-		}
-	l0:
-		v0 = v0 + i32(1)
-		if i32(1) != 0 {
-			goto l1
-		} else {
-			v0 = i32(888)
-		}
-	l1:
-		v0 = v0 + i32(1)
-		if i32(1) != 0 {
-			goto l2
-		} else {
-			v0 = i32(888)
-		}
-	l2:
-		v0 = v0 + i32(1)
-		if i32(0) != 0 {
-			v0 = i32(888)
-		} else {
-			goto l3
-		}
-	l3:
-		v0 = v0 + i32(1)
-		if i32(0) != 0 {
-			v0 = i32(888)
-		} else {
-			goto l4
-		}
-	l4:
-		v0 = v0 + i32(1)
+	if i32(1) != 0 {
+		goto l0
 	}
+l0:
+	v0 = v0 + i32(1)
+	if i32(1) != 0 {
+		goto l1
+	} else {
+		v0 = i32(888)
+	}
+l1:
+	v0 = v0 + i32(1)
+	if i32(1) != 0 {
+		goto l2
+	} else {
+		v0 = i32(888)
+	}
+l2:
+	v0 = v0 + i32(1)
+	if i32(0) != 0 {
+		v0 = i32(888)
+	} else {
+		goto l3
+	}
+l3:
+	v0 = v0 + i32(1)
+	if i32(0) != 0 {
+		v0 = i32(888)
+	} else {
+		goto l4
+	}
+l4:
+	v0 = v0 + i32(1)
 	return v0
 }
 func (m *Module) Xswitch(v0 int32) int32 {
@@ -224,40 +216,26 @@ func (m *Module) Xswitch(v0 int32) int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			{
-				{
-					{
-						{
-							{
-								switch v0 {
-								case 0:
-									goto l0
-								case 1:
-									goto l1
-								case 2:
-									goto l2
-								case 3:
-									goto l3
-								default:
-									goto l4
-								}
-							}
-						l1:
-						}
-					l2:
-						p1 = i32(2)
-						goto l5
-					}
-				l3:
-					p0 = i32(3)
-					goto l6
-				}
-			l4:
-			}
-		l0:
-			p1 = i32(5)
+		switch v0 {
+		case 0:
+			goto l0
+		case 1:
+			goto l2
+		case 2:
+			goto l2
+		case 3:
+			goto l3
+		default:
+			goto l0
 		}
+	l2:
+		p1 = i32(2)
+		goto l5
+	l3:
+		p0 = i32(3)
+		goto l6
+	l0:
+		p1 = i32(5)
 	l5:
 		t2 := i32(10) * p1
 		p0 = t2
@@ -266,21 +244,15 @@ l6:
 	return p0
 }
 func (m *Module) Xreturn(v0 int32) int32 {
-	{
-		{
-			{
-				switch v0 {
-				case 0:
-					goto l0
-				default:
-					goto l1
-				}
-			}
-		l0:
-			return i32(0)
-		}
-	l1:
+	switch v0 {
+	case 0:
+		goto l0
+	default:
+		goto l1
 	}
+l0:
+	return i32(0)
+l1:
 	return i32(2)
 }
 func (m *Module) Xbr_if0() int32 {
@@ -290,16 +262,14 @@ func (m *Module) Xbr_if0() int32 {
 	var p0 int32
 	_ = p0
 	{
-		{
-			if i32(0) != 0 {
-				goto l0
-			}
-			v0 = v0 | i32(1)
-			if i32(1) != 0 {
-				goto l0
-			}
-			v0 = v0 | i32(2)
+		if i32(0) != 0 {
+			goto l0
 		}
+		v0 = v0 | i32(1)
+		if i32(1) != 0 {
+			goto l0
+		}
+		v0 = v0 | i32(2)
 	l0:
 		;
 		var p1 int32
@@ -340,10 +310,8 @@ func (m *Module) Xbr_if1() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			p1 = i32(1)
-			goto l0
-		}
+		p1 = i32(1)
+		goto l0
 	l0:
 		if i32(1) != 0 {
 			p0 = p1
@@ -358,23 +326,19 @@ l1:
 func (m *Module) Xbr_if2() int32 {
 	var p0 int32
 	_ = p0
-	{
+	if i32(1) != 0 {
+		var p1 int32
+		_ = p1
+		p1 = i32(1)
+		goto l0
+	l0:
 		if i32(1) != 0 {
-			var p1 int32
-			_ = p1
-			{
-				p1 = i32(1)
-				goto l0
-			}
-		l0:
-			if i32(1) != 0 {
-				p0 = p1
-				goto l1
-			}
-			_ = p1
+			p0 = p1
+			goto l1
 		}
-		p0 = i32(0)
+		_ = p1
 	}
+	p0 = i32(0)
 l1:
 	return p0
 }
@@ -412,41 +376,33 @@ l0:
 func (m *Module) Xbr() int32 {
 	var p0 int32
 	_ = p0
-	{
-		if i32(1) != 0 {
-			var p1 int32
-			_ = p1
-			{
-				p1 = i32(1)
-				goto l0
-			}
-		l0:
-			p0 = p1
-			goto l1
-		} else {
-			{
-				var p2 int32
-				_ = p2
-				{
-					p2 = i32(1)
-					goto l2
-				}
-			l2:
-				_ = p2
-			}
+	if i32(1) != 0 {
+		var p1 int32
+		_ = p1
+		p1 = i32(1)
+		goto l0
+	l0:
+		p0 = p1
+		goto l1
+	} else {
+		{
+			var p2 int32
+			_ = p2
+			p2 = i32(1)
+			goto l2
+		l2:
+			_ = p2
 		}
-		p0 = i32(1)
 	}
+	p0 = i32(1)
 l1:
 	return p0
 }
 func (m *Module) Xshadowing() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(1)
-		goto l0
-	}
+	p0 = i32(1)
+	goto l0
 l0:
 	return p0
 }
@@ -456,15 +412,11 @@ func (m *Module) Xredefinition() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			p1 = i32(2)
-		}
+		p1 = i32(2)
 		var p2 int32
 		_ = p2
-		{
-			p2 = i32(3)
-			goto l0
-		}
+		p2 = i32(3)
+		goto l0
 	l0:
 		t3 := p1 + p2
 		p0 = t3

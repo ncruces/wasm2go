@@ -36,89 +36,73 @@ func (m *Module) Xsin(v0 float64) float64 {
 	var v3 int32
 	var v4 float64
 	_, _, _, _ = v1, v2, v3, v4
-	{
-		if v0 != float64(0) {
-			goto l0
-		}
-		return v0
+	if v0 != float64(0) {
+		goto l0
 	}
+	return v0
 l0:
 	v1 = math.Float64frombits(0x7ff8000000000000)
+	if int64(math.Float64bits(v0))&i64(0x7fffffffffffffff) > i64(0x7fefffffffffffff) {
+		goto l1
+	}
 	{
-		if int64(math.Float64bits(v0))&i64(0x7fffffffffffffff) > i64(0x7fefffffffffffff) {
-			goto l1
+		v1 = float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0))
+		var p0 int32
+		if math.Abs(v1) < float64(0x1p+63) {
+			p0 = 1
 		}
+		if p0 == 0 {
+			goto l2
+		}
+		t1 := i64_trunc_f64_s(v1)
+		v2 = t1
+		goto l3
+	}
+l2:
+	v2 = i64(-0x8000000000000000)
+l3:
+	v1 = float64(v0 + float64(float64(v2)*float64(-1.5707963267948966)))
+	v3 = i32(0)
+l10:
+	{
+		if math.Abs(v1) > float64(0x1p-27) {
+			goto l4
+		}
+		v4 = float64(1)
+	l9:
 		{
-			{
-				v1 = float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0))
-				var p0 int32
-				if math.Abs(v1) < float64(0x1p+63) {
-					p0 = 1
-				}
-				if p0 == 0 {
-					goto l2
-				}
-				t1 := i64_trunc_f64_s(v1)
-				v2 = t1
-				goto l3
+			if v3 != 0 {
+				goto l5
 			}
-		l2:
-			v2 = i64(-0x8000000000000000)
-		}
-	l3:
-		v1 = float64(v0 + float64(float64(v2)*float64(-1.5707963267948966)))
-		v3 = i32(0)
-	l10:
-		{
-			{
-				if math.Abs(v1) > float64(0x1p-27) {
-					goto l4
-				}
-				v4 = float64(1)
-				{
-					{
-						{
-						l9:
-							{
-								{
-									if v3 != 0 {
-										goto l5
-									}
-									switch int32(v2) & i32(3) {
-									case 1:
-										goto l6
-									case 2:
-										goto l7
-									case 3:
-										goto l8
-									default:
-										goto l1
-									}
-								}
-							l5:
-								v3 = v3 + i32(-1)
-								v0 = float64(v1 * v1)
-								v1 = float64(v4 * v1)
-								v1 = float64(v1 + v1)
-								v4 = float64(float64(1) - float64(v0+v0))
-								goto l9
-							}
-						}
-					l6:
-						return v4
-					}
-				l7:
-					return -v1
-				}
-			l8:
-				v1 = -v4
+			switch int32(v2) & i32(3) {
+			case 1:
+				goto l6
+			case 2:
+				goto l7
+			case 3:
+				goto l8
+			default:
 				goto l1
 			}
-		l4:
-			v3 = v3 + i32(1)
-			v1 = float64(v1 * float64(0.5))
-			goto l10
+		l5:
+			v3 = v3 + i32(-1)
+			v0 = float64(v1 * v1)
+			v1 = float64(v4 * v1)
+			v1 = float64(v1 + v1)
+			v4 = float64(float64(1) - float64(v0+v0))
+			goto l9
 		}
+	l6:
+		return v4
+	l7:
+		return -v1
+	l8:
+		v1 = -v4
+		goto l1
+	l4:
+		v3 = v3 + i32(1)
+		v1 = float64(v1 * float64(0.5))
+		goto l10
 	}
 l1:
 	return v1

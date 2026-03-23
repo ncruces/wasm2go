@@ -127,3 +127,44 @@ func RemoveSelfAssign(n ast.Node) {
 		return true
 	}, nil)
 }
+
+// UnnestBlocks removes block statements that do not contain variable declarations.
+func UnnestBlocks(n ast.Node) {
+	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+		if blk, ok := c.Node().(*ast.BlockStmt); ok {
+			// Only unnest if the block is part of a statement list.
+			if c.Index() < 0 {
+				return true
+			}
+
+			var anyvars bool
+			for _, s := range blk.List {
+				// Unwrap labeled statements to inspect the actual statement.
+				for {
+					if ls, ok := s.(*ast.LabeledStmt); ok {
+						s = ls.Stmt
+					} else {
+						break
+					}
+				}
+				// Check for declarations.
+				if _, ok := s.(*ast.DeclStmt); ok {
+					anyvars = true
+					break
+				}
+				if assign, ok := s.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
+					anyvars = true
+					break
+				}
+			}
+
+			if !anyvars {
+				for _, stmt := range blk.List {
+					c.InsertBefore(stmt)
+				}
+				c.Delete()
+			}
+		}
+		return true
+	})
+}

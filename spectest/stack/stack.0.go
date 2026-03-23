@@ -16,17 +16,15 @@ func (m *Module) Xfac_expr_agt6er(v0 int64) int64 {
 	_, _ = v1, v2
 	v1 = v0
 	v2 = i64(1)
+l1:
 	{
-	l1:
-		{
-			if v1 == i64(0) {
-				goto l0
-			} else {
-				v2 = v1 * v2
-				v1 = v1 - i64(1)
-			}
-			goto l1
+		if v1 == i64(0) {
+			goto l0
+		} else {
+			v2 = v1 * v2
+			v1 = v1 - i64(1)
 		}
+		goto l1
 	}
 l0:
 	return v2
@@ -36,17 +34,15 @@ func (m *Module) Xfac_stack_qwhwkk(v0 int64) int64 {
 	_, _ = v1, v2
 	v1 = v0
 	v2 = i64(1)
+l1:
 	{
-	l1:
-		{
-			if v1 == i64(0) {
-				goto l0
-			} else {
-				v2 = v1 * v2
-				v1 = v1 - i64(1)
-			}
-			goto l1
+		if v1 == i64(0) {
+			goto l0
+		} else {
+			v2 = v1 * v2
+			v1 = v1 - i64(1)
 		}
+		goto l1
 	}
 l0:
 	return v2
@@ -56,17 +52,15 @@ func (m *Module) Xfac_stack_raw_1keekex(v0 int64) int64 {
 	_, _ = v1, v2
 	v1 = v0
 	v2 = i64(1)
+l1:
 	{
-	l1:
-		{
-			if v1 == i64(0) {
-				goto l0
-			} else {
-				v2 = v1 * v2
-				v1 = v1 - i64(1)
-			}
-			goto l1
+		if v1 == i64(0) {
+			goto l0
+		} else {
+			v2 = v1 * v2
+			v1 = v1 - i64(1)
 		}
+		goto l1
 	}
 l0:
 	return v2
@@ -76,17 +70,15 @@ func (m *Module) Xfac_mixed_1ohhc8p(v0 int64) int64 {
 	_, _ = v1, v2
 	v1 = v0
 	v2 = i64(1)
+l1:
 	{
-	l1:
-		{
-			if v1 == i64(0) {
-				goto l0
-			} else {
-				v2 = v1 * v2
-				v1 = v1 - i64(1)
-			}
-			goto l1
+		if v1 == i64(0) {
+			goto l0
+		} else {
+			v2 = v1 * v2
+			v1 = v1 - i64(1)
 		}
+		goto l1
 	}
 l0:
 	return v2
@@ -96,17 +88,15 @@ func (m *Module) Xfac_mixed_raw_aaalrv(v0 int64) int64 {
 	_, _ = v1, v2
 	v1 = v0
 	v2 = i64(1)
+l1:
 	{
-	l1:
-		{
-			if v1 == i64(0) {
-				goto l0
-			} else {
-				v2 = v1 * v2
-				v1 = v1 - i64(1)
-			}
-			goto l1
+		if v1 == i64(0) {
+			goto l0
+		} else {
+			v2 = v1 * v2
+			v1 = v1 - i64(1)
 		}
+		goto l1
 	}
 l0:
 	return v2

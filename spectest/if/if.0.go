@@ -115,14 +115,10 @@ func (m *Module) Xnested(v0 int32, v1 int32) int32 {
 	if v0 != 0 {
 		if v1 != 0 {
 			m.f0()
-			{
-			}
 		}
 		if v1 != 0 {
 		} else {
 			m.f0()
-			{
-			}
 		}
 		var p1 int32
 		_ = p1
@@ -137,14 +133,10 @@ func (m *Module) Xnested(v0 int32, v1 int32) int32 {
 	} else {
 		if v1 != 0 {
 			m.f0()
-			{
-			}
 		}
 		if v1 != 0 {
 		} else {
 			m.f0()
-			{
-			}
 		}
 		var p2 int32
 		_ = p2

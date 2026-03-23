@@ -37,30 +37,22 @@ func (m *Module) Xtype_f64_1milen0() {
 func (m *Module) Xtype_i32_value_17cbvya() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(1)
-	}
+	return i32(1)
 }
 func (m *Module) Xtype_i64_value_1020uq1() int64 {
 	var p0 int64
 	_ = p0
-	{
-		return i64(2)
-	}
+	return i64(2)
 }
 func (m *Module) Xtype_f32_value_1r0y6mn() float32 {
 	var p0 float32
 	_ = p0
-	{
-		return float32(3)
-	}
+	return float32(3)
 }
 func (m *Module) Xtype_f64_value_1ypy29w() float64 {
 	var p0 float64
 	_ = p0
-	{
-		return float64(4)
-	}
+	return float64(4)
 }
 func (m *Module) Xnullary() {
 	return
@@ -84,97 +76,69 @@ func (m *Module) Xas_func_value_1gti5qk() int32 {
 	return i32(3)
 }
 func (m *Module) Xas_block_first_dfe99y() {
-	{
-		return
-	}
+	return
 }
 func (m *Module) Xas_block_mid_x96mur() {
-	{
-		m.f0()
-		return
-	}
+	m.f0()
+	return
 }
 func (m *Module) Xas_block_last_sl4im1() {
-	{
-		m.f0()
-		return
-	}
+	m.f0()
+	return
 }
 func (m *Module) Xas_block_value_pg8qbp() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		return i32(2)
-	}
+	m.f0()
+	return i32(2)
 }
 func (m *Module) Xas_loop_first_liv75m() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(3)
-	}
+	return i32(3)
 }
 func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		return i32(4)
-	}
+	m.f0()
+	return i32(4)
 }
 func (m *Module) Xas_loop_last_dr7k79() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		return i32(5)
-	}
+	m.f0()
+	return i32(5)
 }
 func (m *Module) Xas_br_value_1sx9dl7() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(9)
-	}
+	return i32(9)
 }
 func (m *Module) Xas_br_if_cond_p6cjb3() {
-	{
-		return
-	}
+	return
 }
 func (m *Module) Xas_br_if_value_1tlgvkk() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(8)
-	}
+	return i32(8)
 }
 func (m *Module) Xas_br_if_value_cond_pzz0yu() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(9)
-	}
+	return i32(9)
 }
 func (m *Module) Xas_br_table_index_sdkzon() int64 {
-	{
-		return i64(9)
-	}
+	return i64(9)
 }
 func (m *Module) Xas_br_table_value_1ic2jxx() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(10)
-	}
+	return i32(10)
 }
 func (m *Module) Xas_br_table_value_index_fupi8r() int32 {
 	var p0 int32
 	_ = p0
-	{
-		return i32(11)
-	}
+	return i32(11)
 }
 func (m *Module) Xas_return_value_1wph1uy() int64 {
 	return i64(7)

@@ -23,90 +23,66 @@ func New() *Module {
 func (m *Module) f0() {
 }
 func (m *Module) Xtype_i32_1rrgb77() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_i64_17wwo34() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_f32_1b0c0f3() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_f64_1milen0() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_i32_i32_1xfpyhw() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_i64_i64_l7adk1() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_f32_f32_1rkz9g2() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_f64_f64_n16qmv() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xtype_i32_value_17cbvya() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(1)
-		goto l0
-	}
+	p0 = i32(1)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xtype_i64_value_1020uq1() int64 {
 	var p0 int64
 	_ = p0
-	{
-		p0 = i64(2)
-		goto l0
-	}
+	p0 = i64(2)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xtype_f32_value_1r0y6mn() float32 {
 	var p0 float32
 	_ = p0
-	{
-		p0 = float32(3)
-		goto l0
-	}
+	p0 = float32(3)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xtype_f64_value_1ypy29w() float64 {
 	var p0 float64
 	_ = p0
-	{
-		p0 = float64(4)
-		goto l0
-	}
+	p0 = float64(4)
+	goto l0
 l0:
 	return p0
 }
@@ -114,41 +90,31 @@ func (m *Module) Xtype_f64_f64_value_1oq417v() (float64, float64) {
 	var p0 float64
 	var p1 float64
 	_, _ = p0, p1
-	{
-		p0, p1 = float64(4), float64(5)
-		goto l0
-	}
+	p0, p1 = float64(4), float64(5)
+	goto l0
 l0:
 	return p0, p1
 }
 func (m *Module) Xas_block_first_dfe99y() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xas_block_mid_x96mur() {
-	{
-		m.f0()
-		goto l0
-	}
+	m.f0()
+	goto l0
 l0:
 }
 func (m *Module) Xas_block_last_sl4im1() {
-	{
-		m.f0()
-		goto l0
-	}
+	m.f0()
+	goto l0
 l0:
 }
 func (m *Module) Xas_block_value_pg8qbp() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(2)
-		goto l0
-	}
+	m.f0()
+	p0 = i32(2)
+	goto l0
 l0:
 	return p0
 }
@@ -158,10 +124,8 @@ func (m *Module) Xas_loop_first_liv75m() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			p0 = i32(3)
-			goto l0
-		}
+		p0 = i32(3)
+		goto l0
 	}
 l0:
 	return p0
@@ -172,11 +136,9 @@ func (m *Module) Xas_loop_mid_1pzjrn8() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			m.f0()
-			p0 = i32(4)
-			goto l0
-		}
+		m.f0()
+		p0 = i32(4)
+		goto l0
 	}
 l0:
 	return p0
@@ -187,11 +149,9 @@ func (m *Module) Xas_loop_last_dr7k79() int32 {
 	{
 		var p1 int32
 		_ = p1
-		{
-			m.f0()
-			p0 = i32(5)
-			goto l0
-		}
+		m.f0()
+		p0 = i32(5)
+		goto l0
 	}
 l0:
 	return p0
@@ -199,92 +159,72 @@ l0:
 func (m *Module) Xas_br_value_1sx9dl7() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(9)
-		goto l0
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_br_if_cond_p6cjb3() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xas_br_if_value_1tlgvkk() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(8)
-		goto l0
-	}
+	p0 = i32(8)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_br_if_value_cond_pzz0yu() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(9)
-		goto l0
-	}
+	p0 = i32(9)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_br_table_index_sdkzon() {
-	{
-		goto l0
-	}
+	goto l0
 l0:
 }
 func (m *Module) Xas_br_table_value_1ic2jxx() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(10)
-		goto l0
-	}
+	p0 = i32(10)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_br_table_value_index_fupi8r() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(11)
-		goto l0
-	}
+	p0 = i32(11)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_return_value_1wph1uy() int64 {
 	var p0 int64
 	_ = p0
-	{
-		p0 = i64(7)
-		goto l0
-	}
+	p0 = i64(7)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_return_values_1xce3iy() (int32, int64) {
 	var p0 int64
 	_ = p0
-	{
-		p0 = i64(7)
-		goto l0
-	}
+	p0 = i64(7)
+	goto l0
 l0:
 	return i32(2), p0
 }
 func (m *Module) Xas_if_cond_ok3ah4() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(2)
-		goto l0
-	}
+	p0 = i32(2)
+	goto l0
 l0:
 	return p0
 }
@@ -327,41 +267,33 @@ l0:
 func (m *Module) Xas_select_first_1p4pbiq(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(5)
-		goto l0
-	}
+	p0 = i32(5)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_select_second_og5yck(v0 int32, v1 int32) int32 {
 	var p0 int32
 	_ = p0
-	{
-		_ = v0
-		p0 = i32(6)
-		goto l0
-	}
+	_ = v0
+	p0 = i32(6)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_select_cond_1gi9cp1() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(7)
-		goto l0
-	}
+	p0 = i32(7)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_select_all_1mhr4iz() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(8)
-		goto l0
-	}
+	p0 = i32(8)
+	goto l0
 l0:
 	return p0
 }
@@ -371,90 +303,72 @@ func (m *Module) f37(v0 int32, v1 int32, v2 int32) int32 {
 func (m *Module) Xas_call_first_oczht1() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(12)
-		goto l0
-	}
+	p0 = i32(12)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_mid_1hypaa8() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(13)
-		goto l0
-	}
+	p0 = i32(13)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_last_5v6w73() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(14)
-		goto l0
-	}
+	p0 = i32(14)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_all_1do44x7() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(15)
-		goto l0
-	}
+	p0 = i32(15)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_indirect_func_1ismjqv() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(20)
-		goto l0
-	}
+	p0 = i32(20)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_indirect_first_1kls7bs() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(21)
-		goto l0
-	}
+	p0 = i32(21)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_indirect_mid_1u5vulp() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(22)
-		goto l0
-	}
+	p0 = i32(22)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_indirect_last_os2e8m() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(23)
-		goto l0
-	}
+	p0 = i32(23)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_call_indirect_all_184n2ty() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(24)
-		goto l0
-	}
+	p0 = i32(24)
+	goto l0
 l0:
 	return p0
 }
@@ -463,10 +377,8 @@ func (m *Module) Xas_local_set_value_1e0q6mz() int32 {
 	_ = v0
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(17)
-		goto l0
-	}
+	p0 = i32(17)
+	goto l0
 l0:
 	return p0
 }
@@ -475,211 +387,169 @@ func (m *Module) Xas_local_tee_value_11lf5v3() int32 {
 	_ = v0
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(1)
-		goto l0
-	}
+	p0 = i32(1)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_global_set_value_p447yq() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(1)
-		goto l0
-	}
+	p0 = i32(1)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_load_address_1s1elxs() float32 {
 	var p0 float32
 	_ = p0
-	{
-		p0 = float32(1.7)
-		goto l0
-	}
+	p0 = float32(1.7)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_loadN_address_xz9je7() int64 {
 	var p0 int64
 	_ = p0
-	{
-		p0 = i64(30)
-		goto l0
-	}
+	p0 = i64(30)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_store_address_374rd1() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(30)
-		goto l0
-	}
+	p0 = i32(30)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_store_value_1bx4mta() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(31)
-		goto l0
-	}
+	p0 = i32(31)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_store_both_1tszqnl() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(32)
-		goto l0
-	}
+	p0 = i32(32)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_storeN_address_qez1rh() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(32)
-		goto l0
-	}
+	p0 = i32(32)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_storeN_value_7lcb3d() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(33)
-		goto l0
-	}
+	p0 = i32(33)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_storeN_both_nfigk() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(34)
-		goto l0
-	}
+	p0 = i32(34)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_unary_operand_kr3bi8() float32 {
 	var p0 float32
 	_ = p0
-	{
-		p0 = float32(3.4)
-		goto l0
-	}
+	p0 = float32(3.4)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_binary_left_mz7no() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(3)
-		goto l0
-	}
+	p0 = i32(3)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_binary_right_1h2yoyv() int64 {
 	var p0 int64
 	_ = p0
-	{
-		p0 = i64(45)
-		goto l0
-	}
+	p0 = i64(45)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_binary_both_t9s08() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(46)
-		goto l0
-	}
+	p0 = i32(46)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_test_operand_khoiq6() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(44)
-		goto l0
-	}
+	p0 = i32(44)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_compare_left_afzngt() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(43)
-		goto l0
-	}
+	p0 = i32(43)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_compare_right_1jgames() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(42)
-		goto l0
-	}
+	p0 = i32(42)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_compare_both_a9up6p() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(44)
-		goto l0
-	}
+	p0 = i32(44)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_convert_operand_127wpsd() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(41)
-		goto l0
-	}
+	p0 = i32(41)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xas_memory_grow_size_7te2ha() int32 {
 	var p0 int32
 	_ = p0
-	{
-		p0 = i32(40)
-		goto l0
-	}
+	p0 = i32(40)
+	goto l0
 l0:
 	return p0
 }
 func (m *Module) Xnested_block_value_1mb979j() int32 {
 	var p0 int32
 	_ = p0
-	{
-		m.f0()
-		p0 = i32(8)
-		goto l0
-	}
+	m.f0()
+	p0 = i32(8)
+	goto l0
 l0:
 	return i32(1) + p0
 }
@@ -690,11 +560,9 @@ func (m *Module) Xnested_br_value_1dhs4ly() int32 {
 		_ = i32(2)
 		var p1 int32
 		_ = p1
-		{
-			_ = i32(4)
-			p0 = i32(8)
-			goto l0
-		}
+		_ = i32(4)
+		p0 = i32(8)
+		goto l0
 	}
 l0:
 	return i32(1) + p0
@@ -706,11 +574,9 @@ func (m *Module) Xnested_br_if_value_samgly() int32 {
 		_ = i32(2)
 		var p1 int32
 		_ = p1
-		{
-			_ = i32(4)
-			p0 = i32(8)
-			goto l0
-		}
+		_ = i32(4)
+		p0 = i32(8)
+		goto l0
 	}
 l0:
 	return i32(1) + p0
@@ -718,11 +584,9 @@ l0:
 func (m *Module) Xnested_br_if_value_cond_1ihcle8() int32 {
 	var p0 int32
 	_ = p0
-	{
-		_ = i32(2)
-		p0 = i32(8)
-		goto l0
-	}
+	_ = i32(2)
+	p0 = i32(8)
+	goto l0
 l0:
 	return i32(1) + p0
 }
@@ -733,11 +597,9 @@ func (m *Module) Xnested_br_table_value_6t9639() int32 {
 		_ = i32(2)
 		var p1 int32
 		_ = p1
-		{
-			_ = i32(4)
-			p0 = i32(8)
-			goto l0
-		}
+		_ = i32(4)
+		p0 = i32(8)
+		goto l0
 	}
 l0:
 	return i32(1) + p0
@@ -745,11 +607,9 @@ l0:
 func (m *Module) Xnested_br_table_value_index_1y77qa9() int32 {
 	var p0 int32
 	_ = p0
-	{
-		_ = i32(2)
-		p0 = i32(8)
-		goto l0
-	}
+	_ = i32(2)
+	p0 = i32(8)
+	goto l0
 l0:
 	return i32(1) + p0
 }

@@ -13,63 +13,40 @@ func (m *Module) Xstmt(v0 int32) int32 {
 	var v1 int32
 	_ = v1
 	v1 = i32(100)
-	{
-		{
-			{
-				{
-					{
-						{
-							{
-								{
-									{
-										{
-											switch v0 {
-											case 0:
-												goto l0
-											case 1:
-												goto l1
-											case 2:
-												goto l2
-											case 3:
-												goto l3
-											case 4:
-												goto l4
-											case 5:
-												goto l5
-											case 6:
-												goto l6
-											case 7:
-												goto l7
-											default:
-												goto l8
-											}
-										}
-									l0:
-										return v0
-									}
-								l1:
-								}
-							l2:
-							}
-						l3:
-							v1 = i32(0) - v0
-							goto l9
-						}
-					l4:
-						goto l9
-					}
-				l5:
-					v1 = i32(101)
-					goto l9
-				}
-			l6:
-				v1 = i32(101)
-			}
-		l8:
-			v1 = i32(102)
-		}
-	l7:
+	switch v0 {
+	case 0:
+		goto l0
+	case 1:
+		goto l3
+	case 2:
+		goto l3
+	case 3:
+		goto l3
+	case 4:
+		goto l4
+	case 5:
+		goto l5
+	case 6:
+		goto l6
+	case 7:
+		goto l9
+	default:
+		goto l8
 	}
+l0:
+	return v0
+l3:
+	v1 = i32(0) - v0
+	goto l9
+l4:
+	goto l9
+l5:
+	v1 = i32(101)
+	goto l9
+l6:
+	v1 = i32(101)
+l8:
+	v1 = i32(102)
 l9:
 	return v1
 }
@@ -81,62 +58,42 @@ func (m *Module) Xexpr(v0 int64) int64 {
 	_ = p0
 	{
 		{
-			{
-				{
-					{
-						{
-							{
-								{
-									{
-										{
-											switch int32(v0) {
-											case 0:
-												goto l0
-											case 1:
-												goto l1
-											case 2:
-												goto l2
-											case 3:
-												goto l3
-											case 4:
-												goto l4
-											case 5:
-												goto l5
-											case 6:
-												goto l6
-											case 7:
-												goto l7
-											default:
-												goto l8
-											}
-										}
-									l0:
-										return v0
-									}
-								l1:
-								}
-							l2:
-							}
-						l3:
-							t1 := i64(0) - v0
-							p0 = t1
-							goto l9
-						}
-					l6:
-						v1 = i64(101)
-					}
-				l5:
-				}
-			l4:
+			switch int32(v0) {
+			case 0:
+				goto l0
+			case 1:
+				goto l3
+			case 2:
+				goto l3
+			case 3:
+				goto l3
+			case 4:
+				goto l8
+			case 5:
+				goto l8
+			case 6:
+				goto l6
+			case 7:
+				goto l7
+			default:
+				goto l8
 			}
-		l8:
-			t2 := v1
-			p0 = t2
+		l0:
+			return v0
+		l3:
+			t1 := i64(0) - v0
+			p0 = t1
 			goto l9
 		}
-	l7:
-		p0 = i64(-5)
+	l6:
+		v1 = i64(101)
+	l8:
+		t2 := v1
+		p0 = t2
+		goto l9
 	}
+l7:
+	p0 = i64(-5)
 l9:
 	return p0
 }
@@ -185,11 +142,9 @@ l2:
 	return p0
 }
 func (m *Module) Xcorner() int32 {
-	{
-		switch i32(0) {
-		default:
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		goto l0
 	}
 l0:
 	return i32(1)

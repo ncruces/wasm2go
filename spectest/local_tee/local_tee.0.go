@@ -239,11 +239,9 @@ l0:
 	return p0
 }
 func (m *Module) Xas_br_if_cond_p6cjb3(v0 int32) {
-	{
-		v0 = i32(1)
-		if v0 != 0 {
-			goto l0
-		}
+	v0 = i32(1)
+	if v0 != 0 {
+		goto l0
 	}
 l0:
 }
@@ -266,25 +264,21 @@ l0:
 func (m *Module) Xas_br_if_value_cond_pzz0yu(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	{
-		v0 = i32(9)
-		if v0 != 0 {
-			p0 = i32(6)
-			goto l0
-		}
-		_ = i32(6)
-		p0 = i32(7)
+	v0 = i32(9)
+	if v0 != 0 {
+		p0 = i32(6)
+		goto l0
 	}
+	_ = i32(6)
+	p0 = i32(7)
 l0:
 	return p0
 }
 func (m *Module) Xas_br_table_index_sdkzon(v0 int32) {
-	{
-		v0 = i32(0)
-		switch v0 {
-		default:
-			goto l0
-		}
+	v0 = i32(0)
+	switch v0 {
+	default:
+		goto l0
 	}
 l0:
 }
@@ -306,13 +300,11 @@ l0:
 func (m *Module) Xas_br_table_value_index_fupi8r(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	{
-		v0 = i32(11)
-		switch v0 {
-		default:
-			p0 = i32(6)
-			goto l0
-		}
+	v0 = i32(11)
+	switch v0 {
+	default:
+		p0 = i32(6)
+		goto l0
 	}
 l0:
 	return p0

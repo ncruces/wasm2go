@@ -17,12 +17,10 @@ func (m *Module) Xcalculate() float32 {
 	v2 = float32(1.779513)
 	v3 = float32(float32(-v1*v0) / float32(float32(v0*v2)-v1))
 	v4 = float32(float32(-v1*v0) / float32(float32(v0*v2)-v1))
-	{
-		if v3 == v4 {
-			goto l0
-		}
-		panic("unreachable")
+	if v3 == v4 {
+		goto l0
 	}
+	panic("unreachable")
 l0:
 	return v4
 }

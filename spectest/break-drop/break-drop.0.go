@@ -10,25 +10,19 @@ func New() *Module {
 	return m
 }
 func (m *Module) Xbr() {
-	{
+	goto l0
+l0:
+}
+func (m *Module) Xbr_if() {
+	if i32(1) != 0 {
 		goto l0
 	}
 l0:
 }
-func (m *Module) Xbr_if() {
-	{
-		if i32(1) != 0 {
-			goto l0
-		}
-	}
-l0:
-}
 func (m *Module) Xbr_table() {
-	{
-		switch i32(0) {
-		default:
-			goto l0
-		}
+	switch i32(0) {
+	default:
+		goto l0
 	}
 l0:
 }

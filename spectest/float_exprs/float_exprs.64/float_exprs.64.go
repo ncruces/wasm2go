@@ -22,20 +22,18 @@ func New() *Module {
 func (m *Module) Xf64_kahan_sum_gznj1y(v0 int32, v1 int32) float64 {
 	var v2, v3, v4 float64
 	_, _, _ = v2, v3, v4
+l0:
 	{
-	l0:
-		{
-			t1 := v3
-			t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
-			v4 = float64(t0 - v4)
-			v2 = float64(t1 + v4)
-			v4 = float64(float64(v2-v3) - v4)
-			v0 = v0 + i32(8)
-			v3 = v2
-			v1 = v1 + i32(-1)
-			if v1 != 0 {
-				goto l0
-			}
+		t1 := v3
+		t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
+		v4 = float64(t0 - v4)
+		v2 = float64(t1 + v4)
+		v4 = float64(float64(v2-v3) - v4)
+		v0 = v0 + i32(8)
+		v3 = v2
+		v1 = v1 + i32(-1)
+		if v1 != 0 {
+			goto l0
 		}
 	}
 	return v2
@@ -43,17 +41,15 @@ func (m *Module) Xf64_kahan_sum_gznj1y(v0 int32, v1 int32) float64 {
 func (m *Module) Xf64_plain_sum_114zbcz(v0 int32, v1 int32) float64 {
 	var v2 float64
 	_ = v2
+l0:
 	{
-	l0:
-		{
-			t1 := v2
-			t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
-			v2 = float64(t1 + t0)
-			v0 = v0 + i32(8)
-			v1 = v1 + i32(-1)
-			if v1 != 0 {
-				goto l0
-			}
+		t1 := v2
+		t0 := math.Float64frombits(binary.LittleEndian.Uint64(m.memory[uint32(v0):]))
+		v2 = float64(t1 + t0)
+		v0 = v0 + i32(8)
+		v1 = v1 + i32(-1)
+		if v1 != 0 {
+			goto l0
 		}
 	}
 	return v2

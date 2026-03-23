@@ -21,21 +21,19 @@ func (m *Module) Xcheck_memory_zero_ivkcjo(v0 int64, v1 int64) int32 {
 	var v2 int32
 	_ = v2
 	v2 = i32(1)
+l1:
 	{
-	l1:
-		{
-			t0 := int32(m.memory[v0])
-			v2 = t0
-			if v2 != i32(0) {
-				goto l0
-			}
-			if uint64(v0) >= uint64(v1) {
-				goto l0
-			}
-			v0 = v0 + i64(1)
-			if uint64(v0) <= uint64(v1) {
-				goto l1
-			}
+		t0 := int32(m.memory[v0])
+		v2 = t0
+		if v2 != i32(0) {
+			goto l0
+		}
+		if uint64(v0) >= uint64(v1) {
+			goto l0
+		}
+		v0 = v0 + i64(1)
+		if uint64(v0) <= uint64(v1) {
+			goto l1
 		}
 	}
 l0:

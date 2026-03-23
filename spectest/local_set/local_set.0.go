@@ -76,47 +76,35 @@ func (m *Module) Xwrite(v0 int64, v1 float32, v2 float64, v3 int32, v4 int32) in
 	return t0
 }
 func (m *Module) Xas_block_value_pg8qbp(v0 int32) {
-	{
-		v0 = i32(1)
-	}
+	v0 = i32(1)
 }
 func (m *Module) Xas_loop_value_amjtft(v0 int32) {
-	{
-		v0 = i32(3)
-	}
+	v0 = i32(3)
 }
 func (m *Module) Xas_br_value_1sx9dl7(v0 int32) {
-	{
-		v0 = i32(9)
+	v0 = i32(9)
+	goto l0
+l0:
+}
+func (m *Module) Xas_br_if_value_1tlgvkk(v0 int32) {
+	v0 = i32(8)
+	if i32(1) != 0 {
 		goto l0
 	}
 l0:
 }
-func (m *Module) Xas_br_if_value_1tlgvkk(v0 int32) {
-	{
-		v0 = i32(8)
-		if i32(1) != 0 {
-			goto l0
-		}
-	}
-l0:
-}
 func (m *Module) Xas_br_if_value_cond_pzz0yu(v0 int32) {
-	{
-		v0 = i32(9)
-		if i32(6) != 0 {
-			goto l0
-		}
+	v0 = i32(9)
+	if i32(6) != 0 {
+		goto l0
 	}
 l0:
 }
 func (m *Module) Xas_br_table_value_1ic2jxx(v0 int32) {
-	{
-		v0 = i32(10)
-		switch i32(1) {
-		default:
-			goto l0
-		}
+	v0 = i32(10)
+	switch i32(1) {
+	default:
+		goto l0
 	}
 l0:
 }

@@ -40,17 +40,15 @@ func (m *Module) Xfac_iter_u670pf(v0 int64) int64 {
 	_, _ = v1, v2
 	v1 = v0
 	v2 = i64(1)
+l1:
 	{
-	l1:
-		{
-			if v1 == i64(0) {
-				goto l0
-			} else {
-				v2 = v1 * v2
-				v1 = v1 - i64(1)
-			}
-			goto l1
+		if v1 == i64(0) {
+			goto l0
+		} else {
+			v2 = v1 * v2
+			v1 = v1 - i64(1)
 		}
+		goto l1
 	}
 l0:
 	return v2
@@ -60,17 +58,15 @@ func (m *Module) Xfac_iter_named_1yyaicc(v0 int64) int64 {
 	_, _ = v1, v2
 	v1 = v0
 	v2 = i64(1)
+l1:
 	{
-	l1:
-		{
-			if v1 == i64(0) {
-				goto l0
-			} else {
-				v2 = v1 * v2
-				v1 = v1 - i64(1)
-			}
-			goto l1
+		if v1 == i64(0) {
+			goto l0
+		} else {
+			v2 = v1 * v2
+			v1 = v1 - i64(1)
 		}
+		goto l1
 	}
 l0:
 	return v2
@@ -79,17 +75,15 @@ func (m *Module) Xfac_opt_uhnu4r(v0 int64) int64 {
 	var v1 int64
 	_ = v1
 	v1 = i64(1)
+	if v0 < i64(2) {
+		goto l0
+	}
+l1:
 	{
-		if v0 < i64(2) {
-			goto l0
-		}
-	l1:
-		{
-			v1 = v1 * v0
-			v0 = v0 + i64(-1)
-			if v0 > i64(1) {
-				goto l1
-			}
+		v1 = v1 * v0
+		v0 = v0 + i64(-1)
+		if v0 > i64(1) {
+			goto l1
 		}
 	}
 l0:
