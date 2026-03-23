@@ -7,11 +7,12 @@ import (
 )
 
 var (
-	endian = flag.String("endian", "", "endianness of the generated code (little or big)")
-	nanbox = flag.Bool("nanbox", false, "whether to try to canonicalize NaNs")
-	nohead = flag.Bool("nohead", false, "disable the header comment (including build tags)")
-	nohost = flag.Bool("nohost", false, "disable generating interfaces for imports")
-	noopt  = flag.Bool("noopt", false, "disable all optimization passes")
+	endian    = flag.String("endian", "", "endianness of the generated code (little or big)")
+	nanbox    = flag.Bool("nanbox", false, "whether to try to canonicalize NaNs")
+	nohead    = flag.Bool("nohead", false, "disable the header comment (including build tags)")
+	nohost    = flag.Bool("nohost", false, "disable generating interfaces for imports")
+	noopt     = flag.Bool("noopt", false, "disable all optimization passes")
+	dwarfline = flag.Bool("dwarfline", false, "add line numbers from dwarf debug info")
 )
 
 // https://pkg.go.dev/golang.org/x/sys/cpu#pkg-constants
