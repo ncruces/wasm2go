@@ -268,11 +268,10 @@ func translate(r io.Reader, w io.Writer) error {
 		// this is a terrible hack
 		tmp := bytes.Clone(buf)
 		out.Reset()
-		var last string
+		var prev, cur *line
 		for tmp := range bytes.Lines(tmp) {
-			s := bytes.TrimLeft(tmp, "\t")
-			indent := tmp[:len(tmp)-len(s)]
-			if s1, ok := bytes.CutPrefix(s, []byte("OFFSET_HACK_")); ok {
+			oldcur := cur
+			if s1, ok := bytes.CutPrefix(bytes.TrimLeft(tmp, "\t"), []byte("OFFSET_HACK_")); ok {
 				offset, err := strconv.ParseUint(string(bytes.TrimSuffix(s1, []byte{'\n'})), 10, 64)
 				if err != nil {
 					panic("wtf: " + err.Error())
@@ -280,19 +279,25 @@ func translate(r io.Reader, w io.Writer) error {
 				if i, _ := slices.BinarySearchFunc(lines, offset, func(e line, t uint64) int {
 					return cmp.Compare(e.addr, t)
 				}); i > 0 {
-					if last != lines[i-1].name {
-						s = []byte("//line " + lines[i-1].name + ":" + strconv.Itoa(max(1, lines[i-1].line)) + ":" + strconv.Itoa(max(1, lines[i-1].col)) + "\n")
-						last = lines[i-1].name
-					} else {
-						s = []byte("//line " + ":" + strconv.Itoa(max(1, lines[i-1].line)) + ":" + strconv.Itoa(max(1, lines[i-1].col)) + "\n")
-					}
+					cur = &lines[i-1]
 				} else {
-					continue
+					cur = nil
 				}
-			} else {
-				out.Write(indent)
+				continue
 			}
-			out.Write(s)
+			if cur != nil {
+				out.WriteString("/*line ")
+				if prev == nil || prev.name != cur.name {
+					out.WriteString(cur.name) // TODO: sanitize
+				}
+				out.WriteByte(':')
+				out.WriteString(strconv.Itoa(max(1, cur.line)))
+				out.WriteByte(':')
+				out.WriteString(strconv.Itoa(max(1, cur.col)))
+				out.WriteString("*/")
+				prev = oldcur
+			}
+			out.Write(tmp)
 		}
 		buf = out.Bytes()
 	}
