@@ -368,8 +368,8 @@ func (t *translator) readImportSection() error {
 
 			call := &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.SelectorExpr{X: newID("m"), Sel: ast.NewIdent(internal(mod))},
-					Sel: ast.NewIdent(exported(name))},
+					X:   &ast.SelectorExpr{X: newID("m"), Sel: util.Mangle(mod, util.IDInternal)},
+					Sel: util.Mangle(name, util.IDExported)},
 				Args: args,
 			}
 
@@ -719,7 +719,7 @@ func (t *translator) readExportSection() error {
 		switch externKind(kind) {
 		case externFunction:
 			decl := t.functions[index].decl
-			decl.Name = ast.NewIdent(exported(name))
+			decl.Name = util.Mangle(name, util.IDExported)
 		}
 	}
 	return nil
@@ -2192,9 +2192,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 				return err
 			}
 			name := buf.String()
-			buf.Reset()
-			util.Mangle(&buf, string(name))
-			t.out.Name = ast.NewIdent(buf.String())
+			t.out.Name = util.Mangle(name, util.IDLocal)
 
 		case nameFunction, nameGlobal, nameTable:
 			count, err := readLEB128(r)
@@ -2231,7 +2229,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 					}
 				}
 				if id != nil && id.Name == "" {
-					id.Name = internal(buf.String())
+					id.Name = util.Mangle(buf.String(), util.IDInternal).Name
 				}
 			}
 

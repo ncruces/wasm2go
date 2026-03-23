@@ -60,7 +60,8 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 					defer RecoverTrap(t, cmd.Text)
 				}
 
-				method := mod.MethodByName(exported(cmd.Action.Field))
+				id := util.Mangle(cmd.Action.Field, util.IDExported)
+				method := mod.MethodByName(id.Name)
 				args := make([]reflect.Value, len(cmd.Action.Args))
 				for i, arg := range cmd.Action.Args {
 					switch arg.Type {
@@ -221,13 +222,6 @@ func RecoverTrap(t testing.TB, want string) {
 	}
 
 	t.Fatalf("got trap %q, want %q", got, want)
-}
-
-func exported(name string) string {
-	var buf strings.Builder
-	buf.WriteByte('X')
-	util.Mangle(&buf, name)
-	return buf.String()
 }
 
 func isfloat(name string) bool {

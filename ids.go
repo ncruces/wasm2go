@@ -3,9 +3,6 @@ package main
 import (
 	"go/ast"
 	"strconv"
-	"strings"
-
-	"github.com/ncruces/wasm2go/util"
 )
 
 var idCache = map[string]*ast.Ident{}
@@ -17,20 +14,6 @@ func newID(name string) *ast.Ident {
 		idCache[name] = id
 	}
 	return id
-}
-
-func exported(name string) string {
-	var buf strings.Builder
-	buf.WriteByte('X')
-	util.Mangle(&buf, name)
-	return buf.String()
-}
-
-func internal(name string) string {
-	var buf strings.Builder
-	buf.WriteByte('_')
-	util.Mangle(&buf, name)
-	return buf.String()
 }
 
 func dataID[T interface{ int | uint64 }](i T) *ast.Ident {
