@@ -268,6 +268,7 @@ func translate(r io.Reader, w io.Writer) error {
 		// this is a terrible hack
 		tmp := bytes.Clone(buf)
 		out.Reset()
+		var last string
 		for tmp := range bytes.Lines(tmp) {
 			s := bytes.TrimLeft(tmp, "\t")
 			indent := tmp[:len(tmp)-len(s)]
@@ -279,12 +280,18 @@ func translate(r io.Reader, w io.Writer) error {
 				if i, _ := slices.BinarySearchFunc(lines, offset, func(e line, t uint64) int {
 					return cmp.Compare(e.addr, t)
 				}); i > 0 {
-					s = []byte("//line " + lines[i-1].name + ":" + strconv.Itoa(lines[i-1].line) + ":" + strconv.Itoa(lines[i-1].col) + "\n")
+					if last != lines[i-1].name {
+						s = []byte("//line " + lines[i-1].name + ":" + strconv.Itoa(max(1, lines[i-1].line)) + ":" + strconv.Itoa(max(1, lines[i-1].col)) + "\n")
+						last = lines[i-1].name
+					} else {
+						s = []byte("//line " + ":" + strconv.Itoa(max(1, lines[i-1].line)) + ":" + strconv.Itoa(max(1, lines[i-1].col)) + "\n")
+					}
 				} else {
 					continue
 				}
+			} else {
+				out.Write(indent)
 			}
-			out.Write(indent)
 			out.Write(s)
 		}
 		buf = out.Bytes()
