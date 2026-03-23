@@ -3,11 +3,10 @@ package main
 import (
 	"go/ast"
 	"go/token"
-	"slices"
 	"strconv"
 	"strings"
 
-	"golang.org/x/tools/go/ast/astutil"
+	"github.com/ncruces/wasm2go/util"
 )
 
 type funcCompiler struct {
@@ -228,6 +227,9 @@ func (fn *funcCompiler) pushPure(expr ast.Expr) {
 		return
 	}
 	fn.stack.append(stackEntry{expr: expr, kind: entryExpr})
+	if *noopt {
+		fn.flush()
+	}
 }
 
 // Pushes a pure condition (no observable side effects, including traps) to the value stack.
@@ -236,6 +238,9 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 		return
 	}
 	fn.stack.append(stackEntry{expr: cond, kind: entryCond})
+	if *noopt {
+		fn.flush()
+	}
 }
 
 // Calls push or pushPure depending on purity.
@@ -545,108 +550,13 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 }
 
 func (fn *funcCompiler) cleanup() {
-	body := fn.blocks[0].body
-
-	// Verify that materialized constants are only assigned once.
-	ast.Inspect(body, func(n ast.Node) bool {
-		if assign, ok := n.(*ast.AssignStmt); ok && assign.Tok == token.ASSIGN {
-			for _, lhs := range assign.Lhs {
-				if id, ok := lhs.(*ast.Ident); ok && strings.HasPrefix(id.Name, "t") {
-					panic("assignment to materialized constant: " + id.Name)
-				}
-			}
-		}
-		return true
-	})
-
-	// Add Go imports.
-	ast.Inspect(body, fn.resolveImports)
-
-	// Count identifier uses.
-	uses := make(map[string]int)
-	ast.Inspect(body, func(n ast.Node) bool {
-		if id, ok := n.(*ast.Ident); ok {
-			uses[id.Name]++
-		}
-		return true
-	})
-
-	astutil.Apply(body,
-		// If an identifer only shows up in the left side of an assignment,
-		// replace it with the blank identifier.
-		func(c *astutil.Cursor) bool {
-			if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.DEFINE {
-				anyUsed := false
-				for i := range n.Lhs {
-					if id, ok := n.Lhs[i].(*ast.Ident); ok {
-						if uses[id.Name] == 1 {
-							n.Lhs[i] = newID("_")
-						} else if id.Name != "_" {
-							anyUsed = true
-						}
-					}
-				}
-				if !anyUsed {
-					n.Tok = token.ASSIGN
-				}
-			}
-			return true
-		},
-		// Remove labels followed by an empty statement (;).
-		func(c *astutil.Cursor) bool {
-			// Iterate backwards so once we find a label with an empty statement
-			// we can attach it to the next statement, if it's not a declaration.
-			if block, ok := c.Node().(*ast.BlockStmt); ok && len(block.List) > 0 {
-				stmts := make([]ast.Stmt, 0, len(block.List))
-				for i := len(block.List) - 1; i >= 0; i-- {
-					stmt := block.List[i]
-					if ls, ok := stmt.(*ast.LabeledStmt); ok {
-						if _, ok := ls.Stmt.(*ast.EmptyStmt); ok && len(stmts) > 0 {
-							nextStmt := stmts[len(stmts)-1]
-							if _, ok := nextStmt.(*ast.DeclStmt); !ok {
-								ls.Stmt = nextStmt
-								stmts[len(stmts)-1] = ls
-								// If the next statement was already labeled,
-								// merge the two labels into one.
-								if inner, ok := ls.Stmt.(*ast.LabeledStmt); ok {
-									ls.Label.Name = inner.Label.Name
-									stmts[len(stmts)-1] = inner
-								}
-								continue
-							}
-						}
-					}
-					stmts = append(stmts, stmt)
-				}
-				slices.Reverse(stmts)
-				block.List = stmts
-			}
-			return true
-		})
-
-	// Remove self assignments.
-	astutil.Apply(body, func(c *astutil.Cursor) bool {
-		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN && len(n.Lhs) == len(n.Rhs) {
-			var cloned bool
-			for i := len(n.Lhs) - 1; i >= 0; i-- {
-				if idL, ok := n.Lhs[i].(*ast.Ident); ok {
-					if idR, ok := n.Rhs[i].(*ast.Ident); ok && idL.Name == idR.Name {
-						if !cloned {
-							cloned = true
-							n.Lhs = slices.Clone(n.Lhs)
-							n.Rhs = slices.Clone(n.Rhs)
-						}
-						n.Lhs = slices.Delete(n.Lhs, i, i+1)
-						n.Rhs = slices.Delete(n.Rhs, i, i+1)
-					}
-				}
-			}
-			if len(n.Lhs) == 0 {
-				c.Delete()
-			}
-		}
-		return true
-	}, nil)
+	ast.Inspect(fn.decl, fn.resolveImports)
+	util.CheckMaterialized(fn.decl)
+	util.RemoveUnusedLocals(fn.decl)
+	if !*noopt {
+		util.RemoveEmptyStmts(fn.decl)
+		util.RemoveSelfAssign(fn.decl)
+	}
 }
 
 type funcBlock struct {

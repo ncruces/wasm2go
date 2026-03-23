@@ -880,7 +880,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				lhs := make([]ast.Expr, len(bt.params))
 				rhs := make([]ast.Expr, len(bt.params))
 				for i := len(bt.params) - 1; i >= 0; i-- {
-					lhs[i] = fn.newTempVar()
+					if opcode == 0x03 { // loop
+						lhs[i] = fn.newTempVar()
+					} else {
+						lhs[i] = fn.newTempVal()
+					}
 					rhs[i] = fn.pop()
 				}
 				childBlk.params = lhs
@@ -957,8 +961,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			// so they're available to the parent block.
 			fn.emit(blk.resultStmts(fn)...)
 			fn.stack = fn.stack[:blk.stackPos]
-			for _, tmp := range blk.results {
-				fn.pushConst(tmp)
+			for _, r := range blk.results {
+				fn.pushConst(r)
 			}
 
 			fn.blocks.pop()
@@ -1094,8 +1098,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Lhs: lhs,
 				Tok: token.DEFINE,
 				Rhs: []ast.Expr{call}})
-			for _, tmp := range lhs {
-				fn.pushConst(tmp)
+			for _, r := range lhs {
+				fn.pushConst(r)
 			}
 
 		case 0x11: // call_indirect
@@ -1140,8 +1144,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Lhs: lhs,
 				Tok: token.DEFINE,
 				Rhs: []ast.Expr{call}})
-			for _, tmp := range lhs {
-				fn.pushConst(tmp)
+			for _, r := range lhs {
+				fn.pushConst(r)
 			}
 
 		case 0x0f: // return
@@ -1226,8 +1230,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Lhs: tmp,
 						Rhs: vt}}}})
 
-			for _, tmp := range tmp {
-				fn.pushConst(tmp)
+			for _, t := range tmp {
+				fn.pushConst(t)
 			}
 
 		case 0x20: // local.get

@@ -784,12 +784,12 @@ l0:
 func (m *Module) Xparam(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	p1 := i32(1)
+	t1 := i32(1)
 	if v0 != 0 {
-		t2 := p1 + i32(2)
+		t2 := t1 + i32(2)
 		p0 = t2
 	} else {
-		t3 := p1 + i32(-2)
+		t3 := t1 + i32(-2)
 		p0 = t3
 	}
 	return p0
@@ -797,12 +797,12 @@ func (m *Module) Xparam(v0 int32) int32 {
 func (m *Module) Xparams(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	p2, p1 := i32(1), i32(2)
+	t2, t1 := i32(1), i32(2)
 	if v0 != 0 {
-		t3 := p2 + p1
+		t3 := t2 + t1
 		p0 = t3
 	} else {
-		t4 := p2 - p1
+		t4 := t2 - t1
 		p0 = t4
 	}
 	return p0
@@ -811,24 +811,24 @@ func (m *Module) Xparams_id_k4eonk(v0 int32) int32 {
 	var p0 int32
 	var p1 int32
 	_, _ = p0, p1
-	p3, p2 := i32(1), i32(2)
+	t3, t2 := i32(1), i32(2)
 	if v0 != 0 {
-		p0, p1 = p3, p2
+		p0, p1 = t3, t2
 	} else {
-		p0, p1 = p3, p2
+		p0, p1 = t3, t2
 	}
 	return p0 + p1
 }
 func (m *Module) Xparam_break_o3viaw(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	p1 := i32(1)
+	t1 := i32(1)
 	if v0 != 0 {
-		t2 := p1 + i32(2)
+		t2 := t1 + i32(2)
 		p0 = t2
 		goto l0
 	} else {
-		t3 := p1 + i32(-2)
+		t3 := t1 + i32(-2)
 		p0 = t3
 		goto l0
 	}
@@ -838,13 +838,13 @@ l0:
 func (m *Module) Xparams_break_da59t7(v0 int32) int32 {
 	var p0 int32
 	_ = p0
-	p2, p1 := i32(1), i32(2)
+	t2, t1 := i32(1), i32(2)
 	if v0 != 0 {
-		t3 := p2 + p1
+		t3 := t2 + t1
 		p0 = t3
 		goto l0
 	} else {
-		t4 := p2 - p1
+		t4 := t2 - t1
 		p0 = t4
 		goto l0
 	}
@@ -855,12 +855,12 @@ func (m *Module) Xparams_id_break_1eqx8pk(v0 int32) int32 {
 	var p0 int32
 	var p1 int32
 	_, _ = p0, p1
-	p3, p2 := i32(1), i32(2)
+	t3, t2 := i32(1), i32(2)
 	if v0 != 0 {
-		p0, p1 = p3, p2
+		p0, p1 = t3, t2
 		goto l0
 	} else {
-		p0, p1 = p3, p2
+		p0, p1 = t3, t2
 	}
 l0:
 	return p0 + p1
@@ -904,12 +904,12 @@ func (m *Module) Xadd64_u_saturated(v0 int64, v1 int64) int64 {
 	t0, t1 := m.Xadd64_u_with_carry(v0, v1, i32(0))
 	var p2 int64
 	_ = p2
-	p3 := t0
+	t3 := t0
 	if t1 != 0 {
-		_ = p3
+		_ = t3
 		p2 = i64(-1)
 	} else {
-		p2 = p3
+		p2 = t3
 	}
 	return p2
 }
@@ -923,21 +923,21 @@ func (m *Module) Xtype_use_ka4o2i() {
 	} else {
 		p0 = i32(2)
 	}
-	p1 := p0
+	t1 := p0
 	if i32(1) != 0 {
-		_ = p1
+		_ = t1
 	} else {
-		_ = p1
+		_ = t1
 	}
 	var p2 int32
 	var p3 float64
 	var p4 int32
 	_, _, _ = p2, p3, p4
-	p7, p6, p5 := i32(0), f64(0), i32(0)
+	t7, t6, t5 := i32(0), f64(0), i32(0)
 	if i32(1) != 0 {
-		p2, p3, p4 = p7, p6, p5
+		p2, p3, p4 = t7, t6, t5
 	} else {
-		p2, p3, p4 = p7, p6, p5
+		p2, p3, p4 = t7, t6, t5
 	}
 	_ = p4
 	_ = p3
@@ -949,21 +949,21 @@ func (m *Module) Xtype_use_ka4o2i() {
 	} else {
 		p8 = i32(2)
 	}
-	p9 := p8
+	t9 := p8
 	if i32(1) != 0 {
-		_ = p9
+		_ = t9
 	} else {
-		_ = p9
+		_ = t9
 	}
 	var p10 int32
 	var p11 float64
 	var p12 int32
 	_, _, _ = p10, p11, p12
-	p15, p14, p13 := i32(0), f64(0), i32(0)
+	t15, t14, t13 := i32(0), f64(0), i32(0)
 	if i32(1) != 0 {
-		p10, p11, p12 = p15, p14, p13
+		p10, p11, p12 = t15, t14, t13
 	} else {
-		p10, p11, p12 = p15, p14, p13
+		p10, p11, p12 = t15, t14, t13
 	}
 	_ = p12
 	_ = p11
