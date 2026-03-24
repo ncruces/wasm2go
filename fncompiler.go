@@ -13,6 +13,7 @@ type funcCompiler struct {
 	*translator
 
 	typ  funcType
+	call ast.Expr
 	decl *ast.FuncDecl
 
 	stack  stack[stackEntry]
@@ -190,7 +191,7 @@ func (fn *funcCompiler) loadUnsafe(addr ast.Expr, typ string) ast.Expr {
 	}
 
 	return &ast.StarExpr{X: &ast.CallExpr{
-		Fun: &ast.ParenExpr{X: &ast.StarExpr{X: newID(typ)}},
+		Fun: &ast.StarExpr{X: newID(typ)},
 		Args: []ast.Expr{&ast.CallExpr{
 			Fun: &ast.SelectorExpr{X: newID("unsafe"), Sel: newID("Pointer")},
 			Args: []ast.Expr{&ast.CallExpr{
@@ -557,6 +558,9 @@ func (fn *funcCompiler) cleanup() {
 		util.UnnestBlocks(fn.decl)
 		util.RemoveEmptyStmts(fn.decl)
 		util.RemoveSelfAssign(fn.decl)
+		if util.RemoveReceiver(fn.decl) {
+			fn.call.(*ast.ParenExpr).X = fn.decl.Name
+		}
 	}
 }
 

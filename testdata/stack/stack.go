@@ -9,11 +9,11 @@ func New() *Module {
 	m := &Module{}
 	return m
 }
-func (m *Module) f0(v0 int32, v1 int32) int32 {
+func fn0(v0 int32, v1 int32) int32 {
 	return v0 - v1
 }
 func (m *Module) Xstack_func_call() int32 {
-	t0 := m.f0(i32(91), i32(23))
+	t0 := fn0(i32(91), i32(23))
 	return t0
 }
 func (m *Module) Xgreater(v0 int32, v1 int32) int32 {

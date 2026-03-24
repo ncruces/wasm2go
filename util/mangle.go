@@ -16,7 +16,7 @@ const (
 	IDLocal
 )
 
-func Mangle(name string, kind IDKind) *ast.Ident {
+func Mangle(name string, kind IDKind) string {
 	var buf strings.Builder
 	buf.Grow(len(name))
 
@@ -37,10 +37,15 @@ func Mangle(name string, kind IDKind) *ast.Ident {
 	}
 	if suffix && kind != IDLocal {
 		buf.WriteByte('_')
+		const mod = 36 * 36 * 36 * 36 * 36 * 36
 		table := crc32.MakeTable(crc32.Castagnoli)
-		checksum := crc32.Checksum([]byte(name), table)
+		checksum := crc32.Checksum([]byte(name), table) % mod
 		buf.WriteString(strconv.FormatUint(uint64(checksum), 36))
 	}
 
-	return ast.NewIdent(buf.String())
+	return buf.String()
+}
+
+func MangleID(name string, kind IDKind) *ast.Ident {
+	return ast.NewIdent(Mangle(name, kind))
 }

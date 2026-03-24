@@ -64,8 +64,8 @@ func (t *translator) createModuleStruct() ast.Decl {
 		if !seen.has(imp.module) {
 			seen.add(imp.module)
 			fields = append(fields, &ast.Field{
-				Names: []*ast.Ident{util.Mangle(imp.module, util.IDInternal)},
-				Type:  util.Mangle(imp.module, util.IDExported)})
+				Names: []*ast.Ident{util.MangleID(imp.module, util.IDInternal)},
+				Type:  util.MangleID(imp.module, util.IDExported)})
 		}
 	}
 	return &ast.GenDecl{
@@ -104,12 +104,12 @@ func (t *translator) createNewFunc() ast.Decl {
 
 			params = append(params, &ast.Field{
 				Names: []*ast.Ident{local},
-				Type:  util.Mangle(imp.module, util.IDExported)})
+				Type:  util.MangleID(imp.module, util.IDExported)})
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{
 					X:   newID("m"),
-					Sel: util.Mangle(imp.module, util.IDInternal)}},
+					Sel: util.MangleID(imp.module, util.IDInternal)}},
 				Rhs: []ast.Expr{local}})
 		}
 	}
@@ -161,7 +161,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.Mangle(imp.name, util.IDExported)}}}})
+						Sel: util.MangleID(imp.name, util.IDExported)}}}})
 
 		case externGlobal:
 			body.List = append(body.List, &ast.AssignStmt{
@@ -170,7 +170,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.Mangle(imp.name, util.IDExported)}}}})
+						Sel: util.MangleID(imp.name, util.IDExported)}}}})
 
 		case externMemory:
 			body.List = append(body.List, &ast.AssignStmt{
@@ -179,7 +179,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.Mangle(imp.name, util.IDExported)}}},
+						Sel: util.MangleID(imp.name, util.IDExported)}}},
 			}, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
@@ -271,10 +271,7 @@ func (t *translator) createNewFunc() ast.Decl {
 	// Call start function.
 	if t.start != 0 {
 		body.List = append(body.List, &ast.ExprStmt{
-			X: &ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.functions[^t.start].decl.Name}}})
+			X: &ast.CallExpr{Fun: t.functions[^t.start].call}})
 	}
 
 	body.List = append(body.List, &ast.ReturnStmt{Results: []ast.Expr{newID("m")}})
@@ -304,7 +301,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		}
 
 		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
-			Names: []*ast.Ident{util.Mangle(imp.name, util.IDExported)},
+			Names: []*ast.Ident{util.MangleID(imp.name, util.IDExported)},
 			Type:  typ})
 	}
 
@@ -314,7 +311,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
 				Assign: 1,
-				Name:   util.Mangle(name, util.IDExported),
+				Name:   util.MangleID(name, util.IDExported),
 				Type:   &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
 	}
 	return decls
@@ -357,7 +354,7 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 			Name: newID("Slice"),
 			Type: &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
+				Fun:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
 				Args: []ast.Expr{newID("m")}}}}}},
 		}, &ast.FuncDecl{
 			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
@@ -369,7 +366,7 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 				Fun: newID("memory_grow"),
 				Args: []ast.Expr{
 					&ast.CallExpr{
-						Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
+						Fun:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
 						Args: []ast.Expr{newID("m")}},
 					newID("delta"),
 					newID("max")}}}}}}})
@@ -389,23 +386,23 @@ func (t *translator) createExportMethods() []ast.Decl {
 
 	for _, name := range names {
 		exp := t.exports[name]
-		methodName := util.Mangle(name, util.IDExported)
+		name := util.Mangle(name, util.IDExported)
 
 		var decl = &ast.FuncDecl{
 			Recv: modRecvList,
-			Name: methodName,
+			Name: ast.NewIdent(name),
 			Type: &ast.FuncType{},
 			Body: &ast.BlockStmt{}}
 
 		switch exp.kind {
 		case externFunction:
 			fn := t.functions[exp.index]
-			if fn.decl.Name.Name == methodName.Name {
+			if name == fn.decl.Name.Name {
 				continue
 			}
 
 			decl.Type = fn.typ.toAST()
-			call := &ast.CallExpr{Fun: &ast.SelectorExpr{X: newID("m"), Sel: fn.decl.Name}}
+			call := &ast.CallExpr{Fun: fn.call}
 			for i := range fn.typ.params {
 				call.Args = append(call.Args, localVar(i))
 			}

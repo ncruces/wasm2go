@@ -109,7 +109,7 @@ func translate(r io.Reader, w io.Writer) error {
 	}
 	for i, fn := range t.functions {
 		if fn.decl != nil && fn.decl.Name.Name == "" {
-			fn.decl.Name.Name = "f" + strconv.Itoa(i)
+			fn.decl.Name.Name = "fn" + strconv.Itoa(i)
 		}
 	}
 	if t.memory != nil && t.memory.id.Name == "" {
@@ -170,6 +170,8 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 		t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 	}
+
+	util.RemoveParens(&t.out)
 
 	// Print Go.
 	out := bufio.NewWriter(w)
@@ -368,8 +370,8 @@ func (t *translator) readImportSection() error {
 
 			call := &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.SelectorExpr{X: newID("m"), Sel: util.Mangle(mod, util.IDInternal)},
-					Sel: util.Mangle(name, util.IDExported)},
+					X:   &ast.SelectorExpr{X: newID("m"), Sel: util.MangleID(mod, util.IDInternal)},
+					Sel: util.MangleID(name, util.IDExported)},
 				Args: args,
 			}
 
@@ -380,14 +382,15 @@ func (t *translator) readImportSection() error {
 				stmt = &ast.ReturnStmt{Results: []ast.Expr{call}}
 			}
 
+			id := &ast.Ident{}
 			fn := funcCompiler{
 				typ: typ,
 				decl: &ast.FuncDecl{
-					Name: &ast.Ident{},
+					Name: id,
 					Recv: modRecvList,
 					Type: typ.toAST(),
 					Body: &ast.BlockStmt{List: []ast.Stmt{stmt}}},
-			}
+				call: &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
 			t.functions = append(t.functions, fn)
 			t.out.Decls = append(t.out.Decls, fn.decl)
 
@@ -492,6 +495,7 @@ func (t *translator) readFunctionSection() error {
 			Recv: modRecvList,
 			Type: fn.typ.toAST(),
 		}
+		fn.call = &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: fn.decl.Name}}
 		t.out.Decls = append(t.out.Decls, fn.decl)
 	}
 	return nil
@@ -672,9 +676,7 @@ func (t *translator) readElementSection() error {
 				if err != nil {
 					return err
 				}
-				t.elements[i].init[j] = &ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.functions[idx].decl.Name}
+				t.elements[i].init[j] = t.functions[idx].call
 			}
 		}
 	}
@@ -719,7 +721,7 @@ func (t *translator) readExportSection() error {
 		switch externKind(kind) {
 		case externFunction:
 			decl := t.functions[index].decl
-			decl.Name = util.Mangle(name, util.IDExported)
+			decl.Name.Name = util.Mangle(name, util.IDExported)
 		}
 	}
 	return nil
@@ -1078,12 +1080,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				args[i] = fn.pop()
 			}
 
-			call := &ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: target.decl.Name},
-				Args: args,
-			}
+			call := &ast.CallExpr{Fun: target.call, Args: args}
 
 			if len(target.typ.results) == 0 {
 				fn.emit(&ast.ExprStmt{X: call})
@@ -1789,9 +1786,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushConst(&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.functions[index].decl.Name})
+			fn.pushConst(t.functions[index].call)
 
 		case 0xfc:
 			code, err := readLEB128(t.in)
@@ -2067,7 +2062,7 @@ func (t *translator) readConstExpr() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			stack.append(&ast.SelectorExpr{X: newID("m"), Sel: t.functions[index].decl.Name})
+			stack.append(t.functions[index].call)
 
 		case 0x6a, 0x7c: // i32.add, i64.add
 			stack.append(&ast.BinaryExpr{Y: stack.pop(), X: stack.pop(), Op: token.ADD})
@@ -2196,7 +2191,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 				return err
 			}
 			name := buf.String()
-			t.out.Name = util.Mangle(name, util.IDLocal)
+			t.out.Name = util.MangleID(name, util.IDLocal)
 
 		case nameFunction, nameGlobal, nameTable:
 			count, err := readLEB128(r)
@@ -2232,8 +2227,8 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 						id = t.globals[index].id
 					}
 				}
-				if id != nil && id.Name == "" {
-					id.Name = util.Mangle(buf.String(), util.IDInternal).Name
+				if id.Name == "" {
+					id.Name = util.Mangle(buf.String(), util.IDInternal)
 				}
 			}
 

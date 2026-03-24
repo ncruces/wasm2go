@@ -12,6 +12,8 @@ import (
 	"testing"
 )
 
+//go:generate go test -run translate
+
 func Test_translate(t *testing.T) {
 	tests := []string{"fib", "memory", "primes", "recursion", "stack", "table", "trig"}
 	*nanbox = false
@@ -81,7 +83,7 @@ func generateSpecTest(path string) error {
 	baseDir := filepath.Base(dir)
 	wasmFile := filepath.Base(path)
 	jsonFile := baseDir + ".json"
-	testFile := filepath.Join(dir, baseDir+"_test.go")
+	testFile := filepath.Join(dir, "gen_test.go")
 
 	if _, err := os.Stat(filepath.Join(dir, baseDir+".json")); errors.Is(err, fs.ErrNotExist) {
 		return nil

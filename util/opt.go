@@ -137,7 +137,7 @@ func UnnestBlocks(n ast.Node) {
 				return true
 			}
 
-			var anyvars bool
+			var decls bool
 			for _, s := range blk.List {
 				// Unwrap labeled statements to inspect the actual statement.
 				for {
@@ -149,21 +149,58 @@ func UnnestBlocks(n ast.Node) {
 				}
 				// Check for declarations.
 				if _, ok := s.(*ast.DeclStmt); ok {
-					anyvars = true
+					decls = true
 					break
 				}
 				if assign, ok := s.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
-					anyvars = true
+					decls = true
 					break
 				}
 			}
 
-			if !anyvars {
+			if !decls {
 				for _, stmt := range blk.List {
 					c.InsertBefore(stmt)
 				}
 				c.Delete()
 			}
+		}
+		return true
+	})
+}
+
+// RemoveReceiver converts a method that doesn't use their receiver
+// into a plain function.
+func RemoveReceiver(fn *ast.FuncDecl) bool {
+	if ast.IsExported(fn.Name.Name) {
+		return false
+	}
+
+	unused := true
+	name := fn.Recv.List[0].Names[0].Name
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		if unused {
+			if id, ok := n.(*ast.Ident); ok && id.Name == name {
+				unused = false
+			}
+		}
+		return unused
+	})
+
+	if unused {
+		fn.Recv = nil
+	}
+	return unused
+}
+
+// RemoveParens removes all ParenExpr nodes.
+// These are always unnecessary in generated code.
+// The printer/formatter will automatically introduce whatever parens
+// are necessary to preserve precedence of operators.
+func RemoveParens(n ast.Node) {
+	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+		if paren, ok := c.Node().(*ast.ParenExpr); ok {
+			c.Replace(paren.X)
 		}
 		return true
 	})

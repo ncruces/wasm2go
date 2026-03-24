@@ -60,8 +60,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 					defer RecoverTrap(t, cmd.Text)
 				}
 
-				id := util.Mangle(cmd.Action.Field, util.IDExported)
-				method := mod.MethodByName(id.Name)
+				method := mod.MethodByName(util.Mangle(cmd.Action.Field, util.IDExported))
 				args := make([]reflect.Value, len(cmd.Action.Args))
 				for i, arg := range cmd.Action.Args {
 					switch arg.Type {

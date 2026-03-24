@@ -57,6 +57,9 @@ jobs:
     - uses: actions/setup-go@v6
       with: { go-version: stable }
 
+    - name: Generate
+      run: go generate
+
     - name: Format
       run: gofmt -s -w . && git diff --exit-code
 
