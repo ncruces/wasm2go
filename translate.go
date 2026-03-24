@@ -268,24 +268,47 @@ func translate(r io.Reader, w io.Writer) error {
 		// this is a terrible hack
 		tmp := bytes.Clone(buf)
 		out.Reset()
-		var prev, cur *line
+		var (
+			prev, cur *line
+			linenum   int
+			useline   bool
+		)
 		for tmp := range bytes.Lines(tmp) {
+			tmps := string(bytes.TrimRight(bytes.TrimLeft(tmp, "\t"), "\n"))
 			oldcur := cur
-			if s1, ok := bytes.CutPrefix(bytes.TrimLeft(tmp, "\t"), []byte("OFFSET_HACK_")); ok {
-				offset, err := strconv.ParseUint(string(bytes.TrimSuffix(s1, []byte{'\n'})), 10, 64)
-				if err != nil {
-					panic("wtf: " + err.Error())
-				}
-				if i, _ := slices.BinarySearchFunc(lines, offset, func(e line, t uint64) int {
-					return cmp.Compare(e.addr, t)
-				}); i > 0 {
-					cur = &lines[i-1]
-				} else {
-					cur = nil
-				}
+			if tmps == "OFFSET_HACK_START" {
+				useline = true
 				continue
 			}
-			if cur != nil && !bytes.HasPrefix(bytes.TrimLeft(tmp, "\t"), []byte("/")) {
+			if tmps == "OFFSET_HACK_END" {
+				useline = false
+				continue
+			}
+			if useline {
+				if s, ok := strings.CutPrefix(tmps, "OFFSET_HACK_"); ok {
+					offset, err := strconv.ParseUint(s, 10, 64)
+					if err != nil {
+						panic("wtf: " + err.Error())
+					}
+					if i, _ := slices.BinarySearchFunc(lines, offset, func(e line, t uint64) int {
+						return cmp.Compare(e.addr, t)
+					}); i > 0 {
+						cur = &lines[i-1]
+					} else {
+						cur = nil
+					}
+					continue
+				}
+			}
+			linenum++
+			if !useline {
+				cur = &line{
+					name: "wasm2go.go",
+					line: linenum,
+					col:  1,
+				}
+			}
+			if cur != nil && !strings.HasPrefix(tmps, "/*") && !strings.HasPrefix(tmps, "//") {
 				out.WriteString("/*line ")
 				if prev == nil || prev.name != cur.name {
 					out.WriteString(cur.name) // TODO: sanitize
@@ -884,6 +907,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 	fn.translator = t
 	fn.decl.Body = body
 	fn.blocks = []funcBlock{{body: body}}
+
+	if *dwarfline {
+		fn.emit(&ast.ExprStmt{X: ast.NewIdent("OFFSET_HACK_START")})     // comments are hard so fuck that lol
+		defer fn.emit(&ast.ExprStmt{X: ast.NewIdent("OFFSET_HACK_END")}) // comments are hard so fuck that lol
+	}
 
 	numVars, err := readLEB128(t.in)
 	if err != nil {
