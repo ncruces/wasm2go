@@ -285,7 +285,7 @@ func translate(r io.Reader, w io.Writer) error {
 				}
 				continue
 			}
-			if cur != nil {
+			if cur != nil && !bytes.HasPrefix(bytes.TrimLeft(tmp, "\t"), []byte("/")) {
 				out.WriteString("/*line ")
 				if prev == nil || prev.name != cur.name {
 					out.WriteString(cur.name) // TODO: sanitize
