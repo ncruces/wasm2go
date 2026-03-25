@@ -295,6 +295,16 @@ func (fn *funcCompiler) popCond() ast.Expr {
 		Y: &ast.BasicLit{Kind: token.INT, Value: "0"}}
 }
 
+// Pops an entry from the value stack.
+func (fn *funcCompiler) popEntry() (entryKind, ast.Expr) {
+	if fn.blocks.top().unreachable {
+		return entryConst, &ast.BasicLit{Kind: token.INT, Value: "0"}
+	}
+
+	entry := fn.stack.pop()
+	return entry.kind, entry.expr
+}
+
 // Pops an address from the stack, adds an offset, and returns it.
 func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 	addr := fn.pop()
@@ -503,10 +513,16 @@ func (fn *funcCompiler) binBuiltin(name string) {
 
 // Executes a zero equality comparison operator.
 func (fn *funcCompiler) eqzOp() {
-	fn.pushCond(&ast.BinaryExpr{
-		X:  fn.pop(),
-		Op: token.EQL,
-		Y:  &ast.BasicLit{Kind: token.INT, Value: "0"}})
+	kind, expr := fn.popEntry()
+	// This is often used to negate conditions.
+	if kind == entryCond {
+		fn.pushCond(&ast.UnaryExpr{Op: token.NOT, X: expr})
+	} else {
+		fn.pushCond(&ast.BinaryExpr{
+			X:  expr,
+			Op: token.EQL,
+			Y:  &ast.BasicLit{Kind: token.INT, Value: "0"}})
+	}
 }
 
 // Executes a comparision operation.

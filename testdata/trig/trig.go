@@ -47,15 +47,11 @@ l0:
 	}
 	{
 		v1 = float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0))
-		var p0 int32
-		if math.Abs(v1) < float64(0x1p+63) {
-			p0 = 1
-		}
-		if p0 == 0 {
+		if !(math.Abs(v1) < float64(0x1p+63)) {
 			goto l2
 		}
-		t1 := i64_trunc_f64_s(v1)
-		v2 = t1
+		t0 := i64_trunc_f64_s(v1)
+		v2 = t0
 		goto l3
 	}
 l2:
