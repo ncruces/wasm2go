@@ -25,18 +25,9 @@ func CheckMaterialized(n ast.Node) {
 	})
 }
 
-// RemoveUnusedLocals replaces unused local variables with the black identifier.
+// RemoveUnusedLocals replaces unused local variables with the blank identifier.
 func RemoveUnusedLocals(n ast.Node) {
-	// Count identifier uses.
-	uses := make(map[string]int)
-	ast.Inspect(n, func(n ast.Node) bool {
-		if id, ok := n.(*ast.Ident); ok {
-			uses[id.Name]++
-			return false
-		}
-		return true
-	})
-
+	uses := countUses(n)
 	blank := ast.NewIdent("_")
 
 	// If an identifer only shows up once,
@@ -47,23 +38,88 @@ func RemoveUnusedLocals(n ast.Node) {
 	astutil.Apply(n,
 		func(c *astutil.Cursor) bool {
 			if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.DEFINE {
-				var anydefs bool
+				var any bool
 				for i := range n.Lhs {
 					if id, ok := n.Lhs[i].(*ast.Ident); ok {
 						if uses[id.Name] == 1 {
 							n.Lhs[i] = blank
 						} else if id.Name != blank.Name {
-							anydefs = true
+							any = true
 						}
 					}
 				}
-				if !anydefs {
+				if !any {
 					n.Tok = token.ASSIGN
 				}
 				return false
 			}
 			return true
 		}, nil)
+}
+
+// RemoveSelfAssign removes self assignments to variables.
+func RemoveSelfAssign(n ast.Node) {
+	astutil.Apply(n, func(c *astutil.Cursor) bool {
+		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
+			var lhs, rhs []ast.Expr
+			for i, expr := range n.Rhs {
+				if idL, ok := n.Lhs[i].(*ast.Ident); ok {
+					if idR, ok := expr.(*ast.Ident); ok && idL.Name == idR.Name {
+						continue
+					}
+				}
+				lhs = append(lhs, n.Lhs[i])
+				rhs = append(rhs, expr)
+			}
+
+			if len(lhs) == 0 {
+				c.Delete()
+			} else if len(lhs) < len(n.Lhs) {
+				n.Lhs = lhs
+				n.Rhs = rhs
+			}
+			return true
+		}
+		return true
+	}, nil)
+}
+
+// RemoveBlankAssigns removes redundant blank assignments from a variable
+// when the variable is read elsewhere.
+func RemoveBlankAssigns(n ast.Node) {
+	uses := countUses(n)
+	writes := countWrites(n)
+
+	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
+			for _, expr := range n.Lhs {
+				if id, ok := expr.(*ast.Ident); !ok || id.Name != "_" {
+					return true
+				}
+			}
+
+			var lhs, rhs []ast.Expr
+			for i, expr := range n.Rhs {
+				if id, ok := expr.(*ast.Ident); ok {
+					if uses[id.Name]-writes[id.Name] > 1 {
+						uses[id.Name]--
+						continue
+					}
+				}
+				lhs = append(lhs, n.Lhs[i])
+				rhs = append(rhs, expr)
+			}
+
+			if len(lhs) == 0 {
+				c.Delete()
+			} else if len(lhs) < len(n.Lhs) {
+				n.Lhs = lhs
+				n.Rhs = rhs
+			}
+			return true
+		}
+		return true
+	})
 }
 
 // RemoveEmptyStmts removes empty statements preceded by labels.
@@ -101,33 +157,6 @@ func RemoveEmptyStmts(n ast.Node) {
 		})
 }
 
-// RemoveSelfAssign removes self assignments to locals.
-func RemoveSelfAssign(n ast.Node) {
-	astutil.Apply(n, func(c *astutil.Cursor) bool {
-		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
-			var cloned bool
-			for i := len(n.Lhs) - 1; i >= 0; i-- {
-				if idL, ok := n.Lhs[i].(*ast.Ident); ok {
-					if idR, ok := n.Rhs[i].(*ast.Ident); ok && idL.Name == idR.Name {
-						if !cloned {
-							cloned = true
-							n.Lhs = slices.Clone(n.Lhs)
-							n.Rhs = slices.Clone(n.Rhs)
-						}
-						n.Lhs = slices.Delete(n.Lhs, i, i+1)
-						n.Rhs = slices.Delete(n.Rhs, i, i+1)
-					}
-				}
-			}
-			if len(n.Lhs) == 0 {
-				c.Delete()
-			}
-			return false
-		}
-		return true
-	}, nil)
-}
-
 // UnnestBlocks removes block statements that do not contain variable declarations.
 func UnnestBlocks(n ast.Node) {
 	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
@@ -138,7 +167,7 @@ func UnnestBlocks(n ast.Node) {
 
 		var blk *ast.BlockStmt
 		var lbl *ast.LabeledStmt
-
+		// Find blocks, and blocks preceded by labels.
 		if b, ok := c.Node().(*ast.BlockStmt); ok {
 			blk = b
 		} else if l, ok := c.Node().(*ast.LabeledStmt); ok {
@@ -147,7 +176,6 @@ func UnnestBlocks(n ast.Node) {
 				lbl = l
 			}
 		}
-
 		if blk == nil {
 			return true
 		}
@@ -170,6 +198,7 @@ func UnnestBlocks(n ast.Node) {
 			}
 		}
 
+		// Unnest bare blocks.
 		if lbl == nil {
 			for _, stmt := range blk.List {
 				c.InsertBefore(stmt)
@@ -178,6 +207,7 @@ func UnnestBlocks(n ast.Node) {
 			return true
 		}
 
+		// Unnest labled blocks.
 		if len(blk.List) == 0 {
 			lbl.Stmt = &ast.EmptyStmt{}
 		} else {
@@ -192,6 +222,7 @@ func UnnestBlocks(n ast.Node) {
 
 // RemoveReceiver converts a method that doesn't use their receiver
 // into a plain function.
+// Returns true if we need to update call sites.
 func RemoveReceiver(fn *ast.FuncDecl) bool {
 	if ast.IsExported(fn.Name.Name) {
 		return false
@@ -225,4 +256,38 @@ func RemoveParens(n ast.Node) {
 		}
 		return true
 	})
+}
+
+// countUses counts uses of an identifier.
+func countUses(n ast.Node) map[string]int {
+	uses := make(map[string]int)
+	ast.Inspect(n, func(n ast.Node) bool {
+		if id, ok := n.(*ast.Ident); ok {
+			uses[id.Name]++
+			return false
+		}
+		return true
+	})
+	return uses
+}
+
+// countWrites counts writes to an identifier.
+func countWrites(n ast.Node) map[string]int {
+	writes := make(map[string]int)
+	ast.Inspect(n, func(node ast.Node) bool {
+		switch x := node.(type) {
+		case *ast.ValueSpec:
+			for _, id := range x.Names {
+				writes[id.Name]++
+			}
+		case *ast.AssignStmt:
+			for i := range x.Lhs {
+				if id, ok := x.Lhs[i].(*ast.Ident); ok {
+					writes[id.Name]++
+				}
+			}
+		}
+		return true
+	})
+	return writes
 }

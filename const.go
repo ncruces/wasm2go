@@ -118,6 +118,12 @@ func formatFloat(f float64, bits int) string {
 	return dec
 }
 
+// This helps decide if a number is better represented
+// in decimal or hexadecimal by counting the number of
+// of transitions between different characters
+// (i.e. ignoring runs of the same character).
+// Because s includes the 0x prefix,
+// hexadecimal needs a 3 character advantage to win.
 func complexity(s string) (transitions int) {
 	for i := 1; i < len(s); i++ {
 		if s[i] != s[i-1] {

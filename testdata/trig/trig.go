@@ -35,7 +35,6 @@ func (m *Module) Xsin(v0 float64) float64 {
 	var v2 int64
 	var v3 int32
 	var v4 float64
-	_, _, _, _ = v1, v2, v3, v4
 	if v0 != float64(0) {
 		goto l0
 	}

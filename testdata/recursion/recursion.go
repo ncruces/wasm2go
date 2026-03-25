@@ -11,7 +11,6 @@ func New() *Module {
 }
 func (m *Module) Xfactorial(v0 int32) int32 {
 	var p0 int32
-	_ = p0
 	if v0 <= i32(1) {
 		p0 = i32(1)
 	} else {
@@ -24,7 +23,6 @@ func (m *Module) Xfactorial(v0 int32) int32 {
 }
 func (m *Module) Xis_even(v0 int32) int32 {
 	var p0 int32
-	_ = p0
 	if v0 == 0 {
 		p0 = i32(1)
 	} else {
@@ -35,7 +33,6 @@ func (m *Module) Xis_even(v0 int32) int32 {
 }
 func (m *Module) Xis_odd(v0 int32) int32 {
 	var p0 int32
-	_ = p0
 	if v0 == 0 {
 		p0 = i32(0)
 	} else {

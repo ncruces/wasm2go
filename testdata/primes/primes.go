@@ -11,7 +11,6 @@ func New() *Module {
 }
 func (m *Module) Xis_prime(v0 int32) int32 {
 	var v1 int32
-	_ = v1
 	if uint32(v0) < uint32(i32(2)) {
 		return i32(0)
 	}
