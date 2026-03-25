@@ -131,38 +131,59 @@ func RemoveSelfAssign(n ast.Node) {
 // UnnestBlocks removes block statements that do not contain variable declarations.
 func UnnestBlocks(n ast.Node) {
 	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
-		if blk, ok := c.Node().(*ast.BlockStmt); ok {
-			// Only unnest if the block is part of a statement list.
-			if c.Index() < 0 {
+		// Only unnest if the node is part of a statement list.
+		if c.Index() < 0 {
+			return true
+		}
+
+		var blk *ast.BlockStmt
+		var lbl *ast.LabeledStmt
+
+		if b, ok := c.Node().(*ast.BlockStmt); ok {
+			blk = b
+		} else if l, ok := c.Node().(*ast.LabeledStmt); ok {
+			if b, ok := l.Stmt.(*ast.BlockStmt); ok {
+				blk = b
+				lbl = l
+			}
+		}
+
+		if blk == nil {
+			return true
+		}
+
+		for _, s := range blk.List {
+			// Unwrap labeled statements to inspect the actual statement.
+			for {
+				if ls, ok := s.(*ast.LabeledStmt); ok {
+					s = ls.Stmt
+				} else {
+					break
+				}
+			}
+			// Check for declarations.
+			if _, ok := s.(*ast.DeclStmt); ok {
 				return true
 			}
-
-			var decls bool
-			for _, s := range blk.List {
-				// Unwrap labeled statements to inspect the actual statement.
-				for {
-					if ls, ok := s.(*ast.LabeledStmt); ok {
-						s = ls.Stmt
-					} else {
-						break
-					}
-				}
-				// Check for declarations.
-				if _, ok := s.(*ast.DeclStmt); ok {
-					decls = true
-					break
-				}
-				if assign, ok := s.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
-					decls = true
-					break
-				}
+			if assign, ok := s.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
+				return true
 			}
+		}
 
-			if !decls {
-				for _, stmt := range blk.List {
-					c.InsertBefore(stmt)
-				}
-				c.Delete()
+		if lbl == nil {
+			for _, stmt := range blk.List {
+				c.InsertBefore(stmt)
+			}
+			c.Delete()
+			return true
+		}
+
+		if len(blk.List) == 0 {
+			lbl.Stmt = &ast.EmptyStmt{}
+		} else {
+			lbl.Stmt = blk.List[0]
+			for i := len(blk.List) - 1; i >= 1; i-- {
+				c.InsertAfter(blk.List[i])
 			}
 		}
 		return true

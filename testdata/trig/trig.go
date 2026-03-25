@@ -60,46 +60,42 @@ l3:
 	v1 = float64(v0 + float64(float64(v2)*float64(-1.5707963267948966)))
 	v3 = i32(0)
 l10:
-	{
-		if math.Abs(v1) > float64(0x1p-27) {
-			goto l4
-		}
-		v4 = float64(1)
-	l9:
-		{
-			if v3 != 0 {
-				goto l5
-			}
-			switch int32(v2) & i32(3) {
-			case 1:
-				goto l6
-			case 2:
-				goto l7
-			case 3:
-				goto l8
-			default:
-				goto l1
-			}
-		l5:
-			v3 = v3 + i32(-1)
-			v0 = float64(v1 * v1)
-			v1 = float64(v4 * v1)
-			v1 = float64(v1 + v1)
-			v4 = float64(float64(1) - float64(v0+v0))
-			goto l9
-		}
-	l6:
-		return v4
-	l7:
-		return -v1
-	l8:
-		v1 = -v4
-		goto l1
-	l4:
-		v3 = v3 + i32(1)
-		v1 = float64(v1 * float64(0.5))
-		goto l10
+	if math.Abs(v1) > float64(0x1p-27) {
+		goto l4
 	}
+	v4 = float64(1)
+l9:
+	if v3 != 0 {
+		goto l5
+	}
+	switch int32(v2) & i32(3) {
+	case 1:
+		goto l6
+	case 2:
+		goto l7
+	case 3:
+		goto l8
+	default:
+		goto l1
+	}
+l5:
+	v3 = v3 + i32(-1)
+	v0 = float64(v1 * v1)
+	v1 = float64(v4 * v1)
+	v1 = float64(v1 + v1)
+	v4 = float64(float64(1) - float64(v0+v0))
+	goto l9
+l6:
+	return v4
+l7:
+	return -v1
+l8:
+	v1 = -v4
+	goto l1
+l4:
+	v3 = v3 + i32(1)
+	v1 = float64(v1 * float64(0.5))
+	goto l10
 l1:
 	return v1
 }
