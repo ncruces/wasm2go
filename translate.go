@@ -922,9 +922,22 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x05: // else
 			// Set the results of the if branch.
-			fn.emit(blk.resultStmts(fn)...)
-			fn.stack = fn.stack[:blk.stackPos]
-			// Push the if's arguments again.
+			if n := len(blk.results); n > 0 {
+				stmt := &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: blk.results,
+					Rhs: make([]ast.Expr, n),
+				}
+				for i := n - 1; i >= 0; i-- {
+					stmt.Rhs[i] = fn.pop()
+				}
+				fn.emit(stmt)
+			}
+			// Reset polymorphic stacks.
+			if blk.unreachable {
+				fn.stack = fn.stack[:blk.stackPos]
+			}
+			// Push the if's arguments again, for the else branch.
 			for _, p := range blk.params {
 				fn.pushConst(p)
 			}
@@ -959,10 +972,23 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							Rhs: blk.params}}}
 			}
 
-			// Set block results, but push them again
-			// so they're available to the parent block.
-			fn.emit(blk.resultStmts(fn)...)
-			fn.stack = fn.stack[:blk.stackPos]
+			// Set the block results.
+			if n := len(blk.results); n > 0 {
+				stmt := &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: blk.results,
+					Rhs: make([]ast.Expr, n),
+				}
+				for i := n - 1; i >= 0; i-- {
+					stmt.Rhs[i] = fn.pop()
+				}
+				fn.emit(stmt)
+			}
+			// Reset polymorphic stacks.
+			if blk.unreachable {
+				fn.stack = fn.stack[:blk.stackPos]
+			}
+			// Push the results again, for the parent block.
 			for _, r := range blk.results {
 				fn.pushConst(r)
 			}

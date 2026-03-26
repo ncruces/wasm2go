@@ -49,6 +49,11 @@ jobs:
         go test -run translate -args -endian little
         go test ./spectest/...
 
+    - name: Test no optimization
+      run: |
+        go test -run translate -args -noopt
+        go test ./spectest/...
+
   test-arm:
     runs-on: ubuntu-24.04-arm
 
@@ -90,4 +95,9 @@ jobs:
     - name: Test unsafe
       run: |
         go test -run translate -args -endian little
+        go test ./spectest/...
+
+    - name: Test no optimization
+      run: |
+        go test -run translate -args -noopt
         go test ./spectest/...

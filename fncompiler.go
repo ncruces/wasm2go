@@ -80,17 +80,22 @@ func (fn *funcCompiler) emit(stmts ...ast.Stmt) {
 }
 
 // Returns a statement to exit n blocks.
+// Materializes - but does not pop - the stack!
+// After an unconditional branch, the code is unreachable,
+// stack shape is irrelevant.
+// After a conditional branch, values are supposed to stay on the stack
+// for the next instruction.
 func (fn *funcCompiler) branch(n uint64) (stmts []ast.Stmt) {
 	if fn.blocks.top().unreachable {
 		return nil
 	}
 
+	fn.flush()
 	// Target block index.
 	i := uint64(len(fn.blocks)) - n - 1
 
 	// Returning from the function body.
 	if i == 0 {
-		fn.flush()
 		ret := &ast.ReturnStmt{}
 		for _, e := range fn.stack.last(len(fn.typ.results)) {
 			ret.Results = append(ret.Results, e.expr)
@@ -98,16 +103,23 @@ func (fn *funcCompiler) branch(n uint64) (stmts []ast.Stmt) {
 		return []ast.Stmt{ret}
 	}
 
-	// Create a label for the block we're jumping to.
 	blk := &fn.blocks[i]
+	stmt := &ast.AssignStmt{Tok: token.ASSIGN}
 	if blk.loopPos == 0 {
 		// Breaking out of a block, set its results.
-		stmts = append(stmts, blk.resultStmts(fn)...)
+		stmt.Lhs = blk.results
 	} else {
 		// Breaking to the start of a loop, set its parameters.
-		stmts = append(stmts, blk.paramStmts(fn)...)
+		stmt.Lhs = blk.params
+	}
+	if len(stmt.Lhs) > 0 {
+		for _, e := range fn.stack.last(len(stmt.Lhs)) {
+			stmt.Rhs = append(stmt.Rhs, e.expr)
+		}
+		stmts = append(stmts, stmt)
 	}
 
+	// Create a label for the block we're jumping to.
 	if blk.label == nil {
 		blk.label = fn.newLabel()
 	}
@@ -600,46 +612,6 @@ func (b *funcBlock) emit(stmts ...ast.Stmt) {
 		lst := &b.body.List
 		*lst = append(*lst, stmts...)
 	}
-}
-
-// Returns statements to assign the stack values to the block results.
-func (b *funcBlock) resultStmts(fn *funcCompiler) []ast.Stmt {
-	if b.unreachable || len(b.results) == 0 {
-		return nil
-	}
-
-	// Don't pop results from the stack.
-	// If the branch is conditional,
-	// the values are supposed to stay on the stack
-	// for the next instruction.
-
-	fn.flush()
-	stmt := &ast.AssignStmt{
-		Tok: token.ASSIGN,
-		Lhs: b.results,
-	}
-	for _, e := range fn.stack.last(len(b.results)) {
-		stmt.Rhs = append(stmt.Rhs, e.expr)
-	}
-	return []ast.Stmt{stmt}
-}
-
-// Returns statements to assign the stack values to the loop parameters.
-func (b *funcBlock) paramStmts(fn *funcCompiler) []ast.Stmt {
-	if len(b.params) == 0 {
-		return nil
-	}
-
-	fn.flush()
-	stmt := &ast.AssignStmt{
-		Tok: token.ASSIGN,
-		Lhs: b.params,
-	}
-	for _, e := range fn.stack.last(len(b.params)) {
-		stmt.Rhs = append(stmt.Rhs, e.expr)
-	}
-	fn.stack = fn.stack[:b.stackPos+len(b.params)]
-	return []ast.Stmt{stmt}
 }
 
 // Constructs a type conversion, first to types[0], then to types[1] and so on.

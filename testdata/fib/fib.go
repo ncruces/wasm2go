@@ -22,13 +22,12 @@ l0:
 	{
 		var p2 int64
 		if v0 == 0 {
-			t3 := v2
-			p2 = t3
+			p2 = v2
 		} else {
 			v0 = v0 - i64(1)
-			t4 := v2
+			t3 := v2
 			v2 = v1
-			v1 = t4 + v2
+			v1 = t3 + v2
 			goto l0
 		}
 		p1 = p2
