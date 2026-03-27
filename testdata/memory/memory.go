@@ -39,7 +39,7 @@ func (m *Module) Xwasm_grow(v0 int32) int32 {
 func (m *Module) Xwasm_size() int32 {
 	return int32(len(m.memory) >> 16)
 }
-func (m *Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
+func (m *Module) Xwasm_fill(v0, v1, v2 int32) {
 	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {

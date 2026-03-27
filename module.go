@@ -291,7 +291,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		var typ ast.Expr
 		switch imp.kind {
 		case externFunction:
-			typ = imp.fnType.toAST()
+			typ = imp.fnType.toAST(true)
 		case externTable: // *[]any
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}}
 		case externGlobal: // *type
@@ -401,7 +401,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 				continue
 			}
 
-			decl.Type = fn.typ.toAST()
+			decl.Type = fn.typ.toAST(true)
 			call := &ast.CallExpr{Fun: fn.call}
 			for i := range fn.typ.params {
 				call.Args = append(call.Args, localVar(i))

@@ -41,19 +41,31 @@ type funcType struct {
 	results string // wasmType of results
 }
 
-func (t funcType) toAST() *ast.FuncType {
+func (t funcType) toAST(names bool) *ast.FuncType {
 	return &ast.FuncType{
-		Params:  paramsToAST(t.params),
+		Params:  paramsToAST(t.params, names),
 		Results: resultsToAST(t.results),
 	}
 }
 
-func paramsToAST(types string) *ast.FieldList {
+func paramsToAST(types string, names bool) *ast.FieldList {
+	if names && len(types) > 0 {
+		var list stack[*ast.Field]
+		for i, t := range []byte(types) {
+			if i > 0 && t == types[i-1] {
+				(*list.top()).Names = append((*list.top()).Names, localVar(i))
+			} else {
+				list.append(&ast.Field{
+					Names: []*ast.Ident{localVar(i)},
+					Type:  wasmType(t).ident()})
+			}
+		}
+		return &ast.FieldList{List: list}
+	}
+
 	list := make([]*ast.Field, len(types))
 	for i, t := range []byte(types) {
-		list[i] = &ast.Field{
-			Names: []*ast.Ident{localVar(i)},
-			Type:  wasmType(t).ident()}
+		list[i] = &ast.Field{Type: wasmType(t).ident()}
 	}
 	return &ast.FieldList{List: list}
 }

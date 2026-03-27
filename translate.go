@@ -388,7 +388,7 @@ func (t *translator) readImportSection() error {
 				decl: &ast.FuncDecl{
 					Name: id,
 					Recv: modRecvList,
-					Type: typ.toAST(),
+					Type: typ.toAST(true),
 					Body: &ast.BlockStmt{List: []ast.Stmt{stmt}}},
 				call: &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
 			t.functions = append(t.functions, fn)
@@ -493,7 +493,7 @@ func (t *translator) readFunctionSection() error {
 		fn.decl = &ast.FuncDecl{
 			Name: &ast.Ident{},
 			Recv: modRecvList,
-			Type: fn.typ.toAST(),
+			Type: fn.typ.toAST(true),
 		}
 		fn.call = &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: fn.decl.Name}}
 		t.out.Decls = append(t.out.Decls, fn.decl)
@@ -1153,7 +1153,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					X: &ast.IndexExpr{
 						X:     tab,
 						Index: convert(idx, "uint")},
-					Type: typ.toAST()},
+					Type: typ.toAST(false)},
 				Args: args}
 
 			switch n := len(typ.results); n {
