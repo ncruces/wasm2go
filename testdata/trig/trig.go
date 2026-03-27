@@ -44,15 +44,12 @@ l0:
 	if int64(math.Float64bits(v0))&i64(0x7fffffffffffffff) > i64(0x7fefffffffffffff) {
 		goto l1
 	}
-	{
-		v1 = float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0))
-		if !(math.Abs(v1) < float64(0x1p+63)) {
-			goto l2
-		}
-		t0 := i64_trunc_f64_s(v1)
-		v2 = t0
-		goto l3
+	v1 = float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0))
+	if !(math.Abs(v1) < float64(0x1p+63)) {
+		goto l2
 	}
+	v2 = i64_trunc_f64_s(v1)
+	goto l3
 l2:
 	v2 = i64(-0x8000000000000000)
 l3:

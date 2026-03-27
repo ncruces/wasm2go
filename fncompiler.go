@@ -256,26 +256,22 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 	}
 }
 
-// Calls push or pushPure depending on purity.
-func (fn *funcCompiler) pushPureIf(purity bool, expr ast.Expr) {
-	if purity {
+// Calls push or pushPure.
+func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
+	if pure {
 		fn.pushPure(expr)
 	} else {
 		fn.push(expr)
 	}
 }
 
-// Pushes the materialization of expr to the value stack.
+// Flushes the stack before pushing expr to the value stack.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	tmp := fn.newTempVal()
-	fn.emit(&ast.AssignStmt{
-		Tok: token.DEFINE,
-		Lhs: []ast.Expr{tmp},
-		Rhs: []ast.Expr{expr}})
-	fn.pushConst(tmp)
+	fn.flush()
+	fn.pushPure(expr)
 }
 
 // Pops a value from the value stack.
@@ -291,7 +287,6 @@ func (fn *funcCompiler) pop() ast.Expr {
 }
 
 // Pops a condition from the value stack.
-// The condition must be immediately used once and only once.
 func (fn *funcCompiler) popCond() ast.Expr {
 	if fn.blocks.top().unreachable {
 		return newID("false")

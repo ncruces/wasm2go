@@ -17,23 +17,19 @@ func (m *Module) Xis_prime(v0 int32) int32 {
 	if v0 == i32(2) {
 		return i32(1)
 	}
-	t0 := int32(uint32(v0) % uint32(i32(2)))
-	if t0 == i32(0) {
+	if int32(uint32(v0)%uint32(i32(2))) == i32(0) {
 		return i32(0)
 	}
 	v1 = i32(3)
 l1:
-	{
-		if uint32(v1) >= uint32(v0) {
-			goto l0
-		}
-		t1 := int32(uint32(v0) % uint32(v1))
-		if t1 == i32(0) {
-			return i32(0)
-		}
-		v1 = v1 + i32(2)
-		goto l1
+	if uint32(v1) >= uint32(v0) {
+		goto l0
 	}
+	if int32(uint32(v0)%uint32(v1)) == i32(0) {
+		return i32(0)
+	}
+	v1 = v1 + i32(2)
+	goto l1
 l0:
 	return i32(1)
 }

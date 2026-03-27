@@ -843,30 +843,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				cond = fn.popCond()
 			}
 
-			// Declare block results outside the block.
-			results := make([]ast.Expr, len(bt.results))
-			for i, t := range []byte(bt.results) {
-				tmp := fn.newTempVar()
-				results[i] = tmp
-				fn.emit(&ast.DeclStmt{
-					Decl: &ast.GenDecl{
-						Tok: token.VAR,
-						Specs: []ast.Spec{
-							&ast.ValueSpec{
-								Names: []*ast.Ident{tmp},
-								Type:  wasmType(t).ident()}}}})
-			}
-			// Ensure results are used.
-			if len(results) > 0 {
-				fn.emit(&ast.AssignStmt{
-					Tok: token.ASSIGN,
-					Lhs: slices.Repeat([]ast.Expr{newID("_")}, len(results)),
-					Rhs: results})
-			}
-
 			childBlk := funcBlock{
 				typ:         bt,
-				results:     results,
 				body:        &ast.BlockStmt{},
 				stackPos:    len(fn.stack) - len(bt.params),
 				unreachable: blk.unreachable,
@@ -874,14 +852,36 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				elreachable: blk.unreachable,
 			}
 
+			// Declare block results outside the block.
+			if n := len(bt.results); n > 0 {
+				res := make([]ast.Expr, n)
+				for i, t := range []byte(bt.results) {
+					tmp := fn.newTempVar()
+					res[i] = tmp
+					fn.emit(&ast.DeclStmt{
+						Decl: &ast.GenDecl{
+							Tok: token.VAR,
+							Specs: []ast.Spec{
+								&ast.ValueSpec{
+									Names: []*ast.Ident{tmp},
+									Type:  wasmType(t).ident()}}}})
+				}
+				// Ensure results are used.
+				fn.emit(&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: slices.Repeat([]ast.Expr{newID("_")}, n),
+					Rhs: res})
+				childBlk.results = res
+			}
+
 			// Blocks can naturally consume their arguments.
 			// Loops and ifs need to declare them outside the block so
 			// they persist across iterations and are available to
 			// both branches of the statement.
-			if len(bt.params) > 0 && opcode != 0x02 { // params, not a block
-				lhs := make([]ast.Expr, len(bt.params))
-				rhs := make([]ast.Expr, len(bt.params))
-				for i := len(bt.params) - 1; i >= 0; i-- {
+			if n := len(bt.params); n > 0 && opcode != 0x02 { // params, not a block
+				lhs := make([]ast.Expr, n)
+				rhs := make([]ast.Expr, n)
+				for i := n - 1; i >= 0; i-- {
 					if opcode == 0x03 { // loop
 						lhs[i] = fn.newTempVar()
 					} else {
@@ -1108,21 +1108,23 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			call := &ast.CallExpr{Fun: target.call, Args: args}
 
-			if len(target.typ.results) == 0 {
+			switch n := len(target.typ.results); n {
+			case 0:
 				fn.emit(&ast.ExprStmt{X: call})
-				break
-			}
-
-			lhs := make([]ast.Expr, len(target.typ.results))
-			for i := range lhs {
-				lhs[i] = fn.newTempVal()
-			}
-			fn.emit(&ast.AssignStmt{
-				Lhs: lhs,
-				Tok: token.DEFINE,
-				Rhs: []ast.Expr{call}})
-			for _, r := range lhs {
-				fn.pushConst(r)
+			case 1:
+				fn.push(call)
+			default:
+				lhs := make([]ast.Expr, n)
+				for i := range lhs {
+					lhs[i] = fn.newTempVal()
+				}
+				fn.emit(&ast.AssignStmt{
+					Lhs: lhs,
+					Tok: token.DEFINE,
+					Rhs: []ast.Expr{call}})
+				for _, r := range lhs {
+					fn.pushConst(r)
+				}
 			}
 
 		case 0x11: // call_indirect
@@ -1154,21 +1156,23 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					Type: typ.toAST()},
 				Args: args}
 
-			if len(typ.results) == 0 {
+			switch n := len(typ.results); n {
+			case 0:
 				fn.emit(&ast.ExprStmt{X: call})
-				break
-			}
-
-			lhs := make([]ast.Expr, len(typ.results))
-			for i := range lhs {
-				lhs[i] = fn.newTempVal()
-			}
-			fn.emit(&ast.AssignStmt{
-				Lhs: lhs,
-				Tok: token.DEFINE,
-				Rhs: []ast.Expr{call}})
-			for _, r := range lhs {
-				fn.pushConst(r)
+			case 1:
+				fn.push(call)
+			default:
+				lhs := make([]ast.Expr, n)
+				for i := range lhs {
+					lhs[i] = fn.newTempVal()
+				}
+				fn.emit(&ast.AssignStmt{
+					Lhs: lhs,
+					Tok: token.DEFINE,
+					Rhs: []ast.Expr{call}})
+				for _, r := range lhs {
+					fn.pushConst(r)
+				}
 			}
 
 		case 0x0f: // return
