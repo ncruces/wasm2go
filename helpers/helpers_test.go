@@ -104,6 +104,59 @@ func Test_i64_div_s(t *testing.T) {
 	}
 }
 
+func Test_i32_neg_s(t *testing.T) {
+	tests := []struct {
+		x int32
+		r int32
+		p bool
+	}{
+		{1, -1, false},
+		{math.MinInt32, math.MinInt32, true},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d", tt.x), func(t *testing.T) {
+			if tt.p {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("i32_neg_s(%d) did not panic", tt.x)
+					}
+				}()
+			}
+			got := i32_neg_s(tt.x)
+			if got != tt.r {
+				t.Errorf("i32_neg_s(%d) = %v, want %v", tt.x, got, tt.r)
+			}
+		})
+	}
+}
+
+func Test_i64_neg_s(t *testing.T) {
+	tests := []struct {
+		x int64
+		r int64
+		p bool
+	}{
+		{1, -1, false},
+		{math.MinInt64, math.MinInt64, true},
+		{math.MinInt32, -math.MinInt32, false},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d", tt.x), func(t *testing.T) {
+			if tt.p {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("i64_neg_s(%d) did not panic", tt.x)
+					}
+				}()
+			}
+			got := i64_neg_s(tt.x)
+			if got != tt.r {
+				t.Errorf("i64_neg_s(%d) = %v, want %v", tt.x, got, tt.r)
+			}
+		})
+	}
+}
+
 func Test_i32_shl(t *testing.T) {
 	tests := []struct {
 		x, y int32

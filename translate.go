@@ -1597,7 +1597,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x6c: // i32.mul
 			fn.binOp(token.MUL)
 		case 0x6d: // i32.div_s
-			fn.binHelper("i32_div_s")
+			fn.divHelper("i32")
 		case 0x6e: // i32.div_u
 			fn.binOpU32(token.QUO)
 		case 0x6f: // i32.rem_s
@@ -1611,11 +1611,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x73: // i32.xor
 			fn.binOp(token.XOR)
 		case 0x74: // i32.shl
-			fn.binHelper("i32_shl")
+			fn.bitHelper("i32_shl")
 		case 0x75: // i32.shr_s
-			fn.binHelper("i32_shr_s")
+			fn.bitHelper("i32_shr_s")
 		case 0x76: // i32.shr_u
-			fn.binHelper("i32_shr_u")
+			fn.bitHelper("i32_shr_u")
 		case 0x77: // i32.rotl
 			fn.binHelper("i32_rotl")
 		case 0x78: // i32.rotr
@@ -1634,7 +1634,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x7e: // i64.mul
 			fn.binOp(token.MUL)
 		case 0x7f: // i64.div_s
-			fn.binHelper("i64_div_s")
+			fn.divHelper("i64")
 		case 0x80: // i64.div_u
 			fn.binOpU64(token.QUO)
 		case 0x81: // i64.rem_s
@@ -1648,11 +1648,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x85: // i64.xor
 			fn.binOp(token.XOR)
 		case 0x86: // i64.shl
-			fn.binHelper("i64_shl")
+			fn.bitHelper("i64_shl")
 		case 0x87: // i64.shr_s
-			fn.binHelper("i64_shr_s")
+			fn.bitHelper("i64_shr_s")
 		case 0x88: // i64.shr_u
-			fn.binHelper("i64_shr_u")
+			fn.bitHelper("i64_shr_u")
 		case 0x89: // i64.rotl
 			fn.binHelper("i64_rotl")
 		case 0x8a: // i64.rotr
@@ -1898,7 +1898,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				n := convert(fn.pop(), typ)
 				val := fn.pop()
 				dest := convert(fn.pop(), typ)
-				if iszero(val) {
+				if v, ok := islit(val, "i32"); ok && v == 0 {
 					fn.helpers.add("memory_zero")
 					fn.emit(&ast.ExprStmt{
 						X: &ast.CallExpr{

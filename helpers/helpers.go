@@ -50,6 +50,22 @@ func i64_div_s(x, y int64) int64 {
 	return x / y
 }
 
+//go:nosplit
+func i32_neg_s(x int32) int32 {
+	if x == math.MinInt32 {
+		panic("integer overflow")
+	}
+	return -x
+}
+
+//go:nosplit
+func i64_neg_s(x int64) int64 {
+	if x == math.MinInt64 {
+		panic("integer overflow")
+	}
+	return -x
+}
+
 // These are needed for correct y wrap around behavior.
 
 //go:nosplit

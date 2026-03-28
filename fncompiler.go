@@ -508,6 +508,63 @@ func (fn *funcCompiler) binHelper(name string) {
 			Args: []ast.Expr{x, y}})
 }
 
+// Executes a signed division helper.
+func (fn *funcCompiler) divHelper(typ string) {
+	y := fn.pop()
+	x := fn.pop()
+	if v, ok := islit(y, typ); !ok {
+		name := typ + "_div_s"
+		fn.helpers.add(name)
+		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}})
+	} else if v == -1 {
+		name := typ + "_neg_s"
+		fn.helpers.add(name)
+		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x}})
+	} else {
+		fn.pushPureIf(v != 0, &ast.BinaryExpr{Op: token.QUO, X: x, Y: y})
+	}
+}
+
+// Executes a bitwise shift/rotate helper.
+func (fn *funcCompiler) bitHelper(name string) {
+	typ, op, _ := strings.Cut(name, "_")
+	var mask int64 = 31
+	if typ == "i64" {
+		mask = 63
+	}
+
+	y := fn.pop()
+	x := fn.pop()
+
+	v, ok := islit(y, typ)
+	if !ok || v != (v&mask) {
+		fn.helpers.add(name)
+		fn.pushPureIf(pureHelpers.has(name),
+			&ast.CallExpr{
+				Fun:  newID(name),
+				Args: []ast.Expr{x, y}})
+		return
+	}
+
+	y = &ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}
+	var expr ast.Expr
+	switch op {
+	case "shl":
+		expr = &ast.BinaryExpr{Op: token.SHL, X: x, Y: y}
+	case "shr_s":
+		expr = &ast.BinaryExpr{Op: token.SHR, X: x, Y: y}
+	case "shr_u":
+		s := "int32"
+		u := "uint32"
+		if typ == "i64" {
+			s = "int64"
+			u = "uint64"
+		}
+		expr = convert(&ast.BinaryExpr{Op: token.SHR, X: convert(x, u), Y: y}, s)
+	}
+	fn.pushPure(expr)
+}
+
 // Executes a binary builtin call.
 func (fn *funcCompiler) binBuiltin(name string) {
 	y := fn.pop()
@@ -617,14 +674,15 @@ func convert(expr ast.Expr, types ...string) ast.Expr {
 	return expr
 }
 
-func iszero(expr ast.Expr) bool {
+func islit(expr ast.Expr, typ string) (int64, bool) {
 	if call, ok := expr.(*ast.CallExpr); ok {
-		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "i32" {
-			if len(call.Args) == 1 {
-				lit, ok := call.Args[0].(*ast.BasicLit)
-				return ok && lit.Kind == token.INT && lit.Value == "0"
+		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == typ {
+			if lit, ok := call.Args[0].(*ast.BasicLit); ok {
+				if val, err := strconv.ParseInt(lit.Value, 0, 64); err == nil {
+					return val, true
+				}
 			}
 		}
 	}
-	return false
+	return 0, false
 }
