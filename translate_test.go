@@ -15,7 +15,7 @@ import (
 //go:generate go test -run translate
 
 func Test_translate(t *testing.T) {
-	tests := []string{"fib", "memory", "primes", "recursion", "stack", "table", "trig"}
+	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
 	*nanbox = false
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {

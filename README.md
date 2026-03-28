@@ -76,4 +76,6 @@ Usage of wasm2go:
         disable the header comment (including build tags)
   -nohost
         disable generating interfaces for imports
+  -noopt
+        disable all optimization passes
 ```
