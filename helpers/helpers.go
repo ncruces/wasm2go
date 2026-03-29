@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/binary"
 	"math"
 	"math/bits"
 	"runtime"
@@ -38,7 +39,7 @@ func f64(x float64) float64 {
 //go:nosplit
 func load16(b []byte) uint16 {
 	switch runtime.GOARCH {
-	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
 		v := *(*uint16)(unsafe.Pointer((*[2]byte)(b)))
 		switch runtime.GOARCH {
 		case "ppc64", "s390x":
@@ -47,31 +48,28 @@ func load16(b []byte) uint16 {
 			return v
 		}
 	default:
-		a := (*[2]byte)(b)
-		return uint16(a[0]) | uint16(a[1])<<8
+		return binary.LittleEndian.Uint16(b)
 	}
 }
 
 //go:nosplit
 func store16(b []byte, v uint16) {
 	switch runtime.GOARCH {
-	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
 		switch runtime.GOARCH {
 		case "ppc64", "s390x":
 			v = bits.ReverseBytes16(v)
 		}
 		*(*uint16)(unsafe.Pointer((*[2]byte)(b))) = v
 	default:
-		a := (*[2]byte)(b)
-		a[0] = byte(v)
-		a[1] = byte(v >> 8)
+		binary.LittleEndian.PutUint16(b, v)
 	}
 }
 
 //go:nosplit
 func load32(b []byte) uint32 {
 	switch runtime.GOARCH {
-	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
 		v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
 		switch runtime.GOARCH {
 		case "ppc64", "s390x":
@@ -80,33 +78,28 @@ func load32(b []byte) uint32 {
 			return v
 		}
 	default:
-		a := (*[4]byte)(b)
-		return uint32(a[0]) | uint32(a[1])<<8 | uint32(a[2])<<16 | uint32(a[3])<<24
+		return binary.LittleEndian.Uint32(b)
 	}
 }
 
 //go:nosplit
 func store32(b []byte, v uint32) {
 	switch runtime.GOARCH {
-	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
 		switch runtime.GOARCH {
 		case "ppc64", "s390x":
 			v = bits.ReverseBytes32(v)
 		}
 		*(*uint32)(unsafe.Pointer((*[4]byte)(b))) = v
 	default:
-		a := (*[4]byte)(b)
-		a[0] = byte(v)
-		a[1] = byte(v >> 8)
-		a[2] = byte(v >> 16)
-		a[3] = byte(v >> 24)
+		binary.LittleEndian.PutUint32(b, v)
 	}
 }
 
 //go:nosplit
 func load64(b []byte) uint64 {
 	switch runtime.GOARCH {
-	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
 		v := *(*uint64)(unsafe.Pointer((*[8]byte)(b)))
 		switch runtime.GOARCH {
 		case "ppc64", "s390x":
@@ -115,31 +108,21 @@ func load64(b []byte) uint64 {
 			return v
 		}
 	default:
-		a := (*[8]byte)(b)
-		return uint64(a[0]) | uint64(a[1])<<8 | uint64(a[2])<<16 | uint64(a[3])<<24 |
-			uint64(a[4])<<32 | uint64(a[5])<<40 | uint64(a[6])<<48 | uint64(a[7])<<56
+		return binary.LittleEndian.Uint64(b)
 	}
 }
 
 //go:nosplit
 func store64(b []byte, v uint64) {
 	switch runtime.GOARCH {
-	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
 		switch runtime.GOARCH {
 		case "ppc64", "s390x":
 			v = bits.ReverseBytes64(v)
 		}
 		*(*uint64)(unsafe.Pointer((*[8]byte)(b))) = v
 	default:
-		a := (*[8]byte)(b)
-		a[0] = byte(v)
-		a[1] = byte(v >> 8)
-		a[2] = byte(v >> 16)
-		a[3] = byte(v >> 24)
-		a[4] = byte(v >> 32)
-		a[5] = byte(v >> 40)
-		a[6] = byte(v >> 48)
-		a[7] = byte(v >> 56)
+		binary.LittleEndian.PutUint64(b, v)
 	}
 }
 
