@@ -21,7 +21,7 @@ jobs:
       with: { go-version: stable }
 
     - name: Test
-      run: go test
+      run: go test -args -unsafe
 
     - name: Test amd64
       run: go test ./helpers ./spectest/...
@@ -43,11 +43,6 @@ jobs:
 
     - name: Test s390x
       run: GOARCH=s390x go test ./helpers ./spectest/...
-
-    - name: Test unsafe
-      run: |
-        go test -run translate -args -endian little
-        go test ./spectest/...
 
     - name: Test no optimization
       run: |
@@ -81,18 +76,13 @@ jobs:
       run: go vet
 
     - name: Test
-      run: go test
+      run: go test -args -unsafe
 
     - name: Test arm64
       run: go test ./helpers ./spectest/...
 
     - name: Test arm
       run: GOARCH=arm GOARM=7 go test ./helpers ./spectest/...
-
-    - name: Test unsafe
-      run: |
-        go test -run translate -args -endian little
-        go test ./spectest/...
 
     - name: Test no optimization
       run: |
