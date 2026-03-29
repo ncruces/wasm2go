@@ -3,8 +3,10 @@
 package wasm2go
 
 import (
-	"encoding/binary"
 	"math"
+	"math/bits"
+	"runtime"
+	"unsafe"
 )
 
 type Module struct {
@@ -43,7 +45,7 @@ func (m *Module) Xwasm_fill(v0, v1, v2 int32) {
 	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
-	return int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
+	return int32(swap32(*(*uint32)(unsafe.Pointer((*[4]byte)(m.memory[uint32(v0):])))))
 }
 func (m *Module) Xread_as_i8u(v0 int32) int32 {
 	return int32(m.memory[uint32(v0)])
@@ -54,6 +56,16 @@ func (m *Module) Xmemory() Memory {
 
 //go:nosplit
 func i32(x int32) int32 { return x }
+
+//go:nosplit
+func swap32(x uint32) uint32 {
+	switch runtime.GOARCH {
+	case "armbe", "arm64be", "m68k", "mips", "mips64", "mips64p32", "ppc", "ppc64", "s390", "s390x", "shbe", "sparc", "sparc64":
+		return bits.ReverseBytes32(x)
+	default:
+		return x
+	}
+}
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

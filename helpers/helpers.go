@@ -16,6 +16,38 @@ func i32(x int32) int32 { return x }
 //go:nosplit
 func i64(x int64) int64 { return x }
 
+// Memory access byte swapping.
+
+//go:nosplit
+func swap16(x uint16) uint16 {
+	switch runtime.GOARCH {
+	case "armbe", "arm64be", "m68k", "mips", "mips64", "mips64p32", "ppc", "ppc64", "s390", "s390x", "shbe", "sparc", "sparc64":
+		return bits.ReverseBytes16(x)
+	default:
+		return x
+	}
+}
+
+//go:nosplit
+func swap32(x uint32) uint32 {
+	switch runtime.GOARCH {
+	case "armbe", "arm64be", "m68k", "mips", "mips64", "mips64p32", "ppc", "ppc64", "s390", "s390x", "shbe", "sparc", "sparc64":
+		return bits.ReverseBytes32(x)
+	default:
+		return x
+	}
+}
+
+//go:nosplit
+func swap64(x uint64) uint64 {
+	switch runtime.GOARCH {
+	case "armbe", "arm64be", "m68k", "mips", "mips64", "mips64p32", "ppc", "ppc64", "s390", "s390x", "shbe", "sparc", "sparc64":
+		return bits.ReverseBytes64(x)
+	default:
+		return x
+	}
+}
+
 // These prevent constant folding/propagation,
 // ensuring correct NaN handling.
 
