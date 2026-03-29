@@ -3,6 +3,7 @@
 package wasm2go
 
 import (
+	"encoding/binary"
 	"math"
 	"math/bits"
 	"runtime"
@@ -60,7 +61,7 @@ func i32(x int32) int32 { return x }
 //go:nosplit
 func load32(b []byte) uint32 {
 	switch runtime.GOARCH {
-	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
 		v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
 		switch runtime.GOARCH {
 		case "ppc64", "s390x":
@@ -69,8 +70,7 @@ func load32(b []byte) uint32 {
 			return v
 		}
 	default:
-		a := (*[4]byte)(b)
-		return uint32(a[0]) | uint32(a[1])<<8 | uint32(a[2])<<16 | uint32(a[3])<<24
+		return binary.LittleEndian.Uint32(b)
 	}
 }
 
