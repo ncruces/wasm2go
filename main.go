@@ -14,8 +14,9 @@ var (
 	noopt  = flag.Bool("noopt", false, "disable all optimization passes")
 )
 
-// https://pkg.go.dev/golang.org/x/sys/cpu#pkg-constants
-const littlend = "386 || amd64 || amd64p32 || alpha || arm || arm64 || loong64 || mipsle || mips64le || mips64p32le || nios2 || ppc64le || riscv || riscv64 || sh || wasm"
+// Architectures that are natively little-endian AND unalignedOK:
+// https://go.dev/src/cmd/compile/internal/ssa/config.go
+const littlend = "386 || amd64 || arm64 || loong64 || ppc64le || wasm"
 
 func main() {
 	flag.Parse()
