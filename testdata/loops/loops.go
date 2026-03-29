@@ -90,9 +90,9 @@ func i32(x int32) int32 { return x }
 //go:nosplit
 func swap32(x uint32) uint32 {
 	switch runtime.GOARCH {
-	case "armbe", "arm64be", "m68k", "mips", "mips64", "mips64p32", "ppc", "ppc64", "s390", "s390x", "shbe", "sparc", "sparc64":
-		return bits.ReverseBytes32(x)
-	default:
+	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
 		return x
+	default:
+		return bits.ReverseBytes32(x)
 	}
 }
