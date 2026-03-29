@@ -55,7 +55,7 @@ l1:
 		}
 		v3 = v0 + v2*i32(4)
 		t0 := v4
-		v4 = t0 + int32(swap32(*(*uint32)(unsafe.Pointer((*[4]byte)((*m.memory)[uint32(v3):])))))
+		v4 = t0 + int32(Uint32((*m.memory)[uint32(v3):]))
 		v2 = v2 + i32(1)
 		goto l1
 	}
@@ -88,11 +88,12 @@ l0:
 func i32(x int32) int32 { return x }
 
 //go:nosplit
-func swap32(x uint32) uint32 {
+func Uint32(b []byte) uint32 {
+	v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
 	switch runtime.GOARCH {
 	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return x
+		return v
 	default:
-		return bits.ReverseBytes32(x)
+		return bits.ReverseBytes32(v)
 	}
 }

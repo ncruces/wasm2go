@@ -137,34 +137,14 @@ func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 // Returns an expression that loads bytes from memory.
 func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 	bits := typ[len(typ)-2:]
-	var bytes string
-	switch bits {
-	case "16":
-		bytes = "2"
-	case "32":
-		bytes = "4"
-	case "64":
-		bytes = "8"
-	}
 
-	// Pointer-based memory access producing an l-value.
-	idx := &ast.StarExpr{X: &ast.CallExpr{
-		Fun: &ast.StarExpr{X: newID("uint" + bits)},
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{X: newID("unsafe"), Sel: newID("Pointer")},
-			Args: []ast.Expr{&ast.CallExpr{
-				Fun: &ast.StarExpr{X: &ast.ArrayType{
-					Len: &ast.BasicLit{Kind: token.INT, Value: bytes},
-					Elt: newID("byte")}},
-				Args: []ast.Expr{&ast.SliceExpr{
-					X:   fn.memory.selector,
-					Low: addr}}}}}}}}
-
-	fn.helpers.add("swap" + bits)
+	fn.helpers.add("Uint" + bits)
+	// Load as unsigned, little-endian.
 	expr = &ast.CallExpr{
-		Fun:  newID("swap" + bits),
-		Args: []ast.Expr{idx},
-	}
+		Fun: newID("Uint" + bits),
+		Args: []ast.Expr{&ast.SliceExpr{
+			X:   fn.memory.selector,
+			Low: addr}}}
 
 	switch {
 	case strings.HasPrefix(typ, "float"):
@@ -182,15 +162,6 @@ func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 // Returns a statement that stores bytes to memory.
 func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
 	bits := typ[len(typ)-2:]
-	var bytes string
-	switch bits {
-	case "16":
-		bytes = "2"
-	case "32":
-		bytes = "4"
-	case "64":
-		bytes = "8"
-	}
 
 	if strings.HasPrefix(typ, "float") {
 		// Convert to float.
@@ -202,28 +173,15 @@ func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
 		val = convert(val, "uint"+bits)
 	}
 
-	fn.helpers.add("swap" + bits)
-	val = &ast.CallExpr{
-		Fun:  newID("swap" + bits),
-		Args: []ast.Expr{val},
-	}
-
-	idx := &ast.StarExpr{X: &ast.CallExpr{
-		Fun: &ast.StarExpr{X: newID("uint" + bits)},
-		Args: []ast.Expr{&ast.CallExpr{
-			Fun: &ast.SelectorExpr{X: newID("unsafe"), Sel: newID("Pointer")},
-			Args: []ast.Expr{&ast.CallExpr{
-				Fun: &ast.StarExpr{X: &ast.ArrayType{
-					Len: &ast.BasicLit{Kind: token.INT, Value: bytes},
-					Elt: newID("byte")}},
-				Args: []ast.Expr{&ast.SliceExpr{
-					X:   fn.memory.selector,
-					Low: addr}}}}}}}}
-
-	return &ast.AssignStmt{
-		Tok: token.ASSIGN,
-		Lhs: []ast.Expr{idx},
-		Rhs: []ast.Expr{val}}
+	fn.helpers.add("PutUint" + bits)
+	// Store as unsigned, little-endian.
+	return &ast.ExprStmt{X: &ast.CallExpr{
+		Fun: newID("PutUint" + bits),
+		Args: []ast.Expr{
+			&ast.SliceExpr{
+				X:   fn.memory.selector,
+				Low: addr},
+			val}}}
 }
 
 // Pushes expr (a literal, constant or materialized temporary) to the value stack.

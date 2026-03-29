@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/bits"
 	"runtime"
+	"unsafe"
 )
 
 // These prevent constant folding/propagation,
@@ -15,38 +16,6 @@ func i32(x int32) int32 { return x }
 
 //go:nosplit
 func i64(x int64) int64 { return x }
-
-// Memory access byte swapping.
-
-//go:nosplit
-func swap16(x uint16) uint16 {
-	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return x
-	default:
-		return bits.ReverseBytes16(x)
-	}
-}
-
-//go:nosplit
-func swap32(x uint32) uint32 {
-	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return x
-	default:
-		return bits.ReverseBytes32(x)
-	}
-}
-
-//go:nosplit
-func swap64(x uint64) uint64 {
-	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return x
-	default:
-		return bits.ReverseBytes64(x)
-	}
-}
 
 // These prevent constant folding/propagation,
 // ensuring correct NaN handling.
@@ -61,6 +30,69 @@ func f32(x float32) float32 {
 func f64(x float64) float64 {
 	runtime.KeepAlive(&x)
 	return x
+}
+
+//go:nosplit
+func Uint16(b []byte) uint16 {
+	v := *(*uint16)(unsafe.Pointer((*[2]byte)(b)))
+	switch runtime.GOARCH {
+	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+		return v
+	default:
+		return bits.ReverseBytes16(v)
+	}
+}
+
+//go:nosplit
+func PutUint16(b []byte, v uint16) {
+	switch runtime.GOARCH {
+	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+	default:
+		v = bits.ReverseBytes16(v)
+	}
+	*(*uint16)(unsafe.Pointer((*[2]byte)(b))) = v
+}
+
+//go:nosplit
+func Uint32(b []byte) uint32 {
+	v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
+	switch runtime.GOARCH {
+	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+		return v
+	default:
+		return bits.ReverseBytes32(v)
+	}
+}
+
+//go:nosplit
+func PutUint32(b []byte, v uint32) {
+	switch runtime.GOARCH {
+	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+	default:
+		v = bits.ReverseBytes32(v)
+	}
+	*(*uint32)(unsafe.Pointer((*[4]byte)(b))) = v
+}
+
+//go:nosplit
+func Uint64(b []byte) uint64 {
+	v := *(*uint64)(unsafe.Pointer((*[8]byte)(b)))
+	switch runtime.GOARCH {
+	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+		return v
+	default:
+		return bits.ReverseBytes64(v)
+	}
+}
+
+//go:nosplit
+func PutUint64(b []byte, v uint64) {
+	switch runtime.GOARCH {
+	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+	default:
+		v = bits.ReverseBytes64(v)
+	}
+	*(*uint64)(unsafe.Pointer((*[8]byte)(b))) = v
 }
 
 // Detect signed integer overflow.

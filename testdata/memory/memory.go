@@ -45,7 +45,7 @@ func (m *Module) Xwasm_fill(v0, v1, v2 int32) {
 	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
-	return int32(swap32(*(*uint32)(unsafe.Pointer((*[4]byte)(m.memory[uint32(v0):])))))
+	return int32(Uint32(m.memory[uint32(v0):]))
 }
 func (m *Module) Xread_as_i8u(v0 int32) int32 {
 	return int32(m.memory[uint32(v0)])
@@ -58,12 +58,13 @@ func (m *Module) Xmemory() Memory {
 func i32(x int32) int32 { return x }
 
 //go:nosplit
-func swap32(x uint32) uint32 {
+func Uint32(b []byte) uint32 {
+	v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
 	switch runtime.GOARCH {
 	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return x
+		return v
 	default:
-		return bits.ReverseBytes32(x)
+		return bits.ReverseBytes32(v)
 	}
 }
 
