@@ -32,6 +32,9 @@ func f64(x float64) float64 {
 	return x
 }
 
+// Architectures that are unalignedOK:
+// https://go.dev/src/cmd/compile/internal/ssa/config.go
+
 //go:nosplit
 func load16(b []byte) uint16 {
 	switch runtime.GOARCH {
