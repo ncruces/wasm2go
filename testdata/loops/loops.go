@@ -2,12 +2,7 @@
 
 package wasm2go
 
-import (
-	"encoding/binary"
-	"math/bits"
-	"runtime"
-	"unsafe"
-)
+import "encoding/binary"
 
 type Module struct {
 	memory *[]byte
@@ -56,7 +51,7 @@ l1:
 		}
 		v3 = v0 + v2*i32(4)
 		t0 := v4
-		v4 = t0 + int32(load32((*m.memory)[uint32(v3):]))
+		v4 = t0 + int32(binary.LittleEndian.Uint32((*m.memory)[uint32(v3):]))
 		v2 = v2 + i32(1)
 		goto l1
 	}
@@ -87,19 +82,3 @@ l0:
 
 //go:nosplit
 func i32(x int32) int32 { return x }
-
-//go:nosplit
-func load32(b []byte) uint32 {
-	switch runtime.GOARCH {
-	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
-		v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
-		switch runtime.GOARCH {
-		case "ppc64", "s390x":
-			return bits.ReverseBytes32(v)
-		default:
-			return v
-		}
-	default:
-		return binary.LittleEndian.Uint32(b)
-	}
-}

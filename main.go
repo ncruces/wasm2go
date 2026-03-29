@@ -8,9 +8,9 @@ import (
 
 var (
 	nanbox = flag.Bool("nanbox", false, "whether to try to canonicalize NaNs")
-	nohead = flag.Bool("nohead", false, "disable the header comment (including build tags)")
 	nohost = flag.Bool("nohost", false, "disable generating interfaces for imports")
 	noopt  = flag.Bool("noopt", false, "disable all optimization passes")
+	unsafe = flag.Bool("unsafe", false, "allow importing unsafe")
 )
 
 func main() {

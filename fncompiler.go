@@ -138,10 +138,18 @@ func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 	bits := typ[len(typ)-2:]
 
+	var fun ast.Expr = &ast.SelectorExpr{X: &ast.SelectorExpr{
+		X:   newID("binary"),
+		Sel: newID("LittleEndian")},
+		Sel: newID("Uint" + bits)}
+	if *unsafe {
+		fn.helpers.add("load" + bits)
+		fun = newID("load" + bits)
+	}
+
 	// Load as unsigned, little-endian.
-	fn.helpers.add("load" + bits)
 	expr = &ast.CallExpr{
-		Fun: newID("load" + bits),
+		Fun: fun,
 		Args: []ast.Expr{&ast.SliceExpr{
 			X:   fn.memory.selector,
 			Low: addr}}}
@@ -173,10 +181,18 @@ func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
 		val = convert(val, "uint"+bits)
 	}
 
+	var fun ast.Expr = &ast.SelectorExpr{X: &ast.SelectorExpr{
+		X:   newID("binary"),
+		Sel: newID("LittleEndian")},
+		Sel: newID("PutUint" + bits)}
+	if *unsafe {
+		fn.helpers.add("store" + bits)
+		fun = newID("store" + bits)
+	}
+
 	// Store as unsigned, little-endian.
-	fn.helpers.add("store" + bits)
 	return &ast.ExprStmt{X: &ast.CallExpr{
-		Fun: newID("store" + bits),
+		Fun: fun,
 		Args: []ast.Expr{
 			&ast.SliceExpr{
 				X:   fn.memory.selector,

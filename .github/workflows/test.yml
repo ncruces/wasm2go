@@ -21,7 +21,7 @@ jobs:
       with: { go-version: stable }
 
     - name: Test
-      run: go test
+      run: go test -args -unsafe
 
     - name: Test amd64
       run: go test ./helpers ./spectest/...
@@ -76,7 +76,7 @@ jobs:
       run: go vet
 
     - name: Test
-      run: go test
+      run: go test -args -unsafe
 
     - name: Test arm64
       run: go test ./helpers ./spectest/...
