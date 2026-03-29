@@ -33,66 +33,111 @@ func f64(x float64) float64 {
 }
 
 //go:nosplit
-func Uint16(b []byte) uint16 {
-	v := *(*uint16)(unsafe.Pointer((*[2]byte)(b)))
+func load16(b []byte) uint16 {
 	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return v
+	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+		v := *(*uint16)(unsafe.Pointer((*[2]byte)(b)))
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			return bits.ReverseBytes16(v)
+		default:
+			return v
+		}
 	default:
-		return bits.ReverseBytes16(v)
+		a := (*[2]byte)(b)
+		return uint16(a[0]) | uint16(a[1])<<8
 	}
 }
 
 //go:nosplit
-func PutUint16(b []byte, v uint16) {
+func store16(b []byte, v uint16) {
 	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			v = bits.ReverseBytes16(v)
+		}
+		*(*uint16)(unsafe.Pointer((*[2]byte)(b))) = v
 	default:
-		v = bits.ReverseBytes16(v)
-	}
-	*(*uint16)(unsafe.Pointer((*[2]byte)(b))) = v
-}
-
-//go:nosplit
-func Uint32(b []byte) uint32 {
-	v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
-	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return v
-	default:
-		return bits.ReverseBytes32(v)
+		a := (*[2]byte)(b)
+		a[0] = byte(v)
+		a[1] = byte(v >> 8)
 	}
 }
 
 //go:nosplit
-func PutUint32(b []byte, v uint32) {
+func load32(b []byte) uint32 {
 	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+		v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			return bits.ReverseBytes32(v)
+		default:
+			return v
+		}
 	default:
-		v = bits.ReverseBytes32(v)
-	}
-	*(*uint32)(unsafe.Pointer((*[4]byte)(b))) = v
-}
-
-//go:nosplit
-func Uint64(b []byte) uint64 {
-	v := *(*uint64)(unsafe.Pointer((*[8]byte)(b)))
-	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return v
-	default:
-		return bits.ReverseBytes64(v)
+		a := (*[4]byte)(b)
+		return uint32(a[0]) | uint32(a[1])<<8 | uint32(a[2])<<16 | uint32(a[3])<<24
 	}
 }
 
 //go:nosplit
-func PutUint64(b []byte, v uint64) {
+func store32(b []byte, v uint32) {
 	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
+	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			v = bits.ReverseBytes32(v)
+		}
+		*(*uint32)(unsafe.Pointer((*[4]byte)(b))) = v
 	default:
-		v = bits.ReverseBytes64(v)
+		a := (*[4]byte)(b)
+		a[0] = byte(v)
+		a[1] = byte(v >> 8)
+		a[2] = byte(v >> 16)
+		a[3] = byte(v >> 24)
 	}
-	*(*uint64)(unsafe.Pointer((*[8]byte)(b))) = v
+}
+
+//go:nosplit
+func load64(b []byte) uint64 {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+		v := *(*uint64)(unsafe.Pointer((*[8]byte)(b)))
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			return bits.ReverseBytes64(v)
+		default:
+			return v
+		}
+	default:
+		a := (*[8]byte)(b)
+		return uint64(a[0]) | uint64(a[1])<<8 | uint64(a[2])<<16 | uint64(a[3])<<24 |
+			uint64(a[4])<<32 | uint64(a[5])<<40 | uint64(a[6])<<48 | uint64(a[7])<<56
+	}
+}
+
+//go:nosplit
+func store64(b []byte, v uint64) {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			v = bits.ReverseBytes64(v)
+		}
+		*(*uint64)(unsafe.Pointer((*[8]byte)(b))) = v
+	default:
+		a := (*[8]byte)(b)
+		a[0] = byte(v)
+		a[1] = byte(v >> 8)
+		a[2] = byte(v >> 16)
+		a[3] = byte(v >> 24)
+		a[4] = byte(v >> 32)
+		a[5] = byte(v >> 40)
+		a[6] = byte(v >> 48)
+		a[7] = byte(v >> 56)
+	}
 }
 
 // Detect signed integer overflow.

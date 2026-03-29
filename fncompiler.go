@@ -138,10 +138,10 @@ func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 	bits := typ[len(typ)-2:]
 
-	fn.helpers.add("Uint" + bits)
 	// Load as unsigned, little-endian.
+	fn.helpers.add("load" + bits)
 	expr = &ast.CallExpr{
-		Fun: newID("Uint" + bits),
+		Fun: newID("load" + bits),
 		Args: []ast.Expr{&ast.SliceExpr{
 			X:   fn.memory.selector,
 			Low: addr}}}
@@ -173,10 +173,10 @@ func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
 		val = convert(val, "uint"+bits)
 	}
 
-	fn.helpers.add("PutUint" + bits)
 	// Store as unsigned, little-endian.
+	fn.helpers.add("store" + bits)
 	return &ast.ExprStmt{X: &ast.CallExpr{
-		Fun: newID("PutUint" + bits),
+		Fun: newID("store" + bits),
 		Args: []ast.Expr{
 			&ast.SliceExpr{
 				X:   fn.memory.selector,

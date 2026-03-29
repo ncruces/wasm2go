@@ -45,7 +45,7 @@ func (m *Module) Xwasm_fill(v0, v1, v2 int32) {
 	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
-	return int32(Uint32(m.memory[uint32(v0):]))
+	return int32(load32(m.memory[uint32(v0):]))
 }
 func (m *Module) Xread_as_i8u(v0 int32) int32 {
 	return int32(m.memory[uint32(v0)])
@@ -58,13 +58,19 @@ func (m *Module) Xmemory() Memory {
 func i32(x int32) int32 { return x }
 
 //go:nosplit
-func Uint32(b []byte) uint32 {
-	v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
+func load32(b []byte) uint32 {
 	switch runtime.GOARCH {
-	case "386", "amd64", "amd64p32", "alpha", "arm", "arm64", "loong64", "mipsle", "mips64le", "mips64p32le", "nios2", "ppc64le", "riscv", "riscv64", "sh", "wasm":
-		return v
+	case "386", "amd64", "arm", "arm64", "ppc64le", "ppc64", "s390x", "loong64", "wasm":
+		v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			return bits.ReverseBytes32(v)
+		default:
+			return v
+		}
 	default:
-		return bits.ReverseBytes32(v)
+		a := (*[4]byte)(b)
+		return uint32(a[0]) | uint32(a[1])<<8 | uint32(a[2])<<16 | uint32(a[3])<<24
 	}
 }
 
