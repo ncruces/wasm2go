@@ -14,7 +14,7 @@ import (
 )
 
 func Test(t *testing.T, modptr any, data []byte, name string) {
-	if strings.HasPrefix(runtime.GOARCH, "mips") && isfloat(name) {
+	if skipFloat(name) {
 		t.SkipNow()
 	}
 
@@ -128,7 +128,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 							v := math.Float32bits(f)
 							switch exp.Value {
 							case "nan:canonical":
-								if !canonical() && math.IsNaN(float64(f)) {
+								if !testCanonical() && math.IsNaN(float64(f)) {
 									t.Logf("got %x, want nan:canonical", v)
 									break
 								}
@@ -136,7 +136,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 									t.Errorf("got %x, want nan:canonical", v)
 								}
 							case "nan:arithmetic":
-								if !canonical() && math.IsNaN(float64(f)) {
+								if !testCanonical() && math.IsNaN(float64(f)) {
 									t.Logf("got %x, want nan:arithmetic", v)
 									break
 								}
@@ -157,7 +157,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 							v := math.Float64bits(f)
 							switch exp.Value {
 							case "nan:canonical":
-								if !canonical() && math.IsNaN(f) {
+								if !testCanonical() && math.IsNaN(f) {
 									t.Logf("got %x, want nan:canonical", v)
 									break
 								}
@@ -165,7 +165,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 									t.Errorf("got %x, want nan:canonical", v)
 								}
 							case "nan:arithmetic":
-								if !canonical() && math.IsNaN(f) {
+								if !testCanonical() && math.IsNaN(f) {
 									t.Logf("got %x, want nan:arithmetic", v)
 									break
 								}
@@ -223,15 +223,18 @@ func RecoverTrap(t testing.TB, want string) {
 	t.Fatalf("got trap %q, want %q", got, want)
 }
 
-func isfloat(name string) bool {
-	return strings.Contains(name, "float") ||
-		strings.Contains(name, "f32") ||
-		strings.Contains(name, "f64")
+// We skip float tests on MIPS, due to inaccuracy.
+func skipFloat(name string) bool {
+	return strings.HasPrefix(runtime.GOARCH, "mips") &&
+		(strings.Contains(name, "float") ||
+			strings.Contains(name, "f32") ||
+			strings.Contains(name, "f64"))
 }
 
-func canonical() bool {
+// We only check for canonical NaNs on amd64 and arm64.
+func testCanonical() bool {
 	switch runtime.GOARCH {
-	case "amd64", "arm64", "riscv64":
+	case "amd64", "arm64":
 		return true
 	}
 	return false

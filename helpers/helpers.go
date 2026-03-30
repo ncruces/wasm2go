@@ -8,7 +8,7 @@ import (
 	"unsafe"
 )
 
-// These prevent constant folding/propagation,
+// Prevent constant folding/propagation,
 // ensuring code using them compiles
 // and overflows/panics at runtime.
 
@@ -18,8 +18,9 @@ func i32(x int32) int32 { return x }
 //go:nosplit
 func i64(x int64) int64 { return x }
 
-// These prevent constant folding/propagation,
+// Prevent constant folding/propagation,
 // ensuring correct NaN handling.
+// Only used with nanbox.
 
 //go:nosplit
 func f32(x float32) float32 {
@@ -33,101 +34,9 @@ func f64(x float64) float64 {
 	return x
 }
 
-// Architectures that are unalignedOK:
-// https://go.dev/src/cmd/compile/internal/ssa/config.go
-
-//go:nosplit
-func load16(b []byte) uint16 {
-	switch runtime.GOARCH {
-	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
-		v := *(*uint16)(unsafe.Pointer((*[2]byte)(b)))
-		switch runtime.GOARCH {
-		case "ppc64", "s390x":
-			return bits.ReverseBytes16(v)
-		default:
-			return v
-		}
-	default:
-		return binary.LittleEndian.Uint16(b)
-	}
-}
-
-//go:nosplit
-func store16(b []byte, v uint16) {
-	switch runtime.GOARCH {
-	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
-		switch runtime.GOARCH {
-		case "ppc64", "s390x":
-			v = bits.ReverseBytes16(v)
-		}
-		*(*uint16)(unsafe.Pointer((*[2]byte)(b))) = v
-	default:
-		binary.LittleEndian.PutUint16(b, v)
-	}
-}
-
-//go:nosplit
-func load32(b []byte) uint32 {
-	switch runtime.GOARCH {
-	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
-		v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
-		switch runtime.GOARCH {
-		case "ppc64", "s390x":
-			return bits.ReverseBytes32(v)
-		default:
-			return v
-		}
-	default:
-		return binary.LittleEndian.Uint32(b)
-	}
-}
-
-//go:nosplit
-func store32(b []byte, v uint32) {
-	switch runtime.GOARCH {
-	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
-		switch runtime.GOARCH {
-		case "ppc64", "s390x":
-			v = bits.ReverseBytes32(v)
-		}
-		*(*uint32)(unsafe.Pointer((*[4]byte)(b))) = v
-	default:
-		binary.LittleEndian.PutUint32(b, v)
-	}
-}
-
-//go:nosplit
-func load64(b []byte) uint64 {
-	switch runtime.GOARCH {
-	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
-		v := *(*uint64)(unsafe.Pointer((*[8]byte)(b)))
-		switch runtime.GOARCH {
-		case "ppc64", "s390x":
-			return bits.ReverseBytes64(v)
-		default:
-			return v
-		}
-	default:
-		return binary.LittleEndian.Uint64(b)
-	}
-}
-
-//go:nosplit
-func store64(b []byte, v uint64) {
-	switch runtime.GOARCH {
-	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
-		switch runtime.GOARCH {
-		case "ppc64", "s390x":
-			v = bits.ReverseBytes64(v)
-		}
-		*(*uint64)(unsafe.Pointer((*[8]byte)(b))) = v
-	default:
-		binary.LittleEndian.PutUint64(b, v)
-	}
-}
-
 // Detect signed integer overflow.
-// These generate sub-optimal code on amd64.
+// Folded away for constant y.
+// They generate sub-optimal code on Intel.
 
 //go:nosplit
 func i32_div_s(x, y int32) int32 {
@@ -161,7 +70,8 @@ func i64_neg_s(x int64) int64 {
 	return -x
 }
 
-// These are needed for correct y wrap around behavior.
+// Needed for correct y wrap around behavior.
+// Folded away for constant y.
 
 //go:nosplit
 func i32_shl(x, y int32) int32 {
@@ -213,7 +123,7 @@ func i64_rotr(x, y int64) int64 {
 	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
 }
 
-// These must be implemented as bitwise operations,
+// Must be implemented as bitwise operations,
 // like the math versions are for float64.
 
 //go:nosplit
@@ -226,8 +136,9 @@ func f32_copysign(x, y float32) float32 {
 	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }
 
-// These must return canonical NaNs,
+// Must return canonical NaNs,
 // which they don't on amd64.
+// Only used with nanbox.
 
 //go:nosplit
 func f32_min(x, y float32) float32 {
@@ -462,6 +373,101 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 		i = uint64(x)
 	}
 	return int64(i)
+}
+
+// Faster memory access, using unsafe.
+
+// Architectures that are unalignedOK:
+// go.dev/src/cmd/compile/internal/ssa/config.go
+
+//go:nosplit
+func load16(b []byte) uint16 {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
+		v := *(*uint16)(unsafe.Pointer((*[2]byte)(b)))
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			return bits.ReverseBytes16(v)
+		default:
+			return v
+		}
+	default:
+		return binary.LittleEndian.Uint16(b)
+	}
+}
+
+//go:nosplit
+func store16(b []byte, v uint16) {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			v = bits.ReverseBytes16(v)
+		}
+		*(*uint16)(unsafe.Pointer((*[2]byte)(b))) = v
+	default:
+		binary.LittleEndian.PutUint16(b, v)
+	}
+}
+
+//go:nosplit
+func load32(b []byte) uint32 {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
+		v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			return bits.ReverseBytes32(v)
+		default:
+			return v
+		}
+	default:
+		return binary.LittleEndian.Uint32(b)
+	}
+}
+
+//go:nosplit
+func store32(b []byte, v uint32) {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			v = bits.ReverseBytes32(v)
+		}
+		*(*uint32)(unsafe.Pointer((*[4]byte)(b))) = v
+	default:
+		binary.LittleEndian.PutUint32(b, v)
+	}
+}
+
+//go:nosplit
+func load64(b []byte) uint64 {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
+		v := *(*uint64)(unsafe.Pointer((*[8]byte)(b)))
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			return bits.ReverseBytes64(v)
+		default:
+			return v
+		}
+	default:
+		return binary.LittleEndian.Uint64(b)
+	}
+}
+
+//go:nosplit
+func store64(b []byte, v uint64) {
+	switch runtime.GOARCH {
+	case "386", "amd64", "arm64", "loong64", "ppc64", "ppc64le", "s390x", "wasm":
+		switch runtime.GOARCH {
+		case "ppc64", "s390x":
+			v = bits.ReverseBytes64(v)
+		}
+		*(*uint64)(unsafe.Pointer((*[8]byte)(b))) = v
+	default:
+		binary.LittleEndian.PutUint64(b, v)
+	}
 }
 
 // Bulk memory operations.
