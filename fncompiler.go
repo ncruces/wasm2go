@@ -499,16 +499,11 @@ func (fn *funcCompiler) divHelper(typ string) {
 // Executes a bitwise shift/rotate helper.
 func (fn *funcCompiler) bitHelper(name string) {
 	typ, op, _ := strings.Cut(name, "_")
-	var mask int64 = 31
-	if typ == "i64" {
-		mask = 63
-	}
-
 	y := fn.pop()
 	x := fn.pop()
 
 	v, ok := islit(y, typ)
-	if !ok || v != (v&mask) {
+	if !ok {
 		fn.helpers.add(name)
 		fn.pushPureIf(pureHelpers.has(name),
 			&ast.CallExpr{
@@ -517,7 +512,10 @@ func (fn *funcCompiler) bitHelper(name string) {
 		return
 	}
 
-	y = &ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v, 10)}
+	if typ == "i32" {
+		v &= 31
+	}
+	y = &ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v&63, 10)}
 	var expr ast.Expr
 	switch op {
 	case "shl":

@@ -1881,7 +1881,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				n := convert(fn.pop(), typ)
 				val := fn.pop()
 				dest := convert(fn.pop(), typ)
-				if v, ok := islit(val, "i32"); ok && v == 0 {
+				if v, ok := islit(val, "i32"); ok && byte(v) == 0 {
 					fn.helpers.add("memory_zero")
 					fn.emit(&ast.ExprStmt{
 						X: &ast.CallExpr{
