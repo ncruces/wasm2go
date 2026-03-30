@@ -231,7 +231,7 @@ func isfloat(name string) bool {
 
 func canonical() bool {
 	switch runtime.GOARCH {
-	case "amd64", "arm64":
+	case "amd64", "arm64", "riscv64":
 		return true
 	}
 	return false

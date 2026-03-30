@@ -38,6 +38,9 @@ jobs:
     - name: Test mips64le
       run: GOARCH=mips64le go test ./helpers ./spectest/...
 
+    - name: Test mips64
+      run: GOARCH=mips64 go test ./helpers ./spectest/...
+
     - name: Test s390x
       run: GOARCH=s390x go test ./helpers ./spectest/...
 
@@ -97,7 +100,7 @@ jobs:
     - name: Test
       run: go test -args -unsafe
 
-    - name: Test arm64
+    - name: Test riscv
       run: go test ./helpers ./spectest/...
 
     - name: Test no optimization
