@@ -68,7 +68,7 @@ func (t *translator) dataExpr(i int) *ast.ParenExpr {
 		t.data = append(t.data, make([]dataSegment, i+1-len(t.data))...)
 	}
 	if t.data[i].embed == nil {
-		t.data[i].embed = &ast.ParenExpr{}
+		t.data[i].embed = &ast.ParenExpr{X: dataID(i)}
 	}
 	return t.data[i].embed
 }
