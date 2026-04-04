@@ -95,34 +95,6 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
-	if *embed == "" || len(t.data) == 0 {
-		for i := range t.data {
-			t.dataExpr(i).X = dataID(i)
-		}
-	} else {
-		f, err := os.Create(*embed)
-		if err != nil {
-			return err
-		}
-		var offset int
-		for i, seg := range t.data {
-			n, err := f.Write(seg.init)
-			if err != nil {
-				f.Close()
-				return err
-			}
-			t.dataExpr(i).X = &ast.SliceExpr{
-				X:    newID("data"),
-				Low:  &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(offset)},
-				High: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(offset + n)},
-			}
-			offset += n
-		}
-		if err := f.Close(); err != nil {
-			return err
-		}
-	}
-
 	exported := false
 	for _, exp := range t.exports {
 		if exp.kind == externMemory {
@@ -186,15 +158,13 @@ func translate(r io.Reader, w io.Writer) error {
 	if len(t.packages) > 0 {
 		specs := make([]ast.Spec, 0, len(t.data))
 		for _, pkg := range slices.Sorted(maps.Keys(t.packages)) {
-			specs = append(specs, &ast.ImportSpec{
+			spec := ast.ImportSpec{
 				Path: &ast.BasicLit{Kind: token.STRING, Value: `"` + pkg + `"`},
-			})
-		}
-		if *embed != "" && len(t.data) > 0 {
-			specs = append(specs, &ast.ImportSpec{
-				Name: newID("_"),
-				Path: &ast.BasicLit{Kind: token.STRING, Value: `"embed"`},
-			})
+			}
+			if pkg == "embed" {
+				spec.Name = newID("_")
+			}
+			specs = append(specs, &spec)
 		}
 		t.out.Decls = append([]ast.Decl{
 			&ast.GenDecl{Tok: token.IMPORT, Specs: specs}},
@@ -2184,6 +2154,18 @@ func (t *translator) readDataSection() error {
 	if int(count) >= len(t.data) {
 		t.data = append(t.data, make([]dataSegment, int(count)-len(t.data))...)
 	}
+
+	var f *os.File
+	if *embed != "" {
+		f, err = os.Create(*embed)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		t.packages.add("embed")
+	}
+
+	var offset uint64
 	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
 			return err
@@ -2205,10 +2187,27 @@ func (t *translator) readDataSection() error {
 		if err != nil {
 			return err
 		}
-		t.data[i].init = make([]byte, numElems)
-		if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
-			return err
+		if f == nil {
+			t.data[i].init = make([]byte, numElems)
+			if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
+				return err
+			}
+		} else {
+			_, err := io.CopyN(f, t.in, int64(numElems))
+			if err != nil {
+				return err
+			}
+			t.dataExpr(i).X = &ast.SliceExpr{
+				X:    newID("data"),
+				Low:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)},
+				High: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset+numElems, 10)},
+			}
+			offset += numElems
 		}
+	}
+
+	if f != nil {
+		return f.Close()
 	}
 	return nil
 }
