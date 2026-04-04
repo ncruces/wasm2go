@@ -12,6 +12,7 @@ import (
 	"go/token"
 	"io"
 	"maps"
+	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -62,6 +63,16 @@ type translator struct {
 	data      []dataSegment
 }
 
+func (t *translator) dataExpr(i int) *ast.ParenExpr {
+	if i >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, i+1-len(t.data))...)
+	}
+	if t.data[i].embed == nil {
+		t.data[i].embed = &ast.ParenExpr{}
+	}
+	return t.data[i].embed
+}
+
 func translate(r io.Reader, w io.Writer) error {
 	var t translator
 
@@ -80,6 +91,34 @@ func translate(r io.Reader, w io.Writer) error {
 			if err == io.EOF {
 				break
 			}
+			return err
+		}
+	}
+
+	if *embed == "" || len(t.data) == 0 {
+		for i := range t.data {
+			t.dataExpr(i).X = dataID(i)
+		}
+	} else {
+		f, err := os.Create(*embed)
+		if err != nil {
+			return err
+		}
+		var offset int
+		for i, seg := range t.data {
+			n, err := f.Write(seg.init)
+			if err != nil {
+				f.Close()
+				return err
+			}
+			t.dataExpr(i).X = &ast.SliceExpr{
+				X:    newID("data"),
+				Low:  &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(offset)},
+				High: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(offset + n)},
+			}
+			offset += n
+		}
+		if err := f.Close(); err != nil {
 			return err
 		}
 	}
@@ -151,6 +190,12 @@ func translate(r io.Reader, w io.Writer) error {
 				Path: &ast.BasicLit{Kind: token.STRING, Value: `"` + pkg + `"`},
 			})
 		}
+		if *embed != "" && len(t.data) > 0 {
+			specs = append(specs, &ast.ImportSpec{
+				Name: newID("_"),
+				Path: &ast.BasicLit{Kind: token.STRING, Value: `"embed"`},
+			})
+		}
 		t.out.Decls = append([]ast.Decl{
 			&ast.GenDecl{Tok: token.IMPORT, Specs: specs}},
 			t.out.Decls...)
@@ -158,17 +203,33 @@ func translate(r io.Reader, w io.Writer) error {
 
 	// Add data segments.
 	if len(t.data) > 0 {
-		specs := make([]ast.Spec, len(t.data))
-		for i, seg := range t.data {
-			specs[i] = &ast.ValueSpec{
-				Names: []*ast.Ident{dataID(i)},
-				Values: []ast.Expr{&ast.BasicLit{
-					Kind:  token.STRING,
-					Value: strconv.Quote(string(seg.init)),
-				}},
+		if *embed != "" {
+			embedDecl := &ast.GenDecl{
+				Tok: token.VAR,
+				Doc: &ast.CommentGroup{
+					List: []*ast.Comment{{Text: "//go:embed " + *embed}},
+				},
+				Specs: []ast.Spec{
+					&ast.ValueSpec{
+						Names: []*ast.Ident{newID("data")},
+						Type:  newID("string"),
+					},
+				},
 			}
+			t.out.Decls = append(t.out.Decls, embedDecl)
+		} else {
+			specs := make([]ast.Spec, len(t.data))
+			for i, seg := range t.data {
+				specs[i] = &ast.ValueSpec{
+					Names: []*ast.Ident{dataID(i)},
+					Values: []ast.Expr{&ast.BasicLit{
+						Kind:  token.STRING,
+						Value: strconv.Quote(string(seg.init)),
+					}},
+				}
+			}
+			t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 		}
-		t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 	}
 
 	util.RemoveParens(&t.out)
@@ -1842,7 +1903,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun: newID("memory_init"),
 						Args: []ast.Expr{
 							t.memory.selector,
-							dataID(i), dst, src, n}}})
+							t.dataExpr(int(i)), dst, src, n}}})
 
 			case 0x09: // data.drop
 				// No-op since data segments are constants.
@@ -2120,7 +2181,9 @@ func (t *translator) readDataSection() error {
 		return err
 	}
 
-	t.data = make([]dataSegment, count)
+	if int(count) >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, int(count)-len(t.data))...)
+	}
 	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
 			return err

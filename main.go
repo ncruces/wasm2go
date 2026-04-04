@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	embed  = flag.String("embed", "", "go:embed data sections from this file")
 	nanbox = flag.Bool("nanbox", false, "whether to try to canonicalize NaNs")
 	nohost = flag.Bool("nohost", false, "disable generating interfaces for imports")
 	noopt  = flag.Bool("noopt", false, "disable all optimization passes")

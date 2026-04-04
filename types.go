@@ -156,6 +156,7 @@ type elemSegment struct {
 type dataSegment struct {
 	init    []byte
 	offset  ast.Expr
+	embed   *ast.ParenExpr
 	passive bool
 }
 

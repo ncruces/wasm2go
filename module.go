@@ -231,7 +231,7 @@ func (t *translator) createNewFunc() ast.Decl {
 					&ast.SliceExpr{
 						X:   t.memory.selector,
 						Low: convert(seg.offset, t.memory.utype())},
-					dataID(i)}}})
+					t.dataExpr(i)}}})
 	}
 	// Create and initialize owned globals.
 	for _, g := range t.globals {
