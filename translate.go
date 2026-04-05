@@ -12,6 +12,7 @@ import (
 	"go/token"
 	"io"
 	"maps"
+	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -60,6 +61,16 @@ type translator struct {
 	elements  []elemSegment
 	start     uint64
 	data      []dataSegment
+}
+
+func (t *translator) dataExpr(i int) *ast.ParenExpr {
+	if i >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, i+1-len(t.data))...)
+	}
+	if t.data[i].embed == nil {
+		t.data[i].embed = &ast.ParenExpr{X: dataID(i)}
+	}
+	return t.data[i].embed
 }
 
 func translate(r io.Reader, w io.Writer) error {
@@ -147,9 +158,13 @@ func translate(r io.Reader, w io.Writer) error {
 	if len(t.packages) > 0 {
 		specs := make([]ast.Spec, 0, len(t.data))
 		for _, pkg := range slices.Sorted(maps.Keys(t.packages)) {
-			specs = append(specs, &ast.ImportSpec{
+			spec := ast.ImportSpec{
 				Path: &ast.BasicLit{Kind: token.STRING, Value: `"` + pkg + `"`},
-			})
+			}
+			if pkg == "embed" {
+				spec.Name = newID("_")
+			}
+			specs = append(specs, &spec)
 		}
 		t.out.Decls = append([]ast.Decl{
 			&ast.GenDecl{Tok: token.IMPORT, Specs: specs}},
@@ -158,17 +173,33 @@ func translate(r io.Reader, w io.Writer) error {
 
 	// Add data segments.
 	if len(t.data) > 0 {
-		specs := make([]ast.Spec, len(t.data))
-		for i, seg := range t.data {
-			specs[i] = &ast.ValueSpec{
-				Names: []*ast.Ident{dataID(i)},
-				Values: []ast.Expr{&ast.BasicLit{
-					Kind:  token.STRING,
-					Value: strconv.Quote(string(seg.init)),
-				}},
+		if *embed != "" {
+			embedDecl := &ast.GenDecl{
+				Tok: token.VAR,
+				Doc: &ast.CommentGroup{
+					List: []*ast.Comment{{Text: "//go:embed " + *embed}},
+				},
+				Specs: []ast.Spec{
+					&ast.ValueSpec{
+						Names: []*ast.Ident{newID("data")},
+						Type:  newID("string"),
+					},
+				},
 			}
+			t.out.Decls = append(t.out.Decls, embedDecl)
+		} else {
+			specs := make([]ast.Spec, len(t.data))
+			for i, seg := range t.data {
+				specs[i] = &ast.ValueSpec{
+					Names: []*ast.Ident{dataID(i)},
+					Values: []ast.Expr{&ast.BasicLit{
+						Kind:  token.STRING,
+						Value: strconv.Quote(string(seg.init)),
+					}},
+				}
+			}
+			t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 		}
-		t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 	}
 
 	util.RemoveParens(&t.out)
@@ -1842,7 +1873,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun: newID("memory_init"),
 						Args: []ast.Expr{
 							t.memory.selector,
-							dataID(i), dst, src, n}}})
+							t.dataExpr(int(i)), dst, src, n}}})
 
 			case 0x09: // data.drop
 				// No-op since data segments are constants.
@@ -2120,7 +2151,25 @@ func (t *translator) readDataSection() error {
 		return err
 	}
 
-	t.data = make([]dataSegment, count)
+	if int(count) >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, int(count)-len(t.data))...)
+	}
+
+	var f *os.File
+	if *embed != "" {
+		f, err = os.Create(*embed)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		t.packages.add("embed")
+	}
+
+	var offset uint64
+	var lastActive int = -1
+	var lastDest int64
+	var lastLen uint64
+
 	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
 			return err
@@ -2130,22 +2179,77 @@ func (t *translator) readDataSection() error {
 			return fmt.Errorf("unsupported data segment tag: %d", tag)
 		}
 
+		var dest int64
+		var isConst bool
+
 		if !t.data[i].passive {
 			expr, err := t.readConstExpr()
 			if err != nil {
 				return err
 			}
 			t.data[i].offset = expr
+			if v, ok := islit(expr, "i32"); ok {
+				dest = v
+				isConst = true
+			} else if v, ok := islit(expr, "i64"); ok {
+				dest = v
+				isConst = true
+			}
 		}
 
 		numElems, err := readLEB128(t.in)
 		if err != nil {
 			return err
 		}
-		t.data[i].init = make([]byte, numElems)
-		if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
-			return err
+		if f == nil {
+			t.data[i].init = make([]byte, numElems)
+			if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
+				return err
+			}
+		} else {
+			if isConst && lastActive >= 0 {
+				gap := dest - (lastDest + int64(lastLen))
+				if gap >= 0 && gap < 4096 { // Limit the zero-padding to 4KB
+					if gap > 0 {
+						if _, err := f.Write(make([]byte, gap)); err != nil {
+							return err
+						}
+						offset += uint64(gap)
+					}
+					if _, err := io.CopyN(f, t.in, int64(numElems)); err != nil {
+						return err
+					}
+					offset += numElems
+					lastLen += uint64(gap) + numElems
+					t.dataExpr(lastActive).X.(*ast.SliceExpr).High.(*ast.BasicLit).Value = strconv.FormatUint(offset, 10)
+					t.data[i].merged = true
+					continue
+				}
+			}
+
+			_, err := io.CopyN(f, t.in, int64(numElems))
+			if err != nil {
+				return err
+			}
+			t.dataExpr(i).X = &ast.SliceExpr{
+				X:    newID("data"),
+				Low:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)},
+				High: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset+numElems, 10)},
+			}
+			offset += numElems
+
+			if isConst {
+				lastActive = i
+				lastDest = dest
+				lastLen = numElems
+			} else {
+				lastActive = -1 // Break contiguous chain if dynamically offset
+			}
 		}
+	}
+
+	if f != nil {
+		return f.Close()
 	}
 	return nil
 }
