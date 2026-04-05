@@ -2166,6 +2166,10 @@ func (t *translator) readDataSection() error {
 	}
 
 	var offset uint64
+	var lastActive int = -1
+	var lastDest int64
+	var lastLen uint64
+
 	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
 			return err
@@ -2175,12 +2179,22 @@ func (t *translator) readDataSection() error {
 			return fmt.Errorf("unsupported data segment tag: %d", tag)
 		}
 
+		var dest int64
+		var isConst bool
+
 		if !t.data[i].passive {
 			expr, err := t.readConstExpr()
 			if err != nil {
 				return err
 			}
 			t.data[i].offset = expr
+			if v, ok := islit(expr, "i32"); ok {
+				dest = v
+				isConst = true
+			} else if v, ok := islit(expr, "i64"); ok {
+				dest = v
+				isConst = true
+			}
 		}
 
 		numElems, err := readLEB128(t.in)
@@ -2193,6 +2207,26 @@ func (t *translator) readDataSection() error {
 				return err
 			}
 		} else {
+			if isConst && lastActive >= 0 {
+				gap := dest - (lastDest + int64(lastLen))
+				if gap >= 0 && gap < 4096 { // Limit the zero-padding to 4KB
+					if gap > 0 {
+						if _, err := f.Write(make([]byte, gap)); err != nil {
+							return err
+						}
+						offset += uint64(gap)
+					}
+					if _, err := io.CopyN(f, t.in, int64(numElems)); err != nil {
+						return err
+					}
+					offset += numElems
+					lastLen += uint64(gap) + numElems
+					t.dataExpr(lastActive).X.(*ast.SliceExpr).High.(*ast.BasicLit).Value = strconv.FormatUint(offset, 10)
+					t.data[i].merged = true
+					continue
+				}
+			}
+
 			_, err := io.CopyN(f, t.in, int64(numElems))
 			if err != nil {
 				return err
@@ -2203,6 +2237,14 @@ func (t *translator) readDataSection() error {
 				High: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset+numElems, 10)},
 			}
 			offset += numElems
+
+			if isConst {
+				lastActive = i
+				lastDest = dest
+				lastLen = numElems
+			} else {
+				lastActive = -1 // Break contiguous chain if dynamically offset
+			}
 		}
 	}
 

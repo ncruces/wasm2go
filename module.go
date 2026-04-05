@@ -221,7 +221,7 @@ func (t *translator) createNewFunc() ast.Decl {
 	}
 	// Intialize the memory.
 	for i, seg := range t.data {
-		if seg.passive {
+		if seg.passive || seg.merged {
 			continue
 		}
 		body.List = append(body.List, &ast.ExprStmt{

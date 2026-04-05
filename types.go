@@ -158,6 +158,7 @@ type dataSegment struct {
 	offset  ast.Expr
 	embed   *ast.ParenExpr
 	passive bool
+	merged  bool
 }
 
 type nameSubsection byte
