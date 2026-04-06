@@ -64,16 +64,6 @@ type translator struct {
 	data      []dataSegment
 }
 
-func (t *translator) dataExpr(i int) *ast.ParenExpr {
-	if i >= len(t.data) {
-		t.data = append(t.data, make([]dataSegment, i+1-len(t.data))...)
-	}
-	if t.data[i].embed == nil {
-		t.data[i].embed = &ast.ParenExpr{X: dataID(i)}
-	}
-	return t.data[i].embed
-}
-
 func translate(r io.Reader, w io.Writer) error {
 	var t translator
 
@@ -2269,17 +2259,6 @@ func (t *translator) readDataSection() error {
 	return nil
 }
 
-func (t *translator) resolveImports(n ast.Node) bool {
-	if sel, ok := n.(*ast.SelectorExpr); ok {
-		if id, ok := sel.X.(*ast.Ident); ok {
-			if path, ok := stdlib[id.Name]; ok {
-				t.packages.add(path)
-			}
-		}
-	}
-	return true
-}
-
 func (t *translator) readCustomSection(size int) error {
 	data := make([]byte, size)
 	if _, err := io.ReadFull(t.in, data); err != nil {
@@ -2372,4 +2351,25 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 		}
 	}
 	return nil
+}
+
+func (t *translator) resolveImports(n ast.Node) bool {
+	if sel, ok := n.(*ast.SelectorExpr); ok {
+		if id, ok := sel.X.(*ast.Ident); ok {
+			if path, ok := stdlib[id.Name]; ok {
+				t.packages.add(path)
+			}
+		}
+	}
+	return true
+}
+
+func (t *translator) dataExpr(i int) *ast.ParenExpr {
+	if i >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, i+1-len(t.data))...)
+	}
+	if t.data[i].embed == nil {
+		t.data[i].embed = &ast.ParenExpr{X: dataID(i)}
+	}
+	return t.data[i].embed
 }
