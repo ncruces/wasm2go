@@ -109,6 +109,15 @@ func formatInt(i int64) string {
 	return dec
 }
 
+func formatUint(i uint64) string {
+	dec := strconv.FormatUint(i, 10)
+	hex := "0x" + strconv.FormatUint(i, 16)
+	if complexity(hex) < complexity(dec) {
+		return hex
+	}
+	return dec
+}
+
 func formatFloat(f float64, bits int) string {
 	dec := strconv.FormatFloat(f, 'g', -1, bits)
 	hex := strconv.FormatFloat(f, 'x', -1, bits)

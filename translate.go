@@ -188,15 +188,18 @@ func translate(r io.Reader, w io.Writer) error {
 			}
 			t.out.Decls = append(t.out.Decls, embedDecl)
 		} else {
-			specs := make([]ast.Spec, len(t.data))
+			var specs []ast.Spec
 			for i, seg := range t.data {
-				specs[i] = &ast.ValueSpec{
+				if seg.merged {
+					continue
+				}
+				specs = append(specs, &ast.ValueSpec{
 					Names: []*ast.Ident{dataID(i)},
 					Values: []ast.Expr{&ast.BasicLit{
 						Kind:  token.STRING,
 						Value: strconv.Quote(string(seg.init)),
 					}},
-				}
+				})
 			}
 			t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 		}
@@ -1088,7 +1091,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.CaseClause{Body: fn.branch(target)})
 				}
 
-				caseExpr := &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(i, 10)}
+				caseExpr := &ast.BasicLit{Kind: token.INT, Value: formatUint(i)}
 				caseClse := sw.Body.List[id].(*ast.CaseClause)
 				caseClse.List = append(caseClse.List, caseExpr)
 			}
@@ -1954,7 +1957,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							tab,
 							&ast.IndexExpr{
 								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)}},
+								Index: &ast.BasicLit{Kind: token.INT, Value: formatUint(elemIdx)}},
 							dst, src, n}}})
 
 			case 0x0d: // elem.drop
@@ -1966,7 +1969,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					Tok: token.ASSIGN,
 					Lhs: []ast.Expr{&ast.IndexExpr{
 						X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-						Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(idx, 10)}}},
+						Index: &ast.BasicLit{Kind: token.INT, Value: formatUint(idx)}}},
 					Rhs: []ast.Expr{newID("nil")}})
 
 			case 0x0e: // table.copy
@@ -2155,6 +2158,14 @@ func (t *translator) readDataSection() error {
 		t.data = append(t.data, make([]dataSegment, int(count)-len(t.data))...)
 	}
 
+	var (
+		threshold  int64 = 64
+		lastActive int   = -1
+		lastDest   int64
+		lastSize   int64
+		fileOffset int64
+	)
+
 	var f *os.File
 	if *embed != "" {
 		f, err = os.Create(*embed)
@@ -2162,13 +2173,9 @@ func (t *translator) readDataSection() error {
 			return err
 		}
 		defer f.Close()
+		threshold = 4096
 		t.packages.add("embed")
 	}
-
-	var offset uint64
-	var lastActive int = -1
-	var lastDest int64
-	var lastLen uint64
 
 	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
@@ -2179,8 +2186,7 @@ func (t *translator) readDataSection() error {
 			return fmt.Errorf("unsupported data segment tag: %d", tag)
 		}
 
-		var dest int64
-		var isConst bool
+		var dest int64 = -1
 
 		if !t.data[i].passive {
 			expr, err := t.readConstExpr()
@@ -2190,10 +2196,8 @@ func (t *translator) readDataSection() error {
 			t.data[i].offset = expr
 			if v, ok := islit(expr, "i32"); ok {
 				dest = v
-				isConst = true
 			} else if v, ok := islit(expr, "i64"); ok {
 				dest = v
-				isConst = true
 			}
 		}
 
@@ -2201,50 +2205,60 @@ func (t *translator) readDataSection() error {
 		if err != nil {
 			return err
 		}
+		size := int64(numElems)
+
+		if dest >= 0 && lastActive >= 0 {
+			gap := dest - (lastDest + lastSize)
+			if 0 <= gap && gap < threshold {
+				if f == nil {
+					data := &t.data[lastActive]
+					data.init = append(data.init, make([]byte, gap)...)
+					buf := make([]byte, size)
+					if _, err := io.ReadFull(t.in, buf); err != nil {
+						return err
+					}
+					data.init = append(data.init, buf...)
+				} else {
+					if _, err := f.Write(make([]byte, gap)); err != nil {
+						return err
+					}
+					fileOffset += gap
+					if _, err := io.CopyN(f, t.in, size); err != nil {
+						return err
+					}
+					fileOffset += size
+					t.dataExpr(lastActive).X.(*ast.SliceExpr).High.(*ast.BasicLit).Value = formatInt(fileOffset)
+				}
+				t.data[i].merged = true
+				lastSize += gap + size
+				continue
+			}
+		}
+
 		if f == nil {
-			t.data[i].init = make([]byte, numElems)
-			if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
+			data := &t.data[i]
+			data.init = make([]byte, size)
+			if _, err := io.ReadFull(t.in, data.init); err != nil {
 				return err
 			}
 		} else {
-			if isConst && lastActive >= 0 {
-				gap := dest - (lastDest + int64(lastLen))
-				if gap >= 0 && gap < 4096 { // Limit the zero-padding to 4KB
-					if gap > 0 {
-						if _, err := f.Write(make([]byte, gap)); err != nil {
-							return err
-						}
-						offset += uint64(gap)
-					}
-					if _, err := io.CopyN(f, t.in, int64(numElems)); err != nil {
-						return err
-					}
-					offset += numElems
-					lastLen += uint64(gap) + numElems
-					t.dataExpr(lastActive).X.(*ast.SliceExpr).High.(*ast.BasicLit).Value = strconv.FormatUint(offset, 10)
-					t.data[i].merged = true
-					continue
-				}
-			}
-
-			_, err := io.CopyN(f, t.in, int64(numElems))
-			if err != nil {
+			if _, err := io.CopyN(f, t.in, size); err != nil {
 				return err
 			}
 			t.dataExpr(i).X = &ast.SliceExpr{
 				X:    newID("data"),
-				Low:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)},
-				High: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset+numElems, 10)},
+				Low:  &ast.BasicLit{Kind: token.INT, Value: formatInt(fileOffset)},
+				High: &ast.BasicLit{Kind: token.INT, Value: formatInt(fileOffset + size)},
 			}
-			offset += numElems
+			fileOffset += size
+		}
 
-			if isConst {
-				lastActive = i
-				lastDest = dest
-				lastLen = numElems
-			} else {
-				lastActive = -1 // Break contiguous chain if dynamically offset
-			}
+		if dest >= 0 {
+			lastDest = dest
+			lastSize = size
+			lastActive = i
+		} else {
+			lastActive = -1
 		}
 	}
 
