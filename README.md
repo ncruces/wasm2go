@@ -56,9 +56,6 @@ Another knob is whether to attempt to ensure float operations
 This is tested to work on both `amd64` and `arm64`,
 but is known to be broken on most other architectures.
 
-If you suspect `wasm2go` is producing invalid code,
-please try `noopt` too before submitting a bug report.
-
 ```
 Usage: wasm2go [options] [input.wasm]
   -embed
@@ -74,3 +71,6 @@ Usage: wasm2go [options] [input.wasm]
   -unsafe
         allow importing unsafe
 ```
+
+If you suspect `wasm2go` is producing invalid code,
+please try `noopt` before submitting a bug report.
