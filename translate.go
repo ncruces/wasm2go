@@ -12,6 +12,8 @@ import (
 	"go/token"
 	"io"
 	"maps"
+	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -147,9 +149,13 @@ func translate(r io.Reader, w io.Writer) error {
 	if len(t.packages) > 0 {
 		specs := make([]ast.Spec, 0, len(t.data))
 		for _, pkg := range slices.Sorted(maps.Keys(t.packages)) {
-			specs = append(specs, &ast.ImportSpec{
+			spec := ast.ImportSpec{
 				Path: &ast.BasicLit{Kind: token.STRING, Value: `"` + pkg + `"`},
-			})
+			}
+			if pkg == "embed" {
+				spec.Name = newID("_")
+			}
+			specs = append(specs, &spec)
 		}
 		t.out.Decls = append([]ast.Decl{
 			&ast.GenDecl{Tok: token.IMPORT, Specs: specs}},
@@ -158,17 +164,36 @@ func translate(r io.Reader, w io.Writer) error {
 
 	// Add data segments.
 	if len(t.data) > 0 {
-		specs := make([]ast.Spec, len(t.data))
-		for i, seg := range t.data {
-			specs[i] = &ast.ValueSpec{
-				Names: []*ast.Ident{dataID(i)},
-				Values: []ast.Expr{&ast.BasicLit{
-					Kind:  token.STRING,
-					Value: strconv.Quote(string(seg.init)),
-				}},
+		if *embed {
+			embedDecl := &ast.GenDecl{
+				Tok: token.VAR,
+				Doc: &ast.CommentGroup{
+					List: []*ast.Comment{{Text: "//go:embed " + filepath.Base(embedFile)}},
+				},
+				Specs: []ast.Spec{
+					&ast.ValueSpec{
+						Names: []*ast.Ident{newID("data")},
+						Type:  newID("string"),
+					},
+				},
 			}
+			t.out.Decls = append(t.out.Decls, embedDecl)
+		} else {
+			var specs []ast.Spec
+			for i, seg := range t.data {
+				if seg.merged {
+					continue
+				}
+				specs = append(specs, &ast.ValueSpec{
+					Names: []*ast.Ident{dataID(i)},
+					Values: []ast.Expr{&ast.BasicLit{
+						Kind:  token.STRING,
+						Value: strconv.Quote(string(seg.init)),
+					}},
+				})
+			}
+			t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 		}
-		t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 	}
 
 	util.RemoveParens(&t.out)
@@ -1057,7 +1082,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.CaseClause{Body: fn.branch(target)})
 				}
 
-				caseExpr := &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(i, 10)}
+				caseExpr := &ast.BasicLit{Kind: token.INT, Value: formatUint(i)}
 				caseClse := sw.Body.List[id].(*ast.CaseClause)
 				caseClse.List = append(caseClse.List, caseExpr)
 			}
@@ -1842,7 +1867,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun: newID("memory_init"),
 						Args: []ast.Expr{
 							t.memory.selector,
-							dataID(i), dst, src, n}}})
+							t.dataExpr(int(i)), dst, src, n}}})
 
 			case 0x09: // data.drop
 				// No-op since data segments are constants.
@@ -1923,7 +1948,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 							tab,
 							&ast.IndexExpr{
 								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)}},
+								Index: &ast.BasicLit{Kind: token.INT, Value: formatUint(elemIdx)}},
 							dst, src, n}}})
 
 			case 0x0d: // elem.drop
@@ -1935,7 +1960,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					Tok: token.ASSIGN,
 					Lhs: []ast.Expr{&ast.IndexExpr{
 						X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-						Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(idx, 10)}}},
+						Index: &ast.BasicLit{Kind: token.INT, Value: formatUint(idx)}}},
 					Rhs: []ast.Expr{newID("nil")}})
 
 			case 0x0e: // table.copy
@@ -2120,7 +2145,29 @@ func (t *translator) readDataSection() error {
 		return err
 	}
 
-	t.data = make([]dataSegment, count)
+	if int(count) >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, int(count)-len(t.data))...)
+	}
+
+	var (
+		threshold  int64 = 64
+		lastActive int   = -1
+		lastDest   int64
+		lastSize   int64
+		fileOffset int64
+	)
+
+	var f *os.File
+	if *embed {
+		f, err = os.Create(embedFile)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		threshold = 4096
+		t.packages.add("embed")
+	}
+
 	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
 			return err
@@ -2130,35 +2177,86 @@ func (t *translator) readDataSection() error {
 			return fmt.Errorf("unsupported data segment tag: %d", tag)
 		}
 
+		var dest int64 = -1
+
 		if !t.data[i].passive {
 			expr, err := t.readConstExpr()
 			if err != nil {
 				return err
 			}
 			t.data[i].offset = expr
+			if v, ok := islit(expr, "i32"); ok {
+				dest = v
+			} else if v, ok := islit(expr, "i64"); ok {
+				dest = v
+			}
 		}
 
 		numElems, err := readLEB128(t.in)
 		if err != nil {
 			return err
 		}
-		t.data[i].init = make([]byte, numElems)
-		if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+		size := int64(numElems)
 
-func (t *translator) resolveImports(n ast.Node) bool {
-	if sel, ok := n.(*ast.SelectorExpr); ok {
-		if id, ok := sel.X.(*ast.Ident); ok {
-			if path, ok := stdlib[id.Name]; ok {
-				t.packages.add(path)
+		if dest >= 0 && lastActive >= 0 {
+			gap := dest - (lastDest + lastSize)
+			if 0 <= gap && gap < threshold {
+				if f == nil {
+					data := &t.data[lastActive]
+					data.init = append(data.init, make([]byte, gap)...)
+					buf := make([]byte, size)
+					if _, err := io.ReadFull(t.in, buf); err != nil {
+						return err
+					}
+					data.init = append(data.init, buf...)
+				} else {
+					if _, err := f.Write(make([]byte, gap)); err != nil {
+						return err
+					}
+					fileOffset += gap
+					if _, err := io.CopyN(f, t.in, size); err != nil {
+						return err
+					}
+					fileOffset += size
+					t.dataExpr(lastActive).X.(*ast.SliceExpr).High.(*ast.BasicLit).Value = formatInt(fileOffset)
+				}
+				t.data[i].merged = true
+				lastSize += gap + size
+				continue
 			}
 		}
+
+		if f == nil {
+			data := &t.data[i]
+			data.init = make([]byte, size)
+			if _, err := io.ReadFull(t.in, data.init); err != nil {
+				return err
+			}
+		} else {
+			if _, err := io.CopyN(f, t.in, size); err != nil {
+				return err
+			}
+			t.dataExpr(i).X = &ast.SliceExpr{
+				X:    newID("data"),
+				Low:  &ast.BasicLit{Kind: token.INT, Value: formatInt(fileOffset)},
+				High: &ast.BasicLit{Kind: token.INT, Value: formatInt(fileOffset + size)},
+			}
+			fileOffset += size
+		}
+
+		if dest >= 0 {
+			lastDest = dest
+			lastSize = size
+			lastActive = i
+		} else {
+			lastActive = -1
+		}
 	}
-	return true
+
+	if f != nil {
+		return f.Close()
+	}
+	return nil
 }
 
 func (t *translator) readCustomSection(size int) error {
@@ -2253,4 +2351,25 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 		}
 	}
 	return nil
+}
+
+func (t *translator) resolveImports(n ast.Node) bool {
+	if sel, ok := n.(*ast.SelectorExpr); ok {
+		if id, ok := sel.X.(*ast.Ident); ok {
+			if path, ok := stdlib[id.Name]; ok {
+				t.packages.add(path)
+			}
+		}
+	}
+	return true
+}
+
+func (t *translator) dataExpr(i int) *ast.ParenExpr {
+	if i >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, i+1-len(t.data))...)
+	}
+	if t.data[i].embed == nil {
+		t.data[i].embed = &ast.ParenExpr{X: dataID(i)}
+	}
+	return t.data[i].embed
 }

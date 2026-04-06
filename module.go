@@ -136,7 +136,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				X:   newID("m"),
 				Sel: newID("maxMem")}},
 			Rhs: []ast.Expr{
-				&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(t.memory.max), 10)}}})
+				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max)}}})
 		if !t.memory.imported {
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
@@ -147,7 +147,7 @@ func (t *translator) createNewFunc() ast.Decl {
 						&ast.ArrayType{Elt: newID("byte")},
 						&ast.BasicLit{
 							Kind:  token.INT,
-							Value: strconv.FormatUint(uint64(t.memory.min)<<16, 10)}}}}})
+							Value: formatInt(t.memory.min << 16)}}}}})
 		}
 	}
 
@@ -221,7 +221,7 @@ func (t *translator) createNewFunc() ast.Decl {
 	}
 	// Intialize the memory.
 	for i, seg := range t.data {
-		if seg.passive {
+		if seg.passive || seg.merged {
 			continue
 		}
 		body.List = append(body.List, &ast.ExprStmt{
@@ -231,7 +231,7 @@ func (t *translator) createNewFunc() ast.Decl {
 					&ast.SliceExpr{
 						X:   t.memory.selector,
 						Low: convert(seg.offset, t.memory.utype())},
-					dataID(i)}}})
+					t.dataExpr(i)}}})
 	}
 	// Create and initialize owned globals.
 	for _, g := range t.globals {

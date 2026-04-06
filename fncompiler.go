@@ -297,7 +297,7 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 			X: &ast.BinaryExpr{
 				Op: token.ADD,
 				X:  addr,
-				Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)}},
+				Y:  &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}},
 			Y: &ast.BinaryExpr{
 				Op: token.SHR,
 				X:  addr,
@@ -312,7 +312,7 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 	return &ast.BinaryExpr{
 		Op: token.ADD,
 		X:  convert(expr, "int64"),
-		Y:  &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(offset, 10)}}
+		Y:  &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}}
 }
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.

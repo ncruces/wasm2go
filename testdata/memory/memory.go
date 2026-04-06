@@ -17,7 +17,6 @@ func New() *Module {
 	m.maxMem = 100
 	m.memory = make([]byte, 65536)
 	copy(m.memory[uint32(i32(0)):], data0)
-	copy(m.memory[uint32(i32(32)):], data1)
 	return m
 }
 
@@ -84,7 +83,4 @@ func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
 	}
 }
 
-const (
-	data0 = "ghip\xaa\xff\xdf\xcb\x12\xa12\xb3\xa5\x1f\x01\x02"
-	data1 = "\x01\x03\x05\a\t\v\r\x0f"
-)
+const data0 = "ghip\xaa\xff\xdf\xcb\x12\xa12\xb3\xa5\x1f\x01\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x03\x05\a\t\v\r\x0f"
