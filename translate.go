@@ -13,6 +13,7 @@ import (
 	"io"
 	"maps"
 	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -173,11 +174,11 @@ func translate(r io.Reader, w io.Writer) error {
 
 	// Add data segments.
 	if len(t.data) > 0 {
-		if *embed != "" {
+		if *embed {
 			embedDecl := &ast.GenDecl{
 				Tok: token.VAR,
 				Doc: &ast.CommentGroup{
-					List: []*ast.Comment{{Text: "//go:embed " + *embed}},
+					List: []*ast.Comment{{Text: "//go:embed " + filepath.Base(embedFile)}},
 				},
 				Specs: []ast.Spec{
 					&ast.ValueSpec{
@@ -2167,8 +2168,8 @@ func (t *translator) readDataSection() error {
 	)
 
 	var f *os.File
-	if *embed != "" {
-		f, err = os.Create(*embed)
+	if *embed {
+		f, err = os.Create(embedFile)
 		if err != nil {
 			return err
 		}

@@ -51,24 +51,26 @@ Despite the scary name, the generated code abides by the
 [rules of unsafe](https://pkg.go.dev/unsafe#Pointer),
 and all memory accesses are bounds checked.
 
-To generate such Go code:
-```
-wasm2go -unsafe < input.wasm > output.go
-```
-
-The only other knob is whether to attempt to ensure float operations
+Another knob is whether to attempt to ensure float operations
 [canonicalize NaNs](https://github.com/WebAssembly/design/issues/1463).
 This is tested to work on both `amd64` and `arm64`,
 but is known to be broken on most other architectures.
 
+If you suspect `wasm2go` is producing invalid code,
+please try `noopt` too before submitting a bug report.
+
 ```
-Usage of wasm2go:
+Usage: wasm2go [options] [input.wasm]
+  -embed
+        go:embed data sections from a .dat file
   -nanbox
         whether to try to canonicalize NaNs
   -nohost
         disable generating interfaces for imports
   -noopt
         disable all optimization passes
+  -o string
+        output file (default stdout)
   -unsafe
         allow importing unsafe
 ```
