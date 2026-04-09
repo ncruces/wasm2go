@@ -21,12 +21,19 @@ before attempting to convert an untrusted module.
 
 The current target is a useful subset of Wasm produced by `clang`,
 including the following features:
-- bulk memory instructions and reference types;
-- non-trapping float-to-int conversions;
-- sign-extension instructions;
-- multi-value results;
+- [bulk memory instructions] and [reference types];
+- [non-trapping float-to-int conversions];
+- [sign-extension instructions];
+- [multi-value results];
 - 64-bit address space;
-- extended constant expressions.
+- [extended constant expressions].
+
+[bulk memory instructions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mbulk-memory
+[reference types]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mreference-types
+[non-trapping float-to-int conversions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mnontrapping-fptoint
+[sign-extension instructions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-msign-ext
+[multi-value results]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mmultivalue
+[extended constant expressions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mextended-const
 
 Generating human readable Go code is a non-goal:
 - Wasm names must be mangled into Go identifiers;
