@@ -42,7 +42,7 @@ func (m *Module) Xwasm_fill(v0, v1, v2 int32) {
 	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
-	return int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
+	return int32(load32(m.memory[uint32(v0):]))
 }
 func (m *Module) Xread_as_i8u(v0 int32) int32 {
 	return int32(m.memory[uint32(v0)])
@@ -53,6 +53,11 @@ func (m *Module) Xmemory() Memory {
 
 //go:nosplit
 func i32(x int32) int32 { return x }
+
+//go:nosplit
+func load32(b []byte) uint32 {
+	return binary.LittleEndian.Uint32(b)
+}
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem

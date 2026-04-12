@@ -51,7 +51,7 @@ l1:
 		}
 		v3 = v0 + v2*i32(4)
 		t0 := v4
-		v4 = t0 + int32(binary.LittleEndian.Uint32((*m.memory)[uint32(v3):]))
+		v4 = t0 + int32(load32((*m.memory)[uint32(v3):]))
 		v2 = v2 + i32(1)
 		goto l1
 	}
@@ -82,3 +82,8 @@ l0:
 
 //go:nosplit
 func i32(x int32) int32 { return x }
+
+//go:nosplit
+func load32(b []byte) uint32 {
+	return binary.LittleEndian.Uint32(b)
+}

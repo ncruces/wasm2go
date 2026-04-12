@@ -21,8 +21,13 @@ import (
 	"github.com/ncruces/wasm2go/util"
 )
 
-//go:embed helpers/helpers.go
-var helpersSrc string
+var (
+	//go:embed helpers/helpers.go
+	helpersSrc string
+
+	//go:embed helpers/helpers_unsafe.go
+	helpersUnsafeSrc string
+)
 
 // These helpers can never trap.
 var pureHelpers = set[string]{
@@ -133,6 +138,20 @@ func translate(r io.Reader, w io.Writer) error {
 	// Add helpers.
 	fset := token.NewFileSet()
 	if len(t.helpers) > 0 {
+		if *unsafe {
+			f, err := parser.ParseFile(fset, "helpers_unsafe.go", helpersUnsafeSrc, parser.ParseComments)
+			if err != nil {
+				return err
+			}
+			for _, decl := range f.Decls {
+				if fn, ok := decl.(*ast.FuncDecl); ok && t.helpers.has(fn.Name.Name) {
+					t.out.Decls = append(t.out.Decls, decl)
+					ast.Inspect(fn.Body, t.resolveImports)
+					delete(t.helpers, fn.Name.Name)
+				}
+			}
+		}
+
 		f, err := parser.ParseFile(fset, "helpers.go", helpersSrc, parser.ParseComments)
 		if err != nil {
 			return err
