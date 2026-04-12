@@ -267,6 +267,9 @@ func i64_trunc_f32_u(f float32) int64 {
 }
 
 func i32_trunc_sat_f64_s(f float64) int32 {
+	if runtime.GOARCH == "arm64" {
+		return int32(f)
+	}
 	x := math.Trunc(f)
 	switch {
 	case x < math.MinInt32:
@@ -280,6 +283,9 @@ func i32_trunc_sat_f64_s(f float64) int32 {
 }
 
 func i32_trunc_sat_f32_s(f float32) int32 {
+	if runtime.GOARCH == "arm64" {
+		return int32(f)
+	}
 	x := math.Trunc(float64(f))
 	switch {
 	case x < math.MinInt32:
@@ -321,6 +327,9 @@ func i32_trunc_sat_f32_u(f float32) int32 {
 }
 
 func i64_trunc_sat_f64_s(f float64) int64 {
+	if runtime.GOARCH == "arm64" {
+		return int64(f)
+	}
 	x := math.Trunc(f)
 	switch {
 	case x < math.MinInt64:
@@ -334,6 +343,9 @@ func i64_trunc_sat_f64_s(f float64) int64 {
 }
 
 func i64_trunc_sat_f32_s(f float32) int64 {
+	if runtime.GOARCH == "arm64" {
+		return int64(f)
+	}
 	x := math.Trunc(float64(f))
 	switch {
 	case x < math.MinInt64:
