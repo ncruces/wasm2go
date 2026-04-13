@@ -67,6 +67,7 @@ type translator struct {
 	elements  []elemSegment
 	start     uint64
 	data      []dataSegment
+	dylink    *dylinkDef
 }
 
 func translate(r io.Reader, w io.Writer) error {
@@ -105,10 +106,12 @@ func translate(r io.Reader, w io.Writer) error {
 		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
 	}
 
-	t.out.Decls = append([]ast.Decl{
-		t.createModuleStruct(),
-		t.createNewFunc()},
-		t.out.Decls...)
+	var decls []ast.Decl
+	if t.dylink != nil {
+		decls = append(decls, t.createDylinkConstants())
+	}
+	decls = append(decls, t.createModuleStruct(), t.createNewFunc())
+	t.out.Decls = append(decls, t.out.Decls...)
 
 	// Fill in missing names.
 	if t.out.Name == nil {
@@ -2295,6 +2298,8 @@ func (t *translator) readCustomSection(size int) error {
 	}
 	if buf.String() == "name" {
 		return t.readNameSection(r)
+	} else if buf.String() == "dylink.0" {
+		return t.readDylink0Section(r)
 	}
 	return nil
 }
@@ -2363,6 +2368,58 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 			}
 
 		default:
+			_, err := r.Seek(int64(size), io.SeekCurrent)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (t *translator) readDylink0Section(r *bytes.Reader) error {
+	t.dylink = &dylinkDef{}
+	for r.Len() > 0 {
+		kind, err := r.ReadByte()
+		if err != nil {
+			return err
+		}
+		size, err := readLEB128(r)
+		if err != nil {
+			return err
+		}
+
+		if kind == 1 { // WASM_DYLINK_MEM_INFO
+			payload := make([]byte, size)
+			if _, err := io.ReadFull(r, payload); err != nil {
+				return err
+			}
+			pr := bytes.NewReader(payload)
+
+			memSize, err := readLEB128(pr)
+			if err != nil && err != io.EOF {
+				return err
+			}
+			t.dylink.memorySize = uint32(memSize)
+
+			memAlign, err := readLEB128(pr)
+			if err != nil && err != io.EOF {
+				return err
+			}
+			t.dylink.memoryAlignment = uint32(memAlign)
+
+			tableSize, err := readLEB128(pr)
+			if err != nil && err != io.EOF {
+				return err
+			}
+			t.dylink.tableSize = uint32(tableSize)
+
+			tableAlign, err := readLEB128(pr)
+			if err != nil && err != io.EOF {
+				return err
+			}
+			t.dylink.tableAlignment = uint32(tableAlign)
+		} else {
 			_, err := r.Seek(int64(size), io.SeekCurrent)
 			if err != nil {
 				return err
