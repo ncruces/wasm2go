@@ -67,6 +67,7 @@ type translator struct {
 	elements  []elemSegment
 	start     uint64
 	data      []dataSegment
+	dylink    *dylinkDef
 }
 
 func translate(r io.Reader, w io.Writer) error {
@@ -103,6 +104,9 @@ func translate(r io.Reader, w io.Writer) error {
 	}
 	if !*nohost && len(t.imports) > 0 {
 		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
+	}
+	if t.dylink != nil {
+		t.out.Decls = append(t.out.Decls, t.createDylinkConstants())
 	}
 
 	t.out.Decls = append([]ast.Decl{
@@ -2295,6 +2299,8 @@ func (t *translator) readCustomSection(size int) error {
 	}
 	if buf.String() == "name" {
 		return t.readNameSection(r)
+	} else if buf.String() == "dylink.0" {
+		return t.readDylink0Section(r)
 	}
 	return nil
 }
@@ -2363,6 +2369,52 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 			}
 
 		default:
+			_, err := r.Seek(int64(size), io.SeekCurrent)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (t *translator) readDylink0Section(r *bytes.Reader) error {
+	t.dylink = &dylinkDef{}
+	for r.Len() > 0 {
+		kind, err := r.ReadByte()
+		if err != nil {
+			return err
+		}
+		size, err := readLEB128(r)
+		if err != nil {
+			return err
+		}
+
+		if dylinkKind(kind) == dylinkMemInfo {
+			memSize, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.memorySize = int64(memSize)
+
+			memAlign, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.memoryAlignment = int64(memAlign)
+
+			tableSize, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.tableSize = int64(tableSize)
+
+			tableAlign, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.tableAlignment = int64(tableAlign)
+		} else {
 			_, err := r.Seek(int64(size), io.SeekCurrent)
 			if err != nil {
 				return err
