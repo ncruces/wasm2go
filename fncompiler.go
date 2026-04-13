@@ -480,7 +480,7 @@ func (fn *funcCompiler) divHelper(typ string) {
 	}
 }
 
-// Executes a bitwise shift/rotate helper.
+// Executes a bitwise shift helper.
 func (fn *funcCompiler) bitHelper(name string) {
 	typ, op, _ := strings.Cut(name, "_")
 	y := fn.pop()
