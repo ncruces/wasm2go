@@ -105,13 +105,14 @@ func i32(x int32) int32 { return x }
 //go:nosplit
 func i64(x int64) int64 { return x }
 
+//go:nosplit
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < math.MinInt64 || x >= math.MaxInt64:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int64(x)
 }
