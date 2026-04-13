@@ -104,22 +104,22 @@ func i64_shr_u(x, y int64) int64 {
 
 //go:nosplit
 func i32_rotl(x, y int32) int32 {
-	return int32(bits.RotateLeft32(uint32(x), +int(y)&31))
+	return int32(bits.RotateLeft32(uint32(x), int(y)))
 }
 
 //go:nosplit
 func i32_rotr(x, y int32) int32 {
-	return int32(bits.RotateLeft32(uint32(x), -int(y)&31))
+	return int32(bits.RotateLeft32(uint32(x), -int(y)))
 }
 
 //go:nosplit
 func i64_rotl(x, y int64) int64 {
-	return int64(bits.RotateLeft64(uint64(x), +int(y)&63))
+	return int64(bits.RotateLeft64(uint64(x), int(y)))
 }
 
 //go:nosplit
 func i64_rotr(x, y int64) int64 {
-	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
+	return int64(bits.RotateLeft64(uint64(x), -int(y)))
 }
 
 // Must be implemented as bitwise operations,
