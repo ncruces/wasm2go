@@ -442,3 +442,24 @@ func (t *translator) createExportMethods() []ast.Decl {
 	}
 	return decls
 }
+
+func (t *translator) createDylinkConstants() ast.Decl {
+	return &ast.FuncDecl{
+		Name: newID("DylinkInfo"),
+		Type: &ast.FuncType{
+			Results: &ast.FieldList{
+				List: []*ast.Field{{
+					Names: []*ast.Ident{
+						newID("memorySize"),
+						newID("memoryAlignment"),
+						newID("tableSize"),
+						newID("tableAlignment")},
+					Type: newID("int64")}}}},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{&ast.ReturnStmt{
+				Results: []ast.Expr{
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(t.dylink.memorySize)},
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(1 << t.dylink.memoryAlignment)},
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(t.dylink.tableSize)},
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(1 << t.dylink.tableAlignment)}}}}}}
+}

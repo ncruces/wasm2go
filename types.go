@@ -175,3 +175,14 @@ const (
 	nameElem
 	nameData
 )
+
+type dylinkKind int
+
+const dylinkMemInfo dylinkKind = 1
+
+type dylinkDef struct {
+	memorySize      int64
+	memoryAlignment int64
+	tableSize       int64
+	tableAlignment  int64
+}
