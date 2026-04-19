@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	output = flag.String("o", "", "output file (default stdout)")
+	output   = flag.String("o", "", "output file (default stdout)")
+	provided = flag.String("provided", "", "file containing provided import functions")
 
 	embed  = flag.Bool("embed", false, "go:embed data sections from a .dat file")
 	nanbox = flag.Bool("nanbox", false, "whether to try to canonicalize NaNs")
