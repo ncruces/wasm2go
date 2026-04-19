@@ -84,15 +84,17 @@ func translate(r io.Reader, w io.Writer) error {
 	t.provided = set[string]{}
 	t.helpers = set[string]{}
 
-	if provided != nil && *provided != "" {
+	if len(provided) > 0 {
 		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, *provided, nil, 0)
-		if err != nil {
-			return err
-		}
-		for _, decl := range f.Decls {
-			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
-				t.provided.add(fn.Name.Name)
+		for _, file := range provided {
+			f, err := parser.ParseFile(fset, file, nil, 0)
+			if err != nil {
+				return err
+			}
+			for _, decl := range f.Decls {
+				if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
+					t.provided.add(fn.Name.Name)
+				}
 			}
 		}
 	}
