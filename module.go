@@ -34,11 +34,10 @@ func (t *translator) createModuleStruct() ast.Decl {
 	// Memory: owned a []byte; imported a *[]byte and a Memory field.
 	if t.memory != nil {
 		if t.memory.imported {
-			id := newID("Memory")
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
 				Type:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
-			}, &ast.Field{Names: []*ast.Ident{id}, Type: id})
+			}, &ast.Field{Names: []*ast.Ident{newID("memImp")}, Type: newID("Memory")})
 		} else {
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
@@ -173,9 +172,10 @@ func (t *translator) createNewFunc() ast.Decl {
 						Sel: util.MangleID(imp.name, util.IDExported)}}}})
 
 		case externMemory:
+			expr := &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")}
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}},
+				Lhs: []ast.Expr{expr},
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
@@ -183,8 +183,7 @@ func (t *translator) createNewFunc() ast.Decl {
 			}, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Slice")}}}})
+				Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Slice")}}}})
 		}
 	}
 
@@ -430,7 +429,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 		case externMemory:
 			decl.Type.Results = &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}
 			if t.memory.imported {
-				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}}}}
+				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")}}}}
 			} else {
 				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
 					Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: newID("wasmMemory")}},

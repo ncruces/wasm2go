@@ -55,6 +55,7 @@ type translator struct {
 	out ast.File
 	// Dependencies.
 	packages set[string]
+	provided set[string]
 	helpers  set[string]
 	// Sections.
 	types     []funcType
@@ -80,7 +81,23 @@ func translate(r io.Reader, w io.Writer) error {
 	}
 
 	t.packages = set[string]{}
+	t.provided = set[string]{}
 	t.helpers = set[string]{}
+
+	if len(provided) > 0 {
+		fset := token.NewFileSet()
+		for _, file := range provided {
+			f, err := parser.ParseFile(fset, file, nil, 0)
+			if err != nil {
+				return err
+			}
+			for _, decl := range f.Decls {
+				if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
+					t.provided.add(fn.Name.Name)
+				}
+			}
+		}
+	}
 
 	// Load Wasm.
 	for {
@@ -395,6 +412,19 @@ func (t *translator) readImportSection() error {
 				return err
 			}
 			typ := t.types[index]
+
+			internalName := util.Mangle(name, util.IDInternal)
+			if t.provided.has(internalName) {
+				id := newID(internalName)
+				fn := funcCompiler{
+					typ:      typ,
+					decl:     &ast.FuncDecl{Name: id},
+					call:     &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}},
+					provided: true}
+				t.functions = append(t.functions, fn)
+				continue
+			}
+
 			t.imports = append(t.imports, importDef{
 				module: mod,
 				name:   name,
@@ -760,7 +790,9 @@ func (t *translator) readExportSection() error {
 		switch externKind(kind) {
 		case externFunction:
 			decl := t.functions[index].decl
-			decl.Name.Name = util.Mangle(name, util.IDExported)
+			if !t.functions[index].provided {
+				decl.Name.Name = util.Mangle(name, util.IDExported)
+			}
 		}
 	}
 	return nil
@@ -782,12 +814,7 @@ func (t *translator) readCodeSection() error {
 		return err
 	}
 
-	var importedFuncs uint64
-	for _, imp := range t.imports {
-		if imp.kind == externFunction {
-			importedFuncs++
-		}
-	}
+	importedFuncs := uint64(len(t.functions)) - numFuncs
 
 	for i := range numFuncs {
 		i += importedFuncs
@@ -1498,7 +1525,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if fn.memory.imported {
 				fn.push(convert(&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")},
+						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")},
 						Sel: newID("Grow")},
 					Args: []ast.Expr{
 						convert(fn.pop(), "int64"),

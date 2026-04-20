@@ -6,7 +6,7 @@ import "encoding/binary"
 
 type Module struct {
 	memory *[]byte
-	Memory Memory
+	memImp Memory
 	maxMem int64
 	_env   Xenv
 }
@@ -15,8 +15,8 @@ func New(v0 Xenv) *Module {
 	m := &Module{}
 	m._env = v0
 	m.maxMem = 65536
-	m.Memory = v0.Xbuffer()
-	m.memory = m.Memory.Slice()
+	m.memImp = v0.Xbuffer()
+	m.memory = m.memImp.Slice()
 	if i, ok := any(v0).(interface {
 		Init(any)
 	}); ok {
