@@ -1525,7 +1525,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if fn.memory.imported {
 				fn.push(convert(&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")},
+						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")},
 						Sel: newID("Grow")},
 					Args: []ast.Expr{
 						convert(fn.pop(), "int64"),

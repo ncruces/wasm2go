@@ -127,9 +127,7 @@ func Test_table(t *testing.T) {
 
 type tableEnv struct{}
 
-func (t tableEnv) Xjstimes3(v0 int32) int32 {
-	return v0 * 3
-}
+func (t tableEnv) Xjstimes3(v0 int32) int32 { return v0 * 3 }
 
 func Test_trig(t *testing.T) {
 	want := []float32{
@@ -156,15 +154,15 @@ func Test_trig(t *testing.T) {
 }
 
 func Test_loops(t *testing.T) {
-	m := loops_test.New(loopsEnv{})
-	mem := *m.Memory.Slice()
+	env := new(loopsEnv)
+	m := loops_test.New(env)
 
 	var want int
 	const count = 50
 	const start = 128
 	// Initialize data in memory.
 	for i := range count {
-		binary.LittleEndian.PutUint32(mem[start+i*4:], uint32(i*2-1))
+		binary.LittleEndian.PutUint32(env.mem[start+i*4:], uint32(i*2-1))
 		want += i*2 - 1
 	}
 
@@ -200,13 +198,11 @@ type loopsEnv struct {
 	mem [65536]byte
 }
 
-func (e loopsEnv) Xbuffer() loops_test.Memory {
-	return &e
-}
+func (e *loopsEnv) Xbuffer() loops_test.Memory { return e }
 
-func (loopsEnv) Xlog_i32(v0 int32) {}
+func (e *loopsEnv) Xlog_i32(v0 int32) {}
 
-func (loopsEnv) Xrand_i32() int32 { return rand.Int31n(10000) }
+func (e *loopsEnv) Xrand_i32() int32 { return rand.Int31n(10000) }
 
 func (e *loopsEnv) Slice() *[]byte { b := e.mem[:]; return &b }
 
