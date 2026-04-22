@@ -91,8 +91,13 @@ func translate(r io.Reader, w io.Writer) error {
 			return err
 		}
 		for _, decl := range f.Decls {
+			// Check if the receiver type is *Module.
 			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
-				t.provided.add(fn.Name.Name)
+				if star, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
+					if id, ok := star.X.(*ast.Ident); ok && id.Name == "Module" {
+						t.provided.add(fn.Name.Name)
+					}
+				}
 			}
 		}
 	}
