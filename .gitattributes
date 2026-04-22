@@ -1,1 +1,2 @@
+libc-gen/c/** linguist-vendored
 spectest/*/** linguist-vendored
