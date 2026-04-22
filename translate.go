@@ -80,21 +80,19 @@ func translate(r io.Reader, w io.Writer) error {
 		return err
 	}
 
+	fset := token.NewFileSet()
 	t.packages = set[string]{}
 	t.provided = set[string]{}
 	t.helpers = set[string]{}
 
-	if len(provided) > 0 {
-		fset := token.NewFileSet()
-		for _, file := range provided {
-			f, err := parser.ParseFile(fset, file, nil, 0)
-			if err != nil {
-				return err
-			}
-			for _, decl := range f.Decls {
-				if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
-					t.provided.add(fn.Name.Name)
-				}
+	for _, file := range provided {
+		f, err := parser.ParseFile(fset, file, nil, 0)
+		if err != nil {
+			return err
+		}
+		for _, decl := range f.Decls {
+			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
+				t.provided.add(fn.Name.Name)
 			}
 		}
 	}
@@ -157,7 +155,6 @@ func translate(r io.Reader, w io.Writer) error {
 	t.out.Decls = append(t.out.Decls, t.createExportMethods()...)
 
 	// Add helpers.
-	fset := token.NewFileSet()
 	if len(t.helpers) > 0 {
 		if *unsafe {
 			f, err := parser.ParseFile(fset, "helpers_unsafe.go", helpersUnsafeSrc, parser.ParseComments)
@@ -413,9 +410,8 @@ func (t *translator) readImportSection() error {
 			}
 			typ := t.types[index]
 
-			internalName := util.Mangle(name, util.IDInternal)
-			if t.provided.has(internalName) {
-				id := newID(internalName)
+			if n := util.Mangle(name, util.IDInternal); t.provided.has(n) {
+				id := ast.NewIdent(n)
 				fn := funcCompiler{
 					typ:      typ,
 					decl:     &ast.FuncDecl{Name: id},
@@ -789,8 +785,8 @@ func (t *translator) readExportSection() error {
 
 		switch externKind(kind) {
 		case externFunction:
-			decl := t.functions[index].decl
 			if !t.functions[index].provided {
+				decl := t.functions[index].decl
 				decl.Name.Name = util.Mangle(name, util.IDExported)
 			}
 		}
