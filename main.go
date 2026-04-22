@@ -18,12 +18,14 @@ var (
 	noopt  = flag.Bool("noopt", false, "disable all optimization passes")
 	unsafe = flag.Bool("unsafe", false, "allow importing unsafe")
 
+	provided  stringFlags
 	embedFile string
 )
 
 func main() {
 	log.SetFlags(0)
 
+	flag.Var(&provided, "provided", "file containing provided import functions")
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [options] [input.wasm]\n", os.Args[0])
 		flag.PrintDefaults()
@@ -68,4 +70,15 @@ func main() {
 	if err := out.Close(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+type stringFlags []string
+
+func (l *stringFlags) String() string {
+	return strings.Join(*l, ", ")
+}
+
+func (l *stringFlags) Set(value string) error {
+	*l = append(*l, value)
+	return nil
 }

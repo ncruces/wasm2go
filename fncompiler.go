@@ -20,6 +20,8 @@ type funcCompiler struct {
 	blocks stack[funcBlock]
 	labels int
 	temps  int
+
+	provided bool
 }
 
 type entryKind int
