@@ -28,8 +28,7 @@ func Test_strtod(t *testing.T) {
 			start := ptr(16)
 			endptr := ptr(4)
 
-			copy(memory[uptr(start):], tc.input)
-			memory[uptr(start)+uptr(len(tc.input))] = 0
+			writeString(start, tc.input)
 			store32(memory[uptr(endptr):], 0)
 
 			got := strtod(start, endptr)
@@ -68,8 +67,7 @@ func Test_strtol(t *testing.T) {
 			start := ptr(16)
 			endptr := ptr(4)
 
-			copy(memory[uptr(start):], tc.input)
-			memory[uptr(start)+uptr(len(tc.input))] = 0
+			writeString(start, tc.input)
 			store32(memory[uptr(endptr):], 0)
 
 			got := strtol(start, endptr, tc.base)
