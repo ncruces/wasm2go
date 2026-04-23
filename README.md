@@ -1,19 +1,19 @@
 # A Wasm to Go translator
 
-The input is a Wasm module, and the output is a single Go source file,
-with no dependencies beyond the standard library.
-
-To translate a Wasm module to Go use the following command:
+To translate a Wasm module to Go, use the following command:
 ```
 wasm2go < input.wasm > output.go
 ```
 
-The Go file forms a self contained package,
-that exports a structure called `Module`,
+The input is a Wasm module, and the output is a single Go source file,
+with no dependencies beyond the standard library.
+
+The Go file forms a self-contained package,
+that exports a structure called `Module`
 and a `New` function to initialize it.
 
 The methods of the `Module` structure are the Wasm module's exports,
-whereas imports are interfaces `New` consumes.
+whereas imports are interfaces that `New` consumes.
 
 We assume the input Wasm modules can be trusted.
 At a minimum, you should run Wasm modules through a verifier
@@ -35,7 +35,7 @@ including the following features:
 [multi-value results]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mmultivalue
 [extended constant expressions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mextended-const
 
-Generating human readable Go code is a non-goal:
+Generating human-readable Go code is a non-goal:
 - Wasm names must be mangled into Go identifiers;
 - Wasm control flow is implemented with `goto` and labels;
 - Go's distinction between `bool` and `int32` requires
@@ -75,6 +75,10 @@ Usage: wasm2go [options] [input.wasm]
         disable all optimization passes
   -o string
         output file (default stdout)
+  -provided value
+        file containing provided import functions
+  -tags string
+        go:build tags to include in the generated file
   -unsafe
         allow importing unsafe
 ```

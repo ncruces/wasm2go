@@ -11,6 +11,7 @@ import (
 
 var (
 	output = flag.String("o", "", "output file (default stdout)")
+	tags   = flag.String("tags", "", "go:build tags to include in the generated file")
 
 	embed  = flag.Bool("embed", false, "go:embed data sections from a .dat file")
 	nanbox = flag.Bool("nanbox", false, "whether to try to canonicalize NaNs")
