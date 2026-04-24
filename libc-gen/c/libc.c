@@ -1,4 +1,6 @@
 #include "ctype.c"
+#include "errno.c"
 #include "math.c"
 #include "stdio.c"
 #include "stdlib.c"
+#include "time.c"

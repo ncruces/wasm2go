@@ -117,3 +117,8 @@ func strcpy(d, s ptr) ptr {
 	copy(memory[uptr(d):], b)
 	return d
 }
+
+func strcat(d, s ptr) ptr {
+	strcpy(d+strlen(d), s)
+	return d
+}

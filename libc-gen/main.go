@@ -18,7 +18,7 @@ import (
 	"github.com/ncruces/wasm2go/util"
 )
 
-//go:embed go/*.go c/*.c c/*.h
+//go:embed c go
 var src embed.FS
 
 var (
@@ -70,14 +70,15 @@ func main() {
 
 	// Map out the functions and track module paths for automatic import resolution
 	for _, entry := range entries {
-		if entry.Name() == "libc.go" {
+		name := entry.Name()
+		if name == "libc.go" || strings.HasSuffix(name, "_test.go") {
 			continue
 		}
-		data, err := src.ReadFile("go/" + entry.Name())
+		data, err := src.ReadFile("go/" + name)
 		if err != nil {
 			log.Fatal(err)
 		}
-		f, err := parser.ParseFile(fset, entry.Name(), data, 0)
+		f, err := parser.ParseFile(fset, name, data, 0)
 		if err != nil {
 			log.Fatal(err)
 		}

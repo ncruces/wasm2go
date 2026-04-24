@@ -29,6 +29,8 @@ func Test_gmtime_r(t *testing.T) {
 		5,   // tm_wday (0-6, Friday is 5)
 		43,  // tm_yday (0-365, 44th day of the year - 1)
 		0,   // tm_isdst
+		0,   // tm_gmtoff
+		0,   // tm_zone
 	}
 
 	for i, want := range wantFields {
@@ -58,6 +60,7 @@ func Test_localtime_r(t *testing.T) {
 	if tm.IsDST() {
 		isdst = 1
 	}
+	_, zone := tm.Zone()
 
 	wantFields := []uint32{
 		uint32(tm.Second()),
@@ -69,6 +72,8 @@ func Test_localtime_r(t *testing.T) {
 		uint32(tm.Weekday() - time.Sunday),
 		uint32(tm.YearDay() - 1),
 		isdst,
+		uint32(zone),
+		uint32(0),
 	}
 
 	for i, want := range wantFields {

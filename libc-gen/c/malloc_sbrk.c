@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdlib.h>
+
 #define PAGESIZE 65536
 
 void* sbrk(intptr_t increment) {

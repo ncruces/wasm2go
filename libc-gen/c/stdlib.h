@@ -13,6 +13,7 @@ long strtol(const char* restrict, char** restrict, int);
 double strtod(const char* restrict, char** restrict);
 
 #define abs(x) (__builtin_abs(x))
+#define alloca(x) (__builtin_alloca(x))
 
 void free(void*);
 __attribute__((malloc)) void* malloc(size_t);

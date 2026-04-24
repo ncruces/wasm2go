@@ -1,5 +1,5 @@
 #pragma once
 
-int errno;
+extern int errno;
 
 #define ENOENT 2

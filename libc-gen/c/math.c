@@ -23,3 +23,11 @@ __attribute__((always_inline)) double(sqrt)(double x) {
 __attribute__((always_inline)) double(trunc)(double x) {
   return __builtin_trunc(x);
 }
+
+__attribute__((always_inline)) long(lrint)(double x) {
+  return (long)__builtin_rint(x);
+}
+
+__attribute__((always_inline)) long long(llrint)(double x) {
+  return (long long)__builtin_rint(x);
+}

@@ -33,8 +33,8 @@ double j0(double);
 double j1(double);
 double jn(int, double);
 double ldexp(double, int);
-double lgamma(double);
 double lgamma_r(double, int*);
+double lgamma(double);
 double log(double);
 double log10(double);
 double log1p(double);
@@ -58,6 +58,8 @@ double y0(double);
 double y1(double);
 double yn(int, double);
 int ilogb(double);
+long lrint(double);
+long long llrint(double);
 
 #define ceil(x) (__builtin_ceil(x))
 #define floor(x) (__builtin_floor(x))
@@ -66,8 +68,9 @@ int ilogb(double);
 #define sqrt(x) (__builtin_sqrt(x))
 #define trunc(x) (__builtin_trunc(x))
 
-#define INFINITY __builtin_inf()
-#define HUGE_VAL __builtin_huge_val()
+#define NAN (__builtin_nan(""))
+#define INFINITY (__builtin_inf())
+#define HUGE_VAL (__builtin_huge_val())
 
 #define FP_NAN 0
 #define FP_INFINITE 1

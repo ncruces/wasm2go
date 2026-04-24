@@ -17,7 +17,7 @@ and host-provided capabilities.
 
 1. **C sources**: a minimal C library containing header files,
 and some bits best implemented in C,
-such as a custom `qsort` implementation,
+such as a custom `qsort` implementation, STB's `sprintf`,
 Doug Lea's `malloc` (or a simple bump allocator).
 
 2. **Go host functions**: a code generator that emits testable
