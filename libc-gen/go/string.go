@@ -20,6 +20,16 @@ func memcmp(s1, s2, n ptr) int32 {
 	return int32(bytes.Compare(b1, b2))
 }
 
+func bcmp(s1, s2, n ptr) int32 {
+	e1, e2 := s1+n, s2+n
+	b1 := memory[uptr(s1):uptr(e1)]
+	b2 := memory[uptr(s2):uptr(e2)]
+	if bytes.Equal(b1, b2) {
+		return 0
+	}
+	return 1
+}
+
 func strlen(s ptr) ptr {
 	return ptr(bytes.IndexByte(memory[uptr(s):], 0))
 }

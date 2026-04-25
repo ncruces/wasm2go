@@ -38,6 +38,22 @@ func Test_memcmp(t *testing.T) {
 	}
 }
 
+func Test_bcmp(t *testing.T) {
+	memory = make([]byte, 1024)
+	writeString(10, "abc")
+	writeString(20, "abd")
+
+	if got := bcmp(10, 20, 2); got != 0 {
+		t.Errorf("got %v, want 0", got)
+	}
+	if got := bcmp(10, 20, 3); got != 1 {
+		t.Errorf("got %v, want 1", got)
+	}
+	if got := bcmp(20, 10, 3); got != 1 {
+		t.Errorf("got %v, want 1", got)
+	}
+}
+
 func Test_strlen(t *testing.T) {
 	memory = make([]byte, 1024)
 	writeString(10, "hello")

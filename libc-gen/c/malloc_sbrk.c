@@ -12,15 +12,11 @@ void* sbrk(intptr_t increment) {
   return (void*)(old * PAGESIZE);
 }
 
-#define LACKS_ERRNO_H
 #define LACKS_FCNTL_H
 #define LACKS_SCHED_H
-#define LACKS_STRINGS_H
 #define LACKS_SYS_MMAN_H
 #define LACKS_SYS_PARAM_H
-#define LACKS_SYS_TYPES_H
-#define LACKS_TIME_H
-#define LACKS_UNISTD_H
+#define LACKS_TIME_H // prefer reproducibility
 
 #define HAVE_MMAP 0
 #define MALLOC_ALIGNMENT 16
@@ -30,11 +26,6 @@ void* sbrk(intptr_t increment) {
 #define NO_MALLOC_STATS 1
 #define USE_BUILTIN_FFS 1
 #define USE_LOCKS 0
-
-#define ffs(i) (__builtin_ffs(i))
-
-#define ENOMEM 7   // SQLITE_NOMEM
-#define EINVAL 21  // SQLITE_MISUSE
 
 #pragma clang diagnostic ignored "-Weverything"
 

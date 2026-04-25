@@ -3,14 +3,12 @@ package libc
 import "time"
 
 func localtime_r(timer, buf ptr) ptr {
-	const size = 32 / 8
 	t := load64(memory[uptr(timer):])
 	storetime_r(memory[uptr(buf):], time.Unix(int64(t), 0))
 	return buf
 }
 
 func gmtime_r(timer, buf ptr) ptr {
-	const size = 32 / 8
 	t := load64(memory[uptr(timer):])
 	storetime_r(memory[uptr(buf):], time.Unix(int64(t), 0).UTC())
 	return buf

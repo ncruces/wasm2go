@@ -3,4 +3,5 @@
 #include "math.c"
 #include "stdio.c"
 #include "stdlib.c"
+#include "strings.c"
 #include "time.c"
