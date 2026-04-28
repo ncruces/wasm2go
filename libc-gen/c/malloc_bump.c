@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define CHUNKSIZE 16
 #define PAGESIZE 65536
 
 extern char __heap_base[];
@@ -19,14 +20,23 @@ __attribute__((always_inline)) void free(void*) {}
 
 void* malloc(size_t size) {
   if (size == 0) return NULL;
-  size = __builtin_align_up(size, 16);
+  size = __builtin_align_up(size, CHUNKSIZE);
 
-  size_t avail = __arena_end - __arena_beg;
-  if (size > avail) {
+  for (;;) {
+    size_t avail = __arena_end - __arena_beg;
+    if (size <= avail) break;
+
     size_t npages = (size - avail + PAGESIZE - 1) / PAGESIZE;
     size_t old = __builtin_wasm_memory_grow(0, npages);
     if (old == SIZE_MAX) return NULL;
-    __arena_end += npages * PAGESIZE;
+    if (old * PAGESIZE == (size_t)__arena_end) {
+      __arena_end += npages * PAGESIZE;
+      break;
+    }
+
+    // Memory was grown elsewhere, start a new arena.
+    __arena_beg = (void*)((old) * PAGESIZE);
+    __arena_end = (void*)((old + npages) * PAGESIZE);
   }
 
   void* res = __arena_beg;
@@ -46,11 +56,15 @@ void* aligned_alloc(size_t align, size_t size) {
 void* realloc(void* ptr, size_t size) {
   if (ptr == NULL) return malloc(size);
   // No need to move the first chunk.
-  if (size <= 16) return ptr;
+  if (size <= CHUNKSIZE) return ptr;
 
   size_t copy = __arena_beg - ptr;
+  // Rewind the last chunk.
+  if (copy == CHUNKSIZE) __arena_beg = ptr;
   void* res = malloc(size);
-  if (copy > size) copy = size;
-  __builtin_memcpy(res, ptr, copy);
+  if (res != ptr) {
+    if (copy > size) copy = size;
+    __builtin_memcpy(res, ptr, copy);
+  }
   return res;
 }

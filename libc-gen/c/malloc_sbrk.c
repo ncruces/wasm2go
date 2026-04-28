@@ -1,22 +1,21 @@
+// Configures and includes Doug Lea's malloc
+// for use with Wasm.
+// Optionally, call init_allocator to have
+// malloc take over the initial heap.
+// Grows memory in increments of 64K,
+// and expects it to be contiguous,
+// but can cope with non-contiguities.
+
 #include <stdint.h>
 #include <stdlib.h>
 
 #define PAGESIZE 65536
 
-void* sbrk(intptr_t increment) {
-  if (increment == 0) return (void*)(__builtin_wasm_memory_size(0) * PAGESIZE);
-  if (increment < 0 || increment % PAGESIZE != 0) abort();
-
-  size_t old = __builtin_wasm_memory_grow(0, (size_t)increment / PAGESIZE);
-  if (old == SIZE_MAX) return (void*)old;
-  return (void*)(old * PAGESIZE);
-}
-
 #define LACKS_FCNTL_H
 #define LACKS_SCHED_H
 #define LACKS_SYS_MMAN_H
 #define LACKS_SYS_PARAM_H
-#define LACKS_TIME_H // prefer reproducibility
+#define LACKS_TIME_H // prefer determinism
 
 #define HAVE_MMAP 0
 #define MALLOC_ALIGNMENT 16
@@ -36,7 +35,7 @@ extern char __heap_end[];
 
 // Initialize dlmalloc to be able to use the memory between
 // __heap_base and __heap_end.
-static void try_init_allocator(void) {
+static void init_allocator(void) {
   if (is_initialized(gm)) __builtin_trap();
   ensure_initialization();
 
@@ -55,5 +54,5 @@ static void try_init_allocator(void) {
   init_top(gm, (mchunkptr)__heap_base, heap_size - TOP_FOOT_SIZE);
 }
 
-__attribute__((alias("memalign"))) void* aligned_alloc(size_t align,
-                                                       size_t size);
+__attribute__((alias("memalign")))
+void* aligned_alloc(size_t align, size_t size);
