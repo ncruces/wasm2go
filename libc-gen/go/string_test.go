@@ -22,6 +22,24 @@ func Test_memchr(t *testing.T) {
 	}
 }
 
+func Test_memmem(t *testing.T) {
+	memory = make([]byte, 1024)
+	writeString(10, "hello world")
+	writeString(30, "world")
+	writeString(40, "z")
+	writeString(50, "")
+
+	if got, want := memmem(10, ptr(len("hello world")), 30, ptr(len("world"))), 10+len("hello "); got != ptr(want) {
+		t.Errorf("got %v, want %d", got, want)
+	}
+	if got := memmem(10, ptr(len("hello world")), 50, 0); got != 10 {
+		t.Errorf("got %v, want 10", got)
+	}
+	if got := memmem(10, ptr(len("hello world")), 40, 1); got != 0 {
+		t.Errorf("got %v, want 0", got)
+	}
+}
+
 func Test_memcmp(t *testing.T) {
 	memory = make([]byte, 1024)
 	writeString(10, "abc")
@@ -109,6 +127,24 @@ func Test_strrchr(t *testing.T) {
 	}
 }
 
+func Test_strstr(t *testing.T) {
+	memory = make([]byte, 1024)
+	writeString(10, "hello world")
+	writeString(30, "world")
+	writeString(40, "z")
+	writeString(50, "")
+
+	if got, want := strstr(10, 30), 10+len("hello "); got != ptr(want) {
+		t.Errorf("got %v, want %d", got, want)
+	}
+	if got := strstr(10, 50); got != 10 {
+		t.Errorf("got %v, want 10", got)
+	}
+	if got := strstr(10, 40); got != 0 {
+		t.Errorf("got %v, want 0", got)
+	}
+}
+
 func Test_strcmp(t *testing.T) {
 	memory = make([]byte, 1024)
 	writeString(10, "abc")
@@ -160,35 +196,5 @@ func Test_strcspn(t *testing.T) {
 	}
 	if got, want := strcspn(10, 40), len("hello world"); got != ptr(want) {
 		t.Errorf("got %v, want %d", got, want)
-	}
-}
-
-func Test_strstr(t *testing.T) {
-	memory = make([]byte, 1024)
-	writeString(10, "hello world")
-	writeString(30, "world")
-	writeString(40, "z")
-	writeString(50, "")
-
-	if got, want := strstr(10, 30), 10+len("hello "); got != ptr(want) {
-		t.Errorf("got %v, want %d", got, want)
-	}
-	if got := strstr(10, 50); got != 10 {
-		t.Errorf("got %v, want 10", got)
-	}
-	if got := strstr(10, 40); got != 0 {
-		t.Errorf("got %v, want 0", got)
-	}
-}
-
-func Test_strcpy(t *testing.T) {
-	memory = make([]byte, 1024)
-	writeString(10, "hello")
-
-	if got := strcpy(20, 10); got != 20 {
-		t.Errorf("got %v, want 20", got)
-	}
-	if got := strcmp(10, 20); got != 0 {
-		t.Errorf("got %v, want 0", got)
 	}
 }

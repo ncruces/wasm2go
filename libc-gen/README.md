@@ -2,7 +2,7 @@
 
 `libc-gen` is a utility that provides a minimal C standard library
 to aid in translating C projects to Go (via `wasm2go`)
-using `clang --target=wasm32 -nostdlib`.
+using `clang --target=wasm32 -nostdlib -ffreestanding`.
 
 While primarily developed for translating SQLite,
 it is suitable for porting other C projects.

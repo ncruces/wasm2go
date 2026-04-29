@@ -4,6 +4,10 @@ __attribute__((always_inline)) double(ceil)(double x) {
   return __builtin_ceil(x);
 }
 
+__attribute__((always_inline)) double(fabs)(double x) {
+  return __builtin_fabs(x);
+}
+
 __attribute__((always_inline)) double(floor)(double x) {
   return __builtin_floor(x);
 }

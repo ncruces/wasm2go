@@ -18,7 +18,6 @@ func erfc(x float64) float64           { return math.Erfc(x) }
 func exp(x float64) float64            { return math.Exp(x) }
 func exp2(x float64) float64           { return math.Exp2(x) }
 func expm1(x float64) float64          { return math.Expm1(x) }
-func fabs(x float64) float64           { return math.Abs(x) }
 func fdim(x, y float64) float64        { return math.Dim(x, y) }
 func fma(x, y, z float64) float64      { return math.FMA(x, y, z) }
 func fmod(x, y float64) float64        { return math.Mod(x, y) }

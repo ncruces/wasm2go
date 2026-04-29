@@ -13,6 +13,17 @@ func memchr(s, c, n ptr) ptr {
 	return 0
 }
 
+func memmem(haystack, hn, needle, nn ptr) ptr {
+	hn, nn = haystack+hn, needle+nn
+	h := memory[uptr(haystack):uptr(hn)]
+	n := memory[uptr(needle):uptr(nn)]
+	i := bytes.Index(h, n)
+	if i < 0 {
+		return 0
+	}
+	return haystack + ptr(i)
+}
+
 func memcmp(s1, s2, n ptr) int32 {
 	e1, e2 := s1+n, s2+n
 	b1 := memory[uptr(s1):uptr(e1)]
@@ -63,6 +74,18 @@ func strrchr(s, c ptr) ptr {
 	return 0
 }
 
+func strstr(haystack, needle ptr) ptr {
+	h := memory[uptr(haystack):]
+	n := memory[uptr(needle):]
+	h = h[:bytes.IndexByte(h, 0)]
+	n = n[:bytes.IndexByte(n, 0)]
+	i := bytes.Index(h, n)
+	if i < 0 {
+		return 0
+	}
+	return haystack + ptr(i)
+}
+
 func strcmp(s1, s2 ptr) int32 {
 	b1 := memory[uptr(s1):]
 	b2 := memory[uptr(s2):]
@@ -107,28 +130,4 @@ func strcspn(s, reject ptr) ptr {
 		}
 	}
 	return ptr(len(b))
-}
-
-func strstr(haystack, needle ptr) ptr {
-	h := memory[uptr(haystack):]
-	n := memory[uptr(needle):]
-	h = h[:bytes.IndexByte(h, 0)]
-	n = n[:bytes.IndexByte(n, 0)]
-	i := bytes.Index(h, n)
-	if i < 0 {
-		return 0
-	}
-	return haystack + ptr(i)
-}
-
-func strcpy(d, s ptr) ptr {
-	b := memory[uptr(s):]
-	b = b[:bytes.IndexByte(b, 0)+1]
-	copy(memory[uptr(d):], b)
-	return d
-}
-
-func strcat(d, s ptr) ptr {
-	strcpy(d+strlen(d), s)
-	return d
 }

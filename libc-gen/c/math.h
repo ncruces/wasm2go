@@ -62,6 +62,7 @@ long lrint(double);
 long long llrint(double);
 
 #define ceil(x) (__builtin_ceil(x))
+#define fabs(x) (__builtin_fabs(x))
 #define floor(x) (__builtin_floor(x))
 #define rint(x) (__builtin_rint(x))
 #define roundeven(x) (__builtin_roundeven(x))

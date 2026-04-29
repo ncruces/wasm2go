@@ -8,6 +8,24 @@ __attribute__((always_inline)) int(atoi)(const char* s) {
   return (int)strtol(s, NULL, 10);
 }
 
+void* bsearch(const void* key, const void* base, size_t nel, size_t width,
+              int (*comp)(const void*, const void*)) {
+  while (nel > 0) {
+    size_t half = nel / 2;
+    void* mid = (char*)base + width * half;
+    int sign = comp(key, mid);
+    if (sign > 0) {
+      base = (char*)mid + width;
+      nel -= half + 1;
+    } else if (sign < 0) {
+      nel = half;
+    } else {
+      return mid;
+    }
+  }
+  return NULL;
+}
+
 // Shellsort with Gonnet & Baeza-Yates gap sequence.
 // Simple, no recursion, doesn't use the C stack.
 // Clang auto-vectorizes the inner loop.

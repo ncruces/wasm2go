@@ -22,3 +22,4 @@ __attribute__((malloc)) void* aligned_alloc(size_t, size_t);
 void* realloc(void*, size_t);
 
 void qsort(void*, size_t, size_t, int (*)(const void*, const void*));
+void* bsearch(const void *, const void *, size_t, size_t, int (*)(const void*, const void*));
