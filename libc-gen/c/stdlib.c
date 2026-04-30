@@ -8,6 +8,18 @@ __attribute__((always_inline)) int(atoi)(const char* s) {
   return (int)strtol(s, NULL, 10);
 }
 
+__attribute__((always_inline)) long(atol)(const char* s) {
+  return strtol(s, NULL, 10);
+}
+
+__attribute__((always_inline)) long long(atoll)(const char* s) {
+  return strtoll(s, NULL, 10);
+}
+
+__attribute__((always_inline)) double(atof)(const char* s) {
+  return strtod(s, NULL);
+}
+
 void* bsearch(const void* key, const void* base, size_t nel, size_t width,
               int (*comp)(const void*, const void*)) {
   while (nel > 0) {

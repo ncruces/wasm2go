@@ -1,6 +1,9 @@
 package libc
 
-import "bytes"
+import (
+	"bytes"
+	"math/bits"
+)
 
 func memchr(s, c, n ptr) ptr {
 	b := memory[uptr(s):]
@@ -111,8 +114,9 @@ func strspn(s, accept ptr) ptr {
 	a := memory[uptr(accept):]
 	a = a[:bytes.IndexByte(a, 0)]
 
-	for i, b := range b {
-		if bytes.IndexByte(a, b) < 0 {
+	set := makeByteSet(a)
+	for i, c := range b {
+		if set[c/bits.UintSize]&(1<<(c%bits.UintSize)) == 0 {
 			return ptr(i)
 		}
 	}
@@ -124,10 +128,18 @@ func strcspn(s, reject ptr) ptr {
 	r := memory[uptr(reject):]
 	r = r[:bytes.IndexByte(r, 0)+1]
 
-	for i, b := range b {
-		if bytes.IndexByte(r, b) >= 0 {
+	set := makeByteSet(r)
+	for i, c := range b {
+		if set[c/bits.UintSize]&(1<<(c%bits.UintSize)) != 0 {
 			return ptr(i)
 		}
 	}
 	return ptr(len(b))
+}
+
+func makeByteSet(chars []byte) (set [256 / bits.UintSize]uint) {
+	for _, c := range chars {
+		set[c/bits.UintSize] |= 1 << (c % bits.UintSize)
+	}
+	return set
 }

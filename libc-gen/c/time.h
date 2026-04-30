@@ -1,8 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-
-typedef long long time_t;
+#include <sys/types.h>
 
 struct tm {
   int tm_sec;

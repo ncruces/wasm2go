@@ -2,7 +2,7 @@
 
 `libc-gen` is a utility that provides a minimal C standard library
 to aid in translating C projects to Go (via `wasm2go`)
-using `clang --target=wasm32 -nostdlib -ffreestanding`.
+using `clang --target=wasm32 -ffreestanding -nostdlib`.
 
 While primarily developed for translating SQLite,
 it is suitable for porting other C projects.
@@ -15,13 +15,15 @@ and host-provided capabilities.
 
 `libc-gen` bridges this gap with two components:
 
-1. **C sources**: a minimal C library containing header files,
+1. **C sources**:
+a minimal C library containing header files,
 and some bits best implemented in C,
-such as a custom `qsort` implementation, STB's `sprintf`,
+such as a novel `qsort` implementation, STB's `sprintf`,
 Doug Lea's `malloc` (or a simple bump allocator).
 
-2. **Go host functions**: a code generator that emits testable
-Go methods to back C functions best implemented in Go.
+2. **Go host functions**:
+a code generator that emits testable Go methods
+to back C functions best implemented in Go.
 
 ```
 Usage of libc-gen:
@@ -43,19 +45,18 @@ This library aims to provide a minimal implementation
 of the C standard library.
 
 Functions added to it should be part of the C standard
-(excluding POSIX extensions).
+(avoid most POSIX extensions).
 
 Besides, the C component should not grow much beyond:
 - _macros_ and _function declarations_ added to header files;
 - _simple one-liners_ added to source files.
 
 The big exception was `malloc`, as it is best implemented in C,
-and Doug Lea's public domain `malloc` is excellent for Wasm;
-the other was a basic `qsort` due to its use of function pointers.
+and Doug Lea's public domain `malloc` is excellent for Wasm.
 
 The Go component will contain stuff that's best implemented in Go:
 - `math.h` for `double` using package `math`;
-- `string.h` because `bytes.IndexByte` is unbeatable.
+- `string.h` because `bytes.Index`, `IndexByte`, etc are hard to beat.
 
 I will not be adding file I/O to this, or any other OS stuff.
 

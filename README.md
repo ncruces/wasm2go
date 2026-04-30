@@ -40,6 +40,8 @@ Generating human-readable Go code is a non-goal:
 - Wasm control flow is implemented with `goto` and labels;
 - Go's distinction between `bool` and `int32` requires
   spurious control flow and type conversions;
+- Go's distinction between signed and unsigned integers
+  requires frequent type conversions;
 - Go's untyped numeric literals require explicit type conversions;
 - Go's constant evaluator does not match Wasm semantics,
   requiring workarounds to avoid constant folding/propagation;
