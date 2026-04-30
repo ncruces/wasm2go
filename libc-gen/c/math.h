@@ -61,17 +61,22 @@ int ilogb(double);
 long lrint(double);
 long long llrint(double);
 
-#define ceil(x) (__builtin_ceil(x))
 #define fabs(x) (__builtin_fabs(x))
+#define ceil(x) (__builtin_ceil(x))
 #define floor(x) (__builtin_floor(x))
-#define rint(x) (__builtin_rint(x))
+#define trunc(x) (__builtin_trunc(x))
 #define roundeven(x) (__builtin_roundeven(x))
 #define sqrt(x) (__builtin_sqrt(x))
-#define trunc(x) (__builtin_trunc(x))
+#define copysign(x, y) (__builtin_copysign(x, y))
+#define rint(x) (__builtin_rint(x))
+#define lrint(x) ((long)__builtin_rint(x))
+#define llrint(x) ((long long)__builtin_rint(x))
 
 #define NAN (__builtin_nan(""))
 #define INFINITY (__builtin_inf())
 #define HUGE_VAL (__builtin_huge_val())
+
+#define FP_FAST_FMA 1
 
 #define FP_NAN 0
 #define FP_INFINITE 1

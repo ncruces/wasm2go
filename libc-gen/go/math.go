@@ -10,7 +10,6 @@ func atan(x float64) float64           { return math.Atan(x) }
 func atan2(y, x float64) float64       { return math.Atan2(y, x) }
 func atanh(x float64) float64          { return math.Atanh(x) }
 func cbrt(x float64) float64           { return math.Cbrt(x) }
-func copysign(x, y float64) float64    { return math.Copysign(x, y) }
 func cos(x float64) float64            { return math.Cos(x) }
 func cosh(x float64) float64           { return math.Cosh(x) }
 func erf(x float64) float64            { return math.Erf(x) }
@@ -37,7 +36,6 @@ func remainder(x, y float64) float64   { return math.Remainder(x, y) }
 func round(x float64) float64          { return math.Round(x) }
 func sin(x float64) float64            { return math.Sin(x) }
 func sinh(x float64) float64           { return math.Sinh(x) }
-func sqrt(x float64) float64           { return math.Sqrt(x) }
 func tan(x float64) float64            { return math.Tan(x) }
 func tanh(x float64) float64           { return math.Tanh(x) }
 func tgamma(x float64) float64         { return math.Gamma(x) }
