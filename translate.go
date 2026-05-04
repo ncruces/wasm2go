@@ -1880,7 +1880,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			fn.pushConst(t.functions[index].call)
 
-		case 0xfc:
+		case 0xfb: // GC
+			code, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			return fmt.Errorf("unsupported opcode (GC): 0xFB 0x%02X", code)
+
+		case 0xfc: // FC extensions
 			code, err := readLEB128(t.in)
 			if err != nil {
 				return err
@@ -2103,11 +2110,25 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.wideHelper("i64_mul_wide_u")
 
 			default:
-				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
+				return fmt.Errorf("unsupported opcode: 0xFC 0x%02X", code)
 			}
 
+		case 0xfd: // SIMD
+			code, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			return fmt.Errorf("unsupported opcode (SIMD): 0xFD 0x%02X", code)
+
+		case 0xfe: // Atomics
+			code, err := readLEB128(t.in)
+			if err != nil {
+				return err
+			}
+			return fmt.Errorf("unsupported opcode (atomic): 0xFE 0x%02X", code)
+
 		default:
-			return fmt.Errorf("unsupported opcode: %x", opcode)
+			return fmt.Errorf("unsupported opcode: 0x%02X", opcode)
 		}
 	}
 }
@@ -2176,7 +2197,7 @@ func (t *translator) readConstExpr() (ast.Expr, error) {
 			return stack[0], nil
 
 		default:
-			return nil, fmt.Errorf("unsupported opcode in constant expression: %x", opcode)
+			return nil, fmt.Errorf("unsupported opcode in constant expression: 0x%02X", opcode)
 		}
 	}
 }
@@ -2346,6 +2367,7 @@ func (t *translator) readCustomSection(size int) error {
 }
 
 func (t *translator) readNameSection(r *bytes.Reader) error {
+	seen := set[string]{}
 	for r.Len() > 0 {
 		kind, err := r.ReadByte()
 		if err != nil {
@@ -2403,8 +2425,9 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 						id = t.globals[index].id
 					}
 				}
-				if id.Name == "" {
+				if id.Name == "" && !seen.has(buf.String()) {
 					id.Name = util.Mangle(buf.String(), util.IDInternal)
+					seen.add(buf.String())
 				}
 			}
 

@@ -72,9 +72,10 @@ long long llrint(double);
 #define lrint(x) ((long)__builtin_rint(x))
 #define llrint(x) ((long long)__builtin_rint(x))
 
-#define NAN (__builtin_nan(""))
-#define INFINITY (__builtin_inf())
+#define NAN (__builtin_nanf(""))
+#define INFINITY (__builtin_inff())
 #define HUGE_VAL (__builtin_huge_val())
+#define HUGE_VALF (__builtin_huge_valf())
 
 #define FP_FAST_FMA 1
 
