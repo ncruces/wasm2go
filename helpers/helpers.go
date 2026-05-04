@@ -382,6 +382,42 @@ func i64_trunc_sat_f32_u(f float32) int64 {
 	return int64(i)
 }
 
+// Wide Arithmetic.
+
+//go:nosplit
+func i64_add128(xl, xh, yl, yh int64) (int64, int64) {
+	lo, carry := bits.Add64(uint64(xl), uint64(yl), 0)
+	hi, _ := bits.Add64(uint64(xh), uint64(yh), carry)
+	return int64(lo), int64(hi)
+}
+
+//go:nosplit
+func i64_sub128(xl, xh, yl, yh int64) (int64, int64) {
+	lo, borrow := bits.Sub64(uint64(xl), uint64(yl), 0)
+	hi, _ := bits.Sub64(uint64(xh), uint64(yh), borrow)
+	return int64(lo), int64(hi)
+}
+
+//go:nosplit
+func i64_mul_wide_u(x, y int64) (int64, int64) {
+	hi, lo := bits.Mul64(uint64(x), uint64(y))
+	return int64(lo), int64(hi)
+}
+
+//go:nosplit
+func i64_mul_wide_s(x, y int64) (int64, int64) {
+	hi, lo := bits.Mul64(uint64(x), uint64(y))
+	if x < 0 {
+		hi -= uint64(y)
+	}
+	if y < 0 {
+		hi -= uint64(x)
+	}
+	return int64(lo), int64(hi)
+}
+
+// Multi-byte loads/stores.
+
 //go:nosplit
 func load16(b []byte) uint16 {
 	return binary.LittleEndian.Uint16(b)

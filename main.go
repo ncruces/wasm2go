@@ -14,8 +14,8 @@ var (
 	tags   = flag.String("tags", "", "go:build tags to include in the generated file")
 
 	embed  = flag.Bool("embed", false, "go:embed data sections from a .dat file")
-	nanbox = flag.Bool("nanbox", false, "whether to try to canonicalize NaNs")
-	nohost = flag.Bool("nohost", false, "disable generating interfaces for imports")
+	nanbox = flag.Bool("nanbox", false, "attempt to canonicalize NaNs")
+	nohost = flag.Bool("nohost", false, "don't generate interfaces for imports")
 	noopt  = flag.Bool("noopt", false, "disable all optimization passes")
 	unsafe = flag.Bool("unsafe", false, "allow importing unsafe")
 

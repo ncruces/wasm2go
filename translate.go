@@ -2093,6 +2093,15 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun:  newID("table_fill"),
 						Args: []ast.Expr{tab, dest, val, n}}})
 
+			case 0x13: // i64.add128
+				fn.wideHelper("i64_add128")
+			case 0x14: // i64.sub128
+				fn.wideHelper("i64_sub128")
+			case 0x15: // i64.mul_wide_s
+				fn.wideHelper("i64_mul_wide_s")
+			case 0x16: // i64.mul_wide_u
+				fn.wideHelper("i64_mul_wide_u")
+
 			default:
 				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
 			}

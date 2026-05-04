@@ -26,7 +26,8 @@ including the following features:
 - [sign-extension instructions];
 - [multi-value results];
 - 64-bit address space;
-- [extended constant expressions].
+- [extended constant expressions];
+- [wide arithmetic].
 
 [bulk memory instructions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mbulk-memory
 [reference types]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mreference-types
@@ -34,6 +35,7 @@ including the following features:
 [sign-extension instructions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-msign-ext
 [multi-value results]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mmultivalue
 [extended constant expressions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mextended-const
+[wide arithmetic]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mwide-arithmetic
 
 Generating human-readable Go code is a non-goal:
 - Wasm names must be mangled into Go identifiers;
@@ -70,9 +72,9 @@ Usage: wasm2go [options] [input.wasm]
   -embed
         go:embed data sections from a .dat file
   -nanbox
-        whether to try to canonicalize NaNs
+        attempt to canonicalize NaNs
   -nohost
-        disable generating interfaces for imports
+        don't generate interfaces for imports
   -noopt
         disable all optimization passes
   -o string
