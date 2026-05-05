@@ -48,6 +48,7 @@ var stdlib = map[string]string{
 	"math":    "math",
 	"bits":    "math/bits",
 	"binary":  "encoding/binary",
+	"atomic":  "sync/atomic",
 }
 
 type translator struct {
@@ -2125,7 +2126,90 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			return fmt.Errorf("unsupported opcode (atomic): 0xFE 0x%02X", code)
+
+			var offset uint64
+			if code == 0x03 { // atomic.fence
+				_, err = t.in.ReadByte() // 0x00
+			} else {
+				_, err = readLEB128(t.in) // align
+				if err == nil {
+					offset, err = readLEB128(t.in)
+				}
+			}
+			if err != nil {
+				return err
+			}
+
+			switch code {
+			// case 0x00: // memory.atomic.notify
+			// case 0x01: // memory.atomic.wait32
+
+			case 0x10: // i32.atomic.load
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_load32")
+				fn.push(convert(&ast.CallExpr{
+					Fun:  newID("atomic_load32"),
+					Args: []ast.Expr{&ast.SliceExpr{X: t.memory.selector, Low: addr}},
+				}, "int32"))
+			case 0x11: // i64.atomic.load
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_load64")
+				fn.push(convert(&ast.CallExpr{
+					Fun:  newID("atomic_load64"),
+					Args: []ast.Expr{&ast.SliceExpr{X: t.memory.selector, Low: addr}},
+				}, "int64"))
+			case 0x12: // i32.atomic.load8_u
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_load8")
+				fn.push(convert(&ast.CallExpr{
+					Fun:  newID("atomic_load8"),
+					Args: []ast.Expr{t.memory.selector, addr},
+				}, "int32"))
+
+			case 0x17: // i32.atomic.store
+				val := convert(fn.pop(), "uint32")
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_store32")
+				fn.emit(&ast.ExprStmt{X: &ast.CallExpr{
+					Fun:  newID("atomic_store32"),
+					Args: []ast.Expr{&ast.SliceExpr{X: t.memory.selector, Low: addr}, val}}})
+			case 0x18: // i64.atomic.store
+				val := convert(fn.pop(), "uint64")
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_store64")
+				fn.emit(&ast.ExprStmt{X: &ast.CallExpr{
+					Fun:  newID("atomic_store64"),
+					Args: []ast.Expr{&ast.SliceExpr{X: t.memory.selector, Low: addr}, val}}})
+			case 0x19: // i32.atomic.store8
+				val := convert(fn.pop(), "uint32")
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_store8")
+				fn.emit(&ast.ExprStmt{X: &ast.CallExpr{
+					Fun:  newID("atomic_store8"),
+					Args: []ast.Expr{t.memory.selector, addr, val}}})
+
+			// case 0x1e: // i32.atomic.rmw.add
+			// case 0x25: // i32.atomic.rmw.sub
+			// case 0x41: // i32.atomic.rmw.xchg
+			// case 0x43: // i32.atomic.rmw8.xchg_u
+
+			case 0x48: // i32.atomic.rmw.cmpxchg
+				new := convert(fn.pop(), "uint32")
+				old := convert(fn.pop(), "uint32")
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_cmpxchg32")
+				fn.push(convert(&ast.CallExpr{
+					Fun: newID("atomic_cmpxchg32"),
+					Args: []ast.Expr{
+						&ast.SliceExpr{X: t.memory.selector, Low: addr},
+						old, new},
+				}, "int32"))
+
+			// case 0x4a: // i32.atomic.rmw8.cmpxchg_u
+
+			default:
+				return fmt.Errorf("unsupported opcode (atomic): 0xFE 0x%02X", code)
+			}
 
 		default:
 			return fmt.Errorf("unsupported opcode: 0x%02X", opcode)
