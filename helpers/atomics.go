@@ -11,32 +11,20 @@ import (
 func atomic_load32(b []byte) uint32 {
 	ptr := (*uint32)(unsafe.Pointer((*[4]byte)(b)))
 	v := atomic.LoadUint32(ptr)
-	if little {
-		return v
+	if big {
+		return bits.ReverseBytes32(v)
 	}
-	return bits.ReverseBytes32(v)
+	return v
 }
 
 //go:nosplit
 func atomic_load64(b []byte) uint64 {
 	ptr := (*uint64)(unsafe.Pointer((*[8]byte)(b)))
 	v := atomic.LoadUint64(ptr)
-	if little {
-		return v
-	}
-	return bits.ReverseBytes64(v)
-}
-
-//go:nosplit
-func atomic_load8[T uint32 | uint64](mem []byte, addr T) uint8 {
-	_ = mem[addr] // bounds check
-	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
-	shift := (uint32(addr) & 3) * 8
-	v := atomic.LoadUint32(ptr)
 	if big {
-		v = bits.ReverseBytes32(v)
+		return bits.ReverseBytes64(v)
 	}
-	return uint8(v >> shift)
+	return v
 }
 
 //go:nosplit
@@ -57,25 +45,17 @@ func atomic_store64(b []byte, v uint64) {
 	atomic.StoreUint64(ptr, v)
 }
 
-func atomic_store8[T uint32 | uint64](mem []byte, addr T, v uint32) {
-	_ = mem[addr] // bounds check
-	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
-	shift := (uint32(addr) & 3) * 8
-
-	v = (v & 0xFF) << shift
-	mask := ^(uint32(0xFF) << shift)
+//go:nosplit
+func atomic_xchg32(b []byte, v uint32) uint32 {
+	ptr := (*uint32)(unsafe.Pointer((*[4]byte)(b)))
 	if big {
 		v = bits.ReverseBytes32(v)
-		mask = bits.ReverseBytes32(mask)
 	}
-
-	for {
-		old := atomic.LoadUint32(ptr)
-		new := (old & mask) | v
-		if atomic.CompareAndSwapUint32(ptr, old, new) {
-			return
-		}
+	old := atomic.SwapUint32(ptr, v)
+	if big {
+		return bits.ReverseBytes32(old)
 	}
+	return old
 }
 
 func atomic_cmpxchg32(b []byte, old, new uint32) uint32 {
@@ -87,13 +67,69 @@ func atomic_cmpxchg32(b []byte, old, new uint32) uint32 {
 	}
 	for {
 		if old := atomic.LoadUint32(ptr); old != exp {
-			if little {
-				return old
+			if big {
+				return bits.ReverseBytes32(old)
 			}
-			return bits.ReverseBytes32(old)
+			return old
 		}
 		if atomic.CompareAndSwapUint32(ptr, exp, new) {
 			return old
+		}
+	}
+}
+
+//go:nosplit
+func atomic_load8[T uint32 | uint64](mem []byte, addr T) uint8 {
+	_ = mem[addr] // bounds check
+	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
+	shift := (uint32(addr) & 3) * 8
+
+	v := atomic.LoadUint32(ptr)
+	if big {
+		v = bits.ReverseBytes32(v)
+	}
+	return uint8(v >> shift)
+}
+
+func atomic_store8[T uint32 | uint64](mem []byte, addr T, v uint8) {
+	_ = mem[addr] // bounds check
+	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
+	shift := (uint32(addr) & 3) * 8
+
+	new := uint32(v) << shift
+	mask := ^(uint32(0xFF) << shift)
+	if big {
+		new = bits.ReverseBytes32(new)
+		mask = bits.ReverseBytes32(mask)
+	}
+
+	for {
+		old := atomic.LoadUint32(ptr)
+		if atomic.CompareAndSwapUint32(ptr, old, (old&mask)|new) {
+			return
+		}
+	}
+}
+
+func atomic_xchg8[T uint32 | uint64](mem []byte, addr T, v uint8) uint8 {
+	_ = mem[addr] // bounds check
+	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
+	shift := (uint32(addr) & 3) * 8
+
+	new := uint32(v) << shift
+	mask := ^(uint32(0xFF) << shift)
+	if big {
+		new = bits.ReverseBytes32(new)
+		mask = bits.ReverseBytes32(mask)
+	}
+
+	for {
+		old := atomic.LoadUint32(ptr)
+		if atomic.CompareAndSwapUint32(ptr, old, (old&mask)|new) {
+			if big {
+				old = bits.ReverseBytes32(old)
+			}
+			return uint8(old >> shift)
 		}
 	}
 }
