@@ -7,7 +7,7 @@ import (
 	"unsafe"
 )
 
-// Don't use nosplit on functions with a CAS loop.
+// Use nosplit only on functions with no loops.
 
 //go:nosplit
 func atomic_load32(b []byte) uint32 {
@@ -109,7 +109,7 @@ func atomic_sub32(b []byte, v uint32) uint32 {
 }
 
 //go:nosplit
-func atomic_load8[T uint32 | uint64](mem []byte, addr T) uint8 {
+func atomic_load8[T uint32 | int64](mem []byte, addr T) uint8 {
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift := (uint32(addr) & 3) * 8
 	_ = mem[addr] // bounds check
@@ -121,7 +121,7 @@ func atomic_load8[T uint32 | uint64](mem []byte, addr T) uint8 {
 	return uint8(v >> shift)
 }
 
-func atomic_store8[T uint32 | uint64](mem []byte, addr T, v uint8) {
+func atomic_store8[T uint32 | int64](mem []byte, addr T, v uint8) {
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift := (uint32(addr) & 3) * 8
 	_ = mem[addr] // bounds check
@@ -141,7 +141,7 @@ func atomic_store8[T uint32 | uint64](mem []byte, addr T, v uint8) {
 	}
 }
 
-func atomic_xchg8[T uint32 | uint64](mem []byte, addr T, v uint8) uint8 {
+func atomic_xchg8[T uint32 | int64](mem []byte, addr T, v uint8) uint8 {
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift := (uint32(addr) & 3) * 8
 	_ = mem[addr] // bounds check
@@ -164,7 +164,7 @@ func atomic_xchg8[T uint32 | uint64](mem []byte, addr T, v uint8) uint8 {
 	}
 }
 
-func atomic_cmpxchg8[T uint32 | uint64](mem []byte, addr T, old, new uint8) uint8 {
+func atomic_cmpxchg8[T uint32 | int64](mem []byte, addr T, old, new uint8) uint8 {
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift := (uint32(addr) & 3) * 8
 	_ = mem[addr] // bounds check
@@ -192,6 +192,7 @@ func atomic_cmpxchg8[T uint32 | uint64](mem []byte, addr T, old, new uint8) uint
 	}
 }
 
+// Compiler error if endianess is unknown.
 var _ = map[bool]struct{}{big: {}, little: {}}
 
 const (
