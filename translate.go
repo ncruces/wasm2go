@@ -2221,8 +2221,15 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.SliceExpr{X: t.memory.selector, Low: addr},
 						old, new},
 				}, "int32"))
-
-			// case 0x4a: // i32.atomic.rmw8.cmpxchg_u
+			case 0x4a: // i32.atomic.rmw8.cmpxchg_u
+				new := convert(fn.pop(), "uint32")
+				old := convert(fn.pop(), "uint32")
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_cmpxchg8")
+				fn.push(convert(&ast.CallExpr{
+					Fun:  newID("atomic_cmpxchg8"),
+					Args: []ast.Expr{t.memory.selector, addr, old, new},
+				}, "int32"))
 
 			default:
 				return fmt.Errorf("unsupported opcode (atomic): 0xFE 0x%02X", code)

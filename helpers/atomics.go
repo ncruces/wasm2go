@@ -7,6 +7,8 @@ import (
 	"unsafe"
 )
 
+// Don't use nosplit on functions with a CAS loop.
+
 //go:nosplit
 func atomic_load32(b []byte) uint32 {
 	ptr := (*uint32)(unsafe.Pointer((*[4]byte)(b)))
@@ -66,23 +68,23 @@ func atomic_cmpxchg32(b []byte, old, new uint32) uint32 {
 		new = bits.ReverseBytes32(new)
 	}
 	for {
-		if old := atomic.LoadUint32(ptr); old != exp {
-			if big {
-				return bits.ReverseBytes32(old)
-			}
-			return old
-		}
 		if atomic.CompareAndSwapUint32(ptr, exp, new) {
 			return old
+		}
+		if cur := atomic.LoadUint32(ptr); cur != exp {
+			if big {
+				return bits.ReverseBytes32(cur)
+			}
+			return cur
 		}
 	}
 }
 
 //go:nosplit
 func atomic_load8[T uint32 | uint64](mem []byte, addr T) uint8 {
-	_ = mem[addr] // bounds check
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift := (uint32(addr) & 3) * 8
+	_ = mem[addr] // bounds check
 
 	v := atomic.LoadUint32(ptr)
 	if big {
@@ -92,44 +94,72 @@ func atomic_load8[T uint32 | uint64](mem []byte, addr T) uint8 {
 }
 
 func atomic_store8[T uint32 | uint64](mem []byte, addr T, v uint8) {
-	_ = mem[addr] // bounds check
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift := (uint32(addr) & 3) * 8
+	_ = mem[addr] // bounds check
 
-	new := uint32(v) << shift
-	mask := ^(uint32(0xFF) << shift)
+	new8 := uint32(v) << shift
+	mask := uint32(255) << shift
 	if big {
-		new = bits.ReverseBytes32(new)
+		new8 = bits.ReverseBytes32(new8)
 		mask = bits.ReverseBytes32(mask)
 	}
 
 	for {
-		old := atomic.LoadUint32(ptr)
-		if atomic.CompareAndSwapUint32(ptr, old, (old&mask)|new) {
+		cur := atomic.LoadUint32(ptr)
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|new8) {
 			return
 		}
 	}
 }
 
 func atomic_xchg8[T uint32 | uint64](mem []byte, addr T, v uint8) uint8 {
-	_ = mem[addr] // bounds check
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift := (uint32(addr) & 3) * 8
+	_ = mem[addr] // bounds check
 
-	new := uint32(v) << shift
-	mask := ^(uint32(0xFF) << shift)
+	new8 := uint32(v) << shift
+	mask := uint32(255) << shift
 	if big {
-		new = bits.ReverseBytes32(new)
+		new8 = bits.ReverseBytes32(new8)
 		mask = bits.ReverseBytes32(mask)
 	}
 
 	for {
-		old := atomic.LoadUint32(ptr)
-		if atomic.CompareAndSwapUint32(ptr, old, (old&mask)|new) {
+		cur := atomic.LoadUint32(ptr)
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|new8) {
 			if big {
-				old = bits.ReverseBytes32(old)
+				cur = bits.ReverseBytes32(cur)
 			}
-			return uint8(old >> shift)
+			return uint8(cur >> shift)
+		}
+	}
+}
+
+func atomic_cmpxchg8[T uint32 | uint64](mem []byte, addr T, old, new uint8) uint8 {
+	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))
+	shift := (uint32(addr) & 3) * 8
+	_ = mem[addr] // bounds check
+
+	exp8 := uint32(old) << shift
+	new8 := uint32(new) << shift
+	mask := uint32(255) << shift
+	if big {
+		exp8 = bits.ReverseBytes32(exp8)
+		new8 = bits.ReverseBytes32(new8)
+		mask = bits.ReverseBytes32(mask)
+	}
+
+	for {
+		cur := atomic.LoadUint32(ptr)
+		if cur&mask != exp8 {
+			if big {
+				cur = bits.ReverseBytes32(cur)
+			}
+			return uint8(cur >> shift)
+		}
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|new8) {
+			return old
 		}
 	}
 }
