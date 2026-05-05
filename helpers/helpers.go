@@ -399,6 +399,18 @@ func i64_sub128(xl, xh, yl, yh int64) (int64, int64) {
 }
 
 //go:nosplit
+func i64_add_wide(x, y int64) (int64, int64) {
+	lo, carry := bits.Add64(uint64(x), uint64(y), 0)
+	return int64(lo), int64(carry)
+}
+
+//go:nosplit
+func i64_sub_wide(x, y int64) (int64, int64) {
+	lo, borrow := bits.Sub64(uint64(x), uint64(y), 0)
+	return int64(lo), int64(-borrow)
+}
+
+//go:nosplit
 func i64_mul_wide_u(x, y int64) (int64, int64) {
 	hi, lo := bits.Mul64(uint64(x), uint64(y))
 	return int64(lo), int64(hi)

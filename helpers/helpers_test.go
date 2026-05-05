@@ -928,3 +928,109 @@ func Test_i64_trunc_sat_f32_u(t *testing.T) {
 		})
 	}
 }
+
+func Test_i64_add_wide(t *testing.T) {
+	tests := []struct {
+		x, y int64
+	}{
+		{0, 0},
+		{1, 1},
+		{0, 1},
+		{-1, 1},
+		{1, -1},
+		{-1, -1},
+		{math.MinInt64, 1},
+		{math.MaxInt64, -1},
+		{math.MaxInt64, math.MaxInt64},
+		{math.MinInt64, math.MinInt64},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%x+%x", tt.x, tt.y), func(t *testing.T) {
+			lo1, hi1 := i64_add_wide(tt.x, tt.y)
+			lo2, hi2 := i64_add128(tt.x, 0, tt.y, 0)
+			if lo1 != lo2 || hi1 != hi2 {
+				t.Errorf("i64_add_wide(%x, %x) = (%x, %x), want (%x, %x)", tt.x, tt.y, lo1, hi1, lo2, hi2)
+			}
+		})
+	}
+}
+
+func Test_i64_sub_wide(t *testing.T) {
+	tests := []struct {
+		x, y int64
+	}{
+		{0, 0},
+		{1, 1},
+		{0, 1},
+		{-1, 1},
+		{1, -1},
+		{-1, -1},
+		{math.MinInt64, 1},
+		{math.MaxInt64, -1},
+		{math.MaxInt64, math.MaxInt64},
+		{math.MinInt64, math.MinInt64},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%x-%x", tt.x, tt.y), func(t *testing.T) {
+			lo1, hi1 := i64_sub_wide(tt.x, tt.y)
+			lo2, hi2 := i64_sub128(tt.x, 0, tt.y, 0)
+			if lo1 != lo2 || hi1 != hi2 {
+				t.Errorf("i64_sub_wide(%x, %x) = (%x, %x), want (%x, %x)", tt.x, tt.y, lo1, hi1, lo2, hi2)
+			}
+		})
+	}
+}
+
+func Test_i64_mul_wide_u(t *testing.T) {
+	tests := []struct {
+		x, y   int64
+		lo, hi uint64
+	}{
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFE00000001, 0},
+		{-1, -1, 1, 0xFFFFFFFFFFFFFFFE},
+		{-1, 1, 0xFFFFFFFFFFFFFFFF, 0},
+		{1, -1, 0xFFFFFFFFFFFFFFFF, 0},
+		{math.MaxInt64, 2, 0xFFFFFFFFFFFFFFFE, 0},
+		{math.MinInt64, 2, 0, 1},
+		{math.MaxInt64, math.MaxInt64, 1, 0x3FFFFFFFFFFFFFFF},
+		{math.MinInt64, math.MinInt64, 0, 0x4000000000000000},
+		{math.MaxInt64, math.MinInt64, 0x8000000000000000, 0x3FFFFFFFFFFFFFFF},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%x*%x", tt.x, tt.y), func(t *testing.T) {
+			lo, hi := i64_mul_wide_u(tt.x, tt.y)
+			if uint64(lo) != tt.lo || uint64(hi) != tt.hi {
+				t.Errorf("i64_mul_wide_u(%x, %x) = (%x, %x), want (%x, %x)", tt.x, tt.y, uint64(lo), uint64(hi), tt.lo, tt.hi)
+			}
+		})
+	}
+}
+
+func Test_i64_mul_wide_s(t *testing.T) {
+	tests := []struct {
+		x, y   int64
+		lo, hi uint64
+	}{
+		{0, 0, 0, 0},
+		{1, 1, 1, 0},
+		{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFE00000001, 0},
+		{-1, -1, 1, 0},
+		{-1, 1, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF},
+		{1, -1, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF},
+		{math.MaxInt64, 2, 0xFFFFFFFFFFFFFFFE, 0},
+		{math.MinInt64, 2, 0, 0xFFFFFFFFFFFFFFFF},
+		{math.MaxInt64, math.MaxInt64, 1, 0x3FFFFFFFFFFFFFFF},
+		{math.MinInt64, math.MinInt64, 0, 0x4000000000000000},
+		{math.MaxInt64, math.MinInt64, 0x8000000000000000, 0xC000000000000000},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%x*%x", tt.x, tt.y), func(t *testing.T) {
+			lo, hi := i64_mul_wide_s(tt.x, tt.y)
+			if uint64(lo) != tt.lo || uint64(hi) != tt.hi {
+				t.Errorf("i64_mul_wide_s(%x, %x) = (%x, %x), want (%x, %x)", tt.x, tt.y, uint64(lo), uint64(hi), tt.lo, tt.hi)
+			}
+		})
+	}
+}
