@@ -80,6 +80,34 @@ func atomic_cmpxchg32(b []byte, old, new uint32) uint32 {
 	}
 }
 
+func atomic_add32(b []byte, v uint32) uint32 {
+	ptr := (*uint32)(unsafe.Pointer((*[4]byte)(b)))
+	if little {
+		return atomic.AddUint32(ptr, +v) - v
+	}
+	for {
+		cur := atomic.LoadUint32(ptr)
+		old := bits.ReverseBytes32(cur)
+		if atomic.CompareAndSwapUint32(ptr, cur, bits.ReverseBytes32(old+v)) {
+			return old
+		}
+	}
+}
+
+func atomic_sub32(b []byte, v uint32) uint32 {
+	ptr := (*uint32)(unsafe.Pointer((*[4]byte)(b)))
+	if little {
+		return atomic.AddUint32(ptr, -v) + v
+	}
+	for {
+		cur := atomic.LoadUint32(ptr)
+		old := bits.ReverseBytes32(cur)
+		if atomic.CompareAndSwapUint32(ptr, cur, bits.ReverseBytes32(old-v)) {
+			return old
+		}
+	}
+}
+
 //go:nosplit
 func atomic_load8[T uint32 | uint64](mem []byte, addr T) uint8 {
 	ptr := (*uint32)(unsafe.Pointer(&mem[addr&^3]))

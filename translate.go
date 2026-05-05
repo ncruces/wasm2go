@@ -2188,8 +2188,27 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					Fun:  newID("atomic_store8"),
 					Args: []ast.Expr{t.memory.selector, addr, val}}})
 
-			// case 0x1e: // i32.atomic.rmw.add
-			// case 0x25: // i32.atomic.rmw.sub
+			case 0x1e: // i32.atomic.rmw.add
+				val := convert(fn.pop(), "uint32")
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_add32")
+				fn.push(convert(&ast.CallExpr{
+					Fun: newID("atomic_add32"),
+					Args: []ast.Expr{
+						&ast.SliceExpr{X: t.memory.selector, Low: addr},
+						val},
+				}, "int32"))
+
+			case 0x25: // i32.atomic.rmw.sub
+				val := convert(fn.pop(), "uint32")
+				addr := fn.popAddr(offset)
+				fn.helpers.add("atomic_sub32")
+				fn.push(convert(&ast.CallExpr{
+					Fun: newID("atomic_sub32"),
+					Args: []ast.Expr{
+						&ast.SliceExpr{X: t.memory.selector, Low: addr},
+						val},
+				}, "int32"))
 
 			case 0x41: // i32.atomic.rmw.xchg
 				val := convert(fn.pop(), "uint32")
@@ -2201,6 +2220,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.SliceExpr{X: t.memory.selector, Low: addr},
 						val},
 				}, "int32"))
+
 			case 0x43: // i32.atomic.rmw8.xchg_u
 				val := convert(fn.pop(), "uint32")
 				addr := fn.popAddr(offset)
@@ -2221,6 +2241,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.SliceExpr{X: t.memory.selector, Low: addr},
 						old, new},
 				}, "int32"))
+
 			case 0x4a: // i32.atomic.rmw8.cmpxchg_u
 				new := convert(fn.pop(), "uint32")
 				old := convert(fn.pop(), "uint32")
