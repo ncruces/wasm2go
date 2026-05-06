@@ -26,8 +26,10 @@ var (
 	helpersSrc string
 	//go:embed helpers/helpers_unsafe.go
 	helpersUnsafeSrc string
-	//go:embed helpers/atomics.go
+	//go:embed helpers/atomics_unsafe.go
 	helpersAtomicsSrc string
+	//go:embed helpers/cpuarch_unsafe.go
+	helpersCpuArchSrc string
 )
 
 // These helpers can never trap.
@@ -167,15 +169,21 @@ func translate(r io.Reader, w io.Writer) error {
 	// Add helpers.
 	if len(t.helpers) > 0 {
 		if *unsafe {
+			if err := t.addHelpers(fset, "cpuarch_unsafe.go", helpersCpuArchSrc); err != nil {
+				return err
+			}
 			if err := t.resolveHelpers(fset, "helpers_unsafe.go", helpersUnsafeSrc); err != nil {
 				return err
 			}
-			if err := t.resolveHelpers(fset, "atomics.go", helpersAtomicsSrc); err != nil {
+			if err := t.resolveHelpers(fset, "atomics_unsafe.go", helpersAtomicsSrc); err != nil {
 				return err
 			}
 		}
 		if err := t.resolveHelpers(fset, "helpers.go", helpersSrc); err != nil {
 			return err
+		}
+		for name := range t.helpers {
+			return fmt.Errorf("missing helper: %s", name)
 		}
 	}
 
@@ -2474,6 +2482,21 @@ func (t *translator) readDylink0Section(r *bytes.Reader) error {
 				return err
 			}
 		}
+	}
+	return nil
+}
+
+func (t *translator) addHelpers(fset *token.FileSet, filename, src string) error {
+	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+	for _, decl := range f.Decls {
+		if d, ok := decl.(*ast.GenDecl); ok && d.Tok == token.IMPORT {
+			continue
+		}
+		t.out.Decls = append(t.out.Decls, decl)
+		ast.Inspect(decl, t.resolveImports)
 	}
 	return nil
 }

@@ -11,6 +11,9 @@ func (t *translator) readAtomicOpcode(fn *funcCompiler) error {
 	if err != nil {
 		return err
 	}
+	if !*unsafe {
+		return fmt.Errorf("unsupported opcode (atomic): 0xFE 0x%02X", code)
+	}
 
 	var offset uint64
 	if code == 0x03 { // atomic.fence

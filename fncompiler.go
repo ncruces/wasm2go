@@ -255,8 +255,7 @@ func (fn *funcCompiler) popCond() ast.Expr {
 	}
 
 	return &ast.BinaryExpr{
-		X: entry.expr, Op: token.NEQ,
-		Y: literal0}
+		X: entry.expr, Op: token.NEQ, Y: literal0}
 }
 
 // Pops an entry from the value stack.
@@ -281,13 +280,10 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 		return &ast.BinaryExpr{
 			Op: token.OR,
 			X: &ast.BinaryExpr{
-				Op: token.ADD,
-				X:  addr,
-				Y:  &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}},
+				X: addr, Op: token.ADD,
+				Y: &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}},
 			Y: &ast.BinaryExpr{
-				Op: token.SHR,
-				X:  addr,
-				Y:  literal63}}
+				X: addr, Op: token.SHR, Y: literal63}}
 	}
 
 	expr = convert(addr, "uint32")
@@ -574,9 +570,7 @@ func (fn *funcCompiler) eqzOp() {
 		fn.pushCond(&ast.UnaryExpr{Op: token.NOT, X: expr})
 	} else {
 		fn.pushCond(&ast.BinaryExpr{
-			X:  expr,
-			Op: token.EQL,
-			Y:  literal0})
+			X: expr, Op: token.EQL, Y: literal0})
 	}
 }
 
