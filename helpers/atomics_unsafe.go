@@ -374,6 +374,9 @@ func atomic_wait32[T uint32 | int64](mem []byte, addr T, exp uint32, timeout int
 	case cur != exp:
 		w.Unlock()
 		return not_equal
+	case timeout == 0:
+		w.Unlock()
+		return timed_out
 	case w.List == nil:
 		w.List = list.New()
 	case uint(w.Len()) >= math.MaxUint32:
@@ -429,6 +432,9 @@ func atomic_wait64[T uint32 | int64](mem []byte, addr T, exp uint64, timeout int
 	case cur != exp:
 		w.Unlock()
 		return not_equal
+	case timeout == 0:
+		w.Unlock()
+		return timed_out
 	case w.List == nil:
 		w.List = list.New()
 	case uint(w.Len()) >= math.MaxUint32:
@@ -464,8 +470,7 @@ func atomic_wait64[T uint32 | int64](mem []byte, addr T, exp uint64, timeout int
 
 //go:nosplit
 func atomic_ptr8[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint32) {
-	_ = mem[addr] // bounds check
-	ptr = (*uint32)(unsafe.Pointer(&mem[addr&^3]))
+	ptr = (*uint32)(unsafe.Pointer((*[4]byte)(mem[addr&^3:])))
 	shift = (uint32(addr) & 3) * 8
 	return
 }
@@ -475,8 +480,7 @@ func atomic_ptr16[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint
 	if uint32(addr)&1 != 0 {
 		panic("unaligned atomic")
 	}
-	_ = mem[addr+1] // bounds check
-	ptr = (*uint32)(unsafe.Pointer(&mem[addr&^3]))
+	ptr = (*uint32)(unsafe.Pointer((*[4]byte)(mem[addr&^3:])))
 	shift = (uint32(addr) & 3) * 8
 	return
 }
@@ -486,8 +490,7 @@ func atomic_ptr32[T uint32 | int64](mem []byte, addr T) *uint32 {
 	if uint32(addr)&3 != 0 {
 		panic("unaligned atomic")
 	}
-	_ = mem[addr+3] // bounds check
-	return (*uint32)(unsafe.Pointer(&mem[addr]))
+	return (*uint32)(unsafe.Pointer((*[4]byte)(mem[addr:])))
 }
 
 //go:nosplit
@@ -495,8 +498,7 @@ func atomic_ptr64[T uint32 | int64](mem []byte, addr T) *uint64 {
 	if uint32(addr)&7 != 0 {
 		panic("unaligned atomic")
 	}
-	_ = mem[addr+7] // bounds check
-	return (*uint64)(unsafe.Pointer(&mem[addr]))
+	return (*uint64)(unsafe.Pointer((*[8]byte)(mem[addr:])))
 }
 
 type atomic_waiters = struct {
