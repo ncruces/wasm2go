@@ -141,3 +141,10 @@ func complexity(s string) (transitions int) {
 	}
 	return transitions
 }
+
+var (
+	literal0  = &ast.BasicLit{Kind: token.INT, Value: "0"}
+	literal1  = &ast.BasicLit{Kind: token.INT, Value: "1"}
+	literal16 = &ast.BasicLit{Kind: token.INT, Value: "16"}
+	literal63 = &ast.BasicLit{Kind: token.INT, Value: "63"}
+)

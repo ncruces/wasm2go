@@ -1,13 +1,22 @@
 package helpers
 
 import (
+	"container/list"
+	"math"
 	"math/bits"
-	"runtime"
+	"sync"
 	"sync/atomic"
+	"time"
 	"unsafe"
 )
 
 // Use nosplit only on functions with no loops.
+
+//go:nosplit
+func atomic_fence(mem []byte) {
+	ptr := (*uint32)(unsafe.Pointer((*[4]byte)(mem)))
+	atomic.AddUint32(ptr, 0)
+}
 
 //go:nosplit
 func atomic_load32[T uint32 | int64](mem []byte, addr T) uint32 {
@@ -319,6 +328,140 @@ func atomic_cmpxchg16[T uint32 | int64](mem []byte, addr T, old, new uint16) uin
 	}
 }
 
+func atomic_notify[T uint32 | int64](mem []byte, addr T, count int32, waiters *sync.Map) int32 {
+	_ = atomic_ptr32(mem, addr)
+
+	wa, ok := waiters.Load(int64(addr))
+	if !ok {
+		return 0
+	}
+
+	w := wa.(*atomic_waiters)
+	w.Lock()
+	defer w.Unlock()
+
+	if w.List == nil {
+		return 0
+	}
+
+	var res uint32
+	for res < uint32(count) && w.Len() > 0 {
+		close(w.Remove(w.Front()).(chan struct{}))
+		res++
+	}
+	return int32(res)
+}
+
+func atomic_wait32[T uint32 | int64](mem []byte, addr T, exp uint32, timeout int64, waiters *sync.Map) int32 {
+	const (
+		ok        = 0
+		not_equal = 1
+		timed_out = 2
+	)
+
+	ptr := atomic_ptr32(mem, addr)
+
+	wa, _ := waiters.LoadOrStore(int64(addr), &atomic_waiters{})
+	w := wa.(*atomic_waiters)
+
+	w.Lock()
+	cur := atomic.LoadUint32(ptr)
+	if big {
+		cur = bits.ReverseBytes32(cur)
+	}
+
+	switch {
+	case cur != exp:
+		w.Unlock()
+		return not_equal
+	case w.List == nil:
+		w.List = list.New()
+	case w.Len() >= math.MaxUint32:
+		w.Unlock()
+		panic("too many waiters")
+	}
+
+	wait := make(chan struct{})
+	elem := w.PushBack(wait)
+	w.Unlock()
+
+	if timeout < 0 {
+		<-wait
+		return ok
+	}
+	select {
+	case <-wait:
+		return ok
+	case <-time.After(time.Duration(timeout)):
+	}
+
+	w.Lock()
+	select {
+	case <-wait:
+		w.Unlock()
+		return ok
+	default:
+		w.Remove(elem)
+		w.Unlock()
+		return timed_out
+	}
+}
+
+func atomic_wait64[T uint32 | int64](mem []byte, addr T, exp uint64, timeout int64, waiters *sync.Map) int32 {
+	const (
+		ok        = 0
+		not_equal = 1
+		timed_out = 2
+	)
+
+	ptr := atomic_ptr64(mem, addr)
+
+	wa, _ := waiters.LoadOrStore(int64(addr), &atomic_waiters{})
+	w := wa.(*atomic_waiters)
+
+	w.Lock()
+	cur := atomic.LoadUint64(ptr)
+	if big {
+		cur = bits.ReverseBytes64(cur)
+	}
+
+	switch {
+	case cur != exp:
+		w.Unlock()
+		return not_equal
+	case w.List == nil:
+		w.List = list.New()
+	case w.Len() >= math.MaxUint32:
+		w.Unlock()
+		panic("too many waiters")
+	}
+
+	wait := make(chan struct{})
+	elem := w.PushBack(wait)
+	w.Unlock()
+
+	if timeout < 0 {
+		<-wait
+		return ok
+	}
+	select {
+	case <-wait:
+		return ok
+	case <-time.After(time.Duration(timeout)):
+	}
+
+	w.Lock()
+	select {
+	case <-wait:
+		w.Unlock()
+		return ok
+	default:
+		w.Remove(elem)
+		w.Unlock()
+		return timed_out
+	}
+}
+
 //go:nosplit
 func atomic_ptr8[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint32) {
 	_ = mem[addr] // bounds check
@@ -329,10 +472,10 @@ func atomic_ptr8[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint3
 
 //go:nosplit
 func atomic_ptr16[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint32) {
-	_ = mem[addr+1] // bounds check
 	if uint32(addr)&1 != 0 {
 		panic("unaligned atomic")
 	}
+	_ = mem[addr+1] // bounds check
 	ptr = (*uint32)(unsafe.Pointer(&mem[addr&^3]))
 	shift = (uint32(addr) & 3) * 8
 	return
@@ -340,34 +483,23 @@ func atomic_ptr16[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint
 
 //go:nosplit
 func atomic_ptr32[T uint32 | int64](mem []byte, addr T) *uint32 {
-	_ = mem[addr+3] // bounds check
 	if uint32(addr)&3 != 0 {
 		panic("unaligned atomic")
 	}
+	_ = mem[addr+3] // bounds check
 	return (*uint32)(unsafe.Pointer(&mem[addr]))
 }
 
 //go:nosplit
 func atomic_ptr64[T uint32 | int64](mem []byte, addr T) *uint64 {
-	_ = mem[addr+7] // bounds check
 	if uint32(addr)&7 != 0 {
 		panic("unaligned atomic")
 	}
+	_ = mem[addr+7] // bounds check
 	return (*uint64)(unsafe.Pointer(&mem[addr]))
 }
 
-// Compiler error if endianess is unknown.
-var _ = map[bool]struct{}{big: {}, little: {}}
-
-const (
-	big = false ||
-		runtime.GOARCH == "ppc64" || runtime.GOARCH == "s390x" ||
-		runtime.GOARCH == "mips" || runtime.GOARCH == "mips64"
-
-	little = false ||
-		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
-		runtime.GOARCH == "arm" || runtime.GOARCH == "arm64" ||
-		runtime.GOARCH == "riscv64" || runtime.GOARCH == "wasm" ||
-		runtime.GOARCH == "ppc64le" || runtime.GOARCH == "loong64" ||
-		runtime.GOARCH == "mipsle" || runtime.GOARCH == "mips64le"
-)
+type atomic_waiters = struct {
+	sync.Mutex
+	*list.List
+}

@@ -66,7 +66,7 @@ func (fn *funcCompiler) flush() {
 						&ast.AssignStmt{
 							Tok: token.ASSIGN,
 							Lhs: []ast.Expr{tmp},
-							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}}}}}})
+							Rhs: []ast.Expr{literal1}}}}})
 			e.kind = entryConst
 			e.expr = tmp
 		}
@@ -234,7 +234,7 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 // Pops a value from the value stack.
 func (fn *funcCompiler) pop() ast.Expr {
 	if fn.blocks.top().unreachable {
-		return &ast.BasicLit{Kind: token.INT, Value: "0"}
+		return literal0
 	}
 
 	if fn.stack.top().kind == entryCond {
@@ -256,13 +256,13 @@ func (fn *funcCompiler) popCond() ast.Expr {
 
 	return &ast.BinaryExpr{
 		X: entry.expr, Op: token.NEQ,
-		Y: &ast.BasicLit{Kind: token.INT, Value: "0"}}
+		Y: literal0}
 }
 
 // Pops an entry from the value stack.
 func (fn *funcCompiler) popEntry() (entryKind, ast.Expr) {
 	if fn.blocks.top().unreachable {
-		return entryConst, &ast.BasicLit{Kind: token.INT, Value: "0"}
+		return entryConst, literal0
 	}
 
 	entry := fn.stack.pop()
@@ -287,7 +287,7 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 			Y: &ast.BinaryExpr{
 				Op: token.SHR,
 				X:  addr,
-				Y:  &ast.BasicLit{Kind: token.INT, Value: "63"}}}
+				Y:  literal63}}
 	}
 
 	expr = convert(addr, "uint32")
@@ -576,7 +576,7 @@ func (fn *funcCompiler) eqzOp() {
 		fn.pushCond(&ast.BinaryExpr{
 			X:  expr,
 			Op: token.EQL,
-			Y:  &ast.BasicLit{Kind: token.INT, Value: "0"}})
+			Y:  literal0})
 	}
 }
 

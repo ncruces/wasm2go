@@ -24,9 +24,10 @@ import (
 var (
 	//go:embed helpers/helpers.go
 	helpersSrc string
-
 	//go:embed helpers/helpers_unsafe.go
 	helpersUnsafeSrc string
+	//go:embed helpers/atomics.go
+	helpersAtomicsSrc string
 )
 
 // These helpers can never trap.
@@ -43,12 +44,15 @@ var pureHelpers = set[string]{
 
 // Standard library packages used by generated code.
 var stdlib = map[string]string{
-	"runtime": "runtime",
-	"unsafe":  "unsafe",
+	"list":    "container/list",
+	"binary":  "encoding/binary",
 	"math":    "math",
 	"bits":    "math/bits",
-	"binary":  "encoding/binary",
+	"runtime": "runtime",
+	"sync":    "sync",
 	"atomic":  "sync/atomic",
+	"time":    "time",
+	"unsafe":  "unsafe",
 }
 
 type translator struct {
@@ -163,28 +167,15 @@ func translate(r io.Reader, w io.Writer) error {
 	// Add helpers.
 	if len(t.helpers) > 0 {
 		if *unsafe {
-			f, err := parser.ParseFile(fset, "helpers_unsafe.go", helpersUnsafeSrc, parser.ParseComments)
-			if err != nil {
+			if err := t.resolveHelpers(fset, "helpers_unsafe.go", helpersUnsafeSrc); err != nil {
 				return err
 			}
-			for _, decl := range f.Decls {
-				if fn, ok := decl.(*ast.FuncDecl); ok && t.helpers.has(fn.Name.Name) {
-					t.out.Decls = append(t.out.Decls, decl)
-					ast.Inspect(fn.Body, t.resolveImports)
-					delete(t.helpers, fn.Name.Name)
-				}
+			if err := t.resolveHelpers(fset, "atomics.go", helpersAtomicsSrc); err != nil {
+				return err
 			}
 		}
-
-		f, err := parser.ParseFile(fset, "helpers.go", helpersSrc, parser.ParseComments)
-		if err != nil {
+		if err := t.resolveHelpers(fset, "helpers.go", helpersSrc); err != nil {
 			return err
-		}
-		for _, decl := range f.Decls {
-			if fn, ok := decl.(*ast.FuncDecl); ok && t.helpers.has(fn.Name.Name) {
-				t.out.Decls = append(t.out.Decls, decl)
-				ast.Inspect(fn.Body, t.resolveImports)
-			}
 		}
 	}
 
@@ -1519,7 +1510,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Fun:  newID("len"),
 						Args: []ast.Expr{t.memory.selector}},
 					Op: token.SHR,
-					Y:  &ast.BasicLit{Kind: token.INT, Value: "16"},
+					Y:  literal16,
 				}, t.memory.stype()))
 
 		case 0x40: // memory.grow
@@ -2481,6 +2472,33 @@ func (t *translator) readDylink0Section(r *bytes.Reader) error {
 			_, err := r.Seek(int64(size), io.SeekCurrent)
 			if err != nil {
 				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (t *translator) resolveHelpers(fset *token.FileSet, filename, src string) error {
+	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+	for _, decl := range f.Decls {
+		switch d := decl.(type) {
+		case *ast.FuncDecl:
+			if t.helpers.has(d.Name.Name) {
+				t.out.Decls = append(t.out.Decls, d)
+				ast.Inspect(d, t.resolveImports)
+				delete(t.helpers, d.Name.Name)
+			}
+		case *ast.GenDecl:
+			for _, spec := range d.Specs {
+				if s, ok := spec.(*ast.TypeSpec); ok && t.helpers.has(s.Name.Name) {
+					t.out.Decls = append(t.out.Decls, d)
+					ast.Inspect(d, t.resolveImports)
+					delete(t.helpers, s.Name.Name)
+					break
+				}
 			}
 		}
 	}

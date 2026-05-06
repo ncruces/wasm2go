@@ -27,9 +27,15 @@ func (t *translator) readAtomicOpcode(fn *funcCompiler) error {
 
 	switch code {
 	case 0x00: // memory.atomic.notify
+		fn.push(fn.atomicNotify("atomic_notify", offset))
 	case 0x01: // memory.atomic.wait32
-	// case 0x02: // memory.atomic.wait64
-	// case 0x03: // atomic.fence
+		fn.push(fn.atomicWait("atomic_wait32", offset))
+	case 0x02: // memory.atomic.wait64
+		fn.push(fn.atomicWait("atomic_wait64", offset))
+
+	case 0x03: // atomic.fence
+		fn.helpers.add("atomic_fence")
+		fn.emit(&ast.ExprStmt{X: &ast.CallExpr{Fun: newID("atomic_fence")}})
 
 	case 0x10: // i32.atomic.load
 		fn.push(fn.atomicLoad("int32", "atomic_load32", offset))
@@ -118,10 +124,11 @@ func (fn *funcCompiler) atomicLoad(typ, name string, offset uint64) ast.Expr {
 func (fn *funcCompiler) atomicStore(name string, offset uint64) ast.Stmt {
 	val := fn.pop()
 	addr := fn.popAddr(offset)
-	idx := strings.IndexAny(name, "0123456789")
-	val = convert(val, "uint"+name[idx:])
+	bits := name[strings.IndexAny(name, "0123456789"):]
+	val = convert(val, "uint"+bits)
 
 	fn.helpers.add(name)
+	fn.helpers.add("atomic_ptr" + bits)
 	return &ast.ExprStmt{X: &ast.CallExpr{
 		Fun:  newID(name),
 		Args: []ast.Expr{fn.memory.selector, addr, val},
@@ -131,10 +138,11 @@ func (fn *funcCompiler) atomicStore(name string, offset uint64) ast.Stmt {
 func (fn *funcCompiler) atomicRmw(typ, name string, offset uint64) ast.Expr {
 	val := fn.pop()
 	addr := fn.popAddr(offset)
-	idx := strings.IndexAny(name, "0123456789")
-	val = convert(val, "uint"+name[idx:])
+	bits := name[strings.IndexAny(name, "0123456789"):]
+	val = convert(val, "uint"+bits)
 
 	fn.helpers.add(name)
+	fn.helpers.add("atomic_ptr" + bits)
 	return convert(&ast.CallExpr{
 		Fun:  newID(name),
 		Args: []ast.Expr{fn.memory.selector, addr, val},
@@ -145,13 +153,45 @@ func (fn *funcCompiler) atomicCmpxchg(typ, name string, offset uint64) ast.Expr 
 	new := fn.pop()
 	old := fn.pop()
 	addr := fn.popAddr(offset)
-	idx := strings.IndexAny(name, "0123456789")
-	new = convert(new, "uint"+name[idx:])
-	old = convert(old, "uint"+name[idx:])
+	bits := name[strings.IndexAny(name, "0123456789"):]
+	new = convert(new, "uint"+bits)
+	old = convert(old, "uint"+bits)
 
 	fn.helpers.add(name)
+	fn.helpers.add("atomic_ptr" + bits)
 	return convert(&ast.CallExpr{
 		Fun:  newID(name),
 		Args: []ast.Expr{fn.memory.selector, addr, old, new},
 	}, typ)
+}
+
+func (fn *funcCompiler) atomicNotify(name string, offset uint64) ast.Expr {
+	count := fn.pop()
+	addr := fn.popAddr(offset)
+
+	fn.helpers.add(name)
+	fn.helpers.add("atomic_waiters")
+	fn.helpers.add("atomic_ptr32")
+	return &ast.CallExpr{
+		Fun: newID(name),
+		Args: []ast.Expr{
+			fn.memory.selector, addr, count,
+			&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}}}
+}
+
+func (fn *funcCompiler) atomicWait(name string, offset uint64) ast.Expr {
+	timeout := fn.pop()
+	exp := fn.pop()
+	addr := fn.popAddr(offset)
+	bits := name[strings.IndexAny(name, "0123456789"):]
+	exp = convert(exp, "uint"+bits)
+
+	fn.helpers.add(name)
+	fn.helpers.add("atomic_waiters")
+	fn.helpers.add("atomic_ptr" + bits)
+	return &ast.CallExpr{
+		Fun: newID(name),
+		Args: []ast.Expr{
+			fn.memory.selector, addr, exp, timeout,
+			&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}}}
 }

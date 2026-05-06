@@ -67,6 +67,14 @@ func (t *translator) createModuleStruct() ast.Decl {
 				Type:  util.MangleID(imp.module, util.IDExported)})
 		}
 	}
+
+	if t.helpers.has("atomic_waiters") {
+		fields = append(fields, &ast.Field{
+			Names: []*ast.Ident{newID("waiters")},
+			Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
+		t.packages.add("sync")
+	}
+
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
