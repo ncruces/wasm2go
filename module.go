@@ -43,6 +43,11 @@ func (t *translator) createModuleStruct() ast.Decl {
 				Names: []*ast.Ident{t.memory.id},
 				Type:  &ast.ArrayType{Elt: newID("byte")}})
 		}
+		if t.helpers.has("atomic_waiters") {
+			fields = append(fields, &ast.Field{
+				Names: []*ast.Ident{newID("waiters")},
+				Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
+		}
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{newID("maxMem")},
 			Type:  newID("int64")})
@@ -66,12 +71,6 @@ func (t *translator) createModuleStruct() ast.Decl {
 				Names: []*ast.Ident{util.MangleID(imp.module, util.IDInternal)},
 				Type:  util.MangleID(imp.module, util.IDExported)})
 		}
-	}
-
-	if t.helpers.has("atomic_waiters") {
-		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{newID("waiters")},
-			Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
 	}
 
 	return &ast.GenDecl{
@@ -191,6 +190,13 @@ func (t *translator) createNewFunc() ast.Decl {
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
 				Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Slice")}}}})
+
+			if t.helpers.has("atomic_waiters") {
+				body.List = append(body.List, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}},
+					Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Waiters")}}}})
+			}
 		}
 	}
 
@@ -327,26 +333,37 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 	var decls []ast.Decl
 	// Memory interface as a type alias.
 	if !*nohost {
-		decls = append(decls, &ast.GenDecl{
-			Tok: token.TYPE,
-			Specs: []ast.Spec{&ast.TypeSpec{
-				Assign: 1,
-				Name:   newID("Memory"),
-				Type: &ast.InterfaceType{Methods: &ast.FieldList{
-					List: []*ast.Field{{
-						Names: []*ast.Ident{newID("Slice")},
-						Type: &ast.FuncType{
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
-					}, {
-						Names: []*ast.Ident{newID("Grow")},
-						Type: &ast.FuncType{
-							Params: &ast.FieldList{
-								List: []*ast.Field{{
-									Names: []*ast.Ident{newID("delta"), newID("max")},
-									Type:  newID("int64")}}},
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: newID("int64")}}}}}}}}}}})
+		iface := &ast.InterfaceType{Methods: &ast.FieldList{
+			List: []*ast.Field{{
+				Names: []*ast.Ident{newID("Slice")},
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: &ast.StarExpr{
+							X: &ast.ArrayType{Elt: newID("byte")}}}}}},
+			}, {
+				Names: []*ast.Ident{newID("Grow")},
+				Type: &ast.FuncType{
+					Params: &ast.FieldList{
+						List: []*ast.Field{{
+							Names: []*ast.Ident{newID("delta"), newID("max")},
+							Type:  newID("int64")}}},
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: newID("int64")}}}}}}}}
+
+		if t.helpers.has("atomic_waiters") {
+			iface.Methods.List = append(iface.Methods.List, &ast.Field{
+				Names: []*ast.Ident{newID("Waiters")},
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: &ast.StarExpr{
+							X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}}}})
+		}
+
+		decls = append(decls,
+			&ast.GenDecl{
+				Tok: token.TYPE,
+				Specs: []ast.Spec{&ast.TypeSpec{
+					Assign: 1, Name: newID("Memory"), Type: iface}}})
 	}
 	// Memory structure implementing the interface for owned memory.
 	if !t.memory.imported {
