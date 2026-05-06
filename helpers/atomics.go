@@ -60,6 +60,19 @@ func atomic_xchg32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 	return val
 }
 
+//go:nosplit
+func atomic_xchg64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+	ptr := atomic_ptr64(mem, addr)
+	if big {
+		val = bits.ReverseBytes64(val)
+	}
+	val = atomic.SwapUint64(ptr, val)
+	if big {
+		val = bits.ReverseBytes64(val)
+	}
+	return val
+}
+
 func atomic_cmpxchg32[T uint32 | int64](mem []byte, addr T, old, new uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	exp := old
@@ -80,6 +93,26 @@ func atomic_cmpxchg32[T uint32 | int64](mem []byte, addr T, old, new uint32) uin
 	}
 }
 
+func atomic_cmpxchg64[T uint32 | int64](mem []byte, addr T, old, new uint64) uint64 {
+	ptr := atomic_ptr64(mem, addr)
+	exp := old
+	if big {
+		exp = bits.ReverseBytes64(old)
+		new = bits.ReverseBytes64(new)
+	}
+	for {
+		if atomic.CompareAndSwapUint64(ptr, exp, new) {
+			return old
+		}
+		if cur := atomic.LoadUint64(ptr); cur != exp {
+			if big {
+				return bits.ReverseBytes64(cur)
+			}
+			return cur
+		}
+	}
+}
+
 func atomic_add32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if little {
@@ -94,6 +127,20 @@ func atomic_add32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 	}
 }
 
+func atomic_add64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+	ptr := atomic_ptr64(mem, addr)
+	if little {
+		return atomic.AddUint64(ptr, +val) - val
+	}
+	for {
+		cur := atomic.LoadUint64(ptr)
+		old := bits.ReverseBytes64(cur)
+		if atomic.CompareAndSwapUint64(ptr, cur, bits.ReverseBytes64(old+val)) {
+			return old
+		}
+	}
+}
+
 func atomic_sub32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if little {
@@ -103,6 +150,20 @@ func atomic_sub32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 		cur := atomic.LoadUint32(ptr)
 		old := bits.ReverseBytes32(cur)
 		if atomic.CompareAndSwapUint32(ptr, cur, bits.ReverseBytes32(old-val)) {
+			return old
+		}
+	}
+}
+
+func atomic_sub64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+	ptr := atomic_ptr64(mem, addr)
+	if little {
+		return atomic.AddUint64(ptr, -val) + val
+	}
+	for {
+		cur := atomic.LoadUint64(ptr)
+		old := bits.ReverseBytes64(cur)
+		if atomic.CompareAndSwapUint64(ptr, cur, bits.ReverseBytes64(old-val)) {
 			return old
 		}
 	}
@@ -131,16 +192,34 @@ func atomic_load16[T uint32 | int64](mem []byte, addr T) uint16 {
 func atomic_store8[T uint32 | int64](mem []byte, addr T, val uint8) {
 	ptr, shift := atomic_ptr8(mem, addr)
 
-	new8 := uint32(val) << shift
+	mval := uint32(val) << shift
 	mask := uint32(255) << shift
 	if big {
-		new8 = bits.ReverseBytes32(new8)
+		mval = bits.ReverseBytes32(mval)
 		mask = bits.ReverseBytes32(mask)
 	}
 
 	for {
 		cur := atomic.LoadUint32(ptr)
-		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|new8) {
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|mval) {
+			return
+		}
+	}
+}
+
+func atomic_store16[T uint32 | int64](mem []byte, addr T, val uint16) {
+	ptr, shift := atomic_ptr16(mem, addr)
+
+	mval := uint32(val) << shift
+	mask := uint32(65535) << shift
+	if big {
+		mval = bits.ReverseBytes32(mval)
+		mask = bits.ReverseBytes32(mask)
+	}
+
+	for {
+		cur := atomic.LoadUint32(ptr)
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|mval) {
 			return
 		}
 	}
@@ -149,16 +228,16 @@ func atomic_store8[T uint32 | int64](mem []byte, addr T, val uint8) {
 func atomic_xchg8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
-	new8 := uint32(val) << shift
+	mval := uint32(val) << shift
 	mask := uint32(255) << shift
 	if big {
-		new8 = bits.ReverseBytes32(new8)
+		mval = bits.ReverseBytes32(mval)
 		mask = bits.ReverseBytes32(mask)
 	}
 
 	for {
 		cur := atomic.LoadUint32(ptr)
-		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|new8) {
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|mval) {
 			if big {
 				cur = bits.ReverseBytes32(cur)
 			}
@@ -167,27 +246,74 @@ func atomic_xchg8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 	}
 }
 
-func atomic_cmpxchg8[T uint32 | int64](mem []byte, addr T, old, new uint8) uint8 {
-	ptr, shift := atomic_ptr8(mem, addr)
+func atomic_xchg16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
+	ptr, shift := atomic_ptr16(mem, addr)
 
-	exp8 := uint32(old) << shift
-	new8 := uint32(new) << shift
-	mask := uint32(255) << shift
+	mval := uint32(val) << shift
+	mask := uint32(65535) << shift
 	if big {
-		exp8 = bits.ReverseBytes32(exp8)
-		new8 = bits.ReverseBytes32(new8)
+		mval = bits.ReverseBytes32(mval)
 		mask = bits.ReverseBytes32(mask)
 	}
 
 	for {
 		cur := atomic.LoadUint32(ptr)
-		if cur&mask != exp8 {
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|mval) {
+			if big {
+				cur = bits.ReverseBytes32(cur)
+			}
+			return uint16(cur >> shift)
+		}
+	}
+}
+
+func atomic_cmpxchg8[T uint32 | int64](mem []byte, addr T, old, new uint8) uint8 {
+	ptr, shift := atomic_ptr8(mem, addr)
+
+	mold := uint32(old) << shift
+	mnew := uint32(new) << shift
+	mask := uint32(255) << shift
+	if big {
+		mold = bits.ReverseBytes32(mold)
+		mnew = bits.ReverseBytes32(mnew)
+		mask = bits.ReverseBytes32(mask)
+	}
+
+	for {
+		cur := atomic.LoadUint32(ptr)
+		if cur&mask != mold {
 			if big {
 				cur = bits.ReverseBytes32(cur)
 			}
 			return uint8(cur >> shift)
 		}
-		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|new8) {
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|mnew) {
+			return old
+		}
+	}
+}
+
+func atomic_cmpxchg16[T uint32 | int64](mem []byte, addr T, old, new uint16) uint16 {
+	ptr, shift := atomic_ptr16(mem, addr)
+
+	mold := uint32(old) << shift
+	mnew := uint32(new) << shift
+	mask := uint32(65535) << shift
+	if big {
+		mold = bits.ReverseBytes32(mold)
+		mnew = bits.ReverseBytes32(mnew)
+		mask = bits.ReverseBytes32(mask)
+	}
+
+	for {
+		cur := atomic.LoadUint32(ptr)
+		if cur&mask != mold {
+			if big {
+				cur = bits.ReverseBytes32(cur)
+			}
+			return uint16(cur >> shift)
+		}
+		if atomic.CompareAndSwapUint32(ptr, cur, (cur&^mask)|mnew) {
 			return old
 		}
 	}
