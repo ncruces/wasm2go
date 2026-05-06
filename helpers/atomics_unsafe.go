@@ -376,7 +376,7 @@ func atomic_wait32[T uint32 | int64](mem []byte, addr T, exp uint32, timeout int
 		return not_equal
 	case w.List == nil:
 		w.List = list.New()
-	case w.Len() >= math.MaxUint32:
+	case uint(w.Len()) >= math.MaxUint32:
 		w.Unlock()
 		panic("too many waiters")
 	}
@@ -431,7 +431,7 @@ func atomic_wait64[T uint32 | int64](mem []byte, addr T, exp uint64, timeout int
 		return not_equal
 	case w.List == nil:
 		w.List = list.New()
-	case w.Len() >= math.MaxUint32:
+	case uint(w.Len()) >= math.MaxUint32:
 		w.Unlock()
 		panic("too many waiters")
 	}
