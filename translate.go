@@ -1438,29 +1438,27 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				return err
 			}
 
-			addr := fn.popAddr(offset)
-
 			switch opcode {
 			case 0x28: // i32.load
-				fn.push(fn.load(addr, "int32"))
+				fn.push(fn.load("int32", offset))
 			case 0x29: // i64.load
-				fn.push(fn.load(addr, "int64"))
+				fn.push(fn.load("int64", offset))
 			case 0x2a: // f32.load
-				fn.push(fn.load(addr, "float32"))
+				fn.push(fn.load("float32", offset))
 			case 0x2b: // f64.load
-				fn.push(fn.load(addr, "float64"))
+				fn.push(fn.load("float64", offset))
 			case 0x2e: // i32.load16_s
-				fn.push(convert(fn.load(addr, "int16"), "int32"))
+				fn.push(convert(fn.load("int16", offset), "int32"))
 			case 0x2f: // i32.load16_u
-				fn.push(convert(fn.load(addr, "uint16"), "int32"))
+				fn.push(convert(fn.load("uint16", offset), "int32"))
 			case 0x32: // i64.load16_s
-				fn.push(convert(fn.load(addr, "int16"), "int64"))
+				fn.push(convert(fn.load("int16", offset), "int64"))
 			case 0x33: // i64.load16_u
-				fn.push(convert(fn.load(addr, "uint16"), "int64"))
+				fn.push(convert(fn.load("uint16", offset), "int64"))
 			case 0x34: // i64.load32_s
-				fn.push(convert(fn.load(addr, "int32"), "int64"))
+				fn.push(convert(fn.load("int32", offset), "int64"))
 			case 0x35: // i64.load32_u
-				fn.push(convert(fn.load(addr, "uint32"), "int64"))
+				fn.push(convert(fn.load("uint32", offset), "int64"))
 			}
 
 		case 0x3a, 0x3c: // store8
@@ -1490,24 +1488,21 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				return err
 			}
 
-			val := fn.pop()
-			addr := fn.popAddr(offset)
-
 			switch opcode {
 			case 0x36: // i32.store
-				fn.emit(fn.store(addr, val, "int32"))
+				fn.emit(fn.store("int32", offset))
 			case 0x37: // i64.store
-				fn.emit(fn.store(addr, val, "int64"))
+				fn.emit(fn.store("int64", offset))
 			case 0x38: // f32.store
-				fn.emit(fn.store(addr, val, "float32"))
+				fn.emit(fn.store("float32", offset))
 			case 0x39: // f64.store
-				fn.emit(fn.store(addr, val, "float64"))
+				fn.emit(fn.store("float64", offset))
 			case 0x3b: // i32.store16
-				fn.emit(fn.store(addr, val, "int16"))
+				fn.emit(fn.store("int16", offset))
 			case 0x3d: // i64.store16
-				fn.emit(fn.store(addr, val, "int16"))
+				fn.emit(fn.store("int16", offset))
 			case 0x3e: // i64.store32
-				fn.emit(fn.store(addr, val, "int32"))
+				fn.emit(fn.store("int32", offset))
 			}
 
 		case 0x3f: // memory.size

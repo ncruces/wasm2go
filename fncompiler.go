@@ -137,7 +137,8 @@ func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 }
 
 // Returns an expression that loads bytes from memory.
-func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
+func (fn *funcCompiler) load(typ string, offset uint64) (expr ast.Expr) {
+	addr := fn.popAddr(offset)
 	bits := typ[len(typ)-2:]
 
 	// Load as unsigned, little-endian.
@@ -162,7 +163,9 @@ func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 }
 
 // Returns a statement that stores bytes to memory.
-func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
+func (fn *funcCompiler) store(typ string, offset uint64) ast.Stmt {
+	val := fn.pop()
+	addr := fn.popAddr(offset)
 	bits := typ[len(typ)-2:]
 
 	if strings.HasPrefix(typ, "float") {

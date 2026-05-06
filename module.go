@@ -72,7 +72,6 @@ func (t *translator) createModuleStruct() ast.Decl {
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{newID("waiters")},
 			Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
-		t.packages.add("sync")
 	}
 
 	return &ast.GenDecl{
