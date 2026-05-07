@@ -101,7 +101,7 @@ jobs:
       run: go test -args -unsafe
 
     - name: Test riscv
-      run: go test ./helpers ./spectest/...
+      run: go test ./helpers ./libc-gen/... ./spectest/...
 
     - name: Test no optimization
       run: |

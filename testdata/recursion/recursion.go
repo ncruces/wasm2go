@@ -6,7 +6,7 @@ type Module struct {
 }
 
 func New() *Module {
-	m := &Module{}
+	m := new(Module)
 	return m
 }
 func (m *Module) Xfactorial(v0 int32) int32 {

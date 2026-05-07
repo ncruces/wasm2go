@@ -6,7 +6,7 @@ type Module struct {
 }
 
 func New() *Module {
-	m := &Module{}
+	m := new(Module)
 	return m
 }
 func fn0(v0, v1 int32) int32 {
