@@ -12,7 +12,7 @@ type Module struct {
 }
 
 func New(v0 Xenv) *Module {
-	m := &Module{}
+	m := new(Module)
 	m._env = v0
 	m.maxMem = 65536
 	m.memImp = v0.Xbuffer()

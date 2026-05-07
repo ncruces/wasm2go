@@ -27,6 +27,7 @@ including the following features:
 - [multi-value results];
 - 64-bit address space;
 - [extended constant expressions];
+- [threads and atomics];
 - [wide arithmetic].
 
 [bulk memory instructions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mbulk-memory
@@ -35,6 +36,7 @@ including the following features:
 [sign-extension instructions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-msign-ext
 [multi-value results]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mmultivalue
 [extended constant expressions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mextended-const
+[threads and atomics]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-matomics
 [wide arithmetic]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mwide-arithmetic
 
 Generating human-readable Go code is a non-goal:

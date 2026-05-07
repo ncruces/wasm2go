@@ -9,7 +9,7 @@ type Module struct {
 }
 
 func New(v0 Xenv) *Module {
-	m := &Module{}
+	m := new(Module)
 	m._env = v0
 	m.t0 = make([]any, 32)
 	m.elements = [][]any{{fn1}, {m.fn0}}

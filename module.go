@@ -46,6 +46,12 @@ func (t *translator) createModuleStruct() ast.Decl {
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{newID("maxMem")},
 			Type:  newID("int64")})
+		if t.memory.shared || t.helpers.has("atomic_waiters") {
+			fields = append(fields, &ast.Field{
+				Names: []*ast.Ident{newID("waiters")},
+				Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
+			t.packages.add("sync")
+		}
 	}
 	// Globals: owned are type; imported *type.
 	for _, g := range t.globals {
@@ -67,6 +73,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 				Type:  util.MangleID(imp.module, util.IDExported)})
 		}
 	}
+
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
@@ -83,10 +90,9 @@ func (t *translator) createNewFunc() ast.Decl {
 			&ast.AssignStmt{
 				Tok: token.DEFINE,
 				Lhs: []ast.Expr{newID("m")},
-				Rhs: []ast.Expr{&ast.UnaryExpr{
-					Op: token.AND,
-					X:  &ast.CompositeLit{Type: newID("Module")}}}}},
-	}
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun:  newID("new"),
+					Args: []ast.Expr{newID("Module")}}}}}}
 
 	// Create the params, and initialize fields.
 	params := []*ast.Field{}
@@ -137,6 +143,10 @@ func (t *translator) createNewFunc() ast.Decl {
 			Rhs: []ast.Expr{
 				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max)}}})
 		if !t.memory.imported {
+			pages := t.memory.min
+			if t.memory.shared { // A shared memory must not move.
+				pages = t.memory.max
+			}
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{t.memory.selector},
@@ -146,7 +156,15 @@ func (t *translator) createNewFunc() ast.Decl {
 						&ast.ArrayType{Elt: newID("byte")},
 						&ast.BasicLit{
 							Kind:  token.INT,
-							Value: formatInt(t.memory.min << 16)}}}}})
+							Value: formatInt(pages << 16)}}}}})
+			if t.memory.shared {
+				body.List = append(body.List, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}},
+					Rhs: []ast.Expr{&ast.CallExpr{
+						Fun:  newID("new"),
+						Args: []ast.Expr{&ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}})
+			}
 		}
 	}
 
@@ -184,6 +202,13 @@ func (t *translator) createNewFunc() ast.Decl {
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
 				Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Slice")}}}})
+
+			if t.memory.shared {
+				body.List = append(body.List, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}},
+					Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Waiters")}}}})
+			}
 		}
 	}
 
@@ -320,26 +345,37 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 	var decls []ast.Decl
 	// Memory interface as a type alias.
 	if !*nohost {
-		decls = append(decls, &ast.GenDecl{
-			Tok: token.TYPE,
-			Specs: []ast.Spec{&ast.TypeSpec{
-				Assign: 1,
-				Name:   newID("Memory"),
-				Type: &ast.InterfaceType{Methods: &ast.FieldList{
-					List: []*ast.Field{{
-						Names: []*ast.Ident{newID("Slice")},
-						Type: &ast.FuncType{
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
-					}, {
-						Names: []*ast.Ident{newID("Grow")},
-						Type: &ast.FuncType{
-							Params: &ast.FieldList{
-								List: []*ast.Field{{
-									Names: []*ast.Ident{newID("delta"), newID("max")},
-									Type:  newID("int64")}}},
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: newID("int64")}}}}}}}}}}})
+		iface := &ast.InterfaceType{Methods: &ast.FieldList{
+			List: []*ast.Field{{
+				Names: []*ast.Ident{newID("Slice")},
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: &ast.StarExpr{
+							X: &ast.ArrayType{Elt: newID("byte")}}}}}},
+			}, {
+				Names: []*ast.Ident{newID("Grow")},
+				Type: &ast.FuncType{
+					Params: &ast.FieldList{
+						List: []*ast.Field{{
+							Names: []*ast.Ident{newID("delta"), newID("max")},
+							Type:  newID("int64")}}},
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: newID("int64")}}}}}}}}
+
+		if t.memory.shared {
+			iface.Methods.List = append(iface.Methods.List, &ast.Field{
+				Names: []*ast.Ident{newID("Waiters")},
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: &ast.StarExpr{
+							X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}}}})
+		}
+
+		decls = append(decls,
+			&ast.GenDecl{
+				Tok: token.TYPE,
+				Specs: []ast.Spec{&ast.TypeSpec{
+					Assign: 1, Name: newID("Memory"), Type: iface}}})
 	}
 	// Memory structure implementing the interface for owned memory.
 	if !t.memory.imported {
@@ -370,6 +406,16 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 					newID("delta"),
 					newID("max")}}}}}}})
 		t.helpers.add("memory_grow")
+
+		if t.memory.shared {
+			decls = append(decls, &ast.FuncDecl{
+				Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
+				Name: newID("Waiters"),
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}}},
+				Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{
+					&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}}}}}})
+		}
 	}
 	return decls
 }

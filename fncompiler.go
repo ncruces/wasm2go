@@ -66,7 +66,7 @@ func (fn *funcCompiler) flush() {
 						&ast.AssignStmt{
 							Tok: token.ASSIGN,
 							Lhs: []ast.Expr{tmp},
-							Rhs: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "1"}}}}}})
+							Rhs: []ast.Expr{literal1}}}}})
 			e.kind = entryConst
 			e.expr = tmp
 		}
@@ -137,7 +137,8 @@ func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 }
 
 // Returns an expression that loads bytes from memory.
-func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
+func (fn *funcCompiler) load(typ string, offset uint64) (expr ast.Expr) {
+	addr := fn.popAddr(offset)
 	bits := typ[len(typ)-2:]
 
 	// Load as unsigned, little-endian.
@@ -162,7 +163,9 @@ func (fn *funcCompiler) load(addr ast.Expr, typ string) (expr ast.Expr) {
 }
 
 // Returns a statement that stores bytes to memory.
-func (fn *funcCompiler) store(addr, val ast.Expr, typ string) ast.Stmt {
+func (fn *funcCompiler) store(typ string, offset uint64) ast.Stmt {
+	val := fn.pop()
+	addr := fn.popAddr(offset)
 	bits := typ[len(typ)-2:]
 
 	if strings.HasPrefix(typ, "float") {
@@ -234,7 +237,7 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 // Pops a value from the value stack.
 func (fn *funcCompiler) pop() ast.Expr {
 	if fn.blocks.top().unreachable {
-		return &ast.BasicLit{Kind: token.INT, Value: "0"}
+		return literal0
 	}
 
 	if fn.stack.top().kind == entryCond {
@@ -255,14 +258,13 @@ func (fn *funcCompiler) popCond() ast.Expr {
 	}
 
 	return &ast.BinaryExpr{
-		X: entry.expr, Op: token.NEQ,
-		Y: &ast.BasicLit{Kind: token.INT, Value: "0"}}
+		X: entry.expr, Op: token.NEQ, Y: literal0}
 }
 
 // Pops an entry from the value stack.
 func (fn *funcCompiler) popEntry() (entryKind, ast.Expr) {
 	if fn.blocks.top().unreachable {
-		return entryConst, &ast.BasicLit{Kind: token.INT, Value: "0"}
+		return entryConst, literal0
 	}
 
 	entry := fn.stack.pop()
@@ -281,13 +283,10 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 		return &ast.BinaryExpr{
 			Op: token.OR,
 			X: &ast.BinaryExpr{
-				Op: token.ADD,
-				X:  addr,
-				Y:  &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}},
+				X: addr, Op: token.ADD,
+				Y: &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}},
 			Y: &ast.BinaryExpr{
-				Op: token.SHR,
-				X:  addr,
-				Y:  &ast.BasicLit{Kind: token.INT, Value: "63"}}}
+				X: addr, Op: token.SHR, Y: literal63}}
 	}
 
 	expr = convert(addr, "uint32")
@@ -520,42 +519,6 @@ func (fn *funcCompiler) bitHelper(name string) {
 	fn.pushPure(expr)
 }
 
-func (fn *funcCompiler) wideHelper(name string) {
-	var args []ast.Expr
-	if strings.Contains(name, "mul") {
-		y := fn.pop()
-		x := fn.pop()
-		args = []ast.Expr{x, y}
-	} else {
-		yhi := fn.pop()
-		ylo := fn.pop()
-		xhi := fn.pop()
-		xlo := fn.pop()
-		yc, yk := islit(yhi, "i64")
-		xc, xk := islit(xhi, "i64")
-		if yk && xk && yc == 0 && xc == 0 {
-			if name == "i64_add128" {
-				name = "i64_add_wide"
-			} else {
-				name = "i64_sub_wide"
-			}
-			args = []ast.Expr{xlo, ylo}
-		} else {
-			args = []ast.Expr{xlo, xhi, ylo, yhi}
-		}
-	}
-
-	fn.helpers.add(name)
-	lo := fn.newTempVal()
-	hi := fn.newTempVal()
-	fn.emit(&ast.AssignStmt{
-		Tok: token.DEFINE,
-		Lhs: []ast.Expr{lo, hi},
-		Rhs: []ast.Expr{&ast.CallExpr{Fun: newID(name), Args: args}}})
-	fn.pushConst(lo)
-	fn.pushConst(hi)
-}
-
 // Executes a binary builtin call.
 func (fn *funcCompiler) binBuiltin(name string) {
 	y := fn.pop()
@@ -574,9 +537,7 @@ func (fn *funcCompiler) eqzOp() {
 		fn.pushCond(&ast.UnaryExpr{Op: token.NOT, X: expr})
 	} else {
 		fn.pushCond(&ast.BinaryExpr{
-			X:  expr,
-			Op: token.EQL,
-			Y:  &ast.BasicLit{Kind: token.INT, Value: "0"}})
+			X: expr, Op: token.EQL, Y: literal0})
 	}
 }
 

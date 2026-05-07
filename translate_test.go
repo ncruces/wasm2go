@@ -45,6 +45,9 @@ func Test_translateSpecTest(t *testing.T) {
 	*nanbox = true
 	filepath.WalkDir("spectest/", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
+			if !*unsafe && strings.HasSuffix(path, "/threads") {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		if ext := filepath.Ext(path); ext == ".wasm" {
