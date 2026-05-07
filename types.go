@@ -118,6 +118,7 @@ type memoryDef struct {
 	id       *ast.Ident
 	selector ast.Expr
 	imported bool
+	shared   bool
 	is64     bool
 	min      int64
 	max      int64

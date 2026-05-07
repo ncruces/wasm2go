@@ -38,7 +38,11 @@ func (t *translator) readAtomicOpcode(fn *funcCompiler) error {
 
 	case 0x03: // atomic.fence
 		fn.helpers.add("atomic_fence")
-		fn.emit(&ast.ExprStmt{X: &ast.CallExpr{Fun: newID("atomic_fence")}})
+		fn.emit(&ast.ExprStmt{X: &ast.CallExpr{
+			Fun: newID("atomic_fence"),
+			Args: []ast.Expr{&ast.CallExpr{
+				Fun:  &ast.SelectorExpr{X: newID("unsafe"), Sel: newID("Pointer")},
+				Args: []ast.Expr{newID("m")}}}}})
 
 	case 0x10: // i32.atomic.load
 		fn.push(fn.atomicLoad("int32", "atomic_load32", offset))

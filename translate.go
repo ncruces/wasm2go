@@ -471,7 +471,7 @@ func (t *translator) readImportSection() error {
 			if t.memory != nil {
 				return fmt.Errorf("multiple memories not supported")
 			}
-			min, max, is64, err := t.readLimits(65536) // 4 GiB
+			min, max, shared, is64, err := t.readLimits(65536) // 4 GiB
 			if err != nil {
 				return err
 			}
@@ -480,8 +480,9 @@ func (t *translator) readImportSection() error {
 				id:       id,
 				min:      int64(min),
 				max:      int64(max),
-				is64:     is64,
 				imported: true,
+				shared:   shared,
+				is64:     is64,
 				selector: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
 			t.imports = append(t.imports, importDef{
 				module: mod,
@@ -521,7 +522,7 @@ func (t *translator) readImportSection() error {
 				return fmt.Errorf("unsupported table type: %x", typ)
 			}
 
-			min, max, is64, err := t.readLimits(65536) // 1 MiB
+			min, max, _, is64, err := t.readLimits(65536) // 1 MiB
 			if err != nil {
 				return err
 			}
@@ -592,7 +593,7 @@ func (t *translator) readTableSection() error {
 			return fmt.Errorf("unsupported table type: %x", typ)
 		}
 
-		min, max, is64, err := t.readLimits(65536) // 1 MiB
+		min, max, _, is64, err := t.readLimits(65536) // 1 MiB
 		if err != nil {
 			return err
 		}
@@ -620,21 +621,23 @@ func (t *translator) readMemorySection() error {
 	}
 
 	id := &ast.Ident{}
-	min, max, is64, err := t.readLimits(65536) // 4 GiB
+	min, max, shared, is64, err := t.readLimits(65536) // 4 GiB
 	t.memory = &memoryDef{
 		id:       id,
 		min:      int64(min),
 		max:      int64(max),
+		shared:   shared,
 		is64:     is64,
 		selector: &ast.SelectorExpr{X: newID("m"), Sel: id}}
 	return err
 }
 
-func (t *translator) readLimits(def uint64) (min, max uint64, is64 bool, err error) {
+func (t *translator) readLimits(def uint64) (min, max uint64, shared, is64 bool, err error) {
 	flags, err := readLEB128(t.in)
 	if err != nil {
 		return
 	}
+	shared = (flags & 2) != 0
 	is64 = (flags & 4) != 0
 	min, err = readLEB128(t.in)
 	if err != nil {

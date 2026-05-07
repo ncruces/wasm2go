@@ -13,9 +13,8 @@ import (
 // Use nosplit only on functions with no loops.
 
 //go:nosplit
-func atomic_fence(mem []byte) {
-	ptr := (*uint32)(unsafe.Pointer((*[4]byte)(mem)))
-	atomic.AddUint32(ptr, 0)
+func atomic_fence(ptr unsafe.Pointer) {
+	atomic.AddUintptr((*uintptr)(ptr), 0)
 }
 
 //go:nosplit
@@ -611,6 +610,9 @@ func atomic_cmpxchg16[T uint32 | int64](mem []byte, addr T, old, new uint16) uin
 func atomic_notify[T uint32 | int64](mem []byte, addr T, count int32, waiters *sync.Map) int32 {
 	_ = atomic_ptr32(mem, addr)
 
+	if waiters == nil {
+		return 0
+	}
 	wa, ok := waiters.Load(int64(addr))
 	if !ok {
 		return 0

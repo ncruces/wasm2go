@@ -43,14 +43,14 @@ func (t *translator) createModuleStruct() ast.Decl {
 				Names: []*ast.Ident{t.memory.id},
 				Type:  &ast.ArrayType{Elt: newID("byte")}})
 		}
+		fields = append(fields, &ast.Field{
+			Names: []*ast.Ident{newID("maxMem")},
+			Type:  newID("int64")})
 		if t.helpers.has("atomic_waiters") {
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{newID("waiters")},
 				Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
 		}
-		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{newID("maxMem")},
-			Type:  newID("int64")})
 	}
 	// Globals: owned are type; imported *type.
 	for _, g := range t.globals {
@@ -153,6 +153,14 @@ func (t *translator) createNewFunc() ast.Decl {
 						&ast.BasicLit{
 							Kind:  token.INT,
 							Value: formatInt(t.memory.min << 16)}}}}})
+			if t.memory.shared && t.helpers.has("atomic_waiters") {
+				body.List = append(body.List, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}},
+					Rhs: []ast.Expr{&ast.CallExpr{
+						Fun:  newID("new"),
+						Args: []ast.Expr{&ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}})
+			}
 		}
 	}
 
@@ -191,7 +199,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
 				Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Slice")}}}})
 
-			if t.helpers.has("atomic_waiters") {
+			if t.memory.shared && t.helpers.has("atomic_waiters") {
 				body.List = append(body.List, &ast.AssignStmt{
 					Tok: token.ASSIGN,
 					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}},
@@ -350,7 +358,7 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 					Results: &ast.FieldList{
 						List: []*ast.Field{{Type: newID("int64")}}}}}}}}
 
-		if t.helpers.has("atomic_waiters") {
+		if t.memory.shared && t.helpers.has("atomic_waiters") {
 			iface.Methods.List = append(iface.Methods.List, &ast.Field{
 				Names: []*ast.Ident{newID("Waiters")},
 				Type: &ast.FuncType{
