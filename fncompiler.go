@@ -519,42 +519,6 @@ func (fn *funcCompiler) bitHelper(name string) {
 	fn.pushPure(expr)
 }
 
-func (fn *funcCompiler) wideHelper(name string) {
-	var args []ast.Expr
-	if strings.Contains(name, "mul") {
-		y := fn.pop()
-		x := fn.pop()
-		args = []ast.Expr{x, y}
-	} else {
-		yhi := fn.pop()
-		ylo := fn.pop()
-		xhi := fn.pop()
-		xlo := fn.pop()
-		yc, yk := islit(yhi, "i64")
-		xc, xk := islit(xhi, "i64")
-		if yk && xk && yc == 0 && xc == 0 {
-			if name == "i64_add128" {
-				name = "i64_add_wide"
-			} else {
-				name = "i64_sub_wide"
-			}
-			args = []ast.Expr{xlo, ylo}
-		} else {
-			args = []ast.Expr{xlo, xhi, ylo, yhi}
-		}
-	}
-
-	fn.helpers.add(name)
-	lo := fn.newTempVal()
-	hi := fn.newTempVal()
-	fn.emit(&ast.AssignStmt{
-		Tok: token.DEFINE,
-		Lhs: []ast.Expr{lo, hi},
-		Rhs: []ast.Expr{&ast.CallExpr{Fun: newID(name), Args: args}}})
-	fn.pushConst(lo)
-	fn.pushConst(hi)
-}
-
 // Executes a binary builtin call.
 func (fn *funcCompiler) binBuiltin(name string) {
 	y := fn.pop()

@@ -1,18 +1,20 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
 )
 
-func (t *translator) readAtomicOpcode(fn *funcCompiler) error {
+func (t *translator) readOpcodeAtomic(fn *funcCompiler) error {
+	if !*unsafe {
+		return errors.New("unsupported opcode: atomic needs unsafe")
+	}
+
 	code, err := readLEB128(t.in)
 	if err != nil {
 		return err
-	}
-	if !*unsafe {
-		return fmt.Errorf("unsupported opcode (atomic): 0xFE 0x%02X", code)
 	}
 
 	var offset uint64
