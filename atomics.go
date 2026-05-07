@@ -68,6 +68,14 @@ func (t *translator) readAtomicOpcode(fn *funcCompiler) error {
 		fn.push(fn.atomicRmw("int32", "atomic_add32", offset))
 	case 0x1f: // i64.atomic.rmw.add
 		fn.push(fn.atomicRmw("int64", "atomic_add64", offset))
+	case 0x20: // i32.atomic.rmw8.add_u
+		fn.push(fn.atomicRmw("int32", "atomic_add8", offset))
+	case 0x21: // i32.atomic.rmw16.add_u
+		fn.push(fn.atomicRmw("int32", "atomic_add16", offset))
+	case 0x22: // i64.atomic.rmw8.add_u
+		fn.push(fn.atomicRmw("int64", "atomic_add8", offset))
+	case 0x23: // i64.atomic.rmw16.add_u
+		fn.push(fn.atomicRmw("int64", "atomic_add16", offset))
 	case 0x24: // i64.atomic.rmw32.add_u
 		fn.push(fn.atomicRmw("int64", "atomic_add32", offset))
 
@@ -75,8 +83,61 @@ func (t *translator) readAtomicOpcode(fn *funcCompiler) error {
 		fn.push(fn.atomicRmw("int32", "atomic_sub32", offset))
 	case 0x26: // i64.atomic.rmw.sub
 		fn.push(fn.atomicRmw("int64", "atomic_sub64", offset))
+	case 0x27: // i32.atomic.rmw8.sub_u
+		fn.push(fn.atomicRmw("int32", "atomic_sub8", offset))
+	case 0x28: // i32.atomic.rmw16.sub_u
+		fn.push(fn.atomicRmw("int32", "atomic_sub16", offset))
+	case 0x29: // i64.atomic.rmw8.sub_u
+		fn.push(fn.atomicRmw("int64", "atomic_sub8", offset))
+	case 0x2a: // i64.atomic.rmw16.sub_u
+		fn.push(fn.atomicRmw("int64", "atomic_sub16", offset))
 	case 0x2b: // i64.atomic.rmw32.sub_u
 		fn.push(fn.atomicRmw("int64", "atomic_sub32", offset))
+
+	case 0x2c: // i32.atomic.rmw.and
+		fn.push(fn.atomicRmw("int32", "atomic_and32", offset))
+	case 0x2d: // i64.atomic.rmw.and
+		fn.push(fn.atomicRmw("int64", "atomic_and64", offset))
+	case 0x2e: // i32.atomic.rmw8.and_u
+		fn.push(fn.atomicRmw("int32", "atomic_and8", offset))
+	case 0x2f: // i32.atomic.rmw16.and_u
+		fn.push(fn.atomicRmw("int32", "atomic_and16", offset))
+	case 0x30: // i64.atomic.rmw8.and_u
+		fn.push(fn.atomicRmw("int64", "atomic_and8", offset))
+	case 0x31: // i64.atomic.rmw16.and_u
+		fn.push(fn.atomicRmw("int64", "atomic_and16", offset))
+	case 0x32: // i64.atomic.rmw32.and_u
+		fn.push(fn.atomicRmw("int64", "atomic_and32", offset))
+
+	case 0x33: // i32.atomic.rmw.or
+		fn.push(fn.atomicRmw("int32", "atomic_or32", offset))
+	case 0x34: // i64.atomic.rmw.or
+		fn.push(fn.atomicRmw("int64", "atomic_or64", offset))
+	case 0x35: // i32.atomic.rmw8.or_u
+		fn.push(fn.atomicRmw("int32", "atomic_or8", offset))
+	case 0x36: // i32.atomic.rmw16.or_u
+		fn.push(fn.atomicRmw("int32", "atomic_or16", offset))
+	case 0x37: // i64.atomic.rmw8.or_u
+		fn.push(fn.atomicRmw("int64", "atomic_or8", offset))
+	case 0x38: // i64.atomic.rmw16.or_u
+		fn.push(fn.atomicRmw("int64", "atomic_or16", offset))
+	case 0x39: // i64.atomic.rmw32.or_u
+		fn.push(fn.atomicRmw("int64", "atomic_or32", offset))
+
+	case 0x3a: // i32.atomic.rmw.xor
+		fn.push(fn.atomicRmw("int32", "atomic_xor32", offset))
+	case 0x3b: // i64.atomic.rmw.xor
+		fn.push(fn.atomicRmw("int64", "atomic_xor64", offset))
+	case 0x3c: // i32.atomic.rmw8.xor_u
+		fn.push(fn.atomicRmw("int32", "atomic_xor8", offset))
+	case 0x3d: // i32.atomic.rmw16.xor_u
+		fn.push(fn.atomicRmw("int32", "atomic_xor16", offset))
+	case 0x3e: // i64.atomic.rmw8.xor_u
+		fn.push(fn.atomicRmw("int64", "atomic_xor8", offset))
+	case 0x3f: // i64.atomic.rmw16.xor_u
+		fn.push(fn.atomicRmw("int64", "atomic_xor16", offset))
+	case 0x40: // i64.atomic.rmw32.xor_u
+		fn.push(fn.atomicRmw("int64", "atomic_xor32", offset))
 
 	case 0x41: // i32.atomic.rmw.xchg
 		fn.push(fn.atomicRmw("int32", "atomic_xchg32", offset))
