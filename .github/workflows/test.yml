@@ -23,11 +23,14 @@ jobs:
     - name: Test
       run: go test -args -unsafe
 
-    - name: Test amd64
+    - name: Test native
       run: go test ./helpers ./libc-gen/... ./spectest/...
 
     - name: Test 386
       run: GOARCH=386 GO386=sse2 go test ./helpers ./spectest/...
+
+    - name: Test riscv64
+      run: GOARCH=riscv64 go test ./helpers ./spectest/...
 
     - name: Test loong64
       run: GOARCH=loong64 go test ./helpers ./spectest/...
@@ -78,7 +81,7 @@ jobs:
     - name: Test
       run: go test -args -unsafe
 
-    - name: Test arm64
+    - name: Test native
       run: go test ./helpers ./libc-gen/... ./spectest/...
 
     - name: Test arm
@@ -89,8 +92,12 @@ jobs:
         go test -run translate -args -noopt
         go test ./spectest/...
 
-  test-riscv:
-    runs-on: ubuntu-24.04-riscv
+  test-other:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04-riscv, ubuntu-24.04-ppc64le-p10, ubuntu-24.04-s390x]
+    needs: test
 
     steps:
     - uses: actions/checkout@v6
@@ -100,7 +107,7 @@ jobs:
     - name: Test
       run: go test -args -unsafe
 
-    - name: Test riscv
+    - name: Test native
       run: go test ./helpers ./libc-gen/... ./spectest/...
 
     - name: Test no optimization
