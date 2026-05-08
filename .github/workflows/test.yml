@@ -101,8 +101,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-    - uses: actions/setup-go@v6
-      with: { go-version: stable }
 
     - name: Test
       run: go test -args -unsafe
