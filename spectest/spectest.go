@@ -218,10 +218,6 @@ func RecoverTrap(t testing.TB, want string) {
 		if strings.Contains(got, "is nil") {
 			return
 		}
-	case strings.Contains(want, "expected shared memory"):
-		if strings.Contains(got, "nil pointer dereference") {
-			return
-		}
 	}
 
 	t.Fatalf("got trap %q, want %q", got, want)

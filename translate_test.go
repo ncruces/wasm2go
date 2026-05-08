@@ -12,6 +12,7 @@ import (
 	"testing"
 )
 
+//go:generate go test -run translate -args -unsafe
 //go:generate go test -run translate
 
 func Test_translate(t *testing.T) {
