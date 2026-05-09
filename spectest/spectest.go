@@ -14,10 +14,6 @@ import (
 )
 
 func Test(t *testing.T, modptr any, data []byte, name string) {
-	if skipFloat(name) {
-		t.SkipNow()
-	}
-
 	var test struct {
 		Commands []struct {
 			Type     string `json:"type"`
@@ -112,48 +108,56 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 							if err != nil {
 								t.Fatal(err)
 							}
-							if got, want := res[i].Interface().(int32), int32(v); got != want {
-								t.Errorf("got %d, want %d", got, want)
+							if i := res[i].Interface().(int32); i != int32(v) {
+								if skipFloatBits(name) && isInfOrNaN32(uint32(v)) && isInfOrNaN32(uint32(i)) {
+									t.Logf("got %d, want %d", i, int32(v))
+								} else {
+									t.Errorf("got %d, want %d", i, int32(v))
+								}
 							}
 						case "i64":
 							v, err := strconv.ParseUint(exp.Value, 10, 64)
 							if err != nil {
 								t.Fatal(err)
 							}
-							if got, want := res[i].Interface().(int64), int64(v); got != want {
-								t.Errorf("got %d, want %d", got, want)
+							if i := res[i].Interface().(int64); i != int64(v) {
+								if skipFloatBits(name) && isInfOrNaN64(uint64(v)) && isInfOrNaN64(uint64(i)) {
+									t.Logf("got %d, want %d", i, int64(v))
+								} else {
+									t.Errorf("got %d, want %d", i, int64(v))
+								}
 							}
 						case "f32":
 							f := res[i].Interface().(float32)
 							v := math.Float32bits(f)
 							switch exp.Value {
 							case "nan:canonical":
-								if !testCanonical() && math.IsNaN(float64(f)) {
-									t.Logf("got %x, want nan:canonical", v)
-									break
-								}
 								if v != 0xffc00000 && v != 0x7fc00000 {
-									t.Errorf("got %x, want nan:canonical", v)
+									if skipCanonical() && isNaN32(v) {
+										t.Logf("got %x, want nan:canonical", v)
+									} else {
+										t.Errorf("got %x, want nan:canonical", v)
+									}
 								}
 							case "nan:arithmetic":
-								if !testCanonical() && math.IsNaN(float64(f)) {
-									t.Logf("got %x, want nan:arithmetic", v)
-									break
-								}
 								if v&0x7fc00000 != 0x7fc00000 {
-									t.Errorf("got %x, want nan:arithmetic", v)
+									if skipCanonical() && isNaN32(v) {
+										t.Logf("got %x, want nan:arithmetic", v)
+									} else {
+										t.Errorf("got %x, want nan:arithmetic", v)
+									}
 								}
 							default:
 								i, err := strconv.ParseUint(exp.Value, 10, 32)
 								if err != nil {
 									t.Fatal(err)
 								}
-								if !testNaNBits() && math.IsNaN(float64(f)) && math.IsNaN(float64(math.Float32frombits(uint32(i)))) {
-									t.Logf("got %d, want %d", v, uint32(i))
-									break
-								}
 								if v != uint32(i) {
-									t.Errorf("got %d, want %d", v, uint32(i))
+									if skipFloatBits(name) && isNaN32(v) && isNaN32(uint32(i)) {
+										t.Logf("got %d, want %d", v, uint32(i))
+									} else {
+										t.Errorf("got %d, want %d", v, uint32(i))
+									}
 								}
 							}
 						case "f64":
@@ -161,32 +165,32 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 							v := math.Float64bits(f)
 							switch exp.Value {
 							case "nan:canonical":
-								if !testCanonical() && math.IsNaN(f) {
-									t.Logf("got %x, want nan:canonical", v)
-									break
-								}
 								if v != 0xfff8000000000000 && v != 0x7ff8000000000000 {
-									t.Errorf("got %x, want nan:canonical", v)
+									if skipCanonical() && isNaN64(v) {
+										t.Logf("got %x, want nan:canonical", v)
+									} else {
+										t.Errorf("got %x, want nan:canonical", v)
+									}
 								}
 							case "nan:arithmetic":
-								if !testCanonical() && math.IsNaN(f) {
-									t.Logf("got %x, want nan:arithmetic", v)
-									break
-								}
 								if v&0x7ff8000000000000 != 0x7ff8000000000000 {
-									t.Errorf("got %x, want nan:arithmetic", v)
+									if skipCanonical() && isNaN64(v) {
+										t.Logf("got %x, want nan:arithmetic", v)
+									} else {
+										t.Errorf("got %x, want nan:arithmetic", v)
+									}
 								}
 							default:
 								i, err := strconv.ParseUint(exp.Value, 10, 64)
 								if err != nil {
 									t.Fatal(err)
 								}
-								if !testNaNBits() && math.IsNaN(f) && math.IsNaN(math.Float64frombits(i)) {
-									t.Logf("got %d, want %d", v, uint64(i))
-									break
-								}
 								if v != uint64(i) {
-									t.Errorf("got %d, want %d", v, uint64(i))
+									if skipFloatBits(name) && isNaN64(v) && isNaN64(i) {
+										t.Logf("got %d, want %d", v, uint64(i))
+									} else {
+										t.Errorf("got %d, want %d", v, uint64(i))
+									}
 								}
 							}
 						}
@@ -231,24 +235,38 @@ func RecoverTrap(t testing.TB, want string) {
 	t.Fatalf("got trap %q, want %q", got, want)
 }
 
-// We skip float tests on MIPS, due to inaccuracy.
-func skipFloat(name string) bool {
-	return strings.HasPrefix(runtime.GOARCH, "mips") &&
-		(strings.Contains(name, "float") ||
-			strings.Contains(name, "f32") ||
-			strings.Contains(name, "f64"))
-}
-
 // We only check for canonical NaNs on amd64 and arm64.
-func testCanonical() bool {
+func skipCanonical() bool {
 	switch runtime.GOARCH {
 	case "amd64", "arm64":
-		return true
+		return false
+	}
+	return true
+}
+
+// We skip specific float bit pattern checks (infinities, NaNs) on s390x and MIPS.
+func skipFloatBits(name string) bool {
+	if runtime.GOARCH == "s390x" || strings.HasPrefix(runtime.GOARCH, "mips") {
+		return (strings.Contains(name, "float") ||
+			strings.Contains(name, "f32") ||
+			strings.Contains(name, "f64"))
 	}
 	return false
 }
 
-// We don't check for specific NaN bit patterns on s390x.
-func testNaNBits() bool {
-	return runtime.GOARCH != "s390x"
+func isNaN32(bits uint32) bool {
+	return (bits & 0x7FFFFFFF) > 0x7F800000
+}
+
+// isNaN64 evaluates a float64's raw bits to detect a NaN.
+func isNaN64(bits uint64) bool {
+	return (bits & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000
+}
+
+func isInfOrNaN32(bits uint32) bool {
+	return (bits & 0x7FFFFFFF) >= 0x7F800000
+}
+
+func isInfOrNaN64(bits uint64) bool {
+	return (bits & 0x7FFFFFFFFFFFFFFF) >= 0x7FF0000000000000
 }
