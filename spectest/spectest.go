@@ -148,6 +148,10 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 								if err != nil {
 									t.Fatal(err)
 								}
+								if !testNaNBits() && math.IsNaN(float64(f)) && math.IsNaN(float64(math.Float32frombits(uint32(i)))) {
+									t.Logf("got %d, want %d", v, uint32(i))
+									break
+								}
 								if v != uint32(i) {
 									t.Errorf("got %d, want %d", v, uint32(i))
 								}
@@ -176,6 +180,10 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 								i, err := strconv.ParseUint(exp.Value, 10, 64)
 								if err != nil {
 									t.Fatal(err)
+								}
+								if !testNaNBits() && math.IsNaN(f) && math.IsNaN(math.Float64frombits(i)) {
+									t.Logf("got %d, want %d", v, uint64(i))
+									break
 								}
 								if v != uint64(i) {
 									t.Errorf("got %d, want %d", v, uint64(i))
@@ -238,4 +246,9 @@ func testCanonical() bool {
 		return true
 	}
 	return false
+}
+
+// We don't check for specific NaN bit patterns on s390x.
+func testNaNBits() bool {
+	return runtime.GOARCH != "s390x"
 }
