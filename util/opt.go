@@ -259,27 +259,49 @@ func RemoveParens(n ast.Node) {
 }
 
 // SimplifyGotos replaces all instances of "goto ${label}" with the contents
-// of its code block specifically where it only contains a return statement.
-func SimplifyGotos(root ast.Node) {
+// of its code block specifically where it only contains a return statement,
+// or an empty statement and is the last in the function block.
+func SimplifyGotos(fn *ast.FuncDecl) {
 	returns := make(map[string]*ast.ReturnStmt)
 
 	// First walk to find labelled statements that only contain
 	// a return, collecting the return and deleting the label.
-	astutil.Apply(root, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		switch n := c.Node().(type) {
 		case *ast.LabeledStmt:
 			switch s := n.Stmt.(type) {
 			case *ast.ReturnStmt:
 				returns[n.Label.Name] = s
-				c.Delete()
+
+				// If this isn't the last stmt in the function
+				// body, labeled return can safely be deleted.
+				if fn.Body.List[len(fn.Body.List)-1] != n {
+					c.Delete()
+					break
+				}
+
+				// Else just drop label
+				// and inline the return.
+				c.Replace(s)
+
+			case *ast.EmptyStmt:
+				// If this is the last stmt in the function
+				// body and it's empty, all gotos can be
+				// replaced with a zero parameter return.
+				if fn.Body.List[len(fn.Body.List)-1] == n {
+					returns[n.Label.Name] = &ast.ReturnStmt{}
+					c.Delete()
+				}
 			}
 		}
 		return true
 	})
 
 	// Second walk to replace all "goto ${label}" with return.
-	astutil.Apply(root, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		switch n := c.Node().(type) {
+		case *ast.LabeledStmt:
+
 		case *ast.BranchStmt:
 			if n.Tok == token.GOTO {
 				ret, ok := returns[n.Label.Name]
