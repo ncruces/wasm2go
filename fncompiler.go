@@ -589,6 +589,7 @@ func (fn *funcCompiler) cleanup() {
 	if !*noopt {
 		util.UnnestBlocks(fn.decl)
 		util.RemoveEmptyStmts(fn.decl)
+		util.SimplifyGotos(fn.decl)
 		util.RemoveSelfAssign(fn.decl)
 		util.RemoveBlankAssigns(fn.decl)
 		if util.RemoveReceiver(fn.decl) {

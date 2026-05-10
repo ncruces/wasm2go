@@ -258,6 +258,40 @@ func RemoveParens(n ast.Node) {
 	})
 }
 
+// SimplifyGotos replaces all instances of "goto ${label}" with the contents
+// of its code block specifically where it only contains a return statement.
+func SimplifyGotos(root ast.Node) {
+	returns := make(map[string]*ast.ReturnStmt)
+
+	// First walk to find labelled statements that only contain
+	// a return, collecting the return and deleting the label.
+	astutil.Apply(root, nil, func(c *astutil.Cursor) bool {
+		switch n := c.Node().(type) {
+		case *ast.LabeledStmt:
+			switch s := n.Stmt.(type) {
+			case *ast.ReturnStmt:
+				returns[n.Label.Name] = s
+				c.Delete()
+			}
+		}
+		return true
+	})
+
+	// Second walk to replace all "goto ${label}" with return.
+	astutil.Apply(root, nil, func(c *astutil.Cursor) bool {
+		switch n := c.Node().(type) {
+		case *ast.BranchStmt:
+			if n.Tok == token.GOTO {
+				ret, ok := returns[n.Label.Name]
+				if ok {
+					c.Replace(ret)
+				}
+			}
+		}
+		return true
+	})
+}
+
 // countUses counts uses of an identifier.
 func countUses(n ast.Node) map[string]int {
 	uses := make(map[string]int)
