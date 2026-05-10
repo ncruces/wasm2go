@@ -258,9 +258,10 @@ func RemoveParens(n ast.Node) {
 	})
 }
 
-// SimplifyGotos replaces all instances of "goto ${label}" with the contents
-// of its code block specifically where it only contains a return statement,
-// or an empty statement and is the last in the function block.
+// SimplifyGotos replaces all instances of "goto ${label}" with
+// a return statement, specifically where labeled block matches:
+// - an empty labeled statement at the end of function body
+// - a labeled statement consisting of only a "simple" return
 func SimplifyGotos(fn *ast.FuncDecl) {
 	returns := make(map[string]*ast.ReturnStmt)
 
@@ -271,18 +272,20 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 		case *ast.LabeledStmt:
 			switch s := n.Stmt.(type) {
 			case *ast.ReturnStmt:
-				returns[n.Label.Name] = s
+				if isSimpleReturn(s) {
+					returns[n.Label.Name] = s
 
-				// If this isn't the last stmt in the function
-				// body, labeled return can safely be deleted.
-				if fn.Body.List[len(fn.Body.List)-1] != n {
-					c.Delete()
-					break
+					// If this isn't the last stmt in the function
+					// body, labeled return can safely be deleted.
+					if fn.Body.List[len(fn.Body.List)-1] != n {
+						c.Delete()
+						break
+					}
+
+					// Else just drop label
+					// and inline the return.
+					c.Replace(s)
 				}
-
-				// Else just drop label
-				// and inline the return.
-				c.Replace(s)
 
 			case *ast.EmptyStmt:
 				// If this is the last stmt in the function
@@ -300,8 +303,6 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 	// Second walk to replace all "goto ${label}" with return.
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		switch n := c.Node().(type) {
-		case *ast.LabeledStmt:
-
 		case *ast.BranchStmt:
 			if n.Tok == token.GOTO {
 				ret, ok := returns[n.Label.Name]
@@ -312,6 +313,39 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 		}
 		return true
 	})
+}
+
+// isSimpleReturn applies isSimpleValue() to each of the return's
+// result expressions, returning true only if all are simple.
+func isSimpleReturn(r *ast.ReturnStmt) bool {
+	for _, res := range r.Results {
+		if !isSimpleValue(res) {
+			return false
+		}
+	}
+	return true
+}
+
+// isSimpleValue returns whether given ast.Expr is
+// a simple value type, i.e. just a variable or literal,
+// taking int account any casting to primitive types.
+func isSimpleValue(n ast.Expr) bool {
+	switch n := n.(type) {
+	case *ast.Ident:
+		return true
+	case *ast.BasicLit:
+		return true
+	case *ast.CallExpr:
+		if len(n.Args) == 1 {
+			if id, ok := n.Fun.(*ast.Ident); ok &&
+				(strings.HasPrefix(id.Name, "int") ||
+					strings.HasPrefix(id.Name, "uint") ||
+					strings.HasPrefix(id.Name, "float")) {
+				return isSimpleValue(n.Args[0])
+			}
+		}
+	}
+	return false
 }
 
 // countUses counts uses of an identifier.
