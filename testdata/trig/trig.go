@@ -42,7 +42,7 @@ func (m *Module) Xsin(v0 float64) float64 {
 l0:
 	v1 = math.Float64frombits(0x7ff8000000000000)
 	if int64(math.Float64bits(v0))&i64(0x7fffffffffffffff) > i64(0x7fefffffffffffff) {
-		goto l1
+		return v1
 	}
 	v1 = float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0))
 	if !(math.Abs(v1) < float64(0x1p+63)) {
@@ -66,13 +66,13 @@ l9:
 	}
 	switch int32(v2) & i32(3) {
 	case 1:
-		goto l6
+		return v4
 	case 2:
 		goto l7
 	case 3:
 		goto l8
 	default:
-		goto l1
+		return v1
 	}
 l5:
 	v3 = v3 + i32(-1)
@@ -81,18 +81,15 @@ l5:
 	v1 = float64(v1 + v1)
 	v4 = float64(float64(1) - float64(v0+v0))
 	goto l9
-l6:
-	return v4
 l7:
 	return -v1
 l8:
 	v1 = -v4
-	goto l1
+	return v1
 l4:
 	v3 = v3 + i32(1)
 	v1 = float64(v1 * float64(0.5))
 	goto l10
-l1:
 	return v1
 }
 func (m *Module) Xmemory() Memory {

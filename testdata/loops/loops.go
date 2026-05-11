@@ -47,7 +47,7 @@ func (m *Module) Xadd_all(v0, v1 int32) int32 {
 l1:
 	{
 		if v2 >= v1 {
-			goto l0
+			return v4
 		}
 		v3 = v0 + v2*i32(4)
 		t0 := v4
@@ -55,7 +55,6 @@ l1:
 		v2 = v2 + i32(1)
 		goto l1
 	}
-l0:
 	return v4
 }
 func (m *Module) Xrand_multiple_of_10() int32 {
@@ -72,11 +71,10 @@ func (m *Module) Xfirst_power_over_limit(v0, v1 int32) int32 {
 	v2 = i32(1)
 l1:
 	if v2 > v1 {
-		goto l0
+		return v2
 	}
 	v2 = v2 * v0
 	goto l1
-l0:
 	return v2
 }
 
