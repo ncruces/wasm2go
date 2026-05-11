@@ -253,6 +253,7 @@ func (fn *funcCompiler) atomicWait(name string, offset uint64) ast.Expr {
 	exp = convert(exp, "uint"+bits)
 
 	fn.helpers.add(name)
+	fn.helpers.add("atomic_wait")
 	fn.helpers.add("atomic_waiters")
 	fn.helpers.add("atomic_ptr" + bits)
 	return &ast.CallExpr{

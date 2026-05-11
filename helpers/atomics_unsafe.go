@@ -632,98 +632,54 @@ func atomic_notify[T uint32 | int64](mem []byte, addr T, count int32, waiters *s
 	return int32(res)
 }
 
+//go:nosplit
 func atomic_wait32[T uint32 | int64](mem []byte, addr T, exp uint32, timeout int64, waiters *sync.Map) int32 {
-	const (
-		ok        = 0
-		not_equal = 1
-		timed_out = 2
-	)
-
-	ptr := atomic_ptr32(mem, addr)
-	if waiters == nil {
-		panic("expected shared memory")
-	}
 	if big {
 		exp = bits.ReverseBytes32(exp)
 	}
-	if timeout == 0 {
-		if exp != atomic.LoadUint32(ptr) {
-			return not_equal
-		}
-		return timed_out
-	}
-
-	wa, _ := waiters.LoadOrStore(int64(addr), &atomic_waiters{})
-	w := wa.(*atomic_waiters)
-	w.Lock()
-
-	switch {
-	case exp != atomic.LoadUint32(ptr):
-		w.Unlock()
-		return not_equal
-	case w.C == nil:
-		w.C = make(chan struct{}, min(math.MaxInt, math.MaxUint32))
-	case w.N >= cap(w.C):
-		w.Unlock()
-		panic("too many waiters")
-	}
-
-	wait := w.C
-	w.N++
-	w.Unlock()
-
-	if timeout < 0 {
-		<-wait
-		return ok
-	}
-
-	timer := time.NewTimer(time.Duration(timeout))
-	select {
-	case <-wait:
-		timer.Stop()
-		return ok
-	case <-timer.C:
-	}
-
-	w.Lock()
-	select {
-	case <-wait:
-		w.Unlock()
-		return ok
-	default:
-		w.N--
-		w.Unlock()
-		return timed_out
-	}
+	ptr := atomic_ptr32(mem, addr)
+	return atomic_wait(int64(addr), timeout, waiters, func() bool {
+		return exp == atomic.LoadUint32(ptr)
+	})
 }
 
+//go:nosplit
 func atomic_wait64[T uint32 | int64](mem []byte, addr T, exp uint64, timeout int64, waiters *sync.Map) int32 {
+	if big {
+		exp = bits.ReverseBytes64(exp)
+	}
+	ptr := atomic_ptr64(mem, addr)
+	return atomic_wait(int64(addr), timeout, waiters, func() bool {
+		return exp == atomic.LoadUint64(ptr)
+	})
+}
+
+func atomic_wait(addr, timeout int64, waiters *sync.Map, equal func() bool) int32 {
 	const (
 		ok        = 0
 		not_equal = 1
 		timed_out = 2
 	)
 
-	ptr := atomic_ptr64(mem, addr)
 	if waiters == nil {
 		panic("expected shared memory")
 	}
-	if big {
-		exp = bits.ReverseBytes64(exp)
-	}
 	if timeout == 0 {
-		if exp != atomic.LoadUint64(ptr) {
+		if !equal() {
 			return not_equal
 		}
 		return timed_out
 	}
 
-	wa, _ := waiters.LoadOrStore(int64(addr), &atomic_waiters{})
+	wa, loaded := waiters.Load(addr)
+	if !loaded {
+		wa, _ = waiters.LoadOrStore(addr, &atomic_waiters{})
+	}
 	w := wa.(*atomic_waiters)
 	w.Lock()
 
 	switch {
-	case exp != atomic.LoadUint64(ptr):
+	case !equal():
 		w.Unlock()
 		return not_equal
 	case w.C == nil:
@@ -751,15 +707,14 @@ func atomic_wait64[T uint32 | int64](mem []byte, addr T, exp uint64, timeout int
 	}
 
 	w.Lock()
-	select {
-	case <-wait:
-		w.Unlock()
-		return ok
-	default:
+	if w.N > 0 {
 		w.N--
 		w.Unlock()
 		return timed_out
 	}
+	<-wait
+	w.Unlock()
+	return ok
 }
 
 //go:nosplit

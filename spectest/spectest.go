@@ -258,7 +258,6 @@ func isNaN32(bits uint32) bool {
 	return (bits & 0x7FFFFFFF) > 0x7F800000
 }
 
-// isNaN64 evaluates a float64's raw bits to detect a NaN.
 func isNaN64(bits uint64) bool {
 	return (bits & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000
 }
