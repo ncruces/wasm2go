@@ -591,6 +591,7 @@ func (fn *funcCompiler) cleanup() {
 		util.RemoveEmptyStmts(fn.decl)
 		util.RemoveSelfAssign(fn.decl)
 		util.RemoveBlankAssigns(fn.decl)
+		util.SimplifyGotoEnd(fn.decl)
 		if util.RemoveReceiver(fn.decl) {
 			fn.call.(*ast.ParenExpr).X = fn.decl.Name
 		}

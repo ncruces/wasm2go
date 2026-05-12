@@ -220,6 +220,36 @@ func UnnestBlocks(n ast.Node) {
 	})
 }
 
+// SimplifyGotoEnd replaces a goto to the end of a function with return.
+func SimplifyGotoEnd(fn *ast.FuncDecl) {
+	// A non-empty function returning no values.
+	if len(fn.Body.List) == 0 || fn.Type.Results != nil && len(fn.Type.Results.List) > 0 {
+		return
+	}
+
+	// An empty labeled statement at the end.
+	last := len(fn.Body.List) - 1
+	ls, ok := fn.Body.List[last].(*ast.LabeledStmt)
+	if !ok {
+		return
+	}
+	if _, ok := ls.Stmt.(*ast.EmptyStmt); !ok {
+		return
+	}
+
+	// Remove the statement.
+	fn.Body.List = fn.Body.List[:last]
+
+	// Fix the branches.
+	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+		if branch, ok := c.Node().(*ast.BranchStmt); ok &&
+			branch.Tok == token.GOTO && branch.Label.Name == ls.Label.Name {
+			c.Replace(&ast.ReturnStmt{})
+		}
+		return true
+	})
+}
+
 // RemoveReceiver converts a method that doesn't use their receiver
 // into a plain function.
 // Returns true if we need to update call sites.
