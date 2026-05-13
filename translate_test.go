@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -14,6 +15,8 @@ import (
 
 //go:generate go test -run translate -args -unsafe
 //go:generate go test -run translate
+
+var runGopls = (os.Getenv("RUN_GOPLS") != "")
 
 func Test_translate(t *testing.T) {
 	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
@@ -34,9 +37,20 @@ func Test_translate(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			err = os.WriteFile(path+".go", out.Bytes(), 0644)
+			gopath := path + ".go"
+
+			err = os.WriteFile(gopath, out.Bytes(), 0644)
 			if err != nil {
 				t.Fatal(err)
+			}
+
+			if runGopls {
+				cmd := exec.Command("gopls", "check", "./"+gopath)
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				if err := cmd.Run(); err != nil {
+					panic(err)
+				}
 			}
 		})
 	}
@@ -66,7 +80,9 @@ func Test_translateSpecTest(t *testing.T) {
 				return nil
 			}
 
-			err = os.WriteFile(strings.TrimRight(path, ext)+".go", out.Bytes(), 0644)
+			gopath := strings.TrimRight(path, ext) + ".go"
+
+			err = os.WriteFile(gopath, out.Bytes(), 0644)
 			if err != nil {
 				t.Errorf("%s: %v", path, err)
 				return nil
@@ -76,6 +92,15 @@ func Test_translateSpecTest(t *testing.T) {
 			if err != nil {
 				t.Errorf("%s: %v", path, err)
 				return nil
+			}
+
+			if runGopls {
+				cmd := exec.Command("gopls", "check", "./"+gopath)
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				if err := cmd.Run(); err != nil {
+					panic(err)
+				}
 			}
 		}
 		return nil

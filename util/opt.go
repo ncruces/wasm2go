@@ -422,20 +422,14 @@ func cannotFallthrough(n ast.Node) bool {
 
 			// Empty case always
 			// falls to successor.
-			if len(cc.List) == 0 {
+			if len(cc.Body) == 0 {
 				return false
 			}
 
 			// Check if any statements
 			// in block can break-out.
-			//
-			// TODO?: this is quite limited
-			// in its heuristic abilities here
-			// without handling breaks separately.
-			for _, n := range cc.List {
-				if !cannotFallthrough(n) {
-					return false
-				}
+			if !cannotBreak(cc.Body) {
+				return false
 			}
 
 			if !hasDefault {
@@ -449,9 +443,63 @@ func cannotFallthrough(n ast.Node) bool {
 		// there's a default case.
 		return hasDefault
 
+	case *ast.ForStmt:
+		// Any for loops with a
+		// cond can fallthrough.
+		if n.Cond != nil {
+			return false
+		}
+
+		// Otherwise, check for a BREAK.
+		return cannotBreak(n.Body.List)
+
+	case *ast.IfStmt:
+		// Any if without an
+		// else can fallthrough.
+		if n.Else == nil {
+			return false
+		}
+
+		// Otherwise check if either body can.
+		return cannotFallthrough(n.Body) &&
+			cannotFallthrough(n.Else)
+
 	default:
 		return false
 	}
+}
+
+// cannotBreak returns whether the list of expressions / statements passed
+// DEFINITIVELY DO NOT break out from that list. the default value is false.
+func cannotBreak[T any](list []T) bool {
+	if len(list) == 0 {
+		return false
+	}
+	for _, e := range list {
+		switch e := any(e).(type) {
+		// Some simple types
+		// we know don't break.
+		case *ast.CallExpr:
+		case *ast.BinaryExpr:
+		case *ast.AssignStmt:
+		case *ast.ReturnStmt:
+
+		// Handle specific
+		// flow branch types.
+		case *ast.BranchStmt:
+			switch e.Tok {
+			case token.BREAK,
+				token.FALLTHROUGH:
+				return false
+			}
+
+		// All else treat as a
+		// break from case / loop.
+		default:
+			return false
+		}
+	}
+	return true
 }
 
 // isSimpleReturn applies isSimpleValue() to each of the return's
