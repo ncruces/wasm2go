@@ -68,7 +68,7 @@ l9:
 	case 1:
 		return v4
 	case 2:
-		goto l7
+		return -v1
 	case 3:
 		goto l8
 	default:
@@ -81,8 +81,6 @@ l5:
 	v1 = float64(v1 + v1)
 	v4 = float64(float64(1) - float64(v0+v0))
 	goto l9
-l7:
-	return -v1
 l8:
 	v1 = -v4
 	return v1

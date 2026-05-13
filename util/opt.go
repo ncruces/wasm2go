@@ -268,59 +268,99 @@ func RemoveParens(n ast.Node) {
 //     where fallthrough can be definitively ruled-out, the labeled
 //     return will also be deleted from the funtion block.
 func SimplifyGotos(fn *ast.FuncDecl) {
-	returns := make(map[string]*ast.ReturnStmt)
+	type labeledReturn struct {
+		Stmt   *ast.ReturnStmt
+		NoFall bool
+		Simple bool
+		Uses   int
+	}
 
-	// First walk to find suitable labeled statements
-	// containing only a return, or empty at end of func.
+	// Gather labeled return information by name.
+	returns := make(map[string]*labeledReturn)
+	mustGet := func(label string) *labeledReturn {
+		ret, ok := returns[label]
+		if !ok {
+			ret = new(labeledReturn)
+			returns[label] = ret
+		}
+		return ret
+	}
+
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
-		p := c.Parent() // parent node
 		switch n := c.Node().(type) {
 		case *ast.LabeledStmt:
 			switch s := n.Stmt.(type) {
 			case *ast.ReturnStmt:
-
-				// Only try to "inline" this return
-				// if it's a return of "simple" values,
-				// otherwise this can increase complexity.
-				if isSimpleReturn(s) {
-					returns[n.Label.Name] = s
-
-					// Only if this labeled return DEFINITIVELY
-					// cannot be fallen-through-to, do we remove
-					// it. Otherwise drop label and keep return.
-					if p := getPreviousInBlock(p, n); //
-					cannotFallthrough(p) {
-						c.Delete()
-					} else {
-						c.Replace(s)
-					}
-				}
-
+				// Gather information on
+				// explicit labeled returns.
+				ret := mustGet(n.Label.Name)
+				ret.Simple = isSimpleReturn(s)
+				prev := getPreviousInBlock(c.Parent(), n)
+				ret.NoFall = cannotFallthrough(prev)
+				ret.Stmt = s
 			case *ast.EmptyStmt:
-				// If this is the last stmt in the function
-				// body and it's empty, all gotos can be
-				// replaced with a zero parameter return.
-				//
-				// We don't need to check for fallthroughs as unless this
-				// is invalid AST, reaching the end of the function block
-				// will be semantically equivalent to an empty return.
-				if fn.Body.List[len(fn.Body.List)-1] == n {
-					returns[n.Label.Name] = &ast.ReturnStmt{}
-					c.Delete()
+				// Also add a "deletion" marker for implicit
+				// labeled returns, i.e. goto: function end.
+				if n == fn.Body.List[len(fn.Body.List)-1] {
+					ret := mustGet(n.Label.Name)
+					ret.Simple = true
+					ret.NoFall = true
+					ret.Stmt = &ast.ReturnStmt{}
 				}
+			}
+		case *ast.BranchStmt:
+			if n.Tok == token.GOTO {
+				// Count uses of all labels.
+				ret := mustGet(n.Label.Name)
+				ret.Uses++
 			}
 		}
 		return true
 	})
 
-	// Second walk to replace matching labels with return.
+	// Filter out any without a return set,
+	// i.e. labeled non-single-return blocks.
+	for label, ret := range returns {
+		if ret.Stmt == nil {
+			delete(returns, label)
+		}
+	}
+
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		switch n := c.Node().(type) {
+		case *ast.LabeledStmt:
+			switch s := n.Stmt.(type) {
+			case *ast.ReturnStmt:
+				switch ret := mustGet(n.Label.Name); {
+				// All returns that can't be fallen-into and are
+				// either simple enough to not increase function
+				// complexity if inlined, or are complex but only
+				// used once, we remove and inline in the function.
+				case ret.NoFall && (ret.Uses <= 1 || ret.Simple):
+					c.Delete()
+
+				// i.e. simple but can't definitively say that it
+				// can't be fallen-through-to. we leave the return
+				// in place but drop the label.
+				case ret.Simple:
+					c.Replace(s)
+				}
+			case *ast.EmptyStmt:
+				// It's safe to remove all empty statement
+				// labels we gathered, these will only be
+				// implicit returns at end of function body.
+				if _, ok := returns[n.Label.Name]; ok {
+					c.Delete()
+				}
+			}
 		case *ast.BranchStmt:
 			if n.Tok == token.GOTO {
-				ret, ok := returns[n.Label.Name]
-				if ok {
-					c.Replace(ret)
+				// Replace all "goto ${label}" instances of those
+				// labels replaced / deleted above, with just the
+				// return statement originally contained at label.
+				if ret, ok := returns[n.Label.Name]; //
+				ok && (ret.Simple || ret.NoFall && ret.Uses <= 1) {
+					c.Replace(ret.Stmt)
 				}
 			}
 		}
@@ -350,16 +390,69 @@ func cannotFallthrough(n ast.Node) bool {
 	switch n := n.(type) {
 	case *ast.LabeledStmt:
 		return cannotFallthrough(n.Stmt)
+
 	case *ast.ReturnStmt:
 		return true
+
 	case *ast.BranchStmt:
-		return n.Tok != token.BREAK
+		switch n.Tok {
+		// Anything other than GOTO / CONTINUE
+		// alters the control flow in such a
+		// way we can't guarantee it won't fall.
+		case token.GOTO, token.CONTINUE:
+			return true
+		default:
+			return false
+		}
+
 	case *ast.BlockStmt:
+		// Empty block always
+		// falls to successor.
 		if len(n.List) == 0 {
 			return false
 		}
+
+		// Check if last statement
+		// in block falls through.
 		last := n.List[len(n.List)-1]
 		return cannotFallthrough(last)
+
+	case *ast.SwitchStmt:
+		var hasDefault bool
+
+		// Check through all clauses.
+		for _, n := range n.Body.List {
+			cc, _ := n.(*ast.CaseClause)
+
+			// Empty case always
+			// falls to successor.
+			if len(cc.List) == 0 {
+				return false
+			}
+
+			// Check if any statements
+			// in block can break-out.
+			//
+			// TODO?: this is quite limited
+			// in its heuristic abilities here
+			// without handling breaks separately.
+			for _, n := range cc.List {
+				if !cannotFallthrough(n) {
+					return false
+				}
+			}
+
+			if !hasDefault {
+				// Check if case is default stmt.
+				hasDefault = (len(cc.List) == 0)
+			}
+		}
+
+		// None of cases fallthrough
+		// only definitely doesn't if
+		// there's a default case.
+		return hasDefault
+
 	default:
 		return false
 	}
@@ -385,6 +478,11 @@ func isSimpleValue(n ast.Expr) bool {
 		return true
 	case *ast.BasicLit:
 		return true
+	case *ast.UnaryExpr:
+		return isSimpleValue(n.X)
+	case *ast.BinaryExpr:
+		return isSimpleValue(n.X) &&
+			isSimpleValue(n.Y)
 	case *ast.CallExpr:
 		if len(n.Args) != 1 {
 			return false
