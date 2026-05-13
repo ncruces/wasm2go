@@ -279,11 +279,9 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 			switch s := n.Stmt.(type) {
 			case *ast.ReturnStmt:
 
-				// Only try to "inline" this
-				// return if it's a return of
-				// "simple" values, otherwise
-				// this can increase function
-				// hairiness to the Go compiler.
+				// Only try to "inline" this return
+				// if it's a return of "simple" values,
+				// otherwise this can increase complexity.
 				if isSimpleReturn(s) {
 					returns[n.Label.Name] = s
 
@@ -346,12 +344,10 @@ func getPreviousInBlock(p ast.Node, n ast.Stmt) ast.Node {
 	}
 }
 
-// cannotFallthrough returns whether the given node 'n' will definitively
+// cannotFallthrough returns whether the given node 'n' will DEFINITIVELY
 // NOT fallthrough to the stmt succeeding it. default return value is false.
 func cannotFallthrough(n ast.Node) bool {
 	switch n := n.(type) {
-	case nil:
-		return true
 	case *ast.LabeledStmt:
 		return cannotFallthrough(n.Stmt)
 	case *ast.ReturnStmt:
@@ -390,13 +386,19 @@ func isSimpleValue(n ast.Expr) bool {
 	case *ast.BasicLit:
 		return true
 	case *ast.CallExpr:
-		if len(n.Args) == 1 {
-			if id, ok := n.Fun.(*ast.Ident); ok &&
-				(strings.HasPrefix(id.Name, "int") ||
-					strings.HasPrefix(id.Name, "uint") ||
-					strings.HasPrefix(id.Name, "float")) {
-				return isSimpleValue(n.Args[0])
-			}
+		if len(n.Args) != 1 {
+			return false
+		}
+		id, ok := n.Fun.(*ast.Ident)
+		if !ok {
+			return false
+		}
+		switch id.Name {
+		case "int", "int8", "int16", "int32", "int64", // signed integer types
+			"uint", "uint8", "uint16", "uint32", "uint64", // unsigned integer types
+			"float32", "float64", // float types
+			"i32", "i64", "f32", "f64": // anti-const-folding helpers (see helpers/helpers.go)
+			return isSimpleValue(n.Args[0])
 		}
 	}
 	return false
