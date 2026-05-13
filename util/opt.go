@@ -260,21 +260,36 @@ func RemoveParens(n ast.Node) {
 
 // SimplifyGotos replaces all instances of "goto ${label}" with
 // a return statement, specifically where labeled block matches:
-// - an empty labeled statement at the end of function body
-// - a labeled statement consisting of only a "simple" return
+//
+//   - an empty labeled statement at the end of function body,
+//     i.e. for valid AST this will be a function with no results
+//
+//   - a labeled statement consisting of only a "simple" return.
+//     where fallthrough can be definitively ruled-out, the labeled
+//     return will also be deleted from the funtion block.
 func SimplifyGotos(fn *ast.FuncDecl) {
 	returns := make(map[string]*ast.ReturnStmt)
 
-	// First walk to find labelled statements that only contain
-	// a return, collecting the return and deleting the label.
+	// First walk to find suitable labeled statements
+	// containing only a return, or empty at end of func.
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		p := c.Parent() // parent node
 		switch n := c.Node().(type) {
 		case *ast.LabeledStmt:
 			switch s := n.Stmt.(type) {
 			case *ast.ReturnStmt:
+
+				// Only try to "inline" this
+				// return if it's a return of
+				// "simple" values, otherwise
+				// this can increase function
+				// hairiness to the Go compiler.
 				if isSimpleReturn(s) {
 					returns[n.Label.Name] = s
+
+					// Only if this labeled return DEFINITIVELY
+					// cannot be fallen-through-to, do we remove
+					// it. Otherwise drop label and keep return.
 					if p := getPreviousInBlock(p, n); //
 					cannotFallthrough(p) {
 						c.Delete()
@@ -287,6 +302,10 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 				// If this is the last stmt in the function
 				// body and it's empty, all gotos can be
 				// replaced with a zero parameter return.
+				//
+				// We don't need to check for fallthroughs as unless this
+				// is invalid AST, reaching the end of the function block
+				// will be semantically equivalent to an empty return.
 				if fn.Body.List[len(fn.Body.List)-1] == n {
 					returns[n.Label.Name] = &ast.ReturnStmt{}
 					c.Delete()
@@ -296,7 +315,7 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 		return true
 	})
 
-	// Second walk to replace all "goto ${label}" with return.
+	// Second walk to replace matching labels with return.
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		switch n := c.Node().(type) {
 		case *ast.BranchStmt:
