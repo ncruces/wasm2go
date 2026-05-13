@@ -55,7 +55,6 @@ l1:
 		v2 = v2 + i32(1)
 		goto l1
 	}
-	return v4
 }
 func (m *Module) Xrand_multiple_of_10() int32 {
 	var v0 int32
@@ -75,7 +74,6 @@ l1:
 	}
 	v2 = v2 * v0
 	goto l1
-	return v2
 }
 
 //go:nosplit

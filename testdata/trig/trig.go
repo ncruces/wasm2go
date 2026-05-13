@@ -90,7 +90,6 @@ l4:
 	v3 = v3 + i32(1)
 	v1 = float64(v1 * float64(0.5))
 	goto l10
-	return v1
 }
 func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)

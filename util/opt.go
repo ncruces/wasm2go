@@ -268,23 +268,19 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 	// First walk to find labelled statements that only contain
 	// a return, collecting the return and deleting the label.
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
+		p := c.Parent() // parent node
 		switch n := c.Node().(type) {
 		case *ast.LabeledStmt:
 			switch s := n.Stmt.(type) {
 			case *ast.ReturnStmt:
 				if isSimpleReturn(s) {
 					returns[n.Label.Name] = s
-
-					// If this isn't the last stmt in the function
-					// body, labeled return can safely be deleted.
-					if fn.Body.List[len(fn.Body.List)-1] != n {
+					if p := getPreviousInBlock(p, n); //
+					cannotFallthrough(p) {
 						c.Delete()
-						break
+					} else {
+						c.Replace(s)
 					}
-
-					// Else just drop label
-					// and inline the return.
-					c.Replace(s)
 				}
 
 			case *ast.EmptyStmt:
@@ -313,6 +309,45 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 		}
 		return true
 	})
+}
+
+// getPreviousInBlock attempts to return the previous node to current 'n' in the given
+// parent block 'p', i.e. searching for the previous node to 'n' in parent block's stmt list.
+func getPreviousInBlock(p ast.Node, n ast.Stmt) ast.Node {
+	switch p := p.(type) {
+	case *ast.BlockStmt:
+		i := slices.Index(p.List, n)
+		if i > 0 {
+			return p.List[i-1]
+		} else {
+			return nil
+		}
+	default:
+		return nil
+	}
+}
+
+// cannotFallthrough returns whether the given node 'n' will definitively
+// NOT fallthrough to the stmt succeeding it. default return value is false.
+func cannotFallthrough(n ast.Node) bool {
+	switch n := n.(type) {
+	case nil:
+		return true
+	case *ast.LabeledStmt:
+		return cannotFallthrough(n.Stmt)
+	case *ast.ReturnStmt:
+		return true
+	case *ast.BranchStmt:
+		return n.Tok != token.BREAK
+	case *ast.BlockStmt:
+		if len(n.List) == 0 {
+			return false
+		}
+		last := n.List[len(n.List)-1]
+		return cannotFallthrough(last)
+	default:
+		return false
+	}
 }
 
 // isSimpleReturn applies isSimpleValue() to each of the return's
