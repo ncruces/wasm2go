@@ -395,15 +395,11 @@ func cannotFallthrough(n ast.Node) bool {
 		return true
 
 	case *ast.BranchStmt:
-		switch n.Tok {
-		// Anything other than GOTO / CONTINUE
-		// alters the control flow in such a
-		// way we can't guarantee it won't fall.
-		case token.GOTO, token.CONTINUE:
-			return true
-		default:
-			return false
-		}
+		// Anything other than GOTO isn't
+		// expected to be passed to this
+		// function, or needs more granular
+		// handling in a cannotBreak() func.
+		return n.Tok == token.GOTO
 
 	case *ast.BlockStmt:
 		// Empty block always
