@@ -267,6 +267,11 @@ func RemoveParens(n ast.Node) {
 //   - a labeled statement consisting of only a "simple" return.
 //     where fallthrough can be definitively ruled-out, the labeled
 //     return will also be deleted from the funtion block.
+//
+//   - a labeled statement consisting of only a "complex" return,
+//     specifically where fallthrough is definitively ruled-out and
+//     there is only one usage of the label. i.e. won't increase
+//     function complexity by inlining multiple "complex" returns.
 func SimplifyGotos(fn *ast.FuncDecl) {
 	type labeledReturn struct {
 		Stmt   *ast.ReturnStmt
@@ -319,7 +324,7 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 	})
 
 	// Filter out any without a return set,
-	// i.e. labeled non-single-return blocks.
+	// i.e. labeled non-returning blocks.
 	for label, ret := range returns {
 		if ret.Stmt == nil {
 			delete(returns, label)
@@ -395,10 +400,6 @@ func cannotFallthrough(n ast.Node) bool {
 		return true
 
 	case *ast.BranchStmt:
-		// Anything other than GOTO isn't
-		// expected to be passed to this
-		// function, or needs more granular
-		// handling in a cannotBreak() func.
 		return n.Tok == token.GOTO
 
 	case *ast.BlockStmt:
@@ -480,6 +481,7 @@ func cannotBreak[T any](list []T) bool {
 		// Some simple types
 		// we know don't break.
 		case *ast.CallExpr:
+		case *ast.UnaryExpr:
 		case *ast.BinaryExpr:
 		case *ast.AssignStmt:
 		case *ast.ReturnStmt:
@@ -524,9 +526,6 @@ func isSimpleValue(n ast.Expr) bool {
 		return true
 	case *ast.UnaryExpr:
 		return isSimpleValue(n.X)
-	case *ast.BinaryExpr:
-		return isSimpleValue(n.X) &&
-			isSimpleValue(n.Y)
 	case *ast.CallExpr:
 		if len(n.Args) != 1 {
 			return false
