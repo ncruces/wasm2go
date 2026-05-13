@@ -622,7 +622,13 @@ func (b *funcBlock) emit(stmts ...ast.Stmt) {
 // Constructs a type conversion, first to types[0], then to types[1] and so on.
 func convert(expr ast.Expr, types ...string) ast.Expr {
 	for _, t := range types {
-		expr = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{expr}}
+		var done bool
+		if !*noopt {
+			expr, done = util.UnwrapConversion(expr, t)
+		}
+		if !done {
+			expr = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{expr}}
+		}
 	}
 	return expr
 }
