@@ -303,6 +303,7 @@ func SimplifyGotos(fn *ast.FuncDecl) {
 				prev := getPreviousInBlock(c.Parent(), n)
 				ret.NoFall = cannotFallthrough(prev)
 				ret.Stmt = s
+
 			case *ast.EmptyStmt:
 				// Also add a "deletion" marker for implicit
 				// labeled returns, i.e. goto: function end.
@@ -396,11 +397,21 @@ func cannotFallthrough(n ast.Node) bool {
 	case *ast.LabeledStmt:
 		return cannotFallthrough(n.Stmt)
 
+	case *ast.ExprStmt:
+		return cannotFallthrough(n.X)
+
 	case *ast.ReturnStmt:
 		return true
 
 	case *ast.BranchStmt:
+		// It shouldn't be possible
+		// for anything other than
+		// a GOTO to be passed here.
 		return n.Tok == token.GOTO
+
+	case *ast.CallExpr:
+		id, ok := n.Fun.(*ast.Ident)
+		return ok && id.Name == "panic"
 
 	case *ast.BlockStmt:
 		// Empty block always
@@ -439,7 +450,7 @@ func cannotFallthrough(n ast.Node) bool {
 			}
 		}
 
-		// None of cases fallthrough
+		// Case WITHOUT fallthrough
 		// only definitely doesn't if
 		// there's a default case.
 		return hasDefault
@@ -473,9 +484,6 @@ func cannotFallthrough(n ast.Node) bool {
 // cannotBreak returns whether the list of expressions / statements passed
 // DEFINITIVELY DO NOT break out from that list. the default value is false.
 func cannotBreak[T any](list []T) bool {
-	if len(list) == 0 {
-		return false
-	}
 	for _, e := range list {
 		switch e := any(e).(type) {
 		// Some simple types
@@ -485,6 +493,54 @@ func cannotBreak[T any](list []T) bool {
 		case *ast.BinaryExpr:
 		case *ast.AssignStmt:
 		case *ast.ReturnStmt:
+
+		case *ast.ExprStmt:
+			// Check wrapped expression.
+			if !cannotBreak([]any{e.X}) {
+				return false
+			}
+
+		case *ast.ForStmt:
+			// Check whether for loop contains any breaks.
+			if e.Body != nil && !cannotBreak(e.Body.List) {
+				return false
+			}
+
+		case *ast.IfStmt:
+			// Check if main IF can break.
+			if !cannotBreak(e.Body.List) {
+				return false
+			}
+
+			// Check if ELSE can break.
+			switch e := e.Else.(type) {
+			case nil:
+			case *ast.BlockStmt:
+				if !cannotBreak(e.List) {
+					return false
+				}
+			default:
+				if !cannotBreak([]ast.Stmt{e}) {
+					return false
+				}
+			}
+
+		case *ast.SwitchStmt:
+			// Check through all clauses.
+			for _, n := range e.Body.List {
+				cc, _ := n.(*ast.CaseClause)
+
+				// Empty doesn't break.
+				if len(cc.Body) == 0 {
+					return false
+				}
+
+				// Check if any statements
+				// in block can break-out.
+				if !cannotBreak(cc.Body) {
+					return false
+				}
+			}
 
 		// Handle specific
 		// flow branch types.
