@@ -51,14 +51,13 @@ func RemoveUnusedLocals(n ast.Node) {
 				if !any {
 					n.Tok = token.ASSIGN
 				}
-				return false
 			}
 			return true
 		}, nil)
 }
 
-// RemoveSelfAssign removes self assignments to variables.
-func RemoveSelfAssign(n ast.Node) {
+// RemoveSelfAssigns removes self assignments to variables.
+func RemoveSelfAssigns(n ast.Node) {
 	astutil.Apply(n, func(c *astutil.Cursor) bool {
 		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
 			var lhs, rhs []ast.Expr
@@ -78,7 +77,6 @@ func RemoveSelfAssign(n ast.Node) {
 				n.Lhs = lhs
 				n.Rhs = rhs
 			}
-			return true
 		}
 		return true
 	}, nil)
@@ -116,7 +114,6 @@ func RemoveBlankAssigns(n ast.Node) {
 				n.Lhs = lhs
 				n.Rhs = rhs
 			}
-			return true
 		}
 		return true
 	})
@@ -220,20 +217,25 @@ func UnnestBlocks(n ast.Node) {
 	})
 }
 
-// SimplifyGotoEnd replaces a goto to the end of a function with return.
-func SimplifyGotoEnd(fn *ast.FuncDecl) {
+// InlineGotoEnd replaces a goto to the end of a function with return.
+func InlineGotoEnd(fn *ast.FuncDecl) {
 	// A non-empty function returning no values.
 	if len(fn.Body.List) == 0 || fn.Type.Results != nil && len(fn.Type.Results.List) > 0 {
 		return
 	}
 
-	// An empty labeled statement at the end.
+	// A labeled statement at the end.
 	last := len(fn.Body.List) - 1
 	ls, ok := fn.Body.List[last].(*ast.LabeledStmt)
 	if !ok {
 		return
 	}
-	if _, ok := ls.Stmt.(*ast.EmptyStmt); !ok {
+
+	// That's either empty or return.
+	switch ls.Stmt.(type) {
+	case *ast.EmptyStmt, *ast.ReturnStmt:
+		break
+	default:
 		return
 	}
 
@@ -245,6 +247,41 @@ func SimplifyGotoEnd(fn *ast.FuncDecl) {
 		if branch, ok := c.Node().(*ast.BranchStmt); ok &&
 			branch.Tok == token.GOTO && branch.Label.Name == ls.Label.Name {
 			c.Replace(&ast.ReturnStmt{})
+		}
+		return true
+	})
+}
+
+// InlineGotoReturn replaces a goto to a label with a naked return with a direct return.
+func InlineGotoReturn(fn *ast.FuncDecl) {
+	if fn.Body == nil {
+		return
+	}
+
+	found := set[string]{}
+
+	// Find all labels that point directly to a naked return and remove the label.
+	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+		if ls, ok := c.Node().(*ast.LabeledStmt); ok {
+			if ret, ok := ls.Stmt.(*ast.ReturnStmt); ok && len(ret.Results) == 0 {
+				found.add(ls.Label.Name)
+				c.Replace(ret)
+			}
+		}
+		return true
+	})
+
+	if len(found) == 0 {
+		return
+	}
+
+	// Replace gotos to those labels with a naked return.
+	ret := &ast.ReturnStmt{}
+	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+		if branch, ok := c.Node().(*ast.BranchStmt); ok && branch.Tok == token.GOTO {
+			if found.has(branch.Label.Name) {
+				c.Replace(ret)
+			}
 		}
 		return true
 	})
@@ -288,20 +325,19 @@ func RemoveParens(n ast.Node) {
 	})
 }
 
-// countUses counts uses of an identifier.
+// Counts uses of an identifier.
 func countUses(n ast.Node) map[string]int {
 	uses := make(map[string]int)
 	ast.Inspect(n, func(n ast.Node) bool {
 		if id, ok := n.(*ast.Ident); ok {
 			uses[id.Name]++
-			return false
 		}
 		return true
 	})
 	return uses
 }
 
-// countWrites counts writes to an identifier.
+// Counts writes to an identifier.
 func countWrites(n ast.Node) map[string]int {
 	writes := make(map[string]int)
 	ast.Inspect(n, func(node ast.Node) bool {
