@@ -1108,9 +1108,8 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 						id = t.globals[index].id
 					}
 				}
-				if id.Name == "" && !seen.has(buf.String()) {
+				if id.Name == "" && seen.add(buf.String()) {
 					id.Name = util.Mangle(buf.String(), util.IDInternal)
-					seen.add(buf.String())
 				}
 			}
 

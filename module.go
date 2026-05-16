@@ -66,8 +66,7 @@ func (t *translator) createModuleStruct() ast.Decl {
 	// Imported modules.
 	seen := set[string]{}
 	for _, imp := range t.imports {
-		if !seen.has(imp.module) {
-			seen.add(imp.module)
+		if seen.add(imp.module) {
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{util.MangleID(imp.module, util.IDInternal)},
 				Type:  util.MangleID(imp.module, util.IDExported)})
@@ -311,7 +310,12 @@ func (t *translator) createNewFunc() ast.Decl {
 func (t *translator) createHostInterfaces() []ast.Decl {
 	ifaces := map[string][]*ast.Field{}
 
+	seen := set[struct{ module, name string }]{}
 	for _, imp := range t.imports {
+		if !seen.add(struct{ module, name string }{imp.module, imp.name}) {
+			continue
+		}
+
 		var typ ast.Expr
 		switch imp.kind {
 		case externFunction:
