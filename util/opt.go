@@ -219,13 +219,18 @@ func UnnestBlocks(n ast.Node) {
 
 // InlineGotoEnd replaces a goto to the end of a function with return.
 func InlineGotoEnd(fn *ast.FuncDecl) {
-	// A non-empty function returning no values.
-	if len(fn.Body.List) == 0 || fn.Type.Results != nil && len(fn.Type.Results.List) > 0 {
+	last := len(fn.Body.List) - 1
+
+	// A non-empty function that returns no values.
+	if last < 0 || fn.Type.Results != nil && len(fn.Type.Results.List) > 0 {
 		return
 	}
-
+	// A return statement at the end.
+	if _, ok := fn.Body.List[last].(*ast.ReturnStmt); ok {
+		fn.Body.List = fn.Body.List[:last]
+		return
+	}
 	// A labeled statement at the end.
-	last := len(fn.Body.List) - 1
 	ls, ok := fn.Body.List[last].(*ast.LabeledStmt)
 	if !ok {
 		return

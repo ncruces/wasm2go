@@ -27,6 +27,7 @@ including the following features:
 - [multi-value results];
 - 64-bit address space;
 - [extended constant expressions];
+- [tail calls] [^1];
 - [threads and atomics];
 - [wide arithmetic].
 
@@ -36,8 +37,11 @@ including the following features:
 [sign-extension instructions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-msign-ext
 [multi-value results]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mmultivalue
 [extended constant expressions]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mextended-const
+[tail calls]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mtail-call
 [threads and atomics]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-matomics
 [wide arithmetic]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mwide-arithmetic
+
+[^1]: `wasm2go` does not guarantee tail behavior
 
 Generating human-readable Go code is a non-goal:
 - Wasm names must be mangled into Go identifiers;

@@ -358,85 +358,78 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.emit(sw)
 			blk.unreachable = true // After switch.
 
-		case 0x10: // call
-			index, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
+		case 0x10, 0x11, 0x12, 0x13: // call, call_indirect, return_call, return_call_indirect
+			var fun ast.Expr
+			var typ funcType
 
-			target := &t.functions[index]
+			switch opcode {
+			case 0x10, 0x12: // call, return_call
+				index, err := readLEB128(t.in)
+				if err != nil {
+					return err
+				}
 
-			args := make([]ast.Expr, len(target.typ.params))
-			for i := len(args) - 1; i >= 0; i-- {
-				args[i] = fn.pop()
-			}
+				target := &t.functions[index]
+				fun = target.call
+				typ = target.typ
 
-			call := &ast.CallExpr{Fun: target.call, Args: args}
-
-			switch n := len(target.typ.results); n {
-			case 0:
-				fn.emit(&ast.ExprStmt{X: call})
-			case 1:
-				fn.push(call)
 			default:
-				lhs := make([]ast.Expr, n)
-				for i := range lhs {
-					lhs[i] = fn.newTempVal()
+				typeIdx, err := readLEB128(t.in)
+				if err != nil {
+					return err
 				}
-				fn.emit(&ast.AssignStmt{
-					Lhs: lhs,
-					Tok: token.DEFINE,
-					Rhs: []ast.Expr{call}})
-				for _, r := range lhs {
-					fn.pushConst(r)
+				tableIdx, err := readLEB128(t.in)
+				if err != nil {
+					return err
 				}
+
+				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id}
+				if t.tables[tableIdx].imported {
+					tab = &ast.StarExpr{X: tab}
+				}
+
+				idx := fn.pop()
+				typ = t.types[typeIdx]
+				fun = &ast.TypeAssertExpr{
+					X:    &ast.IndexExpr{X: tab, Index: convert(idx, "uint")},
+					Type: typ.toAST(false)}
 			}
 
-		case 0x11: // call_indirect
-			typeIdx, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			tableIdx, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-
-			idx := fn.pop()
-			typ := t.types[typeIdx]
 			args := make([]ast.Expr, len(typ.params))
 			for i := len(args) - 1; i >= 0; i-- {
 				args[i] = fn.pop()
 			}
 
-			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id}
-			if t.tables[tableIdx].imported {
-				tab = &ast.StarExpr{X: tab}
-			}
-			call := &ast.CallExpr{
-				Fun: &ast.TypeAssertExpr{
-					X: &ast.IndexExpr{
-						X:     tab,
-						Index: convert(idx, "uint")},
-					Type: typ.toAST(false)},
-				Args: args}
+			call := &ast.CallExpr{Fun: fun, Args: args}
 
-			switch n := len(typ.results); n {
-			case 0:
-				fn.emit(&ast.ExprStmt{X: call})
-			case 1:
-				fn.push(call)
-			default:
-				lhs := make([]ast.Expr, n)
-				for i := range lhs {
-					lhs[i] = fn.newTempVal()
+			switch opcode {
+			case 0x12, 0x13: // return_call, return_call_indirect
+				if len(typ.results) == 0 {
+					fn.emit(&ast.ExprStmt{X: call}, &ast.ReturnStmt{})
+				} else {
+					fn.emit(&ast.ReturnStmt{Results: []ast.Expr{call}})
 				}
-				fn.emit(&ast.AssignStmt{
-					Lhs: lhs,
-					Tok: token.DEFINE,
-					Rhs: []ast.Expr{call}})
-				for _, r := range lhs {
-					fn.pushConst(r)
+				blk.unreachable = true // After an uncoditional return.
+				logReturnCallWarning()
+
+			default:
+				switch n := len(typ.results); n {
+				case 0:
+					fn.emit(&ast.ExprStmt{X: call})
+				case 1:
+					fn.push(call)
+				default:
+					lhs := make([]ast.Expr, n)
+					for i := range lhs {
+						lhs[i] = fn.newTempVal()
+					}
+					fn.emit(&ast.AssignStmt{
+						Lhs: lhs,
+						Tok: token.DEFINE,
+						Rhs: []ast.Expr{call}})
+					for _, r := range lhs {
+						fn.pushConst(r)
+					}
 				}
 			}
 

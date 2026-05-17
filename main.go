@@ -83,3 +83,12 @@ func (l *stringFlags) Set(value string) error {
 	*l = append(*l, value)
 	return nil
 }
+
+var loggedReturnCallWarning bool
+
+func logReturnCallWarning() {
+	if !loggedReturnCallWarning {
+		loggedReturnCallWarning = true
+		log.Println("return_call: wasm2go does not guarantee tail behavior")
+	}
+}
