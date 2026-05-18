@@ -15,7 +15,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ncruces/wasm2go/util"
+	"github.com/ncruces/wasm2go/internal/util"
 )
 
 //go:embed c go

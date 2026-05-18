@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/ncruces/wasm2go/util"
+	"github.com/ncruces/wasm2go/internal/util"
 )
 
 var modRecvList = &ast.FieldList{List: []*ast.Field{{

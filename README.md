@@ -41,7 +41,7 @@ including the following features:
 [threads and atomics]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-matomics
 [wide arithmetic]: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-mwide-arithmetic
 
-[^1]: `wasm2go` does not guarantee tail behavior
+[^1]: `wasm2go` does **not** guarantee tail behavior; judge for yourself if enabling tail calls generates better code.
 
 Generating human-readable Go code is a non-goal:
 - Wasm names must be mangled into Go identifiers;

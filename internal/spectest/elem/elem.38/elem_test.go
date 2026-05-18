@@ -4,9 +4,9 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/ncruces/wasm2go/spectest"
-	elem39 "github.com/ncruces/wasm2go/spectest/elem/elem.39"
-	elem40 "github.com/ncruces/wasm2go/spectest/elem/elem.40"
+	"github.com/ncruces/wasm2go/internal/spectest"
+	elem39 "github.com/ncruces/wasm2go/internal/spectest/elem/elem.39"
+	elem40 "github.com/ncruces/wasm2go/internal/spectest/elem/elem.40"
 )
 
 //go:embed elem.json

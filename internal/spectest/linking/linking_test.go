@@ -4,15 +4,15 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/ncruces/wasm2go/spectest"
-	linking10 "github.com/ncruces/wasm2go/spectest/linking/linking.10"
-	linking11 "github.com/ncruces/wasm2go/spectest/linking/linking.11"
-	linking19 "github.com/ncruces/wasm2go/spectest/linking/linking.19"
-	linking20 "github.com/ncruces/wasm2go/spectest/linking/linking.20"
-	linking21 "github.com/ncruces/wasm2go/spectest/linking/linking.21"
-	linking5 "github.com/ncruces/wasm2go/spectest/linking/linking.5"
-	linking6 "github.com/ncruces/wasm2go/spectest/linking/linking.6"
-	linking9 "github.com/ncruces/wasm2go/spectest/linking/linking.9"
+	"github.com/ncruces/wasm2go/internal/spectest"
+	linking10 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.10"
+	linking11 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.11"
+	linking19 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.19"
+	linking20 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.20"
+	linking21 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.21"
+	linking5 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.5"
+	linking6 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.6"
+	linking9 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.9"
 )
 
 func Test_globals(t *testing.T) {

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ncruces/wasm2go/util"
+	"github.com/ncruces/wasm2go/internal/util"
 )
 
 func Test(t *testing.T, modptr any, data []byte, name string) {

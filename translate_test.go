@@ -44,7 +44,7 @@ func Test_translate(t *testing.T) {
 
 func Test_translateSpecTest(t *testing.T) {
 	*nanbox = true
-	filepath.WalkDir("spectest/", func(path string, d fs.DirEntry, err error) error {
+	filepath.WalkDir("internal/spectest/", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			if !*unsafe && strings.HasSuffix(path, "/threads") {
 				return filepath.SkipDir
@@ -131,7 +131,7 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/ncruces/wasm2go/spectest"
+	"github.com/ncruces/wasm2go/internal/spectest"
 )
 
 //go:embed {{.JSONFile}}

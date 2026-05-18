@@ -1,2 +1,2 @@
+internal/spectest/*/** linguist-vendored
 libc-gen/c/** linguist-vendored
-spectest/*/** linguist-vendored

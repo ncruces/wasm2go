@@ -373,7 +373,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fun = target.call
 				typ = target.typ
 
-			default:
+			default: // call_indirect, return_call_indirect
 				typeIdx, err := readLEB128(t.in)
 				if err != nil {
 					return err
@@ -412,7 +412,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				blk.unreachable = true // After an uncoditional return.
 				logReturnCallWarning()
 
-			default:
+			default: // call, call_indirect
 				switch n := len(typ.results); n {
 				case 0:
 					fn.emit(&ast.ExprStmt{X: call})
