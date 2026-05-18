@@ -26,7 +26,7 @@ a code generator that emits testable Go methods
 to back C functions best implemented in Go.
 
 ```
-Usage of libc-gen:
+Usage of libc-gen [option]... [func]...
   -c-out string
         extract libc C source and header files to directory
   -deref-mem
@@ -37,6 +37,8 @@ Usage of libc-gen:
         output file (default stdout)
   -pkg string
         package name (default "main")
+  -wasm string
+        input.wasm file
 ```
 
 ## Future development

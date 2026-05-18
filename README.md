@@ -74,7 +74,7 @@ This is tested to work on both `amd64` and `arm64`,
 but is known to be broken on most other architectures.
 
 ```
-Usage: wasm2go [options] [input.wasm]
+Usage: wasm2go [option]... [input.wasm]
   -embed
         go:embed data sections from a .dat file
   -nanbox

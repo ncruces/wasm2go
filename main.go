@@ -28,7 +28,7 @@ func main() {
 
 	flag.Var(&provided, "provided", "file containing provided import functions")
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [options] [input.wasm]\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [option]... [input.wasm]\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 	flag.Parse()
