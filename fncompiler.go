@@ -234,6 +234,23 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 	fn.pushPure(expr)
 }
 
+// Drops a value from the value stack.
+func (fn *funcCompiler) drop() ast.Expr {
+	if fn.blocks.top().unreachable {
+		return nil
+	}
+
+	expr := fn.pop()
+	if !*noopt {
+		_, i32 := islit(expr, "i32")
+		_, i64 := islit(expr, "i64")
+		if i32 || i64 {
+			return nil
+		}
+	}
+	return expr
+}
+
 // Pops a value from the value stack.
 func (fn *funcCompiler) pop() ast.Expr {
 	if fn.blocks.top().unreachable {
@@ -632,6 +649,12 @@ func convert(expr ast.Expr, types ...string) ast.Expr {
 		}
 	}
 	return expr
+}
+
+// Constructs an expression that you should use to call the module function id
+// while allowing late binding of id, as well as removing the receiver.
+func latecall(id *ast.Ident) ast.Expr {
+	return &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}
 }
 
 func islit(expr ast.Expr, typ string) (int64, bool) {

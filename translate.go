@@ -423,8 +423,8 @@ func (t *translator) readImportSection() error {
 				id := ast.NewIdent(n)
 				fn := funcCompiler{
 					typ:      typ,
+					call:     latecall(id),
 					decl:     &ast.FuncDecl{Name: id},
-					call:     &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}},
 					provided: true}
 				t.functions = append(t.functions, fn)
 				continue
@@ -458,13 +458,13 @@ func (t *translator) readImportSection() error {
 
 			id := &ast.Ident{}
 			fn := funcCompiler{
-				typ: typ,
+				typ:  typ,
+				call: latecall(id),
 				decl: &ast.FuncDecl{
 					Name: id,
 					Recv: modRecvList,
 					Type: typ.toAST(true),
-					Body: &ast.BlockStmt{List: []ast.Stmt{stmt}}},
-				call: &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
+					Body: &ast.BlockStmt{List: []ast.Stmt{stmt}}}}
 			t.functions = append(t.functions, fn)
 			t.out.Decls = append(t.out.Decls, fn.decl)
 
@@ -570,7 +570,7 @@ func (t *translator) readFunctionSection() error {
 			Recv: modRecvList,
 			Type: fn.typ.toAST(true),
 		}
-		fn.call = &ast.ParenExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: fn.decl.Name}}
+		fn.call = latecall(fn.decl.Name)
 		t.out.Decls = append(t.out.Decls, fn.decl)
 	}
 	return nil

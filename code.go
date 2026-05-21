@@ -445,11 +445,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0x1a: // drop
-			fn.emit(&ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{newID("_")},
-				Rhs: []ast.Expr{fn.pop()},
-			})
+			if expr := fn.drop(); expr != nil {
+				fn.emit(&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{newID("_")},
+					Rhs: []ast.Expr{expr},
+				})
+			}
 
 		case 0x1b: // select
 			cond := fn.popCond()
