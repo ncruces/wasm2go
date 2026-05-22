@@ -410,7 +410,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					fn.emit(&ast.ReturnStmt{Results: []ast.Expr{call}})
 				}
 				blk.unreachable = true // After an uncoditional return.
-				logReturnCallWarning()
+				warnReturnCall()
 
 			default: // call, call_indirect
 				switch n := len(typ.results); n {
@@ -721,9 +721,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
 					t.memory.stype()))
 			} else {
-				fn.helpers.add("memory_grow")
+				name := "memory_grow"
+				if t.memory.shared {
+					name = "atomic_memory_grow"
+					needsUnsafe("shared memory")
+				}
+				fn.helpers.add(name)
 				fn.push(convert(&ast.CallExpr{
-					Fun: newID("memory_grow"),
+					Fun: newID(name),
 					Args: []ast.Expr{
 						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
 						convert(fn.pop(), "int64"),

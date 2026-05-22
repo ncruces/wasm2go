@@ -1,30 +1,30 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
 )
 
 func (t *translator) readOpcodeAtomic(fn *funcCompiler) error {
-	if !*unsafe {
-		return errors.New("unsupported opcode: atomic needs unsafe")
-	}
-
 	code, err := readLEB128(t.in)
 	if err != nil {
 		return err
 	}
 
-	var offset uint64
 	if code == 0x03 { // atomic.fence
 		_, err = t.in.ReadByte() // 0x00
-	} else {
-		_, err = readLEB128(t.in) // align
-		if err == nil {
-			offset, err = readLEB128(t.in)
-		}
+		fn.helpers.add("atomic_fence")
+		fn.emit(&ast.ExprStmt{X: &ast.CallExpr{Fun: newID("atomic_fence")}})
+		return nil
+	}
+
+	needsUnsafe("unsupported atomic opcode")
+
+	var offset uint64
+	_, err = readLEB128(t.in) // align
+	if err == nil {
+		offset, err = readLEB128(t.in)
 	}
 	if err != nil {
 		return err
@@ -37,10 +37,6 @@ func (t *translator) readOpcodeAtomic(fn *funcCompiler) error {
 		fn.push(fn.atomicWait("atomic_wait32", offset))
 	case 0x02: // memory.atomic.wait64
 		fn.push(fn.atomicWait("atomic_wait64", offset))
-
-	case 0x03: // atomic.fence
-		fn.helpers.add("atomic_fence")
-		fn.emit(&ast.ExprStmt{X: &ast.CallExpr{Fun: newID("atomic_fence")}})
 
 	case 0x10: // i32.atomic.load
 		fn.push(fn.atomicLoad("int32", "atomic_load32", offset))

@@ -12,12 +12,6 @@ import (
 // Use nosplit only on functions with no loops.
 
 //go:nosplit
-func atomic_fence() {
-	var b atomic.Bool
-	b.Swap(true)
-}
-
-//go:nosplit
 func atomic_load32[T uint32 | int64](mem []byte, addr T) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	val := atomic.LoadUint32(ptr)
@@ -754,4 +748,34 @@ type atomic_waiters = struct {
 	C chan struct{} // +checklocks:Mutex
 	N int           // +checklocks:Mutex
 	sync.Mutex
+}
+
+func atomic_memory_grow(mem *[]byte, delta, max int64) int64 {
+	// Compiler error if sizeof(int) != sizeof(uintptr).
+	var _ [unsafe.Sizeof(int(0))]byte = [unsafe.Sizeof(uintptr(0))]byte{}
+
+	type slice struct {
+		_   uintptr
+		len atomic.Uintptr
+		cap uintptr
+	}
+
+	hdr := (*slice)(unsafe.Pointer(mem))
+	max = min(max<<16, int64(hdr.cap))
+	for {
+		len := int64(hdr.len.Load())
+		old := len >> 16
+		if delta == 0 {
+			return old
+		}
+
+		new := (old + delta) << 16
+		if new > max || new < len || int(new) < 0 {
+			return -1
+		}
+
+		if hdr.len.CompareAndSwap(uintptr(len), uintptr(new)) {
+			return old
+		}
+	}
 }

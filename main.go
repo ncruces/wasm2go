@@ -25,6 +25,7 @@ var (
 
 func main() {
 	log.SetFlags(0)
+	log.SetPrefix("wasm2go: ")
 
 	flag.Var(&provided, "provided", "file containing provided import functions")
 	flag.Usage = func() {
@@ -84,11 +85,17 @@ func (l *stringFlags) Set(value string) error {
 	return nil
 }
 
-var loggedReturnCallWarning bool
+var seenReturnCall bool
 
-func logReturnCallWarning() {
-	if !loggedReturnCallWarning {
-		loggedReturnCallWarning = true
-		log.Println("return_call: wasm2go does not guarantee tail behavior")
+func warnReturnCall() {
+	if !seenReturnCall {
+		seenReturnCall = true
+		log.Print("return_call does not guarantee tail behavior")
+	}
+}
+
+func needsUnsafe(msg string) {
+	if !*unsafe {
+		log.Fatal("needs unsafe: " + msg)
 	}
 }

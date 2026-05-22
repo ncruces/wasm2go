@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/bits"
 	"runtime"
+	"sync/atomic"
 )
 
 // Prevent constant folding/propagation,
@@ -564,4 +565,10 @@ func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
 	for i := range buf {
 		buf[i] = val
 	}
+}
+
+//go:nosplit
+func atomic_fence() {
+	var b atomic.Bool
+	b.Swap(true)
 }

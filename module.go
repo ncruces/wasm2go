@@ -142,20 +142,17 @@ func (t *translator) createNewFunc() ast.Decl {
 			Rhs: []ast.Expr{
 				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max)}}})
 		if !t.memory.imported {
-			pages := t.memory.min
-			if t.memory.shared { // A shared memory must not move.
-				pages = t.memory.max
+			args := []ast.Expr{
+				&ast.ArrayType{Elt: newID("byte")},
+				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.min << 16)},
+			}
+			if t.memory.shared {
+				args = append(args, &ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max << 16)})
 			}
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{t.memory.selector},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: newID("make"),
-					Args: []ast.Expr{
-						&ast.ArrayType{Elt: newID("byte")},
-						&ast.BasicLit{
-							Kind:  token.INT,
-							Value: formatInt(pages << 16)}}}}})
+				Rhs: []ast.Expr{&ast.CallExpr{Fun: newID("make"), Args: args}}})
 			if t.memory.shared {
 				body.List = append(body.List, &ast.AssignStmt{
 					Tok: token.ASSIGN,
@@ -383,6 +380,12 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 	}
 	// Memory structure implementing the interface for owned memory.
 	if !t.memory.imported {
+		name := "memory_grow"
+		if t.memory.shared {
+			name = "atomic_memory_grow"
+			needsUnsafe("shared memory")
+		}
+
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
@@ -402,14 +405,14 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID("int64")}}},
 				Results: &ast.FieldList{List: []*ast.Field{{Type: newID("int64")}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun: newID("memory_grow"),
+				Fun: newID(name),
 				Args: []ast.Expr{
 					&ast.CallExpr{
 						Fun:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
 						Args: []ast.Expr{newID("m")}},
 					newID("delta"),
 					newID("max")}}}}}}})
-		t.helpers.add("memory_grow")
+		t.helpers.add(name)
 
 		if t.memory.shared {
 			decls = append(decls, &ast.FuncDecl{
