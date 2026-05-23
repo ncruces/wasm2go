@@ -3,10 +3,9 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"cmp"
-	"debug/dwarf"
 	_ "embed"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/format"
@@ -14,15 +13,25 @@ import (
 	"go/token"
 	"io"
 	"maps"
+	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
 
-	"github.com/ncruces/wasm2go/util"
+	"github.com/ncruces/wasm2go/internal/util"
 )
 
-//go:embed helpers/helpers.go
-var helpersSrc string
+var (
+	//go:embed helpers/helpers.go
+	helpersSrc string
+	//go:embed helpers/helpers_unsafe.go
+	helpersUnsafeSrc string
+	//go:embed helpers/atomics_unsafe.go
+	helpersAtomicsSrc string
+	//go:embed helpers/cpuarch_unsafe.go
+	helpersCpuArchSrc string
+)
 
 // These helpers can never trap.
 var pureHelpers = set[string]{
@@ -38,18 +47,23 @@ var pureHelpers = set[string]{
 
 // Standard library packages used by generated code.
 var stdlib = map[string]string{
-	"runtime": "runtime",
-	"unsafe":  "unsafe",
+	"list":    "container/list",
+	"binary":  "encoding/binary",
 	"math":    "math",
 	"bits":    "math/bits",
-	"binary":  "encoding/binary",
+	"runtime": "runtime",
+	"sync":    "sync",
+	"atomic":  "sync/atomic",
+	"time":    "time",
+	"unsafe":  "unsafe",
 }
 
 type translator struct {
-	in  *bufioOffsetReader
+	in  *bufio.Reader
 	out ast.File
 	// Dependencies.
 	packages set[string]
+	provided set[string]
 	helpers  set[string]
 	// Sections.
 	types     []funcType
@@ -62,45 +76,39 @@ type translator struct {
 	elements  []elemSegment
 	start     uint64
 	data      []dataSegment
-	code      uint64
-	debug     map[string][]byte
-}
-
-type bufioOffsetReader struct {
-	r *bufio.Reader
-	o uint64
-}
-
-func (r *bufioOffsetReader) Read(p []byte) (n int, err error) {
-	n, err = r.r.Read(p)
-	r.o += uint64(n)
-	return
-}
-
-func (r *bufioOffsetReader) ReadByte() (b byte, err error) {
-	b, err = r.r.ReadByte()
-	if err == nil {
-		r.o++
-	}
-	return
-}
-
-func (r *bufioOffsetReader) Offset() uint64 {
-	return r.o
+	dylink    *dylinkDef
 }
 
 func translate(r io.Reader, w io.Writer) error {
 	var t translator
 
-	t.in = &bufioOffsetReader{r: bufio.NewReader(r)}
+	t.in = bufio.NewReader(r)
 	err := readHeader(t.in)
 	if err != nil {
 		return err
 	}
 
+	fset := token.NewFileSet()
 	t.packages = set[string]{}
+	t.provided = set[string]{}
 	t.helpers = set[string]{}
-	t.debug = map[string][]byte{}
+
+	for _, file := range provided {
+		f, err := parser.ParseFile(fset, file, nil, 0)
+		if err != nil {
+			return err
+		}
+		for _, decl := range f.Decls {
+			// Check if the receiver type is *Module.
+			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
+				if star, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
+					if id, ok := star.X.(*ast.Ident); ok && id.Name == "Module" {
+						t.provided.add(fn.Name.Name)
+					}
+				}
+			}
+		}
+	}
 
 	// Load Wasm.
 	for {
@@ -125,6 +133,9 @@ func translate(r io.Reader, w io.Writer) error {
 	if !*nohost && len(t.imports) > 0 {
 		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
 	}
+	if t.dylink != nil {
+		t.out.Decls = append(t.out.Decls, t.createDylinkConstants())
+	}
 
 	t.out.Decls = append([]ast.Decl{
 		t.createModuleStruct(),
@@ -137,7 +148,7 @@ func translate(r io.Reader, w io.Writer) error {
 	}
 	for i, fn := range t.functions {
 		if fn.decl != nil && fn.decl.Name.Name == "" {
-			fn.decl.Name.Name = "f" + strconv.Itoa(i)
+			fn.decl.Name.Name = "fn" + strconv.Itoa(i)
 		}
 	}
 	if t.memory != nil && t.memory.id.Name == "" {
@@ -157,17 +168,23 @@ func translate(r io.Reader, w io.Writer) error {
 	t.out.Decls = append(t.out.Decls, t.createExportMethods()...)
 
 	// Add helpers.
-	fset := token.NewFileSet()
 	if len(t.helpers) > 0 {
-		f, err := parser.ParseFile(fset, "helpers.go", helpersSrc, parser.ParseComments)
-		if err != nil {
+		if *unsafe {
+			if err := t.addHelpers(fset, "cpuarch_unsafe.go", helpersCpuArchSrc); err != nil {
+				return err
+			}
+			if err := t.resolveHelpers(fset, "helpers_unsafe.go", helpersUnsafeSrc); err != nil {
+				return err
+			}
+			if err := t.resolveHelpers(fset, "atomics_unsafe.go", helpersAtomicsSrc); err != nil {
+				return err
+			}
+		}
+		if err := t.resolveHelpers(fset, "helpers.go", helpersSrc); err != nil {
 			return err
 		}
-		for _, decl := range f.Decls {
-			if fn, ok := decl.(*ast.FuncDecl); ok && t.helpers.has(fn.Name.Name) {
-				t.out.Decls = append(t.out.Decls, decl)
-				ast.Inspect(fn.Body, t.resolveImports)
-			}
+		for name := range t.helpers {
+			return fmt.Errorf("missing helper: %s", name)
 		}
 	}
 
@@ -175,9 +192,13 @@ func translate(r io.Reader, w io.Writer) error {
 	if len(t.packages) > 0 {
 		specs := make([]ast.Spec, 0, len(t.data))
 		for _, pkg := range slices.Sorted(maps.Keys(t.packages)) {
-			specs = append(specs, &ast.ImportSpec{
+			spec := ast.ImportSpec{
 				Path: &ast.BasicLit{Kind: token.STRING, Value: `"` + pkg + `"`},
-			})
+			}
+			if pkg == "embed" {
+				spec.Name = newID("_")
+			}
+			specs = append(specs, &spec)
 		}
 		t.out.Decls = append([]ast.Decl{
 			&ast.GenDecl{Tok: token.IMPORT, Specs: specs}},
@@ -186,146 +207,51 @@ func translate(r io.Reader, w io.Writer) error {
 
 	// Add data segments.
 	if len(t.data) > 0 {
-		specs := make([]ast.Spec, len(t.data))
-		for i, seg := range t.data {
-			specs[i] = &ast.ValueSpec{
-				Names: []*ast.Ident{dataID(i)},
-				Values: []ast.Expr{&ast.BasicLit{
-					Kind:  token.STRING,
-					Value: strconv.Quote(string(seg.init)),
-				}},
+		if *embed {
+			embedDecl := &ast.GenDecl{
+				Tok: token.VAR,
+				Doc: &ast.CommentGroup{
+					List: []*ast.Comment{{Text: "//go:embed " + filepath.Base(embedFile)}},
+				},
+				Specs: []ast.Spec{
+					&ast.ValueSpec{
+						Names: []*ast.Ident{newID("data")},
+						Type:  newID("string"),
+					},
+				},
 			}
+			t.out.Decls = append(t.out.Decls, embedDecl)
+		} else {
+			var specs []ast.Spec
+			for i, seg := range t.data {
+				if seg.merged {
+					continue
+				}
+				specs = append(specs, &ast.ValueSpec{
+					Names: []*ast.Ident{dataID(i)},
+					Values: []ast.Expr{&ast.BasicLit{
+						Kind:  token.STRING,
+						Value: strconv.Quote(string(seg.init)),
+					}},
+				})
+			}
+			t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 		}
-		t.out.Decls = append(t.out.Decls, &ast.GenDecl{Tok: token.CONST, Specs: specs})
 	}
 
+	util.RemoveParens(&t.out)
+
 	// Print Go.
-	out := bytes.NewBuffer(nil)
-	if !*nohead {
-		out.WriteString("// Code generated by wasm2go. DO NOT EDIT.\n\n")
-		switch *endian {
-		case "little":
-			out.WriteString("//go:build " + littlend + "\n\n")
-		default:
-			out.WriteString("//go:build !(" + littlend + ")\n\n")
-		case "":
-		}
+	out := bufio.NewWriter(w)
+	out.WriteString("// Code generated by wasm2go. DO NOT EDIT.\n\n")
+	if *tags != "" {
+		out.WriteString("//go:build " + *tags + "\n\n")
 	}
 	err = format.Node(out, fset, &t.out)
 	if err != nil {
 		return err
 	}
-	buf := out.Bytes()
-
-	if *dwarfline {
-		dbg, err := dwarf.New(t.debug["abbrev"], t.debug["aranges"], t.debug["frame"], t.debug["info"], t.debug["line"], t.debug["pubnames"], t.debug["ranges"], t.debug["str"])
-		if err != nil {
-			return err
-		}
-		r := dbg.Reader()
-		type line struct {
-			addr uint64
-			name string
-			line int
-			col  int
-		}
-		var lines []line
-		for {
-			e, err := r.Next()
-			if err != nil {
-				return err
-			}
-			if e == nil {
-				break
-			}
-			if e.Tag == dwarf.TagCompileUnit {
-				lr, err := dbg.LineReader(e)
-				if err != nil {
-					return err
-				}
-				for {
-					var le dwarf.LineEntry
-					if err := lr.Next(&le); err != nil {
-						if err == io.EOF {
-							break
-						}
-						return err
-					}
-					if !le.EndSequence {
-						lines = append(lines, line{
-							addr: le.Address,
-							name: le.File.Name,
-							line: le.Line,
-							col:  le.Column,
-						})
-					}
-				}
-			}
-		}
-		slices.SortFunc(lines, func(a, b line) int {
-			return cmp.Compare(a.addr, b.addr)
-		})
-		// this is a terrible hack
-		tmp := bytes.Clone(buf)
-		out.Reset()
-		var (
-			prev, cur *line
-			linenum   int
-			useline   bool
-		)
-		for tmp := range bytes.Lines(tmp) {
-			tmps := string(bytes.TrimRight(bytes.TrimLeft(tmp, "\t"), "\n"))
-			oldcur := cur
-			if tmps == "OFFSET_HACK_START" {
-				useline = true
-				continue
-			}
-			if tmps == "OFFSET_HACK_END" {
-				useline = false
-				continue
-			}
-			if useline {
-				if s, ok := strings.CutPrefix(tmps, "OFFSET_HACK_"); ok {
-					offset, err := strconv.ParseUint(s, 10, 64)
-					if err != nil {
-						panic("wtf: " + err.Error())
-					}
-					if i, _ := slices.BinarySearchFunc(lines, offset, func(e line, t uint64) int {
-						return cmp.Compare(e.addr, t)
-					}); i > 0 {
-						cur = &lines[i-1]
-					} else {
-						cur = nil
-					}
-					continue
-				}
-			}
-			linenum++
-			if !useline {
-				cur = &line{
-					name: "wasm2go.go",
-					line: linenum,
-					col:  1,
-				}
-			}
-			if cur != nil && !strings.HasPrefix(tmps, "/*") && !strings.HasPrefix(tmps, "//") {
-				out.WriteString("/*line ")
-				if prev == nil || prev.name != cur.name {
-					out.WriteString(cur.name) // TODO: sanitize
-				}
-				out.WriteByte(':')
-				out.WriteString(strconv.Itoa(max(1, cur.line)))
-				out.WriteByte(':')
-				out.WriteString(strconv.Itoa(max(1, cur.col)))
-				out.WriteString("*/")
-				prev = oldcur
-			}
-			out.Write(tmp)
-		}
-		buf = out.Bytes()
-	}
-	_, err = w.Write(buf)
-	return err
+	return out.Flush()
 }
 
 type sectionID byte
@@ -391,7 +317,6 @@ func (t *translator) readSection() error {
 	case sectionStart:
 		return t.readStartSection()
 	case sectionCode:
-		t.code = t.in.Offset()
 		return t.readCodeSection()
 	case sectionData:
 		return t.readDataSection()
@@ -493,6 +418,18 @@ func (t *translator) readImportSection() error {
 				return err
 			}
 			typ := t.types[index]
+
+			if n := util.Mangle(name, util.IDInternal); t.provided.has(n) {
+				id := ast.NewIdent(n)
+				fn := funcCompiler{
+					typ:      typ,
+					call:     latecall(id),
+					decl:     &ast.FuncDecl{Name: id},
+					provided: true}
+				t.functions = append(t.functions, fn)
+				continue
+			}
+
 			t.imports = append(t.imports, importDef{
 				module: mod,
 				name:   name,
@@ -507,8 +444,8 @@ func (t *translator) readImportSection() error {
 
 			call := &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.SelectorExpr{X: newID("m"), Sel: util.Mangle(mod, util.IDInternal)},
-					Sel: util.Mangle(name, util.IDExported)},
+					X:   &ast.SelectorExpr{X: newID("m"), Sel: util.MangleID(mod, util.IDInternal)},
+					Sel: util.MangleID(name, util.IDExported)},
 				Args: args,
 			}
 
@@ -519,22 +456,23 @@ func (t *translator) readImportSection() error {
 				stmt = &ast.ReturnStmt{Results: []ast.Expr{call}}
 			}
 
+			id := &ast.Ident{}
 			fn := funcCompiler{
-				typ: typ,
+				typ:  typ,
+				call: latecall(id),
 				decl: &ast.FuncDecl{
-					Name: &ast.Ident{},
+					Name: id,
 					Recv: modRecvList,
-					Type: typ.toAST(),
-					Body: &ast.BlockStmt{List: []ast.Stmt{stmt}}},
-			}
+					Type: typ.toAST(true),
+					Body: &ast.BlockStmt{List: []ast.Stmt{stmt}}}}
 			t.functions = append(t.functions, fn)
 			t.out.Decls = append(t.out.Decls, fn.decl)
 
 		case externMemory:
 			if t.memory != nil {
-				return fmt.Errorf("multiple memories not supported")
+				return errors.New("multiple memories not supported")
 			}
-			min, max, is64, err := t.readLimits(65536) // 4 GiB
+			min, max, shared, is64, err := t.readLimits(65536) // 4 GiB
 			if err != nil {
 				return err
 			}
@@ -543,8 +481,9 @@ func (t *translator) readImportSection() error {
 				id:       id,
 				min:      int64(min),
 				max:      int64(max),
-				is64:     is64,
 				imported: true,
+				shared:   shared,
+				is64:     is64,
 				selector: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: id}}}
 			t.imports = append(t.imports, importDef{
 				module: mod,
@@ -584,7 +523,7 @@ func (t *translator) readImportSection() error {
 				return fmt.Errorf("unsupported table type: %x", typ)
 			}
 
-			min, max, is64, err := t.readLimits(65536) // 1 MiB
+			min, max, _, is64, err := t.readLimits(65536) // 1 MiB
 			if err != nil {
 				return err
 			}
@@ -629,8 +568,9 @@ func (t *translator) readFunctionSection() error {
 		fn.decl = &ast.FuncDecl{
 			Name: &ast.Ident{},
 			Recv: modRecvList,
-			Type: fn.typ.toAST(),
+			Type: fn.typ.toAST(true),
 		}
+		fn.call = latecall(fn.decl.Name)
 		t.out.Decls = append(t.out.Decls, fn.decl)
 	}
 	return nil
@@ -654,7 +594,7 @@ func (t *translator) readTableSection() error {
 			return fmt.Errorf("unsupported table type: %x", typ)
 		}
 
-		min, max, is64, err := t.readLimits(65536) // 1 MiB
+		min, max, _, is64, err := t.readLimits(65536) // 1 MiB
 		if err != nil {
 			return err
 		}
@@ -678,25 +618,27 @@ func (t *translator) readMemorySection() error {
 		return nil
 	}
 	if numMems > 1 {
-		return fmt.Errorf("multiple memories not supported")
+		return errors.New("multiple memories not supported")
 	}
 
 	id := &ast.Ident{}
-	min, max, is64, err := t.readLimits(65536) // 4 GiB
+	min, max, shared, is64, err := t.readLimits(65536) // 4 GiB
 	t.memory = &memoryDef{
 		id:       id,
 		min:      int64(min),
 		max:      int64(max),
+		shared:   shared,
 		is64:     is64,
 		selector: &ast.SelectorExpr{X: newID("m"), Sel: id}}
 	return err
 }
 
-func (t *translator) readLimits(def uint64) (min, max uint64, is64 bool, err error) {
+func (t *translator) readLimits(def uint64) (min, max uint64, shared, is64 bool, err error) {
 	flags, err := readLEB128(t.in)
 	if err != nil {
 		return
 	}
+	shared = (flags & 2) != 0
 	is64 = (flags & 4) != 0
 	min, err = readLEB128(t.in)
 	if err != nil {
@@ -811,9 +753,7 @@ func (t *translator) readElementSection() error {
 				if err != nil {
 					return err
 				}
-				t.elements[i].init[j] = &ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.functions[idx].decl.Name}
+				t.elements[i].init[j] = t.functions[idx].call
 			}
 		}
 	}
@@ -857,8 +797,10 @@ func (t *translator) readExportSection() error {
 
 		switch externKind(kind) {
 		case externFunction:
-			decl := t.functions[index].decl
-			decl.Name = util.Mangle(name, util.IDExported)
+			if !t.functions[index].provided {
+				decl := t.functions[index].decl
+				decl.Name.Name = util.Mangle(name, util.IDExported)
+			}
 		}
 	}
 	return nil
@@ -872,1296 +814,6 @@ func (t *translator) readStartSection() error {
 	// Bitwise not makes the zero value useful (no start function).
 	t.start = ^index
 	return nil
-}
-
-func (t *translator) readCodeSection() error {
-	numFuncs, err := readLEB128(t.in)
-	if err != nil {
-		return err
-	}
-
-	var importedFuncs uint64
-	for _, imp := range t.imports {
-		if imp.kind == externFunction {
-			importedFuncs++
-		}
-	}
-
-	for i := range numFuncs {
-		i += importedFuncs
-		_, err := readLEB128(t.in)
-		if err != nil {
-			return err
-		}
-
-		err = t.readCodeForFunction(&t.functions[i])
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (t *translator) readCodeForFunction(fn *funcCompiler) error {
-	body := &ast.BlockStmt{}
-	fn.translator = t
-	fn.decl.Body = body
-	fn.blocks = []funcBlock{{body: body}}
-
-	if *dwarfline {
-		fn.emit(&ast.ExprStmt{X: ast.NewIdent("OFFSET_HACK_START")})     // comments are hard so fuck that lol
-		defer fn.emit(&ast.ExprStmt{X: ast.NewIdent("OFFSET_HACK_END")}) // comments are hard so fuck that lol
-	}
-
-	numVars, err := readLEB128(t.in)
-	if err != nil {
-		return err
-	}
-
-	// Declare local variables.
-	// Parameters are predeclared locals.
-	vars := make([]ast.Expr, 0, numVars)
-	numLocals := len(fn.typ.params)
-	for range numVars {
-		n, err := readLEB128(t.in)
-		if err != nil {
-			return err
-		}
-		typ, err := t.in.ReadByte()
-		if err != nil {
-			return err
-		}
-
-		ids := make([]*ast.Ident, n)
-		for i := range int(n) {
-			ids[i] = localVar(numLocals)
-			vars = append(vars, ids[i])
-			numLocals++
-		}
-		body.List = append(body.List, &ast.DeclStmt{
-			Decl: &ast.GenDecl{
-				Tok: token.VAR,
-				Specs: []ast.Spec{
-					&ast.ValueSpec{
-						Names: ids,
-						Type:  wasmType(typ).ident()}}}})
-	}
-	// Ensure local variables are used.
-	if len(vars) > 0 {
-		fn.emit(&ast.AssignStmt{
-			Tok: token.ASSIGN,
-			Lhs: slices.Repeat([]ast.Expr{newID("_")}, len(vars)),
-			Rhs: vars})
-	}
-
-	for {
-		if *dwarfline {
-			fn.emit(&ast.ExprStmt{X: ast.NewIdent("OFFSET_HACK_" + strconv.FormatUint(t.in.Offset()-t.code, 10))}) // comments are hard so fuck that lol
-		}
-
-		opcode, err := t.in.ReadByte()
-		if err != nil {
-			return err
-		}
-
-		blk := fn.blocks.top()
-
-		switch opcode {
-		case 0x00: // unreachable
-			if !blk.unreachable {
-				fn.emit(&ast.ExprStmt{
-					X: &ast.CallExpr{
-						Fun:  newID("panic"),
-						Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: `"unreachable"`}}}})
-				blk.unreachable = true
-			}
-
-		case 0x01: // nop
-
-		case 0x02, 0x03, 0x04: // block, loop, if
-			bt, err := t.readBlockType()
-			if err != nil {
-				return err
-			}
-
-			var cond ast.Expr
-			if opcode == 0x04 { // if
-				cond = fn.popCond()
-			}
-
-			// Declare block results outside the block.
-			results := make([]ast.Expr, len(bt.results))
-			for i, t := range []byte(bt.results) {
-				tmp := fn.newTempVar()
-				results[i] = tmp
-				fn.emit(&ast.DeclStmt{
-					Decl: &ast.GenDecl{
-						Tok: token.VAR,
-						Specs: []ast.Spec{
-							&ast.ValueSpec{
-								Names: []*ast.Ident{tmp},
-								Type:  wasmType(t).ident()}}}})
-			}
-			// Ensure results are used.
-			if len(results) > 0 {
-				fn.emit(&ast.AssignStmt{
-					Tok: token.ASSIGN,
-					Lhs: slices.Repeat([]ast.Expr{newID("_")}, len(results)),
-					Rhs: results})
-			}
-
-			childBlk := funcBlock{
-				typ:         bt,
-				results:     results,
-				body:        &ast.BlockStmt{},
-				stackPos:    len(fn.stack) - len(bt.params),
-				unreachable: blk.unreachable,
-				ifreachable: blk.unreachable,
-				elreachable: blk.unreachable,
-			}
-
-			// Blocks can naturally consume their arguments.
-			// Loops and ifs need to declare them outside the block so
-			// they persist across iterations and are available to
-			// both branches of the statement.
-			if len(bt.params) > 0 && opcode != 0x02 { // params, not a block
-				lhs := make([]ast.Expr, len(bt.params))
-				rhs := make([]ast.Expr, len(bt.params))
-				for i := len(bt.params) - 1; i >= 0; i-- {
-					if opcode == 0x03 { // loop
-						lhs[i] = fn.newTempVar()
-					} else {
-						lhs[i] = fn.newTempVal()
-					}
-					rhs[i] = fn.pop()
-				}
-				childBlk.params = lhs
-				for _, p := range lhs {
-					fn.pushConst(p)
-				}
-				fn.emit(&ast.AssignStmt{
-					Tok: token.DEFINE,
-					Lhs: lhs,
-					Rhs: rhs})
-			}
-
-			var stmt ast.Stmt
-			switch opcode {
-			case 0x02: // block
-				stmt = childBlk.body
-
-			case 0x03: // loop
-				// Remember the loop start position.
-				// Bitwise not makes the zero value useful (not a loop).
-				childBlk.loopPos = ^len(blk.body.List)
-				stmt = childBlk.body
-
-			case 0x04: // if
-				// We need to remember the if statement
-				// so we can attach an else branch.
-				childBlk.ifStmt = &ast.IfStmt{Cond: cond, Body: childBlk.body}
-				stmt = childBlk.ifStmt
-			}
-
-			fn.emit(stmt)
-			fn.blocks.append(childBlk)
-
-		case 0x05: // else
-			// Set the results of the if branch.
-			fn.emit(blk.resultStmts(fn)...)
-			fn.stack = fn.stack[:blk.stackPos]
-			// Push the if's arguments again.
-			for _, p := range blk.params {
-				fn.pushConst(p)
-			}
-			// Create a new block at the same level,
-			// make it the else branch.
-			blk.body = &ast.BlockStmt{}
-			blk.ifStmt.Else = blk.body
-			blk.ifreachable = blk.unreachable
-			blk.unreachable = blk.elreachable
-
-		case 0x0b: // end
-			if len(fn.blocks) == 1 { // End of the function body.
-				if n := len(fn.typ.results); n > 0 && !blk.unreachable {
-					ret := &ast.ReturnStmt{Results: make([]ast.Expr, n)}
-					for i := n - 1; i >= 0; i-- {
-						ret.Results[i] = fn.pop()
-					}
-					fn.emit(ret)
-				}
-				fn.cleanup()
-				return nil
-			}
-
-			// If this is an if statement with results and no else block,
-			// we need an else statement that assigns the params to the results.
-			if blk.ifStmt != nil && blk.ifStmt.Else == nil && len(blk.results) > 0 {
-				blk.ifStmt.Else = &ast.BlockStmt{
-					List: []ast.Stmt{
-						&ast.AssignStmt{
-							Tok: token.ASSIGN,
-							Lhs: blk.results,
-							Rhs: blk.params}}}
-			}
-
-			// Set block results, but push them again
-			// so they're available to the parent block.
-			fn.emit(blk.resultStmts(fn)...)
-			fn.stack = fn.stack[:blk.stackPos]
-			for _, r := range blk.results {
-				fn.pushConst(r)
-			}
-
-			fn.blocks.pop()
-			parent := fn.blocks.top()
-
-			// Add the label if requested.
-			if blk.label != nil {
-				if blk.loopPos != 0 {
-					// At the start for loops.
-					parent.body.List[^blk.loopPos] = &ast.LabeledStmt{
-						Stmt:  parent.body.List[^blk.loopPos],
-						Label: blk.label}
-				} else {
-					// At the end for other block types.
-					fn.emit(&ast.LabeledStmt{
-						Stmt:  &ast.EmptyStmt{},
-						Label: blk.label})
-				}
-			}
-
-			// A parent block is unreachable at this point
-			// if the end of this block is unreachable,
-			// and the block is a loop (loops jump to the start),
-			// or it has no end label to jump to,
-			// and the block is not an if statement,
-			// or both branches were unreachable.
-			parent.unreachable = blk.unreachable &&
-				(blk.loopPos != 0 || blk.label == nil &&
-					(blk.ifStmt == nil || blk.ifreachable))
-
-		case 0x0c: // br
-			n, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-
-			fn.emit(fn.branch(n)...)
-			blk.unreachable = true // After an uncoditional goto.
-
-		case 0x0d: // br_if
-			n, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-
-			// Conditional break.
-			fn.emit(&ast.IfStmt{
-				Cond: fn.popCond(),
-				Body: &ast.BlockStmt{List: fn.branch(n)}})
-
-		case 0x0e: // br_table
-			numTargets, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-
-			sw := &ast.SwitchStmt{Tag: fn.pop(), Body: &ast.BlockStmt{}}
-
-			// Group targets by their destination to consolidate case clauses.
-			var targetMap = map[uint64]int{}
-			for i := range numTargets {
-				target, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-
-				// New target, add a new case clause.
-				id, ok := targetMap[target]
-				if !ok {
-					id = len(sw.Body.List)
-					targetMap[target] = id
-					sw.Body.List = append(sw.Body.List,
-						&ast.CaseClause{Body: fn.branch(target)})
-				}
-
-				caseExpr := &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(i, 10)}
-				caseClse := sw.Body.List[id].(*ast.CaseClause)
-				caseClse.List = append(caseClse.List, caseExpr)
-			}
-
-			// Add the default target.
-			target, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			id, ok := targetMap[target]
-			if !ok {
-				// New target, add a default clause.
-				sw.Body.List = append(sw.Body.List,
-					&ast.CaseClause{Body: fn.branch(target)})
-			} else {
-				// Make the existing clause the default,
-				// move it to the end.
-				caseClse := sw.Body.List[id].(*ast.CaseClause)
-				copy(sw.Body.List[id:], sw.Body.List[id+1:])
-				sw.Body.List[len(sw.Body.List)-1] = caseClse
-				caseClse.List = nil
-			}
-
-			fn.emit(sw)
-			blk.unreachable = true // After switch.
-
-		case 0x10: // call
-			index, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-
-			target := &t.functions[index]
-
-			args := make([]ast.Expr, len(target.typ.params))
-			for i := len(args) - 1; i >= 0; i-- {
-				args[i] = fn.pop()
-			}
-
-			call := &ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: target.decl.Name},
-				Args: args,
-			}
-
-			if len(target.typ.results) == 0 {
-				fn.emit(&ast.ExprStmt{X: call})
-				break
-			}
-
-			lhs := make([]ast.Expr, len(target.typ.results))
-			for i := range lhs {
-				lhs[i] = fn.newTempVal()
-			}
-			fn.emit(&ast.AssignStmt{
-				Lhs: lhs,
-				Tok: token.DEFINE,
-				Rhs: []ast.Expr{call}})
-			for _, r := range lhs {
-				fn.pushConst(r)
-			}
-
-		case 0x11: // call_indirect
-			typeIdx, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			tableIdx, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-
-			idx := fn.pop()
-			typ := t.types[typeIdx]
-			args := make([]ast.Expr, len(typ.params))
-			for i := len(args) - 1; i >= 0; i-- {
-				args[i] = fn.pop()
-			}
-
-			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id}
-			if t.tables[tableIdx].imported {
-				tab = &ast.StarExpr{X: tab}
-			}
-			call := &ast.CallExpr{
-				Fun: &ast.TypeAssertExpr{
-					X: &ast.IndexExpr{
-						X:     tab,
-						Index: convert(idx, "uint")},
-					Type: typ.toAST()},
-				Args: args}
-
-			if len(typ.results) == 0 {
-				fn.emit(&ast.ExprStmt{X: call})
-				break
-			}
-
-			lhs := make([]ast.Expr, len(typ.results))
-			for i := range lhs {
-				lhs[i] = fn.newTempVal()
-			}
-			fn.emit(&ast.AssignStmt{
-				Lhs: lhs,
-				Tok: token.DEFINE,
-				Rhs: []ast.Expr{call}})
-			for _, r := range lhs {
-				fn.pushConst(r)
-			}
-
-		case 0x0f: // return
-			if !blk.unreachable {
-				n := len(fn.typ.results)
-				ret := &ast.ReturnStmt{Results: make([]ast.Expr, n)}
-				for i := n - 1; i >= 0; i-- {
-					ret.Results[i] = fn.pop()
-				}
-				fn.emit(ret)
-				blk.unreachable = true // After an uncoditional return.
-			}
-
-		case 0x1a: // drop
-			fn.emit(&ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{newID("_")},
-				Rhs: []ast.Expr{fn.pop()},
-			})
-
-		case 0x1b: // select
-			cond := fn.popCond()
-			tmp := fn.newTempVar()
-			fn.emit(&ast.AssignStmt{
-				Tok: token.DEFINE,
-				Lhs: []ast.Expr{tmp},
-				Rhs: []ast.Expr{fn.pop()},
-			}, &ast.IfStmt{
-				Cond: cond,
-				Body: &ast.BlockStmt{
-					List: []ast.Stmt{&ast.AssignStmt{
-						Tok: token.ASSIGN,
-						Lhs: []ast.Expr{tmp},
-						Rhs: []ast.Expr{fn.pop()}}}},
-			})
-			fn.pushConst(tmp)
-
-		case 0x1c: // select (typed)
-			n, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			for range n {
-				if _, err := t.in.ReadByte(); err != nil {
-					return err
-				}
-			}
-
-			cond := fn.popCond()
-			if n == 0 {
-				fn.emit(&ast.IfStmt{
-					Cond: cond,
-					Body: &ast.BlockStmt{},
-				})
-				break
-			}
-
-			vf := make([]ast.Expr, n)
-			for i := int(n) - 1; i >= 0; i-- {
-				vf[i] = fn.pop()
-			}
-
-			vt := make([]ast.Expr, n)
-			for i := int(n) - 1; i >= 0; i-- {
-				vt[i] = fn.pop()
-			}
-
-			tmp := make([]ast.Expr, n)
-			for i := range tmp {
-				tmp[i] = fn.newTempVar()
-			}
-
-			fn.emit(&ast.AssignStmt{
-				Tok: token.DEFINE,
-				Lhs: tmp,
-				Rhs: vf,
-			}, &ast.IfStmt{
-				Cond: cond,
-				Body: &ast.BlockStmt{
-					List: []ast.Stmt{&ast.AssignStmt{
-						Tok: token.ASSIGN,
-						Lhs: tmp,
-						Rhs: vt}}}})
-
-			for _, t := range tmp {
-				fn.pushConst(t)
-			}
-
-		case 0x20: // local.get
-			i, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
-
-		case 0x21: // local.set
-			i, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			fn.emit(&ast.AssignStmt{
-				Lhs: []ast.Expr{localVar(i)},
-				Rhs: []ast.Expr{fn.pop()},
-				Tok: token.ASSIGN})
-
-		case 0x22: // local.tee
-			i, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			fn.emit(&ast.AssignStmt{
-				Lhs: []ast.Expr{localVar(i)},
-				Rhs: []ast.Expr{fn.pop()},
-				Tok: token.ASSIGN})
-			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
-
-		case 0x23: // global.get
-			e, err := t.globalGet()
-			if err != nil {
-				return err
-			}
-			fn.push(e)
-
-		case 0x24: // global.set
-			i, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-
-			var lhs ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.globals[i].id}
-			if t.globals[i].imported {
-				lhs = &ast.StarExpr{X: lhs}
-			}
-			fn.emit(&ast.AssignStmt{
-				Lhs: []ast.Expr{lhs},
-				Rhs: []ast.Expr{fn.pop()},
-				Tok: token.ASSIGN})
-
-		case 0x25: // table.get
-			i, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id}
-			if t.tables[i].imported {
-				tab = &ast.StarExpr{X: tab}
-			}
-			fn.push(&ast.IndexExpr{X: tab, Index: fn.pop()})
-
-		case 0x26: // table.set
-			i, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[i].id}
-			if t.tables[i].imported {
-				tab = &ast.StarExpr{X: tab}
-			}
-			fn.emit(&ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Rhs: []ast.Expr{fn.pop()},
-				Lhs: []ast.Expr{&ast.IndexExpr{X: tab, Index: fn.pop()}}})
-
-		case 0x2c, 0x2d, 0x30, 0x31: // load8
-			_, err := readLEB128(t.in) // align
-			if err != nil {
-				return err
-			}
-			offset, err := readLEB128(t.in)
-			if err != nil { // offset
-				return err
-			}
-
-			idx := fn.load8(offset)
-			switch opcode {
-			case 0x2c: // i32.load8_s
-				fn.push(convert(idx, "int8", "int32"))
-			case 0x2d: // i32.load8_u
-				fn.push(convert(idx, "int32"))
-			case 0x30: // i64.load8_s
-				fn.push(convert(idx, "int8", "int64"))
-			case 0x31: // i64.load8_u
-				fn.push(convert(idx, "int64"))
-			}
-
-		case 0x28, 0x29, 0x2a, 0x2b, 0x2e, 0x2f, 0x32, 0x33, 0x34, 0x35: // load
-			_, err := readLEB128(t.in) // align
-			if err != nil {
-				return err
-			}
-			offset, err := readLEB128(t.in)
-			if err != nil { // offset
-				return err
-			}
-
-			addr := fn.popAddr(offset)
-			load := fn.load
-			if *endian == "little" {
-				load = fn.loadUnsafe
-			}
-
-			switch opcode {
-			case 0x28: // i32.load
-				fn.push(load(addr, "int32"))
-			case 0x29: // i64.load
-				fn.push(load(addr, "int64"))
-			case 0x2a: // f32.load
-				fn.push(load(addr, "float32"))
-			case 0x2b: // f64.load
-				fn.push(load(addr, "float64"))
-			case 0x2e: // i32.load16_s
-				fn.push(convert(load(addr, "int16"), "int32"))
-			case 0x2f: // i32.load16_u
-				fn.push(convert(load(addr, "uint16"), "int32"))
-			case 0x32: // i64.load16_s
-				fn.push(convert(load(addr, "int16"), "int64"))
-			case 0x33: // i64.load16_u
-				fn.push(convert(load(addr, "uint16"), "int64"))
-			case 0x34: // i64.load32_s
-				fn.push(convert(load(addr, "int32"), "int64"))
-			case 0x35: // i64.load32_u
-				fn.push(convert(load(addr, "uint32"), "int64"))
-			}
-
-		case 0x3a, 0x3c: // store8
-			_, err := readLEB128(t.in) // align
-			if err != nil {
-				return err
-			}
-			offset, err := readLEB128(t.in)
-			if err != nil { // offset
-				return err
-			}
-
-			val := fn.pop()
-			idx := fn.load8(offset) // an l-value
-			fn.emit(&ast.AssignStmt{
-				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{idx},
-				Rhs: []ast.Expr{convert(val, "byte")}})
-
-		case 0x36, 0x37, 0x38, 0x39, 0x3b, 0x3d, 0x3e: // store
-			_, err := readLEB128(t.in) // align
-			if err != nil {
-				return err
-			}
-			offset, err := readLEB128(t.in)
-			if err != nil { // offset
-				return err
-			}
-
-			val := fn.pop()
-			addr := fn.popAddr(offset)
-			store := fn.store
-			if *endian == "little" {
-				store = fn.storeUnsafe
-			}
-
-			switch opcode {
-			case 0x36: // i32.store
-				fn.emit(store(addr, val, "int32"))
-			case 0x37: // i64.store
-				fn.emit(store(addr, val, "int64"))
-			case 0x38: // f32.store
-				fn.emit(store(addr, val, "float32"))
-			case 0x39: // f64.store
-				fn.emit(store(addr, val, "float64"))
-			case 0x3b: // i32.store16
-				fn.emit(store(addr, val, "int16"))
-			case 0x3d: // i64.store16
-				fn.emit(store(addr, val, "int16"))
-			case 0x3e: // i64.store32
-				fn.emit(store(addr, val, "int32"))
-			}
-
-		case 0x3f: // memory.size
-			_, _ = readLEB128(t.in) // memory index
-			fn.push(convert(
-				&ast.BinaryExpr{
-					X: &ast.CallExpr{
-						Fun:  newID("len"),
-						Args: []ast.Expr{t.memory.selector}},
-					Op: token.SHR,
-					Y:  &ast.BasicLit{Kind: token.INT, Value: "16"},
-				}, t.memory.stype()))
-
-		case 0x40: // memory.grow
-			_, err := readLEB128(t.in) // memory index
-			if err != nil {
-				return err
-			}
-			if fn.memory.imported {
-				fn.push(convert(&ast.CallExpr{
-					Fun: &ast.SelectorExpr{
-						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")},
-						Sel: newID("Grow")},
-					Args: []ast.Expr{
-						convert(fn.pop(), "int64"),
-						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
-					t.memory.stype()))
-			} else {
-				fn.helpers.add("memory_grow")
-				fn.push(convert(&ast.CallExpr{
-					Fun: newID("memory_grow"),
-					Args: []ast.Expr{
-						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
-						convert(fn.pop(), "int64"),
-						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
-					t.memory.stype()))
-			}
-
-		case 0x41: // i32.const
-			e, err := t.constI32()
-			if err != nil {
-				return err
-			}
-			fn.pushConst(e)
-
-		case 0x42: // i64.const
-			e, err := t.constI64()
-			if err != nil {
-				return err
-			}
-			fn.pushConst(e)
-
-		case 0x43: // f32.const
-			e, err := t.constF32()
-			if err != nil {
-				return err
-			}
-			fn.pushConst(e)
-
-		case 0x44: // f64.const
-			e, err := t.constF64()
-			if err != nil {
-				return err
-			}
-			fn.pushConst(e)
-
-		case 0x45: // i32.eqz
-			fn.eqzOp()
-		case 0x46: // i32.eq
-			fn.cmpOp(token.EQL)
-		case 0x47: // i32.ne
-			fn.cmpOp(token.NEQ)
-		case 0x48: // i32.lt_s
-			fn.cmpOp(token.LSS)
-		case 0x49: // i32.lt_u
-			fn.cmpOpU32(token.LSS)
-		case 0x4a: // i32.gt_s
-			fn.cmpOp(token.GTR)
-		case 0x4b: // i32.gt_u
-			fn.cmpOpU32(token.GTR)
-		case 0x4c: // i32.le_s
-			fn.cmpOp(token.LEQ)
-		case 0x4d: // i32.le_u
-			fn.cmpOpU32(token.LEQ)
-		case 0x4e: // i32.ge_s
-			fn.cmpOp(token.GEQ)
-		case 0x4f: // i32.ge_u
-			fn.cmpOpU32(token.GEQ)
-
-		case 0x50: // i64.eqz
-			fn.eqzOp()
-		case 0x51: // i64.eq
-			fn.cmpOp(token.EQL)
-		case 0x52: // i64.ne
-			fn.cmpOp(token.NEQ)
-		case 0x53: // i64.lt_s
-			fn.cmpOp(token.LSS)
-		case 0x54: // i64.lt_u
-			fn.cmpOpU64(token.LSS)
-		case 0x55: // i64.gt_s
-			fn.cmpOp(token.GTR)
-		case 0x56: // i64.gt_u
-			fn.cmpOpU64(token.GTR)
-		case 0x57: // i64.le_s
-			fn.cmpOp(token.LEQ)
-		case 0x58: // i64.le_u
-			fn.cmpOpU64(token.LEQ)
-		case 0x59: // i64.ge_s
-			fn.cmpOp(token.GEQ)
-		case 0x5a: // i64.ge_u
-			fn.cmpOpU64(token.GEQ)
-
-		case 0x5b: // f32.eq
-			fn.cmpOp(token.EQL)
-		case 0x5c: // f32.ne
-			fn.cmpOp(token.NEQ)
-		case 0x5d: // f32.lt
-			fn.cmpOp(token.LSS)
-		case 0x5e: // f32.gt
-			fn.cmpOp(token.GTR)
-		case 0x5f: // f32.le
-			fn.cmpOp(token.LEQ)
-		case 0x60: // f32.ge
-			fn.cmpOp(token.GEQ)
-
-		case 0x61: // f64.eq
-			fn.cmpOp(token.EQL)
-		case 0x62: // f64.ne
-			fn.cmpOp(token.NEQ)
-		case 0x63: // f64.lt
-			fn.cmpOp(token.LSS)
-		case 0x64: // f64.gt
-			fn.cmpOp(token.GTR)
-		case 0x65: // f64.le
-			fn.cmpOp(token.LEQ)
-		case 0x66: // f64.ge
-			fn.cmpOp(token.GEQ)
-
-		case 0x67: // i32.clz
-			fn.bitOp("LeadingZeros32")
-		case 0x68: // i32.ctz
-			fn.bitOp("TrailingZeros32")
-		case 0x69: // i32.popcnt
-			fn.bitOp("OnesCount32")
-		case 0x6a: // i32.add
-			fn.binOp(token.ADD)
-		case 0x6b: // i32.sub
-			fn.binOp(token.SUB)
-		case 0x6c: // i32.mul
-			fn.binOp(token.MUL)
-		case 0x6d: // i32.div_s
-			fn.binHelper("i32_div_s")
-		case 0x6e: // i32.div_u
-			fn.binOpU32(token.QUO)
-		case 0x6f: // i32.rem_s
-			fn.binOp(token.REM)
-		case 0x70: // i32.rem_u
-			fn.binOpU32(token.REM)
-		case 0x71: // i32.and
-			fn.binOp(token.AND)
-		case 0x72: // i32.or
-			fn.binOp(token.OR)
-		case 0x73: // i32.xor
-			fn.binOp(token.XOR)
-		case 0x74: // i32.shl
-			fn.binHelper("i32_shl")
-		case 0x75: // i32.shr_s
-			fn.binHelper("i32_shr_s")
-		case 0x76: // i32.shr_u
-			fn.binHelper("i32_shr_u")
-		case 0x77: // i32.rotl
-			fn.binHelper("i32_rotl")
-		case 0x78: // i32.rotr
-			fn.binHelper("i32_rotr")
-
-		case 0x79: // i64.clz
-			fn.bitOp("LeadingZeros64")
-		case 0x7a: // i64.ctz
-			fn.bitOp("TrailingZeros64")
-		case 0x7b: // i64.popcnt
-			fn.bitOp("OnesCount64")
-		case 0x7c: // i64.add
-			fn.binOp(token.ADD)
-		case 0x7d: // i64.sub
-			fn.binOp(token.SUB)
-		case 0x7e: // i64.mul
-			fn.binOp(token.MUL)
-		case 0x7f: // i64.div_s
-			fn.binHelper("i64_div_s")
-		case 0x80: // i64.div_u
-			fn.binOpU64(token.QUO)
-		case 0x81: // i64.rem_s
-			fn.binOp(token.REM)
-		case 0x82: // i64.rem_u
-			fn.binOpU64(token.REM)
-		case 0x83: // i64.and
-			fn.binOp(token.AND)
-		case 0x84: // i64.or
-			fn.binOp(token.OR)
-		case 0x85: // i64.xor
-			fn.binOp(token.XOR)
-		case 0x86: // i64.shl
-			fn.binHelper("i64_shl")
-		case 0x87: // i64.shr_s
-			fn.binHelper("i64_shr_s")
-		case 0x88: // i64.shr_u
-			fn.binHelper("i64_shr_u")
-		case 0x89: // i64.rotl
-			fn.binHelper("i64_rotl")
-		case 0x8a: // i64.rotr
-			fn.binHelper("i64_rotr")
-
-		case 0x8b: // f32.abs
-			fn.uniHelper("f32_abs")
-		case 0x8c: // f32.neg
-			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
-		case 0x8d: // f32.ceil
-			fn.uniMath32("Ceil")
-		case 0x8e: // f32.floor
-			fn.uniMath32("Floor")
-		case 0x8f: // f32.trunc
-			fn.uniMath32("Trunc")
-		case 0x90: // f32.nearest
-			fn.uniMath32("RoundToEven")
-		case 0x91: // f32.sqrt
-			fn.uniMath32("Sqrt")
-		case 0x92: // f32.add
-			fn.binOpF32(token.ADD)
-		case 0x93: // f32.sub
-			fn.binOpF32(token.SUB)
-		case 0x94: // f32.mul
-			fn.binOpF32(token.MUL)
-		case 0x95: // f32.div
-			fn.binOpF32(token.QUO) // go.dev/issue/43577
-		case 0x96: // f32.min
-			if *nanbox {
-				fn.binHelper("f32_min")
-			} else {
-				fn.binBuiltin("min")
-			}
-		case 0x97: // f32.max
-			if *nanbox {
-				fn.binHelper("f32_max")
-			} else {
-				fn.binBuiltin("max")
-			}
-		case 0x98: // f32.copysign
-			fn.binHelper("f32_copysign")
-
-		case 0x99: // f64.abs
-			fn.uniMath64("Abs")
-		case 0x9a: // f64.neg
-			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
-		case 0x9b: // f64.ceil
-			fn.uniMath64("Ceil")
-		case 0x9c: // f64.floor
-			fn.uniMath64("Floor")
-		case 0x9d: // f64.trunc
-			fn.uniMath64("Trunc")
-		case 0x9e: // f64.nearest
-			fn.uniMath64("RoundToEven")
-		case 0x9f: // f64.sqrt
-			fn.uniMath64("Sqrt")
-		case 0xa0: // f64.add
-			fn.binOpF64(token.ADD)
-		case 0xa1: // f64.sub
-			fn.binOpF64(token.SUB)
-		case 0xa2: // f64.mul
-			fn.binOpF64(token.MUL)
-		case 0xa3: // f64.div
-			fn.binOpF64(token.QUO) // go.dev/issue/43577
-		case 0xa4: // f64.min
-			if *nanbox {
-				fn.binHelper("f64_min")
-			} else {
-				fn.binBuiltin("min")
-			}
-		case 0xa5: // f64.max
-			if *nanbox {
-				fn.binHelper("f64_max")
-			} else {
-				fn.binBuiltin("max")
-			}
-		case 0xa6: // f64.copysign
-			fn.binMath64("Copysign")
-
-		case 0xa7: // i32.wrap_i64
-			fn.convert("int32")
-
-		case 0xa8: // i32.trunc_f32_s
-			fn.uniHelper("i32_trunc_f32_s")
-		case 0xa9: // i32.trunc_f32_u
-			fn.uniHelper("i32_trunc_f32_u")
-		case 0xaa: // i32.trunc_f64_s
-			fn.uniHelper("i32_trunc_f64_s")
-		case 0xab: // i32.trunc_f64_u
-			fn.uniHelper("i32_trunc_f64_u")
-
-		case 0xac: // i64.extend_i32_s
-			fn.convert("int64")
-		case 0xad: // i64.extend_i32_u
-			fn.convert("uint32", "int64")
-
-		case 0xae: // i64.trunc_f32_s
-			fn.uniHelper("i64_trunc_f32_s")
-		case 0xaf: // i64.trunc_f32_u
-			fn.uniHelper("i64_trunc_f32_u")
-		case 0xb0: // i64.trunc_f64_s
-			fn.uniHelper("i64_trunc_f64_s")
-		case 0xb1: // i64.trunc_f64_u
-			fn.uniHelper("i64_trunc_f64_u")
-
-		case 0xb2: // f32.convert_i32_s
-			fn.convert("float32")
-		case 0xb3: // f32.convert_i32_u
-			fn.convert("uint32", "float32")
-		case 0xb4: // f32.convert_i64_s
-			fn.convert("float32")
-		case 0xb5: // f32.convert_i64_u
-			fn.convert("uint64", "float32")
-		case 0xb6: // f32.demote_f64
-			fn.convert("float32")
-
-		case 0xb7: // f64.convert_i32_s
-			fn.convert("float64")
-		case 0xb8: // f64.convert_i32_u
-			fn.convert("uint32", "float64")
-		case 0xb9: // f64.convert_i64_s
-			fn.convert("float64")
-		case 0xba: // f64.convert_i64_u
-			fn.convert("uint64", "float64")
-		case 0xbb: // f64.promote_f32
-			fn.convert("float64")
-
-		case 0xbc: // i32.reinterpret_f32
-			fn.float32bits()
-		case 0xbd: // i64.reinterpret_f64
-			fn.float64bits()
-		case 0xbe: // f32.reinterpret_i32
-			fn.float32frombits()
-		case 0xbf: // f64.reinterpret_i64
-			fn.float64frombits()
-
-		case 0xc0: // i32.extend8_s
-			fn.convert("int8", "int32")
-		case 0xc1: // i32.extend16_s
-			fn.convert("int16", "int32")
-		case 0xc2: // i64.extend8_s
-			fn.convert("int8", "int64")
-		case 0xc3: // i64.extend16_s
-			fn.convert("int16", "int64")
-		case 0xc4: // i64.extend32_s
-			fn.convert("int32", "int64")
-
-		case 0xd0: // ref.null
-			_, err := t.in.ReadByte()
-			if err != nil {
-				return err
-			}
-			fn.pushConst(newID("nil"))
-		case 0xd1: // ref.is_null
-			fn.pushCond(&ast.BinaryExpr{
-				X:  fn.pop(),
-				Op: token.EQL,
-				Y:  newID("nil")})
-		case 0xd2: // ref.func
-			index, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			fn.pushConst(&ast.SelectorExpr{
-				X:   newID("m"),
-				Sel: t.functions[index].decl.Name})
-
-		case 0xfc:
-			code, err := readLEB128(t.in)
-			if err != nil {
-				return err
-			}
-			switch code {
-			case 0x00: // i32.trunc_sat_f32_s
-				fn.uniHelper("i32_trunc_sat_f32_s")
-			case 0x01: // i32.trunc_sat_f32_u
-				fn.uniHelper("i32_trunc_sat_f32_u")
-			case 0x02: // i32.trunc_sat_f64_s
-				fn.uniHelper("i32_trunc_sat_f64_s")
-			case 0x03: // i32.trunc_sat_f64_u
-				fn.uniHelper("i32_trunc_sat_f64_u")
-			case 0x04: // i64.trunc_sat_f32_s
-				fn.uniHelper("i64_trunc_sat_f32_s")
-			case 0x05: // i64.trunc_sat_f32_u
-				fn.uniHelper("i64_trunc_sat_f32_u")
-			case 0x06: // i64.trunc_sat_f64_s
-				fn.uniHelper("i64_trunc_sat_f64_s")
-			case 0x07: // i64.trunc_sat_f64_u
-				fn.uniHelper("i64_trunc_sat_f64_u")
-
-			case 0x08: // memory.init
-				i, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				_, err = readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				n := convert(fn.pop(), "uint32")
-				src := convert(fn.pop(), "uint32")
-				dst := convert(fn.pop(), t.memory.utype())
-				fn.helpers.add("memory_init")
-				fn.emit(&ast.ExprStmt{
-					X: &ast.CallExpr{
-						Fun: newID("memory_init"),
-						Args: []ast.Expr{
-							t.memory.selector,
-							dataID(i), dst, src, n}}})
-
-			case 0x09: // data.drop
-				// No-op since data segments are constants.
-				_, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-
-			case 0x0a: // memory.copy
-				_, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				_, err = readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				typ := t.memory.utype()
-				n := convert(fn.pop(), typ)
-				src := convert(fn.pop(), typ)
-				dst := convert(fn.pop(), typ)
-				fn.helpers.add("memory_copy")
-				fn.emit(&ast.ExprStmt{
-					X: &ast.CallExpr{
-						Fun: newID("memory_copy"),
-						Args: []ast.Expr{
-							t.memory.selector,
-							dst, src, n}}})
-
-			case 0x0b: // memory.fill
-				_, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				typ := t.memory.utype()
-				n := convert(fn.pop(), typ)
-				val := fn.pop()
-				dest := convert(fn.pop(), typ)
-				if iszero(val) {
-					fn.helpers.add("memory_zero")
-					fn.emit(&ast.ExprStmt{
-						X: &ast.CallExpr{
-							Fun: newID("memory_zero"),
-							Args: []ast.Expr{
-								t.memory.selector,
-								dest, n}}})
-				} else {
-					fn.helpers.add("memory_fill")
-					fn.emit(&ast.ExprStmt{
-						X: &ast.CallExpr{
-							Fun: newID("memory_fill"),
-							Args: []ast.Expr{
-								t.memory.selector,
-								dest, val, n}}})
-				}
-
-			case 0x0c: // table.init
-				elemIdx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				tableIdx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				n := fn.pop()
-				src := fn.pop()
-				dst := fn.pop()
-				fn.helpers.add("table_init")
-				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[tableIdx].id}
-				if t.tables[tableIdx].imported {
-					tab = &ast.StarExpr{X: tab}
-				}
-				fn.emit(&ast.ExprStmt{
-					X: &ast.CallExpr{
-						Fun: newID("table_init"),
-						Args: []ast.Expr{
-							tab,
-							&ast.IndexExpr{
-								X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-								Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(elemIdx, 10)}},
-							dst, src, n}}})
-
-			case 0x0d: // elem.drop
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				fn.emit(&ast.AssignStmt{
-					Tok: token.ASSIGN,
-					Lhs: []ast.Expr{&ast.IndexExpr{
-						X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-						Index: &ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(idx, 10)}}},
-					Rhs: []ast.Expr{newID("nil")}})
-
-			case 0x0e: // table.copy
-				dstIdx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				srcIdx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				n := fn.pop()
-				src := fn.pop()
-				dst := fn.pop()
-				fn.helpers.add("table_copy")
-				var dstTab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[dstIdx].id}
-				if t.tables[dstIdx].imported {
-					dstTab = &ast.StarExpr{X: dstTab}
-				}
-				var srcTab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[srcIdx].id}
-				if t.tables[srcIdx].imported {
-					srcTab = &ast.StarExpr{X: srcTab}
-				}
-				fn.emit(&ast.ExprStmt{
-					X: &ast.CallExpr{
-						Fun:  newID("table_copy"),
-						Args: []ast.Expr{dstTab, srcTab, dst, src, n}}})
-
-			case 0x0f: // table.grow
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				delta := fn.pop()
-				val := fn.pop()
-				fn.helpers.add("table_grow")
-				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}
-				if !t.tables[idx].imported {
-					tab = &ast.UnaryExpr{Op: token.AND, X: tab}
-				}
-				fn.push(&ast.CallExpr{
-					Fun: newID("table_grow"),
-					Args: []ast.Expr{
-						tab, val, delta,
-						&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.tables[idx].max)}}})
-
-			case 0x10: // table.size
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}
-				if t.tables[idx].imported {
-					tab = &ast.StarExpr{X: tab}
-				}
-				fn.push(convert(&ast.CallExpr{
-					Fun:  newID("len"),
-					Args: []ast.Expr{tab},
-				}, t.tables[idx].stype()))
-
-			case 0x11: // table.fill
-				idx, err := readLEB128(t.in)
-				if err != nil {
-					return err
-				}
-				n := fn.pop()
-				val := fn.pop()
-				dest := fn.pop()
-				fn.helpers.add("table_fill")
-				var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[idx].id}
-				if t.tables[idx].imported {
-					tab = &ast.StarExpr{X: tab}
-				}
-				fn.emit(&ast.ExprStmt{
-					X: &ast.CallExpr{
-						Fun:  newID("table_fill"),
-						Args: []ast.Expr{tab, dest, val, n}}})
-
-			default:
-				return fmt.Errorf("unsupported opcode: 0xfc %02x", code)
-			}
-
-		default:
-			return fmt.Errorf("unsupported opcode: %x", opcode)
-		}
-	}
 }
 
 func (t *translator) readConstExpr() (ast.Expr, error) {
@@ -2215,7 +867,7 @@ func (t *translator) readConstExpr() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			stack.append(&ast.SelectorExpr{X: newID("m"), Sel: t.functions[index].decl.Name})
+			stack.append(t.functions[index].call)
 
 		case 0x6a, 0x7c: // i32.add, i64.add
 			stack.append(&ast.BinaryExpr{Y: stack.pop(), X: stack.pop(), Op: token.ADD})
@@ -2228,7 +880,7 @@ func (t *translator) readConstExpr() (ast.Expr, error) {
 			return stack[0], nil
 
 		default:
-			return nil, fmt.Errorf("unsupported opcode in constant expression: %x", opcode)
+			return nil, fmt.Errorf("unsupported opcode in constant expression: 0x%02X", opcode)
 		}
 	}
 }
@@ -2260,7 +912,29 @@ func (t *translator) readDataSection() error {
 		return err
 	}
 
-	t.data = make([]dataSegment, count)
+	if int(count) >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, int(count)-len(t.data))...)
+	}
+
+	var (
+		threshold  int64 = 64
+		lastActive int   = -1
+		lastDest   int64
+		lastSize   int64
+		fileOffset int64
+	)
+
+	var f *os.File
+	if *embed {
+		f, err = os.Create(embedFile)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		threshold = 4096
+		t.packages.add("embed")
+	}
+
 	for i := range t.data {
 		if tag, err := readLEB128(t.in); err != nil {
 			return err
@@ -2270,35 +944,86 @@ func (t *translator) readDataSection() error {
 			return fmt.Errorf("unsupported data segment tag: %d", tag)
 		}
 
+		var dest int64 = -1
+
 		if !t.data[i].passive {
 			expr, err := t.readConstExpr()
 			if err != nil {
 				return err
 			}
 			t.data[i].offset = expr
+			if v, ok := islit(expr, "i32"); ok {
+				dest = v
+			} else if v, ok := islit(expr, "i64"); ok {
+				dest = v
+			}
 		}
 
 		numElems, err := readLEB128(t.in)
 		if err != nil {
 			return err
 		}
-		t.data[i].init = make([]byte, numElems)
-		if _, err := io.ReadFull(t.in, t.data[i].init); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+		size := int64(numElems)
 
-func (t *translator) resolveImports(n ast.Node) bool {
-	if sel, ok := n.(*ast.SelectorExpr); ok {
-		if id, ok := sel.X.(*ast.Ident); ok {
-			if path, ok := stdlib[id.Name]; ok {
-				t.packages.add(path)
+		if dest >= 0 && lastActive >= 0 {
+			gap := dest - (lastDest + lastSize)
+			if 0 <= gap && gap < threshold {
+				if f == nil {
+					data := &t.data[lastActive]
+					data.init = append(data.init, make([]byte, gap)...)
+					buf := make([]byte, size)
+					if _, err := io.ReadFull(t.in, buf); err != nil {
+						return err
+					}
+					data.init = append(data.init, buf...)
+				} else {
+					if _, err := f.Write(make([]byte, gap)); err != nil {
+						return err
+					}
+					fileOffset += gap
+					if _, err := io.CopyN(f, t.in, size); err != nil {
+						return err
+					}
+					fileOffset += size
+					t.dataExpr(lastActive).X.(*ast.SliceExpr).High.(*ast.BasicLit).Value = formatInt(fileOffset)
+				}
+				t.data[i].merged = true
+				lastSize += gap + size
+				continue
 			}
 		}
+
+		if f == nil {
+			data := &t.data[i]
+			data.init = make([]byte, size)
+			if _, err := io.ReadFull(t.in, data.init); err != nil {
+				return err
+			}
+		} else {
+			if _, err := io.CopyN(f, t.in, size); err != nil {
+				return err
+			}
+			t.dataExpr(i).X = &ast.SliceExpr{
+				X:    newID("data"),
+				Low:  &ast.BasicLit{Kind: token.INT, Value: formatInt(fileOffset)},
+				High: &ast.BasicLit{Kind: token.INT, Value: formatInt(fileOffset + size)},
+			}
+			fileOffset += size
+		}
+
+		if dest >= 0 {
+			lastDest = dest
+			lastSize = size
+			lastActive = i
+		} else {
+			lastActive = -1
+		}
 	}
-	return true
+
+	if f != nil {
+		return f.Close()
+	}
+	return nil
 }
 
 func (t *translator) readCustomSection(size int) error {
@@ -2318,18 +1043,14 @@ func (t *translator) readCustomSection(size int) error {
 	}
 	if buf.String() == "name" {
 		return t.readNameSection(r)
-	}
-	if name, ok := strings.CutPrefix(buf.String(), ".debug_"); ok {
-		tmp, err := io.ReadAll(r)
-		if err != nil {
-			return err
-		}
-		t.debug[name] = tmp
+	} else if buf.String() == "dylink.0" {
+		return t.readDylink0Section(r)
 	}
 	return nil
 }
 
 func (t *translator) readNameSection(r *bytes.Reader) error {
+	seen := set[string]{}
 	for r.Len() > 0 {
 		kind, err := r.ReadByte()
 		if err != nil {
@@ -2351,7 +1072,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 				return err
 			}
 			name := buf.String()
-			t.out.Name = util.Mangle(name, util.IDLocal)
+			t.out.Name = util.MangleID(name, util.IDLocal)
 
 		case nameFunction, nameGlobal, nameTable:
 			count, err := readLEB128(r)
@@ -2387,8 +1108,8 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 						id = t.globals[index].id
 					}
 				}
-				if id != nil && id.Name == "" {
-					id.Name = util.Mangle(buf.String(), util.IDInternal).Name
+				if id.Name == "" && seen.add(buf.String()) {
+					id.Name = util.Mangle(buf.String(), util.IDInternal)
 				}
 			}
 
@@ -2400,4 +1121,113 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 		}
 	}
 	return nil
+}
+
+func (t *translator) readDylink0Section(r *bytes.Reader) error {
+	t.dylink = &dylinkDef{}
+	for r.Len() > 0 {
+		kind, err := r.ReadByte()
+		if err != nil {
+			return err
+		}
+		size, err := readLEB128(r)
+		if err != nil {
+			return err
+		}
+
+		if dylinkKind(kind) == dylinkMemInfo {
+			memSize, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.memorySize = int64(memSize)
+
+			memAlign, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.memoryAlignment = int64(memAlign)
+
+			tableSize, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.tableSize = int64(tableSize)
+
+			tableAlign, err := readLEB128(r)
+			if err != nil {
+				return err
+			}
+			t.dylink.tableAlignment = int64(tableAlign)
+		} else {
+			_, err := r.Seek(int64(size), io.SeekCurrent)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (t *translator) addHelpers(fset *token.FileSet, filename, src string) error {
+	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+	for _, decl := range f.Decls {
+		if d, ok := decl.(*ast.GenDecl); ok && d.Tok == token.IMPORT {
+			continue
+		}
+		t.out.Decls = append(t.out.Decls, decl)
+		ast.Inspect(decl, t.resolveImports)
+	}
+	return nil
+}
+
+func (t *translator) resolveHelpers(fset *token.FileSet, filename, src string) error {
+	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+	for _, decl := range f.Decls {
+		switch d := decl.(type) {
+		case *ast.FuncDecl:
+			if t.helpers.has(d.Name.Name) {
+				t.out.Decls = append(t.out.Decls, d)
+				ast.Inspect(d, t.resolveImports)
+				delete(t.helpers, d.Name.Name)
+			}
+		case *ast.GenDecl:
+			for _, spec := range d.Specs {
+				if s, ok := spec.(*ast.TypeSpec); ok && t.helpers.has(s.Name.Name) {
+					t.out.Decls = append(t.out.Decls, d)
+					ast.Inspect(d, t.resolveImports)
+					delete(t.helpers, s.Name.Name)
+					break
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (t *translator) resolveImports(n ast.Node) bool {
+	if sel, ok := n.(*ast.SelectorExpr); ok {
+		if id, ok := sel.X.(*ast.Ident); ok {
+			if path, ok := stdlib[id.Name]; ok {
+				t.packages.add(path)
+			}
+		}
+	}
+	return true
+}
+
+func (t *translator) dataExpr(i int) *ast.ParenExpr {
+	if i >= len(t.data) {
+		t.data = append(t.data, make([]dataSegment, i+1-len(t.data))...)
+	}
+	if t.data[i].embed == nil {
+		t.data[i].embed = &ast.ParenExpr{X: dataID(i)}
+	}
+	return t.data[i].embed
 }

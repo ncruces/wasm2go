@@ -1,12 +1,14 @@
 package helpers
 
 import (
+	"encoding/binary"
 	"math"
 	"math/bits"
 	"runtime"
+	"sync/atomic"
 )
 
-// These prevent constant folding/propagation,
+// Prevent constant folding/propagation,
 // ensuring code using them compiles
 // and overflows/panics at runtime.
 
@@ -16,8 +18,9 @@ func i32(x int32) int32 { return x }
 //go:nosplit
 func i64(x int64) int64 { return x }
 
-// These prevent constant folding/propagation,
+// Prevent constant folding/propagation,
 // ensuring correct NaN handling.
+// Only used with nanbox.
 
 //go:nosplit
 func f32(x float32) float32 {
@@ -32,7 +35,8 @@ func f64(x float64) float64 {
 }
 
 // Detect signed integer overflow.
-// These generate sub-optimal code on amd64.
+// Folded away for constant y.
+// They generate sub-optimal code on Intel.
 
 //go:nosplit
 func i32_div_s(x, y int32) int32 {
@@ -50,7 +54,24 @@ func i64_div_s(x, y int64) int64 {
 	return x / y
 }
 
-// These are needed for correct y wrap around behavior.
+//go:nosplit
+func i32_neg_s(x int32) int32 {
+	if x == math.MinInt32 {
+		panic("integer overflow")
+	}
+	return -x
+}
+
+//go:nosplit
+func i64_neg_s(x int64) int64 {
+	if x == math.MinInt64 {
+		panic("integer overflow")
+	}
+	return -x
+}
+
+// Needed for correct y wrap around behavior.
+// Folded away for constant y.
 
 //go:nosplit
 func i32_shl(x, y int32) int32 {
@@ -84,25 +105,25 @@ func i64_shr_u(x, y int64) int64 {
 
 //go:nosplit
 func i32_rotl(x, y int32) int32 {
-	return int32(bits.RotateLeft32(uint32(x), +int(y)&31))
+	return int32(bits.RotateLeft32(uint32(x), int(y)))
 }
 
 //go:nosplit
 func i32_rotr(x, y int32) int32 {
-	return int32(bits.RotateLeft32(uint32(x), -int(y)&31))
+	return int32(bits.RotateLeft32(uint32(x), -int(y)))
 }
 
 //go:nosplit
 func i64_rotl(x, y int64) int64 {
-	return int64(bits.RotateLeft64(uint64(x), +int(y)&63))
+	return int64(bits.RotateLeft64(uint64(x), int(y)))
 }
 
 //go:nosplit
 func i64_rotr(x, y int64) int64 {
-	return int64(bits.RotateLeft64(uint64(x), -int(y)&63))
+	return int64(bits.RotateLeft64(uint64(x), -int(y)))
 }
 
-// These must be implemented as bitwise operations,
+// Must be implemented as bitwise operations,
 // like the math versions are for float64.
 
 //go:nosplit
@@ -115,8 +136,9 @@ func f32_copysign(x, y float32) float32 {
 	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }
 
-// These must return canonical NaNs,
+// Must return canonical NaNs,
 // which they don't on amd64.
+// Only used with nanbox.
 
 //go:nosplit
 func f32_min(x, y float32) float32 {
@@ -157,200 +179,286 @@ func f64_max(x, y float64) float64 {
 
 // go.dev/issues/76264 can speed these up
 
+//go:nosplit
 func i32_trunc_f64_s(f float64) int32 {
 	x := math.Trunc(f)
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < math.MinInt32 || x > math.MaxInt32:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int32(x)
 }
 
+//go:nosplit
 func i32_trunc_f32_s(f float32) int32 {
 	x := math.Trunc(float64(f))
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < math.MinInt32 || x > math.MaxInt32:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int32(x)
 }
 
+//go:nosplit
 func i32_trunc_f64_u(f float64) int32 {
 	x := math.Trunc(f)
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < 0 || x > math.MaxUint32:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int32(uint32(x))
 }
 
+//go:nosplit
 func i32_trunc_f32_u(f float32) int32 {
 	x := math.Trunc(float64(f))
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < 0 || x > math.MaxUint32:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int32(uint32(x))
 }
 
+//go:nosplit
 func i64_trunc_f64_s(f float64) int64 {
 	x := math.Trunc(f)
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < math.MinInt64 || x >= math.MaxInt64:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int64(x)
 }
 
+//go:nosplit
 func i64_trunc_f32_s(f float32) int64 {
 	x := math.Trunc(float64(f))
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < math.MinInt64 || x >= math.MaxInt64:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int64(x)
 }
 
+//go:nosplit
 func i64_trunc_f64_u(f float64) int64 {
 	x := math.Trunc(f)
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < 0 || x >= math.MaxUint64:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int64(uint64(x))
 }
 
+//go:nosplit
 func i64_trunc_f32_u(f float32) int64 {
 	x := math.Trunc(float64(f))
 	switch {
+	case f != f:
+		panic("invalid conversion to integer")
 	case x < 0 || x >= math.MaxUint64:
 		panic("integer overflow")
-	case math.IsNaN(x):
-		panic("invalid conversion to integer")
 	}
 	return int64(uint64(x))
 }
 
+//go:nosplit
 func i32_trunc_sat_f64_s(f float64) int32 {
-	x := math.Trunc(f)
 	switch {
-	case x < math.MinInt32:
+	case f <= math.MinInt32:
 		return math.MinInt32
-	case x > math.MaxInt32:
+	case f >= math.MaxInt32:
 		return math.MaxInt32
-	case math.IsNaN(x):
+	case f != f:
 		return 0
 	}
-	return int32(x)
+	return int32(f)
 }
 
+//go:nosplit
 func i32_trunc_sat_f32_s(f float32) int32 {
-	x := math.Trunc(float64(f))
 	switch {
-	case x < math.MinInt32:
+	case f <= math.MinInt32:
 		return math.MinInt32
-	case x > math.MaxInt32:
+	case f >= math.MaxInt32:
 		return math.MaxInt32
-	case math.IsNaN(x):
+	case f != f:
 		return 0
 	}
-	return int32(x)
+	return int32(f)
 }
 
+//go:nosplit
 func i32_trunc_sat_f64_u(f float64) int32 {
-	x := math.Trunc(f)
 	var i uint32
 	switch {
-	case x < 0 || math.IsNaN(x):
+	case f <= 0 || f != f:
 		i = 0
-	case x > math.MaxUint32:
+	case f >= math.MaxUint32:
 		i = math.MaxUint32
 	default:
-		i = uint32(x)
+		i = uint32(f)
 	}
 	return int32(i)
 }
 
+//go:nosplit
 func i32_trunc_sat_f32_u(f float32) int32 {
-	x := math.Trunc(float64(f))
 	var i uint32
 	switch {
-	case x < 0 || math.IsNaN(x):
+	case f <= 0 || f != f:
 		i = 0
-	case x > math.MaxUint32:
+	case f >= math.MaxUint32:
 		i = math.MaxUint32
 	default:
-		i = uint32(x)
+		i = uint32(f)
 	}
 	return int32(i)
 }
 
+//go:nosplit
 func i64_trunc_sat_f64_s(f float64) int64 {
-	x := math.Trunc(f)
 	switch {
-	case x < math.MinInt64:
+	case f < math.MinInt64:
 		return math.MinInt64
-	case x >= math.MaxInt64:
+	case f >= math.MaxInt64:
 		return math.MaxInt64
-	case math.IsNaN(x):
+	case f != f:
 		return 0
 	}
-	return int64(x)
+	return int64(f)
 }
 
+//go:nosplit
 func i64_trunc_sat_f32_s(f float32) int64 {
-	x := math.Trunc(float64(f))
 	switch {
-	case x < math.MinInt64:
+	case f < math.MinInt64:
 		return math.MinInt64
-	case x >= math.MaxInt64:
+	case f >= math.MaxInt64:
 		return math.MaxInt64
-	case math.IsNaN(x):
+	case f != f:
 		return 0
 	}
-	return int64(x)
+	return int64(f)
 }
 
+//go:nosplit
 func i64_trunc_sat_f64_u(f float64) int64 {
-	x := math.Trunc(f)
 	var i uint64
 	switch {
-	case x < 0 || math.IsNaN(x):
+	case f <= 0 || f != f:
 		i = 0
-	case x >= math.MaxUint64:
+	case f >= math.MaxUint64:
 		i = math.MaxUint64
 	default:
-		i = uint64(x)
+		i = uint64(f)
 	}
 	return int64(i)
 }
 
+//go:nosplit
 func i64_trunc_sat_f32_u(f float32) int64 {
-	x := math.Trunc(float64(f))
 	var i uint64
 	switch {
-	case x < 0 || math.IsNaN(x):
+	case f <= 0 || f != f:
 		i = 0
-	case x >= math.MaxUint64:
+	case f >= math.MaxUint64:
 		i = math.MaxUint64
 	default:
-		i = uint64(x)
+		i = uint64(f)
 	}
 	return int64(i)
+}
+
+// Wide Arithmetic.
+
+//go:nosplit
+func i64_add128(xl, xh, yl, yh int64) (int64, int64) {
+	lo, carry := bits.Add64(uint64(xl), uint64(yl), 0)
+	hi, _ := bits.Add64(uint64(xh), uint64(yh), carry)
+	return int64(lo), int64(hi)
+}
+
+//go:nosplit
+func i64_sub128(xl, xh, yl, yh int64) (int64, int64) {
+	lo, borrow := bits.Sub64(uint64(xl), uint64(yl), 0)
+	hi, _ := bits.Sub64(uint64(xh), uint64(yh), borrow)
+	return int64(lo), int64(hi)
+}
+
+//go:nosplit
+func i64_add_wide(x, y int64) (int64, int64) {
+	lo, carry := bits.Add64(uint64(x), uint64(y), 0)
+	return int64(lo), int64(carry)
+}
+
+//go:nosplit
+func i64_sub_wide(x, y int64) (int64, int64) {
+	lo, borrow := bits.Sub64(uint64(x), uint64(y), 0)
+	return int64(lo), int64(-borrow)
+}
+
+//go:nosplit
+func i64_mul_wide_u(x, y int64) (int64, int64) {
+	hi, lo := bits.Mul64(uint64(x), uint64(y))
+	return int64(lo), int64(hi)
+}
+
+//go:nosplit
+func i64_mul_wide_s(x, y int64) (int64, int64) {
+	hi, lo := bits.Mul64(uint64(x), uint64(y))
+	if x < 0 {
+		hi -= uint64(y)
+	}
+	if y < 0 {
+		hi -= uint64(x)
+	}
+	return int64(lo), int64(hi)
+}
+
+// Multi-byte loads/stores.
+
+//go:nosplit
+func load16(b []byte) uint16 {
+	return binary.LittleEndian.Uint16(b)
+}
+
+//go:nosplit
+func store16(b []byte, v uint16) {
+	binary.LittleEndian.PutUint16(b, v)
+}
+
+//go:nosplit
+func load32(b []byte) uint32 {
+	return binary.LittleEndian.Uint32(b)
+}
+
+//go:nosplit
+func store32(b []byte, v uint32) {
+	binary.LittleEndian.PutUint32(b, v)
+}
+
+//go:nosplit
+func load64(b []byte) uint64 {
+	return binary.LittleEndian.Uint64(b)
+}
+
+//go:nosplit
+func store64(b []byte, v uint64) {
+	binary.LittleEndian.PutUint64(b, v)
 }
 
 // Bulk memory operations.
@@ -457,4 +565,10 @@ func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
 	for i := range buf {
 		buf[i] = val
 	}
+}
+
+//go:nosplit
+func atomic_fence() {
+	var b atomic.Bool
+	b.Swap(true)
 }

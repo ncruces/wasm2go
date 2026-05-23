@@ -13,11 +13,10 @@ type Module struct {
 }
 
 func New() *Module {
-	m := &Module{}
+	m := new(Module)
 	m.maxMem = 100
 	m.memory = make([]byte, 65536)
 	copy(m.memory[uint32(i32(0)):], data0)
-	copy(m.memory[uint32(i32(32)):], data1)
 	return m
 }
 
@@ -34,23 +33,19 @@ func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xwasm_grow(v0 int32) int32 {
-	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
-	return t0
+	return int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 }
 func (m *Module) Xwasm_size() int32 {
-	t0 := int32(len(m.memory) >> 16)
-	return t0
+	return int32(len(m.memory) >> 16)
 }
-func (m *Module) Xwasm_fill(v0 int32, v1 int32, v2 int32) {
+func (m *Module) Xwasm_fill(v0, v1, v2 int32) {
 	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
 }
 func (m *Module) Xread_as_i32(v0 int32) int32 {
-	t0 := int32(binary.LittleEndian.Uint32(m.memory[uint32(v0):]))
-	return t0
+	return int32(load32(m.memory[uint32(v0):]))
 }
 func (m *Module) Xread_as_i8u(v0 int32) int32 {
-	t0 := int32(m.memory[uint32(v0)])
-	return t0
+	return int32(m.memory[uint32(v0)])
 }
 func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)
@@ -58,6 +53,11 @@ func (m *Module) Xmemory() Memory {
 
 //go:nosplit
 func i32(x int32) int32 { return x }
+
+//go:nosplit
+func load32(b []byte) uint32 {
+	return binary.LittleEndian.Uint32(b)
+}
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
@@ -88,7 +88,4 @@ func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
 	}
 }
 
-const (
-	data0 = "ghip\xaa\xff\xdf\xcb\x12\xa12\xb3\xa5\x1f\x01\x02"
-	data1 = "\x01\x03\x05\a\t\v\r\x0f"
-)
+const data0 = "ghip\xaa\xff\xdf\xcb\x12\xa12\xb3\xa5\x1f\x01\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x03\x05\a\t\v\r\x0f"

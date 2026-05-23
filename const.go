@@ -109,6 +109,15 @@ func formatInt(i int64) string {
 	return dec
 }
 
+func formatUint(i uint64) string {
+	dec := strconv.FormatUint(i, 10)
+	hex := "0x" + strconv.FormatUint(i, 16)
+	if complexity(hex) < complexity(dec) {
+		return hex
+	}
+	return dec
+}
+
 func formatFloat(f float64, bits int) string {
 	dec := strconv.FormatFloat(f, 'g', -1, bits)
 	hex := strconv.FormatFloat(f, 'x', -1, bits)
@@ -118,6 +127,12 @@ func formatFloat(f float64, bits int) string {
 	return dec
 }
 
+// This helps decide if a number is better represented
+// in decimal or hexadecimal by counting the number of
+// of transitions between different characters
+// (i.e. ignoring runs of the same character).
+// Because s includes the 0x prefix,
+// hexadecimal needs a 3 character advantage to win.
 func complexity(s string) (transitions int) {
 	for i := 1; i < len(s); i++ {
 		if s[i] != s[i-1] {
@@ -126,3 +141,10 @@ func complexity(s string) (transitions int) {
 	}
 	return transitions
 }
+
+var (
+	literal0  = &ast.BasicLit{Kind: token.INT, Value: "0"}
+	literal1  = &ast.BasicLit{Kind: token.INT, Value: "1"}
+	literal16 = &ast.BasicLit{Kind: token.INT, Value: "16"}
+	literal63 = &ast.BasicLit{Kind: token.INT, Value: "63"}
+)

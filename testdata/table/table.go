@@ -9,10 +9,10 @@ type Module struct {
 }
 
 func New(v0 Xenv) *Module {
-	m := &Module{}
+	m := new(Module)
 	m._env = v0
 	m.t0 = make([]any, 32)
-	m.elements = [][]any{{m.f1}, {m.f0}}
+	m.elements = [][]any{{fn1}, {m.fn0}}
 	copy(m.t0[i32(16):], m.elements[0])
 	copy(m.t0[i32(17):], m.elements[1])
 	if i, ok := any(v0).(interface {
@@ -27,19 +27,17 @@ type Xenv = interface {
 	Xjstimes3(v0 int32) int32
 }
 
-func (m *Module) f0(v0 int32) int32 {
+func (m *Module) fn0(v0 int32) int32 {
 	return m._env.Xjstimes3(v0)
 }
-func (m *Module) f1(v0 int32) int32 {
+func fn1(v0 int32) int32 {
 	return v0 + v0
 }
 func (m *Module) Xtimes2(v0 int32) int32 {
-	t0 := m.t0[uint(i32(16))].(func(v0 int32) int32)(v0)
-	return t0
+	return m.t0[uint(i32(16))].(func(int32) int32)(v0)
 }
 func (m *Module) Xtimes3(v0 int32) int32 {
-	t0 := m.t0[uint(i32(17))].(func(v0 int32) int32)(v0)
-	return t0
+	return m.t0[uint(i32(17))].(func(int32) int32)(v0)
 }
 
 //go:nosplit

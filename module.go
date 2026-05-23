@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/ncruces/wasm2go/util"
+	"github.com/ncruces/wasm2go/internal/util"
 )
 
 var modRecvList = &ast.FieldList{List: []*ast.Field{{
@@ -34,11 +34,10 @@ func (t *translator) createModuleStruct() ast.Decl {
 	// Memory: owned a []byte; imported a *[]byte and a Memory field.
 	if t.memory != nil {
 		if t.memory.imported {
-			id := newID("Memory")
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
 				Type:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
-			}, &ast.Field{Names: []*ast.Ident{id}, Type: id})
+			}, &ast.Field{Names: []*ast.Ident{newID("memImp")}, Type: newID("Memory")})
 		} else {
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
@@ -47,6 +46,12 @@ func (t *translator) createModuleStruct() ast.Decl {
 		fields = append(fields, &ast.Field{
 			Names: []*ast.Ident{newID("maxMem")},
 			Type:  newID("int64")})
+		if t.memory.shared || t.helpers.has("atomic_waiters") {
+			fields = append(fields, &ast.Field{
+				Names: []*ast.Ident{newID("waiters")},
+				Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
+			t.packages.add("sync")
+		}
 	}
 	// Globals: owned are type; imported *type.
 	for _, g := range t.globals {
@@ -61,13 +66,13 @@ func (t *translator) createModuleStruct() ast.Decl {
 	// Imported modules.
 	seen := set[string]{}
 	for _, imp := range t.imports {
-		if !seen.has(imp.module) {
-			seen.add(imp.module)
+		if seen.add(imp.module) {
 			fields = append(fields, &ast.Field{
-				Names: []*ast.Ident{util.Mangle(imp.module, util.IDInternal)},
-				Type:  util.Mangle(imp.module, util.IDExported)})
+				Names: []*ast.Ident{util.MangleID(imp.module, util.IDInternal)},
+				Type:  util.MangleID(imp.module, util.IDExported)})
 		}
 	}
+
 	return &ast.GenDecl{
 		Tok: token.TYPE,
 		Specs: []ast.Spec{
@@ -84,10 +89,9 @@ func (t *translator) createNewFunc() ast.Decl {
 			&ast.AssignStmt{
 				Tok: token.DEFINE,
 				Lhs: []ast.Expr{newID("m")},
-				Rhs: []ast.Expr{&ast.UnaryExpr{
-					Op: token.AND,
-					X:  &ast.CompositeLit{Type: newID("Module")}}}}},
-	}
+				Rhs: []ast.Expr{&ast.CallExpr{
+					Fun:  newID("new"),
+					Args: []ast.Expr{newID("Module")}}}}}}
 
 	// Create the params, and initialize fields.
 	params := []*ast.Field{}
@@ -104,12 +108,12 @@ func (t *translator) createNewFunc() ast.Decl {
 
 			params = append(params, &ast.Field{
 				Names: []*ast.Ident{local},
-				Type:  util.Mangle(imp.module, util.IDExported)})
+				Type:  util.MangleID(imp.module, util.IDExported)})
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{
 					X:   newID("m"),
-					Sel: util.Mangle(imp.module, util.IDInternal)}},
+					Sel: util.MangleID(imp.module, util.IDInternal)}},
 				Rhs: []ast.Expr{local}})
 		}
 	}
@@ -136,18 +140,27 @@ func (t *translator) createNewFunc() ast.Decl {
 				X:   newID("m"),
 				Sel: newID("maxMem")}},
 			Rhs: []ast.Expr{
-				&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(uint64(t.memory.max), 10)}}})
+				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max)}}})
 		if !t.memory.imported {
+			args := []ast.Expr{
+				&ast.ArrayType{Elt: newID("byte")},
+				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.min << 16)},
+			}
+			if t.memory.shared {
+				args = append(args, &ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max << 16)})
+			}
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{t.memory.selector},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: newID("make"),
-					Args: []ast.Expr{
-						&ast.ArrayType{Elt: newID("byte")},
-						&ast.BasicLit{
-							Kind:  token.INT,
-							Value: strconv.FormatUint(uint64(t.memory.min)<<16, 10)}}}}})
+				Rhs: []ast.Expr{&ast.CallExpr{Fun: newID("make"), Args: args}}})
+			if t.memory.shared {
+				body.List = append(body.List, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}},
+					Rhs: []ast.Expr{&ast.CallExpr{
+						Fun:  newID("new"),
+						Args: []ast.Expr{&ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}})
+			}
 		}
 	}
 
@@ -161,7 +174,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.Mangle(imp.name, util.IDExported)}}}})
+						Sel: util.MangleID(imp.name, util.IDExported)}}}})
 
 		case externGlobal:
 			body.List = append(body.List, &ast.AssignStmt{
@@ -170,21 +183,28 @@ func (t *translator) createNewFunc() ast.Decl {
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.Mangle(imp.name, util.IDExported)}}}})
+						Sel: util.MangleID(imp.name, util.IDExported)}}}})
 
 		case externMemory:
+			expr := &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")}
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
-				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}},
+				Lhs: []ast.Expr{expr},
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.Mangle(imp.name, util.IDExported)}}},
+						Sel: util.MangleID(imp.name, util.IDExported)}}},
 			}, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: &ast.SelectorExpr{X: &ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}, Sel: newID("Slice")}}}})
+				Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Slice")}}}})
+
+			if t.memory.shared {
+				body.List = append(body.List, &ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}},
+					Rhs: []ast.Expr{&ast.CallExpr{Fun: &ast.SelectorExpr{X: expr, Sel: newID("Waiters")}}}})
+			}
 		}
 	}
 
@@ -221,7 +241,7 @@ func (t *translator) createNewFunc() ast.Decl {
 	}
 	// Intialize the memory.
 	for i, seg := range t.data {
-		if seg.passive {
+		if seg.passive || seg.merged {
 			continue
 		}
 		body.List = append(body.List, &ast.ExprStmt{
@@ -231,7 +251,7 @@ func (t *translator) createNewFunc() ast.Decl {
 					&ast.SliceExpr{
 						X:   t.memory.selector,
 						Low: convert(seg.offset, t.memory.utype())},
-					dataID(i)}}})
+					t.dataExpr(i)}}})
 	}
 	// Create and initialize owned globals.
 	for _, g := range t.globals {
@@ -271,10 +291,7 @@ func (t *translator) createNewFunc() ast.Decl {
 	// Call start function.
 	if t.start != 0 {
 		body.List = append(body.List, &ast.ExprStmt{
-			X: &ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   newID("m"),
-					Sel: t.functions[^t.start].decl.Name}}})
+			X: &ast.CallExpr{Fun: t.functions[^t.start].call}})
 	}
 
 	body.List = append(body.List, &ast.ReturnStmt{Results: []ast.Expr{newID("m")}})
@@ -290,11 +307,16 @@ func (t *translator) createNewFunc() ast.Decl {
 func (t *translator) createHostInterfaces() []ast.Decl {
 	ifaces := map[string][]*ast.Field{}
 
+	seen := set[struct{ module, name string }]{}
 	for _, imp := range t.imports {
+		if !seen.add(struct{ module, name string }{imp.module, imp.name}) {
+			continue
+		}
+
 		var typ ast.Expr
 		switch imp.kind {
 		case externFunction:
-			typ = imp.fnType.toAST()
+			typ = imp.fnType.toAST(true)
 		case externTable: // *[]any
 			typ = &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("any")}}}}}}
 		case externGlobal: // *type
@@ -304,7 +326,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		}
 
 		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
-			Names: []*ast.Ident{util.Mangle(imp.name, util.IDExported)},
+			Names: []*ast.Ident{util.MangleID(imp.name, util.IDExported)},
 			Type:  typ})
 	}
 
@@ -314,7 +336,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
 				Assign: 1,
-				Name:   util.Mangle(name, util.IDExported),
+				Name:   util.MangleID(name, util.IDExported),
 				Type:   &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
 	}
 	return decls
@@ -324,29 +346,46 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 	var decls []ast.Decl
 	// Memory interface as a type alias.
 	if !*nohost {
-		decls = append(decls, &ast.GenDecl{
-			Tok: token.TYPE,
-			Specs: []ast.Spec{&ast.TypeSpec{
-				Assign: 1,
-				Name:   newID("Memory"),
-				Type: &ast.InterfaceType{Methods: &ast.FieldList{
-					List: []*ast.Field{{
-						Names: []*ast.Ident{newID("Slice")},
-						Type: &ast.FuncType{
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
-					}, {
-						Names: []*ast.Ident{newID("Grow")},
-						Type: &ast.FuncType{
-							Params: &ast.FieldList{
-								List: []*ast.Field{{
-									Names: []*ast.Ident{newID("delta"), newID("max")},
-									Type:  newID("int64")}}},
-							Results: &ast.FieldList{
-								List: []*ast.Field{{Type: newID("int64")}}}}}}}}}}})
+		iface := &ast.InterfaceType{Methods: &ast.FieldList{
+			List: []*ast.Field{{
+				Names: []*ast.Ident{newID("Slice")},
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: &ast.StarExpr{
+							X: &ast.ArrayType{Elt: newID("byte")}}}}}},
+			}, {
+				Names: []*ast.Ident{newID("Grow")},
+				Type: &ast.FuncType{
+					Params: &ast.FieldList{
+						List: []*ast.Field{{
+							Names: []*ast.Ident{newID("delta"), newID("max")},
+							Type:  newID("int64")}}},
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: newID("int64")}}}}}}}}
+
+		if t.memory.shared {
+			iface.Methods.List = append(iface.Methods.List, &ast.Field{
+				Names: []*ast.Ident{newID("Waiters")},
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{
+						List: []*ast.Field{{Type: &ast.StarExpr{
+							X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}}}})
+		}
+
+		decls = append(decls,
+			&ast.GenDecl{
+				Tok: token.TYPE,
+				Specs: []ast.Spec{&ast.TypeSpec{
+					Assign: 1, Name: newID("Memory"), Type: iface}}})
 	}
 	// Memory structure implementing the interface for owned memory.
 	if !t.memory.imported {
+		name := "memory_grow"
+		if t.memory.shared {
+			name = "atomic_memory_grow"
+			needsUnsafe("shared memory")
+		}
+
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
@@ -357,7 +396,7 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 			Name: newID("Slice"),
 			Type: &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
+				Fun:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
 				Args: []ast.Expr{newID("m")}}}}}},
 		}, &ast.FuncDecl{
 			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
@@ -366,14 +405,24 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID("int64")}}},
 				Results: &ast.FieldList{List: []*ast.Field{{Type: newID("int64")}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun: newID("memory_grow"),
+				Fun: newID(name),
 				Args: []ast.Expr{
 					&ast.CallExpr{
-						Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}},
+						Fun:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
 						Args: []ast.Expr{newID("m")}},
 					newID("delta"),
 					newID("max")}}}}}}})
-		t.helpers.add("memory_grow")
+		t.helpers.add(name)
+
+		if t.memory.shared {
+			decls = append(decls, &ast.FuncDecl{
+				Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
+				Name: newID("Waiters"),
+				Type: &ast.FuncType{
+					Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}}},
+				Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{
+					&ast.SelectorExpr{X: newID("m"), Sel: newID("waiters")}}}}}})
+		}
 	}
 	return decls
 }
@@ -389,23 +438,23 @@ func (t *translator) createExportMethods() []ast.Decl {
 
 	for _, name := range names {
 		exp := t.exports[name]
-		methodName := util.Mangle(name, util.IDExported)
+		name := util.Mangle(name, util.IDExported)
 
 		var decl = &ast.FuncDecl{
 			Recv: modRecvList,
-			Name: methodName,
+			Name: ast.NewIdent(name),
 			Type: &ast.FuncType{},
 			Body: &ast.BlockStmt{}}
 
 		switch exp.kind {
 		case externFunction:
 			fn := t.functions[exp.index]
-			if fn.decl.Name.Name == methodName.Name {
+			if name == fn.decl.Name.Name {
 				continue
 			}
 
-			decl.Type = fn.typ.toAST()
-			call := &ast.CallExpr{Fun: &ast.SelectorExpr{X: newID("m"), Sel: fn.decl.Name}}
+			decl.Type = fn.typ.toAST(true)
+			call := &ast.CallExpr{Fun: fn.call}
 			for i := range fn.typ.params {
 				call.Args = append(call.Args, localVar(i))
 			}
@@ -433,7 +482,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 		case externMemory:
 			decl.Type.Results = &ast.FieldList{List: []*ast.Field{{Type: newID("Memory")}}}
 			if t.memory.imported {
-				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("Memory")}}}}
+				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")}}}}
 			} else {
 				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
 					Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: newID("wasmMemory")}},
@@ -444,4 +493,25 @@ func (t *translator) createExportMethods() []ast.Decl {
 		decls = append(decls, decl)
 	}
 	return decls
+}
+
+func (t *translator) createDylinkConstants() ast.Decl {
+	return &ast.FuncDecl{
+		Name: newID("DylinkInfo"),
+		Type: &ast.FuncType{
+			Results: &ast.FieldList{
+				List: []*ast.Field{{
+					Names: []*ast.Ident{
+						newID("memorySize"),
+						newID("memoryAlignment"),
+						newID("tableSize"),
+						newID("tableAlignment")},
+					Type: newID("int64")}}}},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{&ast.ReturnStmt{
+				Results: []ast.Expr{
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(t.dylink.memorySize)},
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(1 << t.dylink.memoryAlignment)},
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(t.dylink.tableSize)},
+					&ast.BasicLit{Kind: token.INT, Value: formatInt(1 << t.dylink.tableAlignment)}}}}}}
 }

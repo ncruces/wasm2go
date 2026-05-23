@@ -12,8 +12,11 @@ import (
 	"testing"
 )
 
+//go:generate go test -run translate -args -unsafe
+//go:generate go test -run translate
+
 func Test_translate(t *testing.T) {
-	tests := []string{"fib", "memory", "primes", "recursion", "stack", "table", "trig"}
+	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
 	*nanbox = false
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -41,8 +44,11 @@ func Test_translate(t *testing.T) {
 
 func Test_translateSpecTest(t *testing.T) {
 	*nanbox = true
-	filepath.WalkDir("spectest/", func(path string, d fs.DirEntry, err error) error {
+	filepath.WalkDir("internal/spectest/", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
+			if !*unsafe && strings.HasSuffix(path, "/threads") {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		if ext := filepath.Ext(path); ext == ".wasm" {
@@ -81,7 +87,7 @@ func generateSpecTest(path string) error {
 	baseDir := filepath.Base(dir)
 	wasmFile := filepath.Base(path)
 	jsonFile := baseDir + ".json"
-	testFile := filepath.Join(dir, baseDir+"_test.go")
+	testFile := filepath.Join(dir, "gen_test.go")
 
 	if _, err := os.Stat(filepath.Join(dir, baseDir+".json")); errors.Is(err, fs.ErrNotExist) {
 		return nil
@@ -125,7 +131,7 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/ncruces/wasm2go/spectest"
+	"github.com/ncruces/wasm2go/internal/spectest"
 )
 
 //go:embed {{.JSONFile}}

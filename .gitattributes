@@ -1,1 +1,2 @@
-spectest/*/** linguist-vendored
+internal/spectest/*/** linguist-vendored
+libc-gen/c/** linguist-vendored
