@@ -21,7 +21,8 @@ type funcCompiler struct {
 	labels int
 	temps  int
 
-	provided bool
+	provided     bool
+	namedReturns bool
 }
 
 type entryKind int
@@ -98,6 +99,24 @@ func (fn *funcCompiler) branch(n uint64) (stmts []ast.Stmt) {
 
 	// Returning from the function body.
 	if i == 0 {
+		if fn.blocks.top().iifeDepth > 0 {
+			fn.namedReturns = true
+			stmt := &ast.AssignStmt{Tok: token.ASSIGN}
+			for j, e := range fn.stack.last(len(fn.typ.results)) {
+				stmt.Lhs = append(stmt.Lhs, returnVal(j))
+				stmt.Rhs = append(stmt.Rhs, e.expr)
+			}
+			if len(stmt.Lhs) > 0 {
+				stmts = append(stmts, stmt)
+			}
+			stmts = append(stmts, &ast.ReturnStmt{
+				Results: []ast.Expr{
+					&ast.UnaryExpr{Op: token.SUB, X: &ast.BasicLit{Kind: token.INT, Value: "1"}},
+					newID("nil")},
+			})
+			return stmts
+		}
+
 		ret := &ast.ReturnStmt{}
 		for _, e := range fn.stack.last(len(fn.typ.results)) {
 			ret.Results = append(ret.Results, e.expr)
@@ -121,12 +140,22 @@ func (fn *funcCompiler) branch(n uint64) (stmts []ast.Stmt) {
 		stmts = append(stmts, stmt)
 	}
 
-	// Create a label for the block we're jumping to.
-	if blk.label == nil {
-		blk.label = fn.newLabel()
+	escapes := fn.blocks.top().iifeDepth > blk.iifeDepth
+	if escapes {
+		stmts = append(stmts, &ast.ReturnStmt{
+			Results: []ast.Expr{
+				&ast.BasicLit{Kind: token.INT, Value: strconv.FormatUint(i, 10)},
+				newID("nil")},
+		})
+	} else {
+		// Create a label for the block we're jumping to.
+		if blk.label == nil {
+			blk.label = fn.newLabel()
+		}
+		stmts = append(stmts, &ast.BranchStmt{Tok: token.GOTO, Label: blk.label})
 	}
 
-	return append(stmts, &ast.BranchStmt{Tok: token.GOTO, Label: blk.label})
+	return stmts
 }
 
 // Returns an expression that loads a byte from memory (an l-value).
@@ -628,6 +657,7 @@ type funcBlock struct {
 	unreachable bool
 	ifreachable bool
 	elreachable bool
+	iifeDepth   int
 }
 
 func (b *funcBlock) emit(stmts ...ast.Stmt) {

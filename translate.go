@@ -138,6 +138,7 @@ func translate(r io.Reader, w io.Writer) error {
 	}
 
 	t.out.Decls = append([]ast.Decl{
+		t.createExceptionType(),
 		t.createModuleStruct(),
 		t.createNewFunc()},
 		t.out.Decls...)

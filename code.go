@@ -223,6 +223,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					fn.emit(ret)
 				}
 				fn.cleanup()
+
+				if fn.namedReturns && fn.decl.Type.Results != nil {
+					for i, field := range fn.decl.Type.Results.List {
+						field.Names = []*ast.Ident{returnVal(i)}
+					}
+				}
+
 				return nil
 			}
 
@@ -436,11 +443,34 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x0f: // return
 			if !blk.unreachable {
 				n := len(fn.typ.results)
-				ret := &ast.ReturnStmt{Results: make([]ast.Expr, n)}
-				for i := n - 1; i >= 0; i-- {
-					ret.Results[i] = fn.pop()
+				if blk.iifeDepth > 0 {
+					fn.namedReturns = true
+					if n > 0 {
+						lhs := make([]ast.Expr, n)
+						rhs := make([]ast.Expr, n)
+						for i := n - 1; i >= 0; i-- {
+							lhs[i] = returnVal(i)
+							rhs[i] = fn.pop()
+						}
+						fn.emit(&ast.AssignStmt{
+							Tok: token.ASSIGN,
+							Lhs: lhs,
+							Rhs: rhs,
+						})
+					}
+					fn.emit(&ast.ReturnStmt{
+						Results: []ast.Expr{
+							&ast.UnaryExpr{Op: token.SUB, X: &ast.BasicLit{Kind: token.INT, Value: "1"}},
+							newID("nil"),
+						},
+					})
+				} else {
+					ret := &ast.ReturnStmt{Results: make([]ast.Expr, n)}
+					for i := n - 1; i >= 0; i-- {
+						ret.Results[i] = fn.pop()
+					}
+					fn.emit(ret)
 				}
-				fn.emit(ret)
 				blk.unreachable = true // After an uncoditional return.
 			}
 

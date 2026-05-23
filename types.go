@@ -14,13 +14,14 @@ const (
 	f64
 	funcref   wasmType = 0x70
 	externref wasmType = 0x6f
+	exnref    wasmType = 0x69
 )
 
 func (t wasmType) ref() bool {
-	return t == funcref || t == externref
+	return t == funcref || t == externref || t == exnref
 }
 
-func (t wasmType) ident() *ast.Ident {
+func (t wasmType) ident() ast.Expr {
 	switch t {
 	case i32:
 		return newID("int32")
@@ -32,6 +33,8 @@ func (t wasmType) ident() *ast.Ident {
 		return newID("float64")
 	case funcref, externref:
 		return newID("any")
+	case exnref:
+		return &ast.StarExpr{X: newID("Exception")}
 	}
 	panic(fmt.Sprintf("unsupported type: %x", byte(t)))
 }

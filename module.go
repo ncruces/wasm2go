@@ -82,6 +82,20 @@ func (t *translator) createModuleStruct() ast.Decl {
 	}
 }
 
+func (t *translator) createExceptionType() ast.Decl {
+	return &ast.GenDecl{
+		Tok: token.TYPE,
+		Specs: []ast.Spec{
+			&ast.TypeSpec{
+				Assign: 1,
+				Name:   newID("Exception"),
+				Type: &ast.StructType{
+					Fields: &ast.FieldList{
+						List: []*ast.Field{
+							{Names: []*ast.Ident{newID("Tag")}, Type: &ast.StarExpr{X: newID("byte")}},
+							{Names: []*ast.Ident{newID("Val")}, Type: &ast.ArrayType{Elt: newID("any")}}}}}}}}
+}
+
 func (t *translator) createNewFunc() ast.Decl {
 	// Create a new instance of module.
 	body := &ast.BlockStmt{

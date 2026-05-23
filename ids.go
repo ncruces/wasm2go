@@ -54,6 +54,10 @@ func tempVal(i int) *ast.Ident {
 	return newID("t" + strconv.Itoa(i))
 }
 
+func returnVal(i int) *ast.Ident {
+	return newID("r" + strconv.Itoa(i))
+}
+
 func tempVar(i int) *ast.Ident {
 	return newID("p" + strconv.Itoa(i))
 }
