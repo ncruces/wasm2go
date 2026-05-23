@@ -72,7 +72,12 @@ func RemoveSelfAssigns(n ast.Node) {
 			}
 
 			if len(lhs) == 0 {
-				c.Delete()
+				if c.Index() < 0 {
+					// cannot delete node in non-list field (e.g., LabeledStmt.Stmt)
+					c.Replace(&ast.EmptyStmt{})
+				} else {
+					c.Delete()
+				}
 			} else if len(lhs) < len(n.Lhs) {
 				n.Lhs = lhs
 				n.Rhs = rhs
