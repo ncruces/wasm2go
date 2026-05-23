@@ -40,6 +40,24 @@ func Test_translate(t *testing.T) {
 			}
 		})
 	}
+
+	regression := []string{"tee_self_loop"}
+	for _, name := range regression {
+		t.Run(name, func(t *testing.T) {
+			path := "testdata/regression/" + name + "/" + name
+
+			in, err := os.Open(path + ".wasm")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer in.Close()
+
+			var out bytes.Buffer
+			if err := translate(in, &out); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
 }
 
 func Test_translateSpecTest(t *testing.T) {
