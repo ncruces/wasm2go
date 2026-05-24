@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	output  = flag.String("o", "", "output file (default stdout)")
-	pkgName = flag.String("pkg", "", "package name for the generated file (default module name, or wasm2go)")
-	tags    = flag.String("tags", "", "go:build tags to include in the generated file")
+	output = flag.String("o", "", "output file (default stdout)")
+	pkg    = flag.String("pkg", "", "package name (default module name, or wasm2go)")
+	tags   = flag.String("tags", "", "go:build tags to include in the generated file")
 
 	embed  = flag.Bool("embed", false, "go:embed data sections from a .dat file")
 	nanbox = flag.Bool("nanbox", false, "attempt to canonicalize NaNs")
