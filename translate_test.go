@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go/format"
 	"html/template"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -40,9 +41,11 @@ func Test_translate(t *testing.T) {
 			}
 		})
 	}
+}
 
-	regression := []string{"tee_self_loop"}
-	for _, name := range regression {
+func Test_regression(t *testing.T) {
+	tests := []string{"tee_self_loop"}
+	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
 			path := "testdata/regression/" + name + "/" + name
 
@@ -52,8 +55,7 @@ func Test_translate(t *testing.T) {
 			}
 			defer in.Close()
 
-			var out bytes.Buffer
-			if err := translate(in, &out); err != nil {
+			if err := translate(in, io.Discard); err != nil {
 				t.Fatal(err)
 			}
 		})
