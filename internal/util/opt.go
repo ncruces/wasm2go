@@ -71,12 +71,7 @@ func RemoveSelfAssigns(n ast.Node) {
 				rhs = append(rhs, expr)
 			}
 
-			if len(lhs) == 0 {
-				c.Delete()
-			} else if len(lhs) < len(n.Lhs) {
-				n.Lhs = lhs
-				n.Rhs = rhs
-			}
+			simplifyAssign(c, n, lhs, rhs)
 		}
 		return true
 	}, nil)
@@ -108,15 +103,23 @@ func RemoveBlankAssigns(n ast.Node) {
 				rhs = append(rhs, expr)
 			}
 
-			if len(lhs) == 0 {
-				c.Delete()
-			} else if len(lhs) < len(n.Lhs) {
-				n.Lhs = lhs
-				n.Rhs = rhs
-			}
+			simplifyAssign(c, n, lhs, rhs)
 		}
 		return true
 	})
+}
+
+func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
+	if len(lhs) == 0 {
+		if c.Index() < 0 {
+			c.Replace(&ast.EmptyStmt{})
+		} else {
+			c.Delete()
+		}
+	} else if len(lhs) < len(n.Lhs) {
+		n.Lhs = lhs
+		n.Rhs = rhs
+	}
 }
 
 // RemoveEmptyStmts removes empty statements preceded by labels.

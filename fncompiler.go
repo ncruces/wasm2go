@@ -605,9 +605,9 @@ func (fn *funcCompiler) cleanup() {
 	util.RemoveUnusedLocals(fn.decl)
 	if !*noopt {
 		util.UnnestBlocks(fn.decl)
-		util.RemoveEmptyStmts(fn.decl)
 		util.RemoveSelfAssigns(fn.decl)
 		util.RemoveBlankAssigns(fn.decl)
+		util.RemoveEmptyStmts(fn.decl)
 		util.InlineGotoEnd(fn.decl)
 		util.InlineGotoReturn(fn.decl)
 		if util.RemoveReceiver(fn.decl) {

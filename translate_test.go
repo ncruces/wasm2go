@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go/format"
 	"html/template"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -36,6 +37,25 @@ func Test_translate(t *testing.T) {
 
 			err = os.WriteFile(path+".go", out.Bytes(), 0644)
 			if err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func Test_regression(t *testing.T) {
+	tests := []string{"tee_self_loop"}
+	for _, name := range tests {
+		t.Run(name, func(t *testing.T) {
+			path := "testdata/regression/" + name + "/" + name
+
+			in, err := os.Open(path + ".wasm")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer in.Close()
+
+			if err := translate(in, io.Discard); err != nil {
 				t.Fatal(err)
 			}
 		})
