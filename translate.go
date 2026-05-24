@@ -142,6 +142,9 @@ func translate(r io.Reader, w io.Writer) error {
 		t.createNewFunc()},
 		t.out.Decls...)
 
+	if *pkg != "" {
+		t.out.Name = newID(*pkg)
+	}
 	// Fill in missing names.
 	if t.out.Name == nil {
 		t.out.Name = newID("wasm2go")
