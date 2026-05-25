@@ -225,13 +225,17 @@ func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 	}
 }
 
-// Flushes the stack before pushing expr to the value stack.
+// Pushes the materialization of expr to the value stack.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	fn.flush()
-	fn.pushPure(expr)
+	tmp := fn.newTempVal()
+	fn.emit(&ast.AssignStmt{
+		Tok: token.DEFINE,
+		Lhs: []ast.Expr{tmp},
+		Rhs: []ast.Expr{expr}})
+	fn.pushConst(tmp)
 }
 
 // Drops a value from the value stack.
