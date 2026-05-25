@@ -44,7 +44,7 @@ func Test_translate(t *testing.T) {
 }
 
 func Test_regression(t *testing.T) {
-	tests := []string{"tee_self_loop"}
+	tests := []string{"tee_self_loop", "select_effect", "store_grow"}
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
 			path := "testdata/regression/" + name + "/" + name

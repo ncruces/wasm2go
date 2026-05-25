@@ -225,13 +225,17 @@ func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 	}
 }
 
-// Flushes the stack before pushing expr to the value stack.
+// Pushes a side-effectful expr (any observable side effect, including traps) to the value stack.
+//
+// This should be the default, since treating an expression as pure
+// could result in it being evaluated conditionally (i.e.)
+// or being reordered relative to other side-effectful operations.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	fn.flush()
 	fn.pushPure(expr)
+	fn.flush()
 }
 
 // Drops a value from the value stack.
