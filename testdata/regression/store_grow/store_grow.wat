@@ -1,0 +1,10 @@
+(module
+  (memory 1)
+  (func $alloc (result i32)
+    (drop (memory.grow (i32.const 1)))
+    i32.const 12345)
+  (func (export "test") (result i32)
+    (i32.store (i32.const 0) (call $alloc))
+    (i32.load (i32.const 0)))
+  (func (export "size") (result i32)
+    (memory.size)))
