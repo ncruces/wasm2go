@@ -1,4 +1,4 @@
-# Libraries
+# Users
 
 An incomplete list of libraries using wasm2go.
 
