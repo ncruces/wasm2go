@@ -226,6 +226,11 @@ func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 }
 
 // Pushes the materialization of expr to the value stack.
+//
+// This must be used for impure expressions (side effects or traps), since
+// treating one as pure could result in it being evaluated conditionally later
+// (e.g., as a select operand) or being reordered (e.g., memory.grow inside a
+// store, invalidating the pre-sliced array).
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
