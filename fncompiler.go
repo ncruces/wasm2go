@@ -194,8 +194,12 @@ func (fn *funcCompiler) pushConst(expr ast.Expr) {
 	fn.stack.append(stackEntry{expr: expr, kind: entryConst})
 }
 
-// Pushes a pure expression (no observable side effects, including traps) to the value stack.
-func (fn *funcCompiler) pushPure(expr ast.Expr) {
+// Pushes an expression to the value stack.
+//
+// If an expression has any side effects (other than traps), flush must be
+// called before and conditional expressions, or any other non-pure expression
+// (including memory.grow).
+func (fn *funcCompiler) pushLazy(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
@@ -213,34 +217,6 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 	fn.stack.append(stackEntry{expr: cond, kind: entryCond})
 	if *noopt {
 		fn.flush()
-	}
-}
-
-// Pushes a deferred expression that may trap but has no other observable effect
-// (a load, a division, a global/table read).
-//
-// Like pushPure, it is left unevaluated on the value stack, but unlike a pure
-// expression, it cannot be evaluated conditionally, and must be materialized
-// before any conditional use (e.g., flush before emitting a select). They are
-// safe to defer past pure expressions and, since they never reallocate a
-// container, safe to inline as a memory/table index or store value (emit's
-// flush still orders them before any statement with side-effects).
-func (fn *funcCompiler) pushLazy(expr ast.Expr) {
-	if fn.blocks.top().unreachable {
-		return
-	}
-	fn.stack.append(stackEntry{expr: expr, kind: entryExpr})
-	if *noopt {
-		fn.flush()
-	}
-}
-
-// Calls pushLazy or pushPure.
-func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
-	if pure {
-		fn.pushPure(expr)
-	} else {
-		fn.pushLazy(expr)
 	}
 }
 
@@ -342,45 +318,42 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.
 func (fn *funcCompiler) convert(types ...string) {
-	fn.pushPure(convert(fn.pop(), types...))
+	fn.pushLazy(convert(fn.pop(), types...))
 }
 
 // Executes a binary operator.
 func (fn *funcCompiler) binOp(op token.Token) {
-	fn.pushPureIf(op != token.QUO && op != token.REM,
-		&ast.BinaryExpr{
-			Y:  fn.pop(),
-			X:  fn.pop(),
-			Op: op})
+	fn.pushLazy(&ast.BinaryExpr{
+		Y:  fn.pop(),
+		X:  fn.pop(),
+		Op: op})
 }
 
 // Executes a binary uint32 operator.
 // Requires casts to unsigned and back.
 func (fn *funcCompiler) binOpU32(op token.Token) {
-	fn.pushPureIf(op != token.QUO && op != token.REM,
-		convert(&ast.BinaryExpr{
-			Y:  convert(fn.pop(), "uint32"),
-			X:  convert(fn.pop(), "uint32"),
-			Op: op,
-		}, "int32"))
+	fn.pushLazy(convert(&ast.BinaryExpr{
+		Y:  convert(fn.pop(), "uint32"),
+		X:  convert(fn.pop(), "uint32"),
+		Op: op,
+	}, "int32"))
 }
 
 // Executes a binary uint64 operator.
 // Requires casts to unsigned and back.
 func (fn *funcCompiler) binOpU64(op token.Token) {
-	fn.pushPureIf(op != token.QUO && op != token.REM,
-		convert(&ast.BinaryExpr{
-			Y:  convert(fn.pop(), "uint64"),
-			X:  convert(fn.pop(), "uint64"),
-			Op: op,
-		}, "int64"))
+	fn.pushLazy(convert(&ast.BinaryExpr{
+		Y:  convert(fn.pop(), "uint64"),
+		X:  convert(fn.pop(), "uint64"),
+		Op: op,
+	}, "int64"))
 }
 
 // Executes a binary float64 operator.
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF64(op token.Token) {
-	fn.pushPure(
+	fn.pushLazy(
 		convert(&ast.BinaryExpr{
 			Y:  fn.pop(),
 			X:  fn.pop(),
@@ -392,7 +365,7 @@ func (fn *funcCompiler) binOpF64(op token.Token) {
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF32(op token.Token) {
-	fn.pushPure(
+	fn.pushLazy(
 		convert(&ast.BinaryExpr{
 			Y:  fn.pop(),
 			X:  fn.pop(),
@@ -404,7 +377,7 @@ func (fn *funcCompiler) binOpF32(op token.Token) {
 func (fn *funcCompiler) bitOp(name string) {
 	bits := name[len(name)-2:]
 
-	fn.pushPure(
+	fn.pushLazy(
 		convert(&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("bits"),
@@ -415,7 +388,7 @@ func (fn *funcCompiler) bitOp(name string) {
 
 // Executes a unary float64 math call.
 func (fn *funcCompiler) uniMath64(name string) {
-	fn.pushPure(&ast.CallExpr{
+	fn.pushLazy(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID(name)},
@@ -426,7 +399,7 @@ func (fn *funcCompiler) uniMath64(name string) {
 func (fn *funcCompiler) binMath64(name string) {
 	y := fn.pop()
 	x := fn.pop()
-	fn.pushPure(&ast.CallExpr{
+	fn.pushLazy(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID(name)},
@@ -435,7 +408,7 @@ func (fn *funcCompiler) binMath64(name string) {
 
 // Executes a unary float32 math call.
 func (fn *funcCompiler) uniMath32(name string) {
-	fn.pushPure(
+	fn.pushLazy(
 		convert(&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
@@ -446,7 +419,7 @@ func (fn *funcCompiler) uniMath32(name string) {
 
 // Executes a Float32bits call.
 func (fn *funcCompiler) float32bits() {
-	fn.pushPure(
+	fn.pushLazy(
 		convert(&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
@@ -457,7 +430,7 @@ func (fn *funcCompiler) float32bits() {
 
 // Executes a Float64bits call.
 func (fn *funcCompiler) float64bits() {
-	fn.pushPure(
+	fn.pushLazy(
 		convert(&ast.CallExpr{
 			Fun: &ast.SelectorExpr{
 				X:   newID("math"),
@@ -468,7 +441,7 @@ func (fn *funcCompiler) float64bits() {
 
 // Executes a Float32frombits call.
 func (fn *funcCompiler) float32frombits() {
-	fn.pushPure(&ast.CallExpr{
+	fn.pushLazy(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID("Float32frombits")},
@@ -477,7 +450,7 @@ func (fn *funcCompiler) float32frombits() {
 
 // Executes a Float64frombits call.
 func (fn *funcCompiler) float64frombits() {
-	fn.pushPure(&ast.CallExpr{
+	fn.pushLazy(&ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID("Float64frombits")},
@@ -487,10 +460,9 @@ func (fn *funcCompiler) float64frombits() {
 // Executes a unary helper call.
 func (fn *funcCompiler) uniHelper(name string) {
 	fn.helpers.add(name)
-	fn.pushPureIf(pureHelpers.has(name),
-		&ast.CallExpr{
-			Fun:  newID(name),
-			Args: []ast.Expr{fn.pop()}})
+	fn.pushLazy(&ast.CallExpr{
+		Fun:  newID(name),
+		Args: []ast.Expr{fn.pop()}})
 }
 
 // Executes a binary helper call.
@@ -498,10 +470,9 @@ func (fn *funcCompiler) binHelper(name string) {
 	fn.helpers.add(name)
 	y := fn.pop()
 	x := fn.pop()
-	fn.pushPureIf(pureHelpers.has(name),
-		&ast.CallExpr{
-			Fun:  newID(name),
-			Args: []ast.Expr{x, y}})
+	fn.pushLazy(&ast.CallExpr{
+		Fun:  newID(name),
+		Args: []ast.Expr{x, y}})
 }
 
 // Executes a signed division helper.
@@ -517,7 +488,7 @@ func (fn *funcCompiler) divHelper(typ string) {
 		fn.helpers.add(name)
 		fn.pushLazy(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x}})
 	} else {
-		fn.pushPureIf(v != 0, &ast.BinaryExpr{Op: token.QUO, X: x, Y: y})
+		fn.pushLazy(&ast.BinaryExpr{Op: token.QUO, X: x, Y: y})
 	}
 }
 
@@ -530,10 +501,9 @@ func (fn *funcCompiler) bitHelper(name string) {
 	v, ok := islit(y, typ)
 	if !ok {
 		fn.helpers.add(name)
-		fn.pushPureIf(pureHelpers.has(name),
-			&ast.CallExpr{
-				Fun:  newID(name),
-				Args: []ast.Expr{x, y}})
+		fn.pushLazy(&ast.CallExpr{
+			Fun:  newID(name),
+			Args: []ast.Expr{x, y}})
 		return
 	}
 
@@ -556,17 +526,16 @@ func (fn *funcCompiler) bitHelper(name string) {
 		}
 		expr = convert(&ast.BinaryExpr{Op: token.SHR, X: convert(x, u), Y: y}, s)
 	}
-	fn.pushPure(expr)
+	fn.pushLazy(expr)
 }
 
 // Executes a binary builtin call.
 func (fn *funcCompiler) binBuiltin(name string) {
 	y := fn.pop()
 	x := fn.pop()
-	fn.pushPureIf(name == "min" || name == "max",
-		&ast.CallExpr{
-			Fun:  newID(name),
-			Args: []ast.Expr{x, y}})
+	fn.pushLazy(&ast.CallExpr{
+		Fun:  newID(name),
+		Args: []ast.Expr{x, y}})
 }
 
 // Executes a zero equality comparison operator.

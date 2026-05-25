@@ -455,8 +455,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x1b: // select
 			cond := fn.popCond()
-			fn.flush() // select must always evaluate all operands
 			tmp := fn.newTempVar()
+			// emit will always call flush to unconditionally evaluate all operands
 			fn.emit(&ast.AssignStmt{
 				Tok: token.DEFINE,
 				Lhs: []ast.Expr{tmp},
@@ -491,7 +491,6 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				break
 			}
 
-			fn.flush() // select must always evaluate all operands
 			vf := make([]ast.Expr, n)
 			for i := int(n) - 1; i >= 0; i-- {
 				vf[i] = fn.pop()
@@ -507,6 +506,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				tmp[i] = fn.newTempVar()
 			}
 
+			// emit will always call flush to unconditionally evaluate all operands
 			fn.emit(&ast.AssignStmt{
 				Tok: token.DEFINE,
 				Lhs: tmp,
@@ -528,7 +528,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
+			fn.pushLazy(localVar(i)) // Pure because assigning locals flushes.
 
 		case 0x21: // local.set
 			i, err := readLEB128(t.in)
@@ -549,7 +549,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{fn.pop()},
 				Tok: token.ASSIGN})
-			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
+			fn.pushLazy(localVar(i)) // Pure because assigning locals flushes.
 
 		case 0x23: // global.get
 			e, err := t.globalGet()
@@ -915,7 +915,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x8b: // f32.abs
 			fn.uniHelper("f32_abs")
 		case 0x8c: // f32.neg
-			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+			fn.pushLazy(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
 		case 0x8d: // f32.ceil
 			fn.uniMath32("Ceil")
 		case 0x8e: // f32.floor
@@ -952,7 +952,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x99: // f64.abs
 			fn.uniMath64("Abs")
 		case 0x9a: // f64.neg
-			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+			fn.pushLazy(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
 		case 0x9b: // f64.ceil
 			fn.uniMath64("Ceil")
 		case 0x9c: // f64.floor
