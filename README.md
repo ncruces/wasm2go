@@ -48,6 +48,8 @@ including the following features:
 [^1]: `wasm2go` does **not** guarantee tail behavior;
 judge for yourself if using tail calls generates better code.
 
+## Generated code
+
 Generating human-readable Go code is a non-goal:
 - Wasm names must be mangled into Go identifiers;
 - Wasm control flow is implemented with `goto` and labels;
