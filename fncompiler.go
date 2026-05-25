@@ -225,22 +225,17 @@ func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 	}
 }
 
-// Pushes the materialization of expr to the value stack.
+// Pushes a side-effectful expr (any observable side effect, including traps) to the value stack.
 //
-// This must be used for impure expressions (side effects or traps), since
-// treating one as pure could result in it being evaluated conditionally later
-// (e.g., as a select operand) or being reordered (e.g., memory.grow inside a
-// store, invalidating the pre-sliced array).
+// This should be the default, since treating an expression as pure
+// could result in it being evaluated conditionally (i.e.)
+// or being reordered relative to other side-effectful operations.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	tmp := fn.newTempVal()
-	fn.emit(&ast.AssignStmt{
-		Tok: token.DEFINE,
-		Lhs: []ast.Expr{tmp},
-		Rhs: []ast.Expr{expr}})
-	fn.pushConst(tmp)
+	fn.pushPure(expr)
+	fn.flush()
 }
 
 // Drops a value from the value stack.
