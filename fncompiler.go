@@ -216,22 +216,45 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 	}
 }
 
-// Calls push or pushPure.
+// Pushes a deferred expression that may trap but has no other observable effect
+// (a load, a division, a global/table read).
+//
+// Like pushPure, it is left unevaluated on the value stack, but unlike a pure
+// expression, it cannot be evaluated conditionally, and must be materialized
+// before any conditional use (e.g., flush before emitting a select). They are
+// safe to defer past pure expressions and, since they never reallocate a
+// container, safe to inline as a memory/table index or store value (emit's
+// flush still orders them before any statement with side-effects).
+func (fn *funcCompiler) pushLazy(expr ast.Expr) {
+	if fn.blocks.top().unreachable {
+		return
+	}
+	fn.stack.append(stackEntry{expr: expr, kind: entryExpr})
+	if *noopt {
+		fn.flush()
+	}
+}
+
+// Calls pushLazy or pushPure.
 func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 	if pure {
 		fn.pushPure(expr)
 	} else {
-		fn.push(expr)
+		fn.pushLazy(expr)
 	}
 }
 
-// Flushes the stack before pushing expr to the value stack.
+// Pushes the materialization of expr to the value stack.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	fn.flush()
-	fn.pushPure(expr)
+	tmp := fn.newTempVal()
+	fn.emit(&ast.AssignStmt{
+		Tok: token.DEFINE,
+		Lhs: []ast.Expr{tmp},
+		Rhs: []ast.Expr{expr}})
+	fn.pushConst(tmp)
 }
 
 // Drops a value from the value stack.
@@ -488,11 +511,11 @@ func (fn *funcCompiler) divHelper(typ string) {
 	if v, ok := islit(y, typ); !ok {
 		name := typ + "_div_s"
 		fn.helpers.add(name)
-		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}})
+		fn.pushLazy(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}})
 	} else if v == -1 {
 		name := typ + "_neg_s"
 		fn.helpers.add(name)
-		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x}})
+		fn.pushLazy(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x}})
 	} else {
 		fn.pushPureIf(v != 0, &ast.BinaryExpr{Op: token.QUO, X: x, Y: y})
 	}

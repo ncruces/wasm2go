@@ -33,7 +33,8 @@ func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xwasm_grow(v0 int32) int32 {
-	return int32(memory_grow(&m.memory, int64(v0), m.maxMem))
+	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
+	return t0
 }
 func (m *Module) Xwasm_size() int32 {
 	return int32(len(m.memory) >> 16)

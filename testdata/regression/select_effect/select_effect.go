@@ -16,11 +16,12 @@ func (m *Module) fn0() int32 {
 	return i32(100)
 }
 func (m *Module) Xtest(v0 int32) int32 {
-	p0 := i32(5)
+	t0 := m.fn0()
+	p1 := i32(5)
 	if v0 != 0 {
-		p0 = m.fn0()
+		p1 = t0
 	}
-	return p0
+	return p1
 }
 func (m *Module) Xcounter() int32 {
 	return m.g0

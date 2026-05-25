@@ -198,7 +198,7 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 		if t.tables[idx].imported {
 			tab = &ast.StarExpr{X: tab}
 		}
-		fn.push(convert(&ast.CallExpr{
+		fn.pushLazy(convert(&ast.CallExpr{
 			Fun:  newID("len"),
 			Args: []ast.Expr{tab},
 		}, t.tables[idx].stype()))

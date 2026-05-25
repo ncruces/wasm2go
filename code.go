@@ -455,6 +455,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x1b: // select
 			cond := fn.popCond()
+			fn.flush() // select must always evaluate all operands
 			tmp := fn.newTempVar()
 			fn.emit(&ast.AssignStmt{
 				Tok: token.DEFINE,
@@ -490,6 +491,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				break
 			}
 
+			fn.flush() // select must always evaluate all operands
 			vf := make([]ast.Expr, n)
 			for i := int(n) - 1; i >= 0; i-- {
 				vf[i] = fn.pop()
@@ -554,7 +556,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.push(e)
+			fn.pushLazy(e)
 
 		case 0x24: // global.set
 			i, err := readLEB128(t.in)
@@ -580,7 +582,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if t.tables[i].imported {
 				tab = &ast.StarExpr{X: tab}
 			}
-			fn.push(&ast.IndexExpr{X: tab, Index: fn.pop()})
+			fn.pushLazy(&ast.IndexExpr{X: tab, Index: fn.pop()})
 
 		case 0x26: // table.set
 			i, err := readLEB128(t.in)
@@ -609,13 +611,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			idx := fn.load8(offset)
 			switch opcode {
 			case 0x2c: // i32.load8_s
-				fn.push(convert(idx, "int8", "int32"))
+				fn.pushLazy(convert(idx, "int8", "int32"))
 			case 0x2d: // i32.load8_u
-				fn.push(convert(idx, "int32"))
+				fn.pushLazy(convert(idx, "int32"))
 			case 0x30: // i64.load8_s
-				fn.push(convert(idx, "int8", "int64"))
+				fn.pushLazy(convert(idx, "int8", "int64"))
 			case 0x31: // i64.load8_u
-				fn.push(convert(idx, "int64"))
+				fn.pushLazy(convert(idx, "int64"))
 			}
 
 		case 0x28, 0x29, 0x2a, 0x2b, 0x2e, 0x2f, 0x32, 0x33, 0x34, 0x35: // load
@@ -630,25 +632,25 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			switch opcode {
 			case 0x28: // i32.load
-				fn.push(fn.load("int32", offset))
+				fn.pushLazy(fn.load("int32", offset))
 			case 0x29: // i64.load
-				fn.push(fn.load("int64", offset))
+				fn.pushLazy(fn.load("int64", offset))
 			case 0x2a: // f32.load
-				fn.push(fn.load("float32", offset))
+				fn.pushLazy(fn.load("float32", offset))
 			case 0x2b: // f64.load
-				fn.push(fn.load("float64", offset))
+				fn.pushLazy(fn.load("float64", offset))
 			case 0x2e: // i32.load16_s
-				fn.push(convert(fn.load("int16", offset), "int32"))
+				fn.pushLazy(convert(fn.load("int16", offset), "int32"))
 			case 0x2f: // i32.load16_u
-				fn.push(convert(fn.load("uint16", offset), "int32"))
+				fn.pushLazy(convert(fn.load("uint16", offset), "int32"))
 			case 0x32: // i64.load16_s
-				fn.push(convert(fn.load("int16", offset), "int64"))
+				fn.pushLazy(convert(fn.load("int16", offset), "int64"))
 			case 0x33: // i64.load16_u
-				fn.push(convert(fn.load("uint16", offset), "int64"))
+				fn.pushLazy(convert(fn.load("uint16", offset), "int64"))
 			case 0x34: // i64.load32_s
-				fn.push(convert(fn.load("int32", offset), "int64"))
+				fn.pushLazy(convert(fn.load("int32", offset), "int64"))
 			case 0x35: // i64.load32_u
-				fn.push(convert(fn.load("uint32", offset), "int64"))
+				fn.pushLazy(convert(fn.load("uint32", offset), "int64"))
 			}
 
 		case 0x3a, 0x3c: // store8
@@ -697,7 +699,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x3f: // memory.size
 			_, _ = readLEB128(t.in) // memory index
-			fn.push(convert(
+			fn.pushLazy(convert(
 				&ast.BinaryExpr{
 					X: &ast.CallExpr{
 						Fun:  newID("len"),

@@ -11,28 +11,29 @@ func New() *Module {
 }
 func (m *Module) Xfibonacci(v0 int64) int64 {
 	var v1, v2 int64
-	p0 := i64(0)
+	t0 := v0
+	p1 := i64(0)
 	if v0 > i64(0) {
-		p0 = v0
+		p1 = t0
 	}
-	v0 = p0
+	v0 = p1
 	v1 = i64(1)
-	var p1 int64
+	var p2 int64
 l0:
 	{
-		var p2 int64
+		var p3 int64
 		if v0 == 0 {
-			p2 = v2
+			p3 = v2
 		} else {
 			v0 = v0 - i64(1)
-			t3 := v2
+			t4 := v2
 			v2 = v1
-			v1 = t3 + v2
+			v1 = t4 + v2
 			goto l0
 		}
-		p1 = p2
+		p2 = p3
 	}
-	return p1
+	return p2
 }
 
 //go:nosplit

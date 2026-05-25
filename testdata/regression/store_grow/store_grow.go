@@ -16,11 +16,13 @@ func New() *Module {
 	return m
 }
 func (m *Module) fn0() int32 {
-	_ = int32(memory_grow(&m.memory, int64(i32(1)), m.maxMem))
+	t0 := int32(memory_grow(&m.memory, int64(i32(1)), m.maxMem))
+	_ = t0
 	return i32(12345)
 }
 func (m *Module) Xtest() int32 {
-	store32(m.memory[uint32(i32(0)):], uint32(m.fn0()))
+	t0 := m.fn0()
+	store32(m.memory[uint32(i32(0)):], uint32(t0))
 	return int32(load32(m.memory[uint32(i32(0)):]))
 }
 func (m *Module) Xsize() int32 {
