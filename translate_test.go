@@ -5,7 +5,6 @@ import (
 	"errors"
 	"go/format"
 	"html/template"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -13,8 +12,8 @@ import (
 	"testing"
 )
 
-//go:generate go test -run translate -args -unsafe
-//go:generate go test -run translate
+//go:generate go test -tags generator -run translate -args -unsafe
+//go:generate go test -tags generator -run translate
 
 func Test_translate(t *testing.T) {
 	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
@@ -43,7 +42,7 @@ func Test_translate(t *testing.T) {
 	}
 }
 
-func Test_regression(t *testing.T) {
+func Test_translate_regression(t *testing.T) {
 	tests := []string{"tee_self_loop", "select_effect", "store_grow"}
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -55,7 +54,14 @@ func Test_regression(t *testing.T) {
 			}
 			defer in.Close()
 
-			if err := translate(in, io.Discard); err != nil {
+			var out bytes.Buffer
+			err = translate(in, &out)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = os.WriteFile(path+".go", out.Bytes(), 0644)
+			if err != nil {
 				t.Fatal(err)
 			}
 		})
