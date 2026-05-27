@@ -14,9 +14,8 @@ func (m *Module) Xfactorial(v0 int32) int32 {
 	if v0 <= i32(1) {
 		p0 = i32(1)
 	} else {
-		t1 := v0
-		t2 := m.Xfactorial(v0 - i32(1))
-		p0 = t1 * t2
+		t1 := m.Xfactorial(v0 - i32(1))
+		p0 = v0 * t1
 	}
 	return p0
 }
