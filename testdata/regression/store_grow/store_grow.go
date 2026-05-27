@@ -16,8 +16,7 @@ func New() *Module {
 	return m
 }
 func (m *Module) fn0() int32 {
-	t0 := int32(memory_grow(&m.memory, int64(i32(1)), m.maxMem))
-	_ = t0
+	_ = int32(memory_grow(&m.memory, int64(i32(1)), m.maxMem))
 	return i32(12345)
 }
 func (m *Module) Xtest() int32 {

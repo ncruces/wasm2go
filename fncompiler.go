@@ -611,17 +611,22 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 func (fn *funcCompiler) cleanup() {
 	ast.Inspect(fn.decl, fn.resolveImports)
 	util.CheckMaterialized(fn.decl)
+
+	if *noopt {
+		util.RemoveUnusedLocals(fn.decl)
+		return
+	}
+
+	util.RemoveSelfAssigns(fn.decl)
+	util.RemoveBlankAssigns(fn.decl)
 	util.RemoveUnusedLocals(fn.decl)
-	if !*noopt {
-		util.UnnestBlocks(fn.decl)
-		util.RemoveSelfAssigns(fn.decl)
-		util.RemoveBlankAssigns(fn.decl)
-		util.RemoveEmptyStmts(fn.decl)
-		util.InlineGotoEnd(fn.decl)
-		util.InlineGotoReturn(fn.decl)
-		if util.RemoveReceiver(fn.decl) {
-			fn.call.(*ast.ParenExpr).X = fn.decl.Name
-		}
+	util.UnnestBlocks(fn.decl)
+	util.RemoveEmptyStmts(fn.decl)
+	util.InlineGotoEnd(fn.decl)
+	util.InlineGotoReturn(fn.decl)
+
+	if util.RemoveReceiver(fn.decl) {
+		fn.call.(*ast.ParenExpr).X = fn.decl.Name
 	}
 }
 
