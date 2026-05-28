@@ -212,7 +212,11 @@ func (t *translator) createNewFunc() ast.Decl {
 	if len(t.elements) > 0 {
 		elts := make([]ast.Expr, len(t.elements))
 		for i, elem := range t.elements {
-			elts[i] = &ast.CompositeLit{Elts: elem.init}
+			if elem.declive {
+				elts[i] = newID("nil")
+			} else {
+				elts[i] = &ast.CompositeLit{Elts: elem.init}
+			}
 		}
 		body.List = append(body.List, &ast.AssignStmt{
 			Tok: token.ASSIGN,
@@ -222,21 +226,27 @@ func (t *translator) createNewFunc() ast.Decl {
 				Elts: elts}}})
 
 		for i, elem := range t.elements {
-			if elem.passive {
+			if elem.passive || elem.declive {
 				continue
 			}
 			var tab ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: t.tables[elem.index].id}
 			if t.tables[elem.index].imported {
 				tab = &ast.StarExpr{X: tab}
 			}
-			body.List = append(body.List, &ast.ExprStmt{
-				X: &ast.CallExpr{
+			body.List = append(body.List,
+				&ast.ExprStmt{X: &ast.CallExpr{
 					Fun: newID("copy"),
 					Args: []ast.Expr{
 						&ast.SliceExpr{X: tab, Low: elem.offset},
 						&ast.IndexExpr{
 							X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-							Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}}}})
+							Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}}}},
+				&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{&ast.IndexExpr{
+						X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
+						Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}},
+					Rhs: []ast.Expr{newID("nil")}})
 		}
 	}
 	// Intialize the memory.

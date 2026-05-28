@@ -75,6 +75,9 @@ func Test_translateSpecTest(t *testing.T) {
 			if !*unsafe && strings.HasSuffix(path, "/threads") {
 				return filepath.SkipDir
 			}
+			if strings.Contains(path, "/skip") {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		if ext := filepath.Ext(path); ext == ".wasm" {

@@ -14,7 +14,9 @@ func New(v0 Xenv) *Module {
 	m.t0 = make([]any, 32)
 	m.elements = [][]any{{fn1}, {m.fn0}}
 	copy(m.t0[i32(16):], m.elements[0])
+	m.elements[0] = nil
 	copy(m.t0[i32(17):], m.elements[1])
+	m.elements[1] = nil
 	if i, ok := any(v0).(interface {
 		Init(any)
 	}); ok {

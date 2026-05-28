@@ -1068,7 +1068,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushConst(t.functions[index].call)
+			// Push to materialize the reference.
+			fn.push(t.functions[index].call)
 
 		case 0xfb: // GC
 			code, err := readLEB128(t.in)

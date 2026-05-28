@@ -706,12 +706,15 @@ func (t *translator) readElementSection() error {
 			return fmt.Errorf("unsupported element segment tag: %d", tag)
 		}
 
-		isPassive := tag&1 != 0
+		isActive := tag&1 == 0
+		isPassive := tag&3 == 1
+		isDeclarative := tag&3 == 3
 		hasIndex := tag&3 == 2
 		hasType := tag&3 != 0
 		hasExpr := tag&4 != 0
 
 		t.elements[i].passive = isPassive
+		t.elements[i].declive = isDeclarative
 
 		if hasIndex {
 			idx, err := readLEB128(t.in)
@@ -721,7 +724,7 @@ func (t *translator) readElementSection() error {
 			t.elements[i].index = uint32(idx)
 		}
 
-		if !isPassive {
+		if isActive {
 			expr, err := t.readConstExpr()
 			if err != nil {
 				return err
@@ -743,20 +746,26 @@ func (t *translator) readElementSection() error {
 		if err != nil {
 			return err
 		}
-		t.elements[i].init = make([]ast.Expr, numElems)
-		for j := range t.elements[i].init {
+		if !isDeclarative {
+			t.elements[i].init = make([]ast.Expr, numElems)
+		}
+		for j := range numElems {
 			if hasExpr {
 				expr, err := t.readConstExpr()
 				if err != nil {
 					return err
 				}
-				t.elements[i].init[j] = expr
+				if !isDeclarative {
+					t.elements[i].init[j] = expr
+				}
 			} else {
 				idx, err := readLEB128(t.in)
 				if err != nil {
 					return err
 				}
-				t.elements[i].init[j] = t.functions[idx].call
+				if !isDeclarative {
+					t.elements[i].init[j] = t.functions[idx].call
+				}
 			}
 		}
 	}

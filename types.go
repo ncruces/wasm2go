@@ -152,6 +152,7 @@ type elemSegment struct {
 	index   uint32
 	offset  ast.Expr
 	passive bool
+	declive bool
 }
 
 type dataSegment struct {
