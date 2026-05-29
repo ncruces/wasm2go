@@ -696,15 +696,42 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0x3f: // memory.size
-			_, _ = readLEB128(t.in) // memory index
-			fn.push(convert(
-				&ast.BinaryExpr{
-					X: &ast.CallExpr{
-						Fun:  newID("len"),
-						Args: []ast.Expr{t.memory.selector}},
-					Op: token.SHR,
-					Y:  literal16,
-				}, t.memory.stype()))
+			_, err := readLEB128(t.in) // memory index
+			if err != nil {
+				return err
+			}
+			switch {
+			case !t.memory.shared:
+				fn.push(convert(
+					&ast.BinaryExpr{
+						X: &ast.CallExpr{
+							Fun:  newID("len"),
+							Args: []ast.Expr{t.memory.selector}},
+						Op: token.SHR,
+						Y:  literal16,
+					}, t.memory.stype()))
+
+			case t.memory.imported:
+				fn.push(convert(&ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")},
+						Sel: newID("Grow")},
+					Args: []ast.Expr{
+						literal0,
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
+
+			default:
+				needsUnsafe("shared memory")
+				fn.helpers.add("atomic_memory_grow")
+				fn.push(convert(&ast.CallExpr{
+					Fun: newID("atomic_memory_grow"),
+					Args: []ast.Expr{
+						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
+						literal0,
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
+			}
 
 		case 0x40: // memory.grow
 			_, err := readLEB128(t.in) // memory index
