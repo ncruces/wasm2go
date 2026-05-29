@@ -80,19 +80,20 @@ func (t *translator) constF64() (ast.Expr, error) {
 	}, nil
 }
 
-func (t *translator) globalGet() (ast.Expr, error) {
+func (t *translator) globalGet() (ast.Expr, bool, error) {
 	v, err := readLEB128(t.in)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
+	global := t.globals[v]
 	var expr ast.Expr = &ast.SelectorExpr{
 		X:   newID("m"),
-		Sel: t.globals[v].id,
+		Sel: global.id,
 	}
-	if t.globals[v].imported {
+	if global.imported && global.mutable {
 		expr = &ast.StarExpr{X: expr}
 	}
-	return expr, nil
+	return expr, global.mutable, nil
 }
 
 func formatInt(i int64) string {

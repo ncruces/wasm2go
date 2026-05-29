@@ -53,10 +53,10 @@ func (t *translator) createModuleStruct() ast.Decl {
 			t.packages.add("sync")
 		}
 	}
-	// Globals: owned are type; imported *type.
+	// Globals: owned/immutable are type; imported *type.
 	for _, g := range t.globals {
 		var typ ast.Expr = g.typ.ident()
-		if g.imported {
+		if g.imported && g.mutable {
 			typ = &ast.StarExpr{X: typ}
 		}
 		fields = append(fields, &ast.Field{
@@ -177,13 +177,17 @@ func (t *translator) createNewFunc() ast.Decl {
 						Sel: util.MangleID(imp.name, util.IDExported)}}}})
 
 		case externGlobal:
+			var rhs ast.Expr = &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   locals[imp.module],
+					Sel: util.MangleID(imp.name, util.IDExported)}}
+			if !t.globals[imp.index].mutable {
+				rhs = &ast.StarExpr{X: rhs}
+			}
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.globals[imp.index].id}},
-				Rhs: []ast.Expr{&ast.CallExpr{
-					Fun: &ast.SelectorExpr{
-						X:   locals[imp.module],
-						Sel: util.MangleID(imp.name, util.IDExported)}}}})
+				Rhs: []ast.Expr{rhs}})
 
 		case externMemory:
 			expr := &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")}
@@ -485,7 +489,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 			g := t.globals[exp.index]
 			decl.Type.Results = &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: g.typ.ident()}}}}
 			var ret ast.Expr = &ast.SelectorExpr{X: newID("m"), Sel: g.id}
-			if !g.imported {
+			if !(g.imported && g.mutable) {
 				ret = &ast.UnaryExpr{Op: token.AND, X: ret}
 			}
 			decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{ret}}}

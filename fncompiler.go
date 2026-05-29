@@ -225,7 +225,8 @@ func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 	}
 }
 
-// Pushes a side-effectful expr (any observable side effect, including traps) to the value stack.
+// Pushes a side-effectful expression, or an expression sensitive to side-effects,
+// (any observable side-effect, including traps) to the value stack.
 //
 // This should be the default, since treating an expression as pure
 // could result in it being evaluated conditionally or
