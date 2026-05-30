@@ -138,6 +138,7 @@ func (m *memoryDef) utype() string {
 type globalDef struct {
 	id       *ast.Ident
 	typ      wasmType
+	mutable  bool
 	imported bool
 	init     ast.Expr
 }
@@ -152,6 +153,7 @@ type elemSegment struct {
 	index   uint32
 	offset  ast.Expr
 	passive bool
+	declive bool
 }
 
 type dataSegment struct {

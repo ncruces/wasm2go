@@ -25,6 +25,8 @@ Doug Lea's `malloc` (or a simple bump allocator).
 a code generator that emits testable Go methods
 to back C functions best implemented in Go.
 
+## Usage
+
 ```
 Usage of libc-gen [option]... [func]...
   -c-out string
@@ -46,8 +48,7 @@ Usage of libc-gen [option]... [func]...
 This library aims to provide a minimal implementation
 of the C standard library.
 
-Functions added to it should be part of the C standard
-(avoid most POSIX extensions).
+Functions added to it should be part of the C standard.
 
 Besides, the C component should not grow much beyond:
 - _macros_ and _function declarations_ added to header files;
@@ -62,10 +63,8 @@ The Go component will contain stuff that's best implemented in Go:
 
 I will not be adding file I/O to this, or any other OS stuff.
 
-I _can_ add the function declarations,
-and other standard C stuff you might need
-(though consider adding them yourself).
+I _can_ add the necessary standard C declarations,
+but you will need to implement the Go component within your own host module.
 
-But you will need to implement the Go component within your own host module.
-
-Or just bite the bullet, use WASI and implement your own WASI host module.
+Or just use WASI and either implement your own WASI host module,
+or use [github.com/lbe/wasm2go-wasi-host](https://github.com/lbe/wasm2go-wasi-host).

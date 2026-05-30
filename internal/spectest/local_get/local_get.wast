@@ -175,7 +175,7 @@
 )
 
 
-;; Invalid result type
+;; local.set should have retval
 
 (assert_invalid
   (module (func $type-empty-vs-i32 (local i32) (local.get 0)))
@@ -223,3 +223,4 @@
   (module (func $large-mixed (param i64) (local i32 i64) (local.get 214324343) drop))
   "unknown local"
 )
+

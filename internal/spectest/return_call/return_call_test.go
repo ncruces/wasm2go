@@ -7,7 +7,7 @@ import (
 	"github.com/ncruces/wasm2go/internal/spectest"
 )
 
-//go:embed return_call.0.json
+//go:embed return_call_test.json
 var data []byte
 
 func Test(t *testing.T) {

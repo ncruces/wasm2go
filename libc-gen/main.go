@@ -326,7 +326,8 @@ func readWasm() (funcs []string) {
 		}
 	}
 
-	return funcs
+	slices.Sort(funcs)
+	return slices.Compact(funcs)
 }
 
 func readHeader(b []byte) []byte {

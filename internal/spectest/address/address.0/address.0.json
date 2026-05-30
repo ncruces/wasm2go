@@ -92,7 +92,7 @@
   {"type": "assert_trap", "line": 209, "action": {"type": "invoke", "field": "16u_bad", "args": [{"type": "i32", "value": "1"}]}, "text": "out of bounds memory access", "expected": []}, 
   {"type": "assert_trap", "line": 210, "action": {"type": "invoke", "field": "16s_bad", "args": [{"type": "i32", "value": "1"}]}, "text": "out of bounds memory access", "expected": []}, 
   {"type": "assert_trap", "line": 211, "action": {"type": "invoke", "field": "32_bad", "args": [{"type": "i32", "value": "1"}]}, "text": "out of bounds memory access", "expected": []}, 
-  {"type": "assert_invalid", "line": 214, "filename": "address.1.wat", "text": "offset out of range", "module_type": "text"}, 
+  {"type": "assert_malformed", "line": 214, "filename": "address.1.wat", "text": "i32 constant", "module_type": "text"}, 
   {"type": "module", "line": 223, "filename": "address.2.wasm"}, 
   {"type": "assert_return", "line": 362, "action": {"type": "invoke", "field": "8u_good1", "args": [{"type": "i32", "value": "0"}]}, "expected": [{"type": "i64", "value": "97"}]}, 
   {"type": "assert_return", "line": 363, "action": {"type": "invoke", "field": "8u_good2", "args": [{"type": "i32", "value": "0"}]}, "expected": [{"type": "i64", "value": "97"}]}, 

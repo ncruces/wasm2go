@@ -50,8 +50,8 @@ l1:
 			goto l0
 		}
 		v3 = v0 + v2*i32(4)
-		t0 := v4
-		v4 = t0 + int32(load32((*m.memory)[uint32(v3):]))
+		t0 := int32(load32((*m.memory)[uint32(v3):]))
+		v4 = v4 + t0
 		v2 = v2 + i32(1)
 		goto l1
 	}
@@ -61,9 +61,13 @@ l0:
 func (m *Module) Xrand_multiple_of_10() int32 {
 	var v0 int32
 l0:
-	v0 = m.fn1()
-	if int32(uint32(v0)%uint32(i32(10))) != i32(0) {
-		goto l0
+	{
+		t0 := m.fn1()
+		v0 = t0
+		t1 := int32(uint32(v0) % uint32(i32(10)))
+		if t1 != i32(0) {
+			goto l0
+		}
 	}
 	return v0
 }

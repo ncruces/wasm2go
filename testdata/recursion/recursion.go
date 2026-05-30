@@ -14,8 +14,8 @@ func (m *Module) Xfactorial(v0 int32) int32 {
 	if v0 <= i32(1) {
 		p0 = i32(1)
 	} else {
-		t1 := v0
-		p0 = t1 * m.Xfactorial(v0-i32(1))
+		t1 := m.Xfactorial(v0 - i32(1))
+		p0 = v0 * t1
 	}
 	return p0
 }
@@ -24,7 +24,8 @@ func (m *Module) Xis_even(v0 int32) int32 {
 	if v0 == 0 {
 		p0 = i32(1)
 	} else {
-		p0 = m.Xis_odd(v0 - i32(1))
+		t1 := m.Xis_odd(v0 - i32(1))
+		p0 = t1
 	}
 	return p0
 }
@@ -33,7 +34,8 @@ func (m *Module) Xis_odd(v0 int32) int32 {
 	if v0 == 0 {
 		p0 = i32(0)
 	} else {
-		p0 = m.Xis_even(v0 - i32(1))
+		t1 := m.Xis_even(v0 - i32(1))
+		p0 = t1
 	}
 	return p0
 }

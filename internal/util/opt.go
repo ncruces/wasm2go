@@ -37,7 +37,17 @@ func RemoveUnusedLocals(n ast.Node) {
 	// turn the definition into an assignment.
 	astutil.Apply(n,
 		func(c *astutil.Cursor) bool {
-			if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.DEFINE {
+			switch n := c.Node().(type) {
+			case *ast.ValueSpec:
+				for i, id := range n.Names {
+					if uses[id.Name] == 1 {
+						n.Names[i] = blank
+					}
+				}
+			case *ast.AssignStmt:
+				if n.Tok != token.DEFINE {
+					break
+				}
 				var any bool
 				for i := range n.Lhs {
 					if id, ok := n.Lhs[i].(*ast.Ident); ok {
@@ -71,12 +81,7 @@ func RemoveSelfAssigns(n ast.Node) {
 				rhs = append(rhs, expr)
 			}
 
-			if len(lhs) == 0 {
-				c.Delete()
-			} else if len(lhs) < len(n.Lhs) {
-				n.Lhs = lhs
-				n.Rhs = rhs
-			}
+			simplifyAssign(c, n, lhs, rhs)
 		}
 		return true
 	}, nil)
@@ -99,24 +104,35 @@ func RemoveBlankAssigns(n ast.Node) {
 			var lhs, rhs []ast.Expr
 			for i, expr := range n.Rhs {
 				if id, ok := expr.(*ast.Ident); ok {
-					if uses[id.Name]-writes[id.Name] > 1 {
-						uses[id.Name]--
-						continue
+					if writes := writes[id.Name]; writes > 0 {
+						reads := uses[id.Name] - writes
+						if reads > 1 || reads == 1 && writes == 1 {
+							uses[id.Name]--
+							continue
+						}
 					}
 				}
 				lhs = append(lhs, n.Lhs[i])
 				rhs = append(rhs, expr)
 			}
 
-			if len(lhs) == 0 {
-				c.Delete()
-			} else if len(lhs) < len(n.Lhs) {
-				n.Lhs = lhs
-				n.Rhs = rhs
-			}
+			simplifyAssign(c, n, lhs, rhs)
 		}
 		return true
 	})
+}
+
+func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
+	if len(lhs) == 0 {
+		if c.Index() < 0 {
+			c.Replace(&ast.EmptyStmt{})
+		} else {
+			c.Delete()
+		}
+	} else if len(lhs) < len(n.Lhs) {
+		n.Lhs = lhs
+		n.Rhs = rhs
+	}
 }
 
 // RemoveEmptyStmts removes empty statements preceded by labels.
@@ -346,14 +362,14 @@ func countUses(n ast.Node) map[string]int {
 func countWrites(n ast.Node) map[string]int {
 	writes := make(map[string]int)
 	ast.Inspect(n, func(node ast.Node) bool {
-		switch x := node.(type) {
+		switch n := node.(type) {
 		case *ast.ValueSpec:
-			for _, id := range x.Names {
+			for _, id := range n.Names {
 				writes[id.Name]++
 			}
 		case *ast.AssignStmt:
-			for i := range x.Lhs {
-				if id, ok := x.Lhs[i].(*ast.Ident); ok {
+			for i := range n.Lhs {
+				if id, ok := n.Lhs[i].(*ast.Ident); ok {
 					writes[id.Name]++
 				}
 			}

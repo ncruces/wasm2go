@@ -225,13 +225,23 @@ func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 	}
 }
 
-// Flushes the stack before pushing expr to the value stack.
+// Pushes a side-effectful expression, or an expression sensitive to side-effects,
+// (any observable side-effect, including traps) to the value stack.
+//
+// This should be the default, since treating an expression as pure
+// could result in it being evaluated conditionally or
+// being reordered relative to other side-effectful operations.
 func (fn *funcCompiler) push(expr ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	fn.flush()
-	fn.pushPure(expr)
+
+	tmp := fn.newTempVal()
+	fn.blocks.top().emit(&ast.AssignStmt{
+		Tok: token.DEFINE,
+		Lhs: []ast.Expr{tmp},
+		Rhs: []ast.Expr{expr}})
+	fn.pushConst(tmp)
 }
 
 // Drops a value from the value stack.
@@ -602,17 +612,22 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 func (fn *funcCompiler) cleanup() {
 	ast.Inspect(fn.decl, fn.resolveImports)
 	util.CheckMaterialized(fn.decl)
+
+	if *noopt {
+		util.RemoveUnusedLocals(fn.decl)
+		return
+	}
+
+	util.RemoveSelfAssigns(fn.decl)
+	util.RemoveBlankAssigns(fn.decl)
 	util.RemoveUnusedLocals(fn.decl)
-	if !*noopt {
-		util.UnnestBlocks(fn.decl)
-		util.RemoveEmptyStmts(fn.decl)
-		util.RemoveSelfAssigns(fn.decl)
-		util.RemoveBlankAssigns(fn.decl)
-		util.InlineGotoEnd(fn.decl)
-		util.InlineGotoReturn(fn.decl)
-		if util.RemoveReceiver(fn.decl) {
-			fn.call.(*ast.ParenExpr).X = fn.decl.Name
-		}
+	util.UnnestBlocks(fn.decl)
+	util.RemoveEmptyStmts(fn.decl)
+	util.InlineGotoEnd(fn.decl)
+	util.InlineGotoReturn(fn.decl)
+
+	if util.RemoveReceiver(fn.decl) {
+		fn.call.(*ast.ParenExpr).X = fn.decl.Name
 	}
 }
 

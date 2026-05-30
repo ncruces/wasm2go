@@ -167,6 +167,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					}
 					rhs[i] = fn.pop()
 				}
+				// The variables only change at block re-entry (loop).
 				childBlk.params = lhs
 				for _, p := range lhs {
 					fn.pushConst(p)
@@ -215,7 +216,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if blk.unreachable {
 				fn.stack = fn.stack[:blk.stackPos]
 			}
-			// Push the if's arguments again, for the else branch.
+			// Push the if's arguments again for the else branch.
+			// These were constant.
 			for _, p := range blk.params {
 				fn.pushConst(p)
 			}
@@ -267,6 +269,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				fn.stack = fn.stack[:blk.stackPos]
 			}
 			// Push the results again, for the parent block.
+			// The variables never change again.
 			for _, r := range blk.results {
 				fn.pushConst(r)
 			}
@@ -481,6 +484,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Lhs: []ast.Expr{tmp},
 						Rhs: []ast.Expr{fn.pop()}}}},
 			})
+			// This variable never changes again.
 			fn.pushConst(tmp)
 
 		case 0x1c: // select (typed)
@@ -530,6 +534,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Lhs: tmp,
 						Rhs: vt}}}})
 
+			// These variables never change again.
 			for _, t := range tmp {
 				fn.pushConst(t)
 			}
@@ -563,11 +568,11 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
 
 		case 0x23: // global.get
-			e, err := t.globalGet()
+			e, mut, err := t.globalGet()
 			if err != nil {
 				return err
 			}
-			fn.push(e)
+			fn.pushPureIf(!mut, e)
 
 		case 0x24: // global.set
 			i, err := readLEB128(t.in)
@@ -709,15 +714,42 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0x3f: // memory.size
-			_, _ = readLEB128(t.in) // memory index
-			fn.push(convert(
-				&ast.BinaryExpr{
-					X: &ast.CallExpr{
-						Fun:  newID("len"),
-						Args: []ast.Expr{t.memory.selector}},
-					Op: token.SHR,
-					Y:  literal16,
-				}, t.memory.stype()))
+			_, err := readLEB128(t.in) // memory index
+			if err != nil {
+				return err
+			}
+			switch {
+			case !t.memory.shared:
+				fn.push(convert(
+					&ast.BinaryExpr{
+						X: &ast.CallExpr{
+							Fun:  newID("len"),
+							Args: []ast.Expr{t.memory.selector}},
+						Op: token.SHR,
+						Y:  literal16,
+					}, t.memory.stype()))
+
+			case t.memory.imported:
+				fn.push(convert(&ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")},
+						Sel: newID("Grow")},
+					Args: []ast.Expr{
+						literal0,
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
+
+			default:
+				needsUnsafe("shared memory")
+				fn.helpers.add("atomic_memory_grow")
+				fn.push(convert(&ast.CallExpr{
+					Fun: newID("atomic_memory_grow"),
+					Args: []ast.Expr{
+						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
+						literal0,
+						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
+					t.memory.stype()))
+			}
 
 		case 0x40: // memory.grow
 			_, err := readLEB128(t.in) // memory index
@@ -1081,7 +1113,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushConst(t.functions[index].call)
+			// Push to materialize the reference.
+			fn.push(t.functions[index].call)
 
 		case 0xfb: // GC
 			code, err := readLEB128(t.in)

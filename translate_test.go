@@ -14,8 +14,8 @@ import (
 	"testing"
 )
 
-//go:generate go test -run translate -args -unsafe
-//go:generate go test -run translate
+//go:generate go test -tags generator -run translate -args -unsafe
+//go:generate go test -tags generator -run translate
 
 func Test_translate(t *testing.T) {
 	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
@@ -118,6 +118,9 @@ func Test_translateSpecTest(t *testing.T) {
 	filepath.WalkDir("internal/spectest/", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			if !*unsafe && strings.HasSuffix(path, "/threads") {
+				return filepath.SkipDir
+			}
+			if strings.Contains(path, "/skip") {
 				return filepath.SkipDir
 			}
 			return nil
