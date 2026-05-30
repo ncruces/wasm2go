@@ -41,6 +41,9 @@ func main() {
 		os.Exit(2)
 	}
 
+	if *dwarfline && *output == "" {
+		log.Fatal("-dwarfline requires `-o output.go` to be specified")
+	}
 	if *embed {
 		if *output == "" {
 			log.Fatal("-embed requires `-o output.go` to be specified")

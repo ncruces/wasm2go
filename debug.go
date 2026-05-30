@@ -110,9 +110,9 @@ func injectDwarfLines(buf []byte, sections map[string][]byte) ([]byte, error) {
 		return nil, err
 	}
 
-	file := "wasm2go.go"
-	if *output != "" {
-		file, _ = filepath.Abs(*output)
+	file, err := filepath.Abs(*output)
+	if err != nil {
+		return nil, err
 	}
 
 	var (
