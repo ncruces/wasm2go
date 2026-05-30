@@ -84,6 +84,8 @@ but is known to be broken on most other CPU architectures.
 
 ```
 Usage: wasm2go [option]... [input.wasm]
+  -dwarfline
+        use line numbers from DWARF metadata
   -embed
         go:embed data sections from a .dat file
   -nanbox
