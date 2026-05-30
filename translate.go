@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"cmp"
 	"debug/dwarf"
@@ -21,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ncruces/wasm2go/internal/offset"
 	"github.com/ncruces/wasm2go/internal/util"
 )
 
@@ -60,29 +60,8 @@ var stdlib = map[string]string{
 	"unsafe":  "unsafe",
 }
 
-type offsetReader struct {
-	r *bufio.Reader
-	n uint64
-}
-
-func (r *offsetReader) Read(p []byte) (n int, err error) {
-	n, err = r.r.Read(p)
-	r.n += uint64(n)
-	return
-}
-
-func (r *offsetReader) ReadByte() (b byte, err error) {
-	b, err = r.r.ReadByte()
-	if err == nil {
-		r.n++
-	}
-	return
-}
-
-func (r *offsetReader) Offset() uint64 { return r.n }
-
 type translator struct {
-	in  *offsetReader
+	in  *offset.Reader
 	out ast.File
 	// Dependencies.
 	packages set[string]
@@ -107,7 +86,7 @@ type translator struct {
 func translate(r io.Reader, w io.Writer) error {
 	var t translator
 
-	t.in = &offsetReader{r: bufio.NewReader(r)}
+	t.in = offset.NewReader(r)
 	err := readHeader(t.in)
 	if err != nil {
 		return err
