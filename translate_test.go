@@ -17,7 +17,6 @@ import (
 
 func Test_translate(t *testing.T) {
 	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
-	*nanbox = false
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
 			path := "testdata/" + name + "/" + name
@@ -44,6 +43,8 @@ func Test_translate(t *testing.T) {
 
 func Test_translateSpecTest(t *testing.T) {
 	*nanbox = true
+	t.Cleanup(func() { *nanbox = false })
+
 	filepath.WalkDir("internal/spectest/", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			if !*unsafe && strings.HasSuffix(path, "/threads") {

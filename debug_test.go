@@ -31,7 +31,7 @@ func Test_dwarfline(t *testing.T) {
 	}
 
 	*dwarfline = true
-	defer func() { *dwarfline = false }()
+	t.Cleanup(func() { *dwarfline = false })
 
 	in, err := os.Open("testdata/dwarfline/dwarfline.wasm")
 	if err != nil {
