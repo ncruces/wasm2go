@@ -1,4 +1,4 @@
-package util
+package passes
 
 import "go/ast"
 

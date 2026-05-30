@@ -1,4 +1,4 @@
-package util
+package mangle
 
 import (
 	"go/ast"
@@ -8,22 +8,22 @@ import (
 	"unicode"
 )
 
-type IDKind int
+type Kind int
 
 const (
-	IDExported IDKind = iota
-	IDInternal
-	IDLocal
+	Exported Kind = iota
+	Internal
+	Local
 )
 
-func Mangle(name string, kind IDKind) string {
+func Name(name string, kind Kind) string {
 	var buf strings.Builder
 	buf.Grow(len(name))
 
 	switch kind {
-	case IDExported:
+	case Exported:
 		buf.WriteByte('X')
-	case IDInternal:
+	case Internal:
 		buf.WriteByte('_')
 	}
 
@@ -35,7 +35,7 @@ func Mangle(name string, kind IDKind) string {
 		}
 		buf.WriteRune(r)
 	}
-	if suffix && kind != IDLocal {
+	if suffix && kind != Local {
 		buf.WriteByte('_')
 		const mod = 36 * 36 * 36 * 36 * 36 * 36
 		table := crc32.MakeTable(crc32.Castagnoli)
@@ -46,6 +46,6 @@ func Mangle(name string, kind IDKind) string {
 	return buf.String()
 }
 
-func MangleID(name string, kind IDKind) *ast.Ident {
-	return ast.NewIdent(Mangle(name, kind))
+func ID(name string, kind Kind) *ast.Ident {
+	return ast.NewIdent(Name(name, kind))
 }

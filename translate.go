@@ -18,8 +18,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ncruces/wasm2go/internal/mangle"
 	"github.com/ncruces/wasm2go/internal/offset"
-	"github.com/ncruces/wasm2go/internal/util"
+	"github.com/ncruces/wasm2go/internal/passes"
 )
 
 var (
@@ -245,7 +246,7 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
-	util.RemoveParens(&t.out)
+	passes.RemoveParens(&t.out)
 
 	// Print Go.
 	var out bytes.Buffer
@@ -437,7 +438,7 @@ func (t *translator) readImportSection() error {
 			}
 			typ := t.types[index]
 
-			if n := util.Mangle(name, util.IDInternal); t.provided.has(n) {
+			if n := mangle.Name(name, mangle.Internal); t.provided.has(n) {
 				id := ast.NewIdent(n)
 				fn := funcCompiler{
 					typ:      typ,
@@ -462,8 +463,8 @@ func (t *translator) readImportSection() error {
 
 			call := &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.SelectorExpr{X: newID("m"), Sel: util.MangleID(mod, util.IDInternal)},
-					Sel: util.MangleID(name, util.IDExported)},
+					X:   &ast.SelectorExpr{X: newID("m"), Sel: mangle.ID(mod, mangle.Internal)},
+					Sel: mangle.ID(name, mangle.Exported)},
 				Args: args,
 			}
 
@@ -828,7 +829,7 @@ func (t *translator) readExportSection() error {
 		case externFunction:
 			if !t.functions[index].provided {
 				decl := t.functions[index].decl
-				decl.Name.Name = util.Mangle(name, util.IDExported)
+				decl.Name.Name = mangle.Name(name, mangle.Exported)
 			}
 		}
 	}
@@ -1106,7 +1107,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 				return err
 			}
 			name := buf.String()
-			t.out.Name = util.MangleID(name, util.IDLocal)
+			t.out.Name = mangle.ID(name, mangle.Local)
 
 		case nameFunction, nameGlobal, nameTable:
 			count, err := readLEB128(r)
@@ -1143,7 +1144,7 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 					}
 				}
 				if id.Name == "" && seen.add(buf.String()) {
-					id.Name = util.Mangle(buf.String(), util.IDInternal)
+					id.Name = mangle.Name(buf.String(), mangle.Internal)
 				}
 			}
 
