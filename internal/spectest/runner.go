@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ncruces/wasm2go/internal/util"
+	"github.com/ncruces/wasm2go/internal/mangle"
 )
 
 func Test(t *testing.T, modptr any, data []byte, name string) {
@@ -56,7 +56,7 @@ func Test(t *testing.T, modptr any, data []byte, name string) {
 					defer RecoverTrap(t, cmd.Text)
 				}
 
-				method := mod.MethodByName(util.Mangle(cmd.Action.Field, util.IDExported))
+				method := mod.MethodByName(mangle.Name(cmd.Action.Field, mangle.Exported))
 				args := make([]reflect.Value, len(cmd.Action.Args))
 				for i, arg := range cmd.Action.Args {
 					switch arg.Type {

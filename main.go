@@ -14,11 +14,12 @@ var (
 	pkg    = flag.String("pkg", "", "package name (default module name, or wasm2go)")
 	tags   = flag.String("tags", "", "go:build tags to include in the generated file")
 
-	embed  = flag.Bool("embed", false, "go:embed data sections from a .dat file")
-	nanbox = flag.Bool("nanbox", false, "attempt to canonicalize NaNs")
-	nohost = flag.Bool("nohost", false, "don't generate interfaces for imports")
-	noopt  = flag.Bool("noopt", false, "disable all optimization passes")
-	unsafe = flag.Bool("unsafe", false, "allow importing unsafe")
+	embed     = flag.Bool("embed", false, "go:embed data sections from a .dat file")
+	nanbox    = flag.Bool("nanbox", false, "attempt to canonicalize NaNs")
+	nohost    = flag.Bool("nohost", false, "don't generate interfaces for imports")
+	noopt     = flag.Bool("noopt", false, "disable all optimization passes")
+	unsafe    = flag.Bool("unsafe", false, "allow importing unsafe")
+	dwarfline = flag.Bool("dwarfline", false, "use line numbers from DWARF metadata")
 
 	provided  stringFlags
 	embedFile string
@@ -40,6 +41,9 @@ func main() {
 		os.Exit(2)
 	}
 
+	if *dwarfline && *output == "" {
+		log.Fatal("-dwarfline requires `-o output.go` to be specified")
+	}
 	if *embed {
 		if *output == "" {
 			log.Fatal("-embed requires `-o output.go` to be specified")

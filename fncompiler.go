@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ncruces/wasm2go/internal/util"
+	"github.com/ncruces/wasm2go/internal/passes"
 )
 
 type funcCompiler struct {
@@ -611,22 +611,22 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 
 func (fn *funcCompiler) cleanup() {
 	ast.Inspect(fn.decl, fn.resolveImports)
-	util.CheckMaterialized(fn.decl)
+	passes.CheckMaterialized(fn.decl)
 
 	if *noopt {
-		util.RemoveUnusedLocals(fn.decl)
+		passes.RemoveUnusedLocals(fn.decl)
 		return
 	}
 
-	util.RemoveSelfAssigns(fn.decl)
-	util.RemoveBlankAssigns(fn.decl)
-	util.RemoveUnusedLocals(fn.decl)
-	util.UnnestBlocks(fn.decl)
-	util.RemoveEmptyStmts(fn.decl)
-	util.InlineGotoEnd(fn.decl)
-	util.InlineGotoReturn(fn.decl)
+	passes.RemoveSelfAssigns(fn.decl)
+	passes.RemoveBlankAssigns(fn.decl)
+	passes.RemoveUnusedLocals(fn.decl)
+	passes.UnnestBlocks(fn.decl)
+	passes.RemoveEmptyStmts(fn.decl)
+	passes.InlineGotoEnd(fn.decl)
+	passes.InlineGotoReturn(fn.decl)
 
-	if util.RemoveReceiver(fn.decl) {
+	if passes.RemoveReceiver(fn.decl) {
 		fn.call.(*ast.ParenExpr).X = fn.decl.Name
 	}
 }
@@ -657,7 +657,7 @@ func convert(expr ast.Expr, types ...string) ast.Expr {
 	for _, t := range types {
 		var done bool
 		if !*noopt {
-			expr, done = util.UnwrapConversion(expr, t)
+			expr, done = passes.UnwrapConversion(expr, t)
 		}
 		if !done {
 			expr = &ast.CallExpr{Fun: newID(t), Args: []ast.Expr{expr}}

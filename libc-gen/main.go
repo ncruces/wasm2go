@@ -17,7 +17,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ncruces/wasm2go/internal/util"
+	"github.com/ncruces/wasm2go/internal/mangle"
 )
 
 //go:embed c go
@@ -170,7 +170,7 @@ func main() {
 				}
 			case *ast.CallExpr:
 				if id, ok := x.Fun.(*ast.Ident); ok && available[id.Name] != nil {
-					x.Fun = &ast.SelectorExpr{X: ast.NewIdent("m"), Sel: util.MangleID(id.Name, util.IDInternal)}
+					x.Fun = &ast.SelectorExpr{X: ast.NewIdent("m"), Sel: mangle.ID(id.Name, mangle.Internal)}
 				}
 				for i, arg := range x.Args {
 					if id, ok := arg.(*ast.Ident); ok && id.Name == "memory" {
@@ -195,7 +195,7 @@ func main() {
 		})
 
 		// Finally mangle the function's own name
-		fd.Name = util.MangleID(fd.Name.Name, util.IDInternal)
+		fd.Name = mangle.ID(fd.Name.Name, mangle.Internal)
 	}
 
 	// Write the unified file
@@ -266,7 +266,7 @@ func readWasm() (funcs []string) {
 					sec = sec[subSize:]
 					if subId == 0 {
 						name, _ := readString(subContent)
-						*pkg = util.Mangle(name, util.IDLocal)
+						*pkg = mangle.Name(name, mangle.Local)
 					}
 				}
 			}

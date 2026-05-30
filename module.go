@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/ncruces/wasm2go/internal/util"
+	"github.com/ncruces/wasm2go/internal/mangle"
 )
 
 var modRecvList = &ast.FieldList{List: []*ast.Field{{
@@ -68,8 +68,8 @@ func (t *translator) createModuleStruct() ast.Decl {
 	for _, imp := range t.imports {
 		if seen.add(imp.module) {
 			fields = append(fields, &ast.Field{
-				Names: []*ast.Ident{util.MangleID(imp.module, util.IDInternal)},
-				Type:  util.MangleID(imp.module, util.IDExported)})
+				Names: []*ast.Ident{mangle.ID(imp.module, mangle.Internal)},
+				Type:  mangle.ID(imp.module, mangle.Exported)})
 		}
 	}
 
@@ -108,12 +108,12 @@ func (t *translator) createNewFunc() ast.Decl {
 
 			params = append(params, &ast.Field{
 				Names: []*ast.Ident{local},
-				Type:  util.MangleID(imp.module, util.IDExported)})
+				Type:  mangle.ID(imp.module, mangle.Exported)})
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{
 					X:   newID("m"),
-					Sel: util.MangleID(imp.module, util.IDInternal)}},
+					Sel: mangle.ID(imp.module, mangle.Internal)}},
 				Rhs: []ast.Expr{local}})
 		}
 	}
@@ -174,13 +174,13 @@ func (t *translator) createNewFunc() ast.Decl {
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.MangleID(imp.name, util.IDExported)}}}})
+						Sel: mangle.ID(imp.name, mangle.Exported)}}}})
 
 		case externGlobal:
 			var rhs ast.Expr = &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
 					X:   locals[imp.module],
-					Sel: util.MangleID(imp.name, util.IDExported)}}
+					Sel: mangle.ID(imp.name, mangle.Exported)}}
 			if !t.globals[imp.index].mutable {
 				rhs = &ast.StarExpr{X: rhs}
 			}
@@ -197,7 +197,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Rhs: []ast.Expr{&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   locals[imp.module],
-						Sel: util.MangleID(imp.name, util.IDExported)}}},
+						Sel: mangle.ID(imp.name, mangle.Exported)}}},
 			}, &ast.AssignStmt{
 				Tok: token.ASSIGN,
 				Lhs: []ast.Expr{&ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}},
@@ -340,7 +340,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 		}
 
 		ifaces[imp.module] = append(ifaces[imp.module], &ast.Field{
-			Names: []*ast.Ident{util.MangleID(imp.name, util.IDExported)},
+			Names: []*ast.Ident{mangle.ID(imp.name, mangle.Exported)},
 			Type:  typ})
 	}
 
@@ -350,7 +350,7 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
 				Assign: 1,
-				Name:   util.MangleID(name, util.IDExported),
+				Name:   mangle.ID(name, mangle.Exported),
 				Type:   &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}}}})
 	}
 	return decls
@@ -452,7 +452,7 @@ func (t *translator) createExportMethods() []ast.Decl {
 
 	for _, name := range names {
 		exp := t.exports[name]
-		name := util.Mangle(name, util.IDExported)
+		name := mangle.Name(name, mangle.Exported)
 
 		var decl = &ast.FuncDecl{
 			Recv: modRecvList,

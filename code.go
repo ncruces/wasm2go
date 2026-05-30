@@ -77,7 +77,16 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			Rhs: vars})
 	}
 
+	if *dwarfline {
+		fn.markDebugStart()
+		defer fn.markDebugEnd()
+	}
+
 	for {
+		if *dwarfline {
+			fn.markDebugOffset(t.in.Offset() - t.codeStart)
+		}
+
 		opcode, err := t.in.ReadByte()
 		if err != nil {
 			return err

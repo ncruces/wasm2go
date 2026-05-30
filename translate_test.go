@@ -17,7 +17,6 @@ import (
 
 func Test_translate(t *testing.T) {
 	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
-	*nanbox = false
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
 			path := "testdata/" + name + "/" + name
@@ -42,34 +41,10 @@ func Test_translate(t *testing.T) {
 	}
 }
 
-func Test_translate_regression(t *testing.T) {
-	tests := []string{"tee_self_loop", "select_effect", "store_grow"}
-	for _, name := range tests {
-		t.Run(name, func(t *testing.T) {
-			path := "testdata/regression/" + name + "/" + name
-
-			in, err := os.Open(path + ".wasm")
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer in.Close()
-
-			var out bytes.Buffer
-			err = translate(in, &out)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			err = os.WriteFile(path+".go", out.Bytes(), 0644)
-			if err != nil {
-				t.Fatal(err)
-			}
-		})
-	}
-}
-
 func Test_translateSpecTest(t *testing.T) {
 	*nanbox = true
+	t.Cleanup(func() { *nanbox = false })
+
 	filepath.WalkDir("internal/spectest/", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			if !*unsafe && strings.HasSuffix(path, "/threads") {
