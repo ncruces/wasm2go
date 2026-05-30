@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"go/token"
 	"slices"
-	"strconv"
 )
 
 func (t *translator) readCodeSection() error {
@@ -79,16 +78,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 	}
 
 	if *dwarfline {
-		body.List = append(body.List, &ast.ExprStmt{X: ast.NewIdent(dwarfPCStart)})
-		defer func() {
-			body.List = append(body.List, &ast.ExprStmt{X: ast.NewIdent(dwarfPCEnd)})
-		}()
+		fn.markDebugStart()
+		defer fn.markDebugEnd()
 	}
 
 	for {
 		if *dwarfline {
-			offset := t.in.Offset() - t.codeStart
-			fn.emit(&ast.ExprStmt{X: ast.NewIdent(dwarfPCPfx + strconv.FormatUint(offset, 10))})
+			fn.markDebugOffset(t.in.Offset() - t.codeStart)
 		}
 
 		opcode, err := t.in.ReadByte()
