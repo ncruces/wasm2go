@@ -3,6 +3,7 @@ package main
 import (
 	"go/ast"
 	"go/token"
+	"maps"
 	"slices"
 	"strconv"
 
@@ -345,7 +346,8 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 	}
 
 	decls := make([]ast.Decl, 0, len(ifaces))
-	for name, methods := range ifaces {
+	for _, name := range slices.Sorted(maps.Keys(ifaces)) {
+		methods := ifaces[name]
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{
