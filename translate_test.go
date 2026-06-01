@@ -16,10 +16,12 @@ import (
 //go:generate go test -tags generator -run translate
 
 func Test_translate(t *testing.T) {
-	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig", "regression/select_effect", "regression/store_grow", "regression/tee_self_loop"}
+	tests := []string{
+		"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig",
+		"regression/select_effect", "regression/store_grow", "regression/tee_self_loop",
+	}
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
-			name = filepath.FromSlash(name)
 			path := "testdata/" + name + "/" + filepath.Base(name)
 
 			in, err := os.Open(path + ".wasm")
@@ -47,11 +49,14 @@ func Test_translateSpecTest(t *testing.T) {
 	t.Cleanup(func() { *nanbox = false })
 
 	filepath.WalkDir("internal/spectest/", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if d.IsDir() {
 			if !*unsafe && strings.HasSuffix(path, "/threads") {
 				return filepath.SkipDir
 			}
-			if strings.Contains(path, "/skip") {
+			if strings.HasSuffix(path, "skip") {
 				return filepath.SkipDir
 			}
 			return nil

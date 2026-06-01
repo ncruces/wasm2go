@@ -5,14 +5,14 @@ import (
 	"testing"
 
 	"github.com/ncruces/wasm2go/internal/spectest"
-	linking10 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.10"
 	linking11 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.11"
-	linking19 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.19"
-	linking20 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.20"
+	linking15 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.15"
+	linking16 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.16"
 	linking21 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.21"
+	linking29 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.29"
+	linking30 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.30"
 	linking5 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.5"
 	linking6 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.6"
-	linking9 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.9"
 )
 
 func Test_globals(t *testing.T) {
@@ -39,8 +39,8 @@ func Test_globals(t *testing.T) {
 }
 
 func Test_tables(t *testing.T) {
-	mt := linking9.New()
-	nt := linking10.New(mt)
+	mt := linking15.New()
+	nt := linking16.New(mt)
 
 	assert_return(t, mt.Xcall(2), 4)                // (assert_return (invoke $Mt "call" (i32.const 2)) (i32.const 4))
 	assert_return(t, nt.XMt_call_6jzka2(2), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 2)) (i32.const 4))
@@ -94,8 +94,8 @@ func Test_tables(t *testing.T) {
 }
 
 func Test_memory(t *testing.T) {
-	mm := linking19.New()
-	nm := linking20.New(mm)
+	mm := linking29.New()
+	nm := linking30.New(mm)
 
 	assert_return(t, mm.Xload(12), 2)           // (assert_return (invoke $Mm "load" (i32.const 12)) (i32.const 2))
 	assert_return(t, nm.XMm_load_5sbr74(12), 2) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 2))
