@@ -20,7 +20,7 @@ import (
 const wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
 
 var skipModules = []string{
-	"bulk.5", // needs review
+	"bulk.5", // data.drop not supported
 	"elem.58",
 	"elem.60",
 	"elem.61",
@@ -34,7 +34,7 @@ var skipModules = []string{
 	"linking.30",
 	"linking.31",
 	"linking.34",
-	"linking.38", // needs review
+	"linking.38", // needs linking.39
 	"linking.6",
 	"memory_grow.6",
 	"memory_grow.7",
@@ -221,7 +221,7 @@ func processJSON(path string) {
 			if err := os.Rename(path, filepath.Join(currentFolder, cmd.Filename)); err != nil {
 				log.Fatalf("failed to move %s: %v", path, err)
 			}
-		case "assert_return", "assert_trap":
+		case "action", "assert_return", "assert_trap":
 			if currentFolder == "" || copied.has(currentFolder) {
 				continue
 			}

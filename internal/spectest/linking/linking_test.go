@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/ncruces/wasm2go/internal/spectest"
-	linking11 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.11"
 	linking15 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.15"
 	linking16 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.16"
-	linking21 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.21"
+	linking17 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.17"
 	linking29 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.29"
 	linking30 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.30"
+	linking31 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.31"
 	linking5 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.5"
 	linking6 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.6"
 )
@@ -65,7 +65,7 @@ func Test_tables(t *testing.T) {
 	assert_return(t, nt.Xcall(3), -4)                       // (assert_return (invoke $Nt "call" (i32.const 3)) (i32.const -4))
 	assert_trap(t, func() { nt.Xcall(4) }, "indirect call") // (assert_trap (invoke $Nt "call" (i32.const 4)) "indirect call")
 
-	ot := linking11.New(mt)
+	ot := linking17.New(mt)
 
 	assert_return(t, mt.Xcall(3), 4)                // (assert_return (invoke $Mt "call" (i32.const 3)) (i32.const 4))
 	assert_return(t, nt.XMt_call_6jzka2(3), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 3)) (i32.const 4))
@@ -101,7 +101,7 @@ func Test_memory(t *testing.T) {
 	assert_return(t, nm.XMm_load_5sbr74(12), 2) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 2))
 	assert_return(t, nm.Xload(12), 0xf2)        // (assert_return (invoke $Nm "load" (i32.const 12)) (i32.const 0xf2))
 
-	om := linking21.New(mm)
+	om := linking31.New(mm)
 
 	assert_return(t, mm.Xload(12), 0xa7)           // (assert_return (invoke $Mm "load" (i32.const 12)) (i32.const 0xa7))
 	assert_return(t, nm.XMm_load_5sbr74(12), 0xa7) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 0xa7))
