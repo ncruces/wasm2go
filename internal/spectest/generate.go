@@ -19,15 +19,17 @@ import (
 
 const wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
 
+// These modules are translated, but not tested
+// (despite having testable assertions).
+// Most need custom code linking modules to be tested,
+// which is implemented for only a few.
 var skipModules = []string{
 	"bulk.5", // data.drop not supported
-	"elem.58",
 	"elem.60",
 	"elem.61",
 	"elem.67",
-	"func_ptrs.0",
-	"global.0",
 	"linking.1",
+	"linking.6",
 	"linking.16",
 	"linking.17",
 	"linking.20",
@@ -35,23 +37,10 @@ var skipModules = []string{
 	"linking.31",
 	"linking.34",
 	"linking.38", // needs linking.39
-	"linking.6",
 	"memory_grow.6",
 	"memory_grow.7",
-	"names.3",
 	"ref_func.1",
-	"return_call.0",
-	"return_call_indirect.0",
 	"table_copy.1",
-	"table_copy.10",
-	"table_copy.11",
-	"table_copy.12",
-	"table_copy.13",
-	"table_copy.14",
-	"table_copy.15",
-	"table_copy.16",
-	"table_copy.17",
-	"table_copy.18",
 	"table_copy.2",
 	"table_copy.3",
 	"table_copy.4",
@@ -62,6 +51,15 @@ var skipModules = []string{
 	"table_copy.9",
 	"table_grow.6",
 	"table_grow.7",
+	"table_copy.10",
+	"table_copy.11",
+	"table_copy.12",
+	"table_copy.13",
+	"table_copy.14",
+	"table_copy.15",
+	"table_copy.16",
+	"table_copy.17",
+	"table_copy.18",
 	"table_init.1",
 	"table_init.2",
 	"table_init.3",

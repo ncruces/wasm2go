@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -47,6 +48,7 @@ func Test_translate(t *testing.T) {
 func Test_translateSpecTest(t *testing.T) {
 	*nanbox = true
 	t.Cleanup(func() { *nanbox = false })
+	slices.Sort(specHostModules)
 
 	filepath.WalkDir("internal/spectest/", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -104,15 +106,18 @@ func generateSpecTest(path string) error {
 	}
 
 	type specFileInfo struct {
-		ImportPath string
 		JSONFile   string
 		WasmFile   string
+		HostModule string
 	}
 
 	info := specFileInfo{
-		ImportPath: "github.com/ncruces/wasm2go/" + dir,
-		JSONFile:   jsonFile,
-		WasmFile:   wasmFile,
+		JSONFile: jsonFile,
+		WasmFile: wasmFile,
+	}
+
+	if _, found := slices.BinarySearch(specHostModules, baseDir); found {
+		info.HostModule = `spectest.Host{T: t}`
 	}
 
 	tmpl, err := template.New("spectest").Parse(specTestTemplate)
@@ -148,6 +153,21 @@ import (
 var data []byte
 
 func Test(t *testing.T) {
-	spectest.Test(t, New(), data, "{{.WasmFile}}")
+	spectest.Test(t, New({{.HostModule}}), data, "{{.WasmFile}}")
 }
 `
+
+var specHostModules = []string{
+	"data.3",
+	"elem.58",
+	"func_ptrs.0",
+	"global.0",
+	"global.23",
+	"linking.2",
+	"names.3",
+	"return_call.0",
+	"return_call_indirect.0",
+	"start.5",
+	"start.6",
+	"start.7",
+}
