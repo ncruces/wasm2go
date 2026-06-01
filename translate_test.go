@@ -16,10 +16,11 @@ import (
 //go:generate go test -tags generator -run translate
 
 func Test_translate(t *testing.T) {
-	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig"}
+	tests := []string{"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig", "regression/select_effect", "regression/store_grow", "regression/tee_self_loop"}
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
-			path := "testdata/" + name + "/" + name
+			name = filepath.FromSlash(name)
+			path := "testdata/" + name + "/" + filepath.Base(name)
 
 			in, err := os.Open(path + ".wasm")
 			if err != nil {
