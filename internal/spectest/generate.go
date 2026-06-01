@@ -13,61 +13,61 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 )
 
 const wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
 
-var skipModules = set[string]{
-	"bulk.5":     {},
-	"linking.38": {},
-	//
-	"elem.58":                {},
-	"elem.60":                {},
-	"elem.61":                {},
-	"elem.67":                {},
-	"func_ptrs.0":            {},
-	"global.0":               {},
-	"linking.1":              {},
-	"linking.6":              {},
-	"linking.16":             {},
-	"linking.17":             {},
-	"linking.20":             {},
-	"linking.30":             {},
-	"linking.31":             {},
-	"linking.34":             {},
-	"memory_grow.6":          {},
-	"memory_grow.7":          {},
-	"names.3":                {},
-	"ref_func.1":             {},
-	"return_call.0":          {},
-	"return_call_indirect.0": {},
-	"table_copy.1":           {},
-	"table_copy.2":           {},
-	"table_copy.3":           {},
-	"table_copy.4":           {},
-	"table_copy.5":           {},
-	"table_copy.6":           {},
-	"table_copy.7":           {},
-	"table_copy.8":           {},
-	"table_copy.9":           {},
-	"table_copy.10":          {},
-	"table_copy.11":          {},
-	"table_copy.12":          {},
-	"table_copy.13":          {},
-	"table_copy.14":          {},
-	"table_copy.15":          {},
-	"table_copy.16":          {},
-	"table_copy.17":          {},
-	"table_copy.18":          {},
-	"table_grow.6":           {},
-	"table_grow.7":           {},
-	"table_init.1":           {},
-	"table_init.2":           {},
-	"table_init.3":           {},
-	"table_init.4":           {},
-	"table_init.5":           {},
-	"table_init.6":           {},
+var skipModules = []string{
+	"bulk.5", // needs review
+	"elem.58",
+	"elem.60",
+	"elem.61",
+	"elem.67",
+	"func_ptrs.0",
+	"global.0",
+	"linking.1",
+	"linking.16",
+	"linking.17",
+	"linking.20",
+	"linking.30",
+	"linking.31",
+	"linking.34",
+	"linking.38", // needs review
+	"linking.6",
+	"memory_grow.6",
+	"memory_grow.7",
+	"names.3",
+	"ref_func.1",
+	"return_call.0",
+	"return_call_indirect.0",
+	"table_copy.1",
+	"table_copy.10",
+	"table_copy.11",
+	"table_copy.12",
+	"table_copy.13",
+	"table_copy.14",
+	"table_copy.15",
+	"table_copy.16",
+	"table_copy.17",
+	"table_copy.18",
+	"table_copy.2",
+	"table_copy.3",
+	"table_copy.4",
+	"table_copy.5",
+	"table_copy.6",
+	"table_copy.7",
+	"table_copy.8",
+	"table_copy.9",
+	"table_grow.6",
+	"table_grow.7",
+	"table_init.1",
+	"table_init.2",
+	"table_init.3",
+	"table_init.4",
+	"table_init.5",
+	"table_init.6",
 }
 
 func main() {
@@ -222,7 +222,10 @@ func processJSON(path string) {
 				log.Fatalf("failed to move %s: %v", path, err)
 			}
 		case "assert_return", "assert_trap":
-			if currentFolder == "" || copied.has(currentFolder) || skipModules.has(currentBase) {
+			if currentFolder == "" || copied.has(currentFolder) {
+				continue
+			}
+			if _, skip := slices.BinarySearch(skipModules, currentBase); skip {
 				continue
 			}
 			copied.add(currentFolder)
