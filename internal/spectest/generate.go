@@ -1,4 +1,4 @@
-//go:build generator
+//go:build ignore
 
 package main
 
@@ -71,6 +71,7 @@ var skipModules = []string{
 }
 
 func main() {
+	slices.Sort(skipModules)
 	log.SetFlags(0)
 
 	chdir()
@@ -118,8 +119,8 @@ func download() {
 			log.Fatalf("tar read error: %v", err)
 		}
 
-		if filepath.Base(hdr.Name) == "wast2json" && hdr.Typeflag == tar.TypeReg {
-			f, err := os.OpenFile("wast2json", os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.FileMode(hdr.Mode))
+		if filepath.Base(hdr.Name) == "wast2json" {
+			f, err := os.OpenFile("wast2json", os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0755)
 			if err != nil {
 				log.Fatalf("file open error: %v", err)
 			}
@@ -177,70 +178,79 @@ func wast2json(exe, path string) {
 }
 
 func processJSON(path string) {
-	data, err := os.ReadFile(path)
+	spec := parseJSON(path)
+
+	root, err := os.OpenRoot(filepath.Dir(path))
 	if err != nil {
-		log.Fatalf("failed to read %s: %v", path, err)
+		log.Fatalf("failed to open root %s: %v", filepath.Dir(path), err)
 	}
+	defer root.Close()
 
-	var spec struct {
-		Commands []struct {
-			Type     string `json:"type"`
-			Filename string `json:"filename"`
-		} `json:"commands"`
-	}
-
-	if err := json.Unmarshal(data, &spec); err != nil {
-		log.Fatalf("failed to parse %s: %v", path, err)
-	}
-
-	dir := filepath.Dir(path)
-
-	var currentFolder, currentBase string
 	copied := make(set[string])
+	base := filepath.Base(path)
 
+	var module string
 	for _, cmd := range spec.Commands {
 		switch cmd.Type {
 		case "assert_invalid", "assert_malformed", "assert_unlinkable", "assert_uninstantiable":
 			if cmd.Filename == "" {
 				continue
 			}
-			path := filepath.Join(dir, cmd.Filename)
-			if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-				log.Fatalf("failed to remove %s: %v", path, err)
+			if err := root.Remove(cmd.Filename); err != nil && !os.IsNotExist(err) {
+				log.Fatalf("failed to remove %s: %v", cmd.Filename, err)
 			}
 		case "module":
 			if cmd.Filename == "" {
 				continue
 			}
-			currentBase = strings.TrimSuffix(cmd.Filename, filepath.Ext(cmd.Filename))
-			currentFolder = filepath.Join(dir, currentBase)
-			if err := os.MkdirAll(currentFolder, 0755); err != nil {
-				log.Fatalf("failed to create dir %s: %v", currentFolder, err)
+			module = strings.TrimSuffix(cmd.Filename, filepath.Ext(cmd.Filename))
+			if err := root.MkdirAll(module, 0755); err != nil {
+				log.Fatalf("failed to create dir %s: %v", module, err)
 			}
-			path := filepath.Join(dir, cmd.Filename)
-			if err := os.Rename(path, filepath.Join(currentFolder, cmd.Filename)); err != nil {
-				log.Fatalf("failed to move %s: %v", path, err)
+			if err := root.Rename(cmd.Filename, filepath.Join(module, cmd.Filename)); err != nil {
+				log.Fatalf("failed to move %s: %v", cmd.Filename, err)
 			}
 		case "action", "assert_return", "assert_trap":
-			if currentFolder == "" || copied.has(currentFolder) {
+			if module == "" || copied.has(module) {
 				continue
 			}
-			if _, skip := slices.BinarySearch(skipModules, currentBase); skip {
+			if _, skip := slices.BinarySearch(skipModules, module); skip {
 				continue
 			}
-			copied.add(currentFolder)
+			copied.add(module)
 
-			dest := filepath.Join(currentFolder, currentBase+".json")
-			os.Remove(dest)
-			if err := os.Link(path, dest); err != nil {
-				log.Fatalf("failed to link json to %s: %v", dest, err)
+			copy := filepath.Join(module, module+".json")
+			root.Remove(copy)
+			if err := root.Link(base, copy); err != nil {
+				log.Fatalf("failed to link json to %s: %v", copy, err)
 			}
 		}
 	}
 
-	if err := os.Remove(path); err != nil {
-		log.Fatalf("failed to remove original json %s: %v", path, err)
+	if err := root.Remove(base); err != nil {
+		log.Fatalf("failed to remove original json %s: %v", base, err)
 	}
+}
+
+func parseJSON(path string) *specTest {
+	f, err := os.Open(path)
+	if err != nil {
+		log.Fatalf("failed to open %s: %v", path, err)
+	}
+	defer f.Close()
+
+	spec := new(specTest)
+	if err := json.NewDecoder(f).Decode(spec); err != nil {
+		log.Fatalf("failed to parse %s: %v", path, err)
+	}
+	return spec
+}
+
+type specTest struct {
+	Commands []struct {
+		Type     string `json:"type"`
+		Filename string `json:"filename"`
+	} `json:"commands"`
 }
 
 type set[T comparable] map[T]struct{}
