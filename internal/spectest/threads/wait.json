@@ -1,0 +1,3 @@
+{"source_filename": "wait.wast",
+ "commands": [
+  {"type": "module", "line": 1, "filename": "wait.0.wasm"}]}

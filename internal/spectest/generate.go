@@ -13,63 +13,12 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"slices"
 	"strings"
 )
 
 const wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
 
-// These modules are translated, but not tested
-// (despite having testable assertions).
-// Most need custom code linking modules to be tested,
-// which is implemented for only a few.
-var skipModules = []string{
-	"bulk.5", // data.drop not supported
-	"elem.60",
-	"elem.61",
-	"elem.67",
-	"linking.1",
-	"linking.6",
-	"linking.16",
-	"linking.17",
-	"linking.20",
-	"linking.30",
-	"linking.31",
-	"linking.34",
-	"linking.38", // needs linking.39
-	"memory_grow.6",
-	"memory_grow.7",
-	"ref_func.1",
-	"table_copy.1",
-	"table_copy.2",
-	"table_copy.3",
-	"table_copy.4",
-	"table_copy.5",
-	"table_copy.6",
-	"table_copy.7",
-	"table_copy.8",
-	"table_copy.9",
-	"table_grow.6",
-	"table_grow.7",
-	"table_copy.10",
-	"table_copy.11",
-	"table_copy.12",
-	"table_copy.13",
-	"table_copy.14",
-	"table_copy.15",
-	"table_copy.16",
-	"table_copy.17",
-	"table_copy.18",
-	"table_init.1",
-	"table_init.2",
-	"table_init.3",
-	"table_init.4",
-	"table_init.5",
-	"table_init.6",
-}
-
 func main() {
-	slices.Sort(skipModules)
 	log.SetFlags(0)
 
 	chdir()
@@ -184,49 +133,33 @@ func processJSON(path string) {
 	}
 	defer root.Close()
 
-	copied := make(set[string])
-	base := filepath.Base(path)
-
-	var module string
 	for _, cmd := range spec.Commands {
+		if cmd.Filename == "" {
+			continue
+		}
+
 		switch cmd.Type {
-		case "assert_invalid", "assert_malformed", "assert_unlinkable", "assert_uninstantiable":
-			if cmd.Filename == "" {
-				continue
-			}
+		case "assert_invalid", "assert_malformed":
 			if err := root.Remove(cmd.Filename); err != nil && !os.IsNotExist(err) {
 				log.Fatalf("failed to remove %s: %v", cmd.Filename, err)
 			}
-		case "module":
-			if cmd.Filename == "" {
-				continue
+
+		case "module", "assert_unlinkable", "assert_uninstantiable":
+			ext := filepath.Ext(cmd.Filename)
+			if ext != ".wasm" {
+				log.Fatalf("unexpected extension: %s", ext)
 			}
-			module = strings.TrimSuffix(cmd.Filename, filepath.Ext(cmd.Filename))
+			module := strings.TrimSuffix(cmd.Filename, ext)
 			if err := root.MkdirAll(module, 0755); err != nil {
 				log.Fatalf("failed to create dir %s: %v", module, err)
 			}
 			if err := root.Rename(cmd.Filename, filepath.Join(module, cmd.Filename)); err != nil {
 				log.Fatalf("failed to move %s: %v", cmd.Filename, err)
 			}
-		case "action", "assert_return", "assert_trap":
-			if module == "" || copied.has(module) {
-				continue
-			}
-			if _, skip := slices.BinarySearch(skipModules, module); skip {
-				continue
-			}
-			copied.add(module)
 
-			copy := filepath.Join(module, module+".json")
-			root.Remove(copy)
-			if err := root.Link(base, copy); err != nil {
-				log.Fatalf("failed to link json to %s: %v", copy, err)
-			}
+		default:
+			log.Fatalf("unknown command: %s", cmd.Type)
 		}
-	}
-
-	if err := root.Remove(base); err != nil {
-		log.Fatalf("failed to remove original json %s: %v", base, err)
 	}
 }
 
@@ -249,19 +182,4 @@ type specTest struct {
 		Type     string `json:"type"`
 		Filename string `json:"filename"`
 	} `json:"commands"`
-}
-
-type set[T comparable] map[T]struct{}
-
-func (s set[T]) add(t T) bool {
-	if _, ok := s[t]; ok {
-		return false
-	}
-	s[t] = struct{}{}
-	return true
-}
-
-func (s set[T]) has(t T) bool {
-	_, ok := s[t]
-	return ok
 }
