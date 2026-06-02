@@ -5,19 +5,19 @@ import (
 	"testing"
 
 	"github.com/ncruces/wasm2go/internal/spectest"
-	linking10 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.10"
-	linking11 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.11"
-	linking19 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.19"
-	linking20 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.20"
-	linking21 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.21"
-	linking5 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.5"
-	linking6 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.6"
-	linking9 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.9"
+	linking_15 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.15"
+	linking_16 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.16"
+	linking_17 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.17"
+	linking_29 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.29"
+	linking_30 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.30"
+	linking_31 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.31"
+	linking_5 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.5"
+	linking_6 "github.com/ncruces/wasm2go/internal/spectest/linking/linking.6"
 )
 
 func Test_globals(t *testing.T) {
-	mg := linking5.New()
-	ng := linking6.New(mg)
+	mg := linking_5.New()
+	ng := linking_6.New(mg)
 
 	assert_return(t, *mg.Xglob(), 42)          // (assert_return (get $Mg "glob") (i32.const 42))
 	assert_return(t, *ng.XMg_glob_xuy5e(), 42) // (assert_return (get $Ng "Mg.glob") (i32.const 42))
@@ -39,8 +39,8 @@ func Test_globals(t *testing.T) {
 }
 
 func Test_tables(t *testing.T) {
-	mt := linking9.New()
-	nt := linking10.New(mt)
+	mt := linking_15.New()
+	nt := linking_16.New(mt)
 
 	assert_return(t, mt.Xcall(2), 4)                // (assert_return (invoke $Mt "call" (i32.const 2)) (i32.const 4))
 	assert_return(t, nt.XMt_call_6jzka2(2), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 2)) (i32.const 4))
@@ -65,7 +65,7 @@ func Test_tables(t *testing.T) {
 	assert_return(t, nt.Xcall(3), -4)                       // (assert_return (invoke $Nt "call" (i32.const 3)) (i32.const -4))
 	assert_trap(t, func() { nt.Xcall(4) }, "indirect call") // (assert_trap (invoke $Nt "call" (i32.const 4)) "indirect call")
 
-	ot := linking11.New(mt)
+	ot := linking_17.New(mt)
 
 	assert_return(t, mt.Xcall(3), 4)                // (assert_return (invoke $Mt "call" (i32.const 3)) (i32.const 4))
 	assert_return(t, nt.XMt_call_6jzka2(3), 4)      // (assert_return (invoke $Nt "Mt.call" (i32.const 3)) (i32.const 4))
@@ -94,14 +94,14 @@ func Test_tables(t *testing.T) {
 }
 
 func Test_memory(t *testing.T) {
-	mm := linking19.New()
-	nm := linking20.New(mm)
+	mm := linking_29.New()
+	nm := linking_30.New(mm)
 
 	assert_return(t, mm.Xload(12), 2)           // (assert_return (invoke $Mm "load" (i32.const 12)) (i32.const 2))
 	assert_return(t, nm.XMm_load_5sbr74(12), 2) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 2))
 	assert_return(t, nm.Xload(12), 0xf2)        // (assert_return (invoke $Nm "load" (i32.const 12)) (i32.const 0xf2))
 
-	om := linking21.New(mm)
+	om := linking_31.New(mm)
 
 	assert_return(t, mm.Xload(12), 0xa7)           // (assert_return (invoke $Mm "load" (i32.const 12)) (i32.const 0xa7))
 	assert_return(t, nm.XMm_load_5sbr74(12), 0xa7) // (assert_return (invoke $Nm "Mm.load" (i32.const 12)) (i32.const 0xa7))

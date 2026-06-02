@@ -1,2 +1,3 @@
 *.[0-9]*.go
 gen_test.go
+wast2json

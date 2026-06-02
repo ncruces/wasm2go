@@ -8,9 +8,8 @@ import (
 	a "github.com/ncruces/wasm2go/internal/spectest/table_init/table_init.0"
 )
 
-//go:embed table_init_test.json
-var data []byte
-
 func Test(t *testing.T) {
-	spectest.Test(t, New(a.New()), data, "table_init.4.wasm")
+	spectest.TestModule(t, func() any {
+		return New(a.New())
+	}, "../table_init.json", "table_init.4.wasm")
 }

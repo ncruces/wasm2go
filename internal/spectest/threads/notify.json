@@ -1,0 +1,3 @@
+{"source_filename": "notify.wast",
+ "commands": [
+  {"type": "module", "line": 1, "filename": "notify.0.wasm"}]}

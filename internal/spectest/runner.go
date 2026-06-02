@@ -1,7 +1,6 @@
 package spectest
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"reflect"
@@ -13,35 +12,35 @@ import (
 	"github.com/ncruces/wasm2go/internal/mangle"
 )
 
-func Test(t *testing.T, modptr any, data []byte, name string) {
-	var test struct {
-		Commands []struct {
-			Type     string `json:"type"`
-			Line     int    `json:"line"`
-			Filename string `json:"filename"`
-			Action   struct {
-				Field string `json:"field"`
-				Args  []struct {
-					Type  string `json:"type"`
-					Value string `json:"value"`
-				} `json:"args"`
-			} `json:"action"`
-			Text     string `json:"text"`
-			Expected []struct {
-				Type  string `json:"type"`
-				Value string `json:"value"`
-			} `json:"expected"`
-		} `json:"commands"`
-	}
+func TestModule(t *testing.T, ctor func() any, jsonPath, name string) {
+	t.Helper()
 
-	mod := reflect.ValueOf(modptr)
-
-	if err := json.Unmarshal(data, &test); err != nil {
+	spec, err := parseSpec(jsonPath)
+	if err != nil {
 		t.Fatal(err)
 	}
 
+	exp := classifyModule(spec, name)
+	switch exp.mode {
+	case moduleTestUnlinkable:
+		if exp.text == "" {
+			t.Skip("module is assert_unlinkable")
+		} else {
+			t.Skipf("module is assert_unlinkable: %s", exp.text)
+		}
+	case moduleTestUninstantiable:
+		defer RecoverTrap(t, exp.text)
+		_ = ctor()
+	case moduleTestRuntime:
+		runAssertions(t, reflect.ValueOf(ctor()), spec, name)
+	default:
+		_ = ctor()
+	}
+}
+
+func runAssertions(t *testing.T, mod reflect.Value, spec *specTest, name string) {
 	var file string
-	for _, cmd := range test.Commands {
+	for _, cmd := range spec.Commands {
 		if cmd.Type == "module" {
 			file = cmd.Filename
 			continue
