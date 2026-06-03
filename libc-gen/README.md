@@ -28,7 +28,7 @@ to back C functions best implemented in Go.
 ## Usage
 
 ```
-Usage of libc-gen [option]... [func]...
+Usage: libc-gen [option]... [func]...
   -c-out string
         extract libc C source and header files to directory
   -deref-mem
@@ -39,6 +39,8 @@ Usage of libc-gen [option]... [func]...
         output file (default stdout)
   -pkg string
         package name (default "main")
+  -version
+        print version and exit
   -wasm string
         input.wasm file
 ```

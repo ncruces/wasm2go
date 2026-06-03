@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 )
 
@@ -20,6 +21,7 @@ var (
 	noopt     = flag.Bool("noopt", false, "disable all optimization passes")
 	unsafe    = flag.Bool("unsafe", false, "allow importing unsafe")
 	dwarfline = flag.Bool("dwarfline", false, "use line numbers from DWARF metadata")
+	version   = flag.Bool("version", false, "print version and exit")
 
 	provided  stringFlags
 	embedFile string
@@ -31,10 +33,15 @@ func main() {
 
 	flag.Var(&provided, "provided", "file containing provided import functions")
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [option]... [input.wasm]\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [option]... [input.wasm]\n", filepath.Base(os.Args[0]))
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+
+	if *version {
+		fmt.Fprintln(flag.CommandLine.Output(), filepath.Base(os.Args[0]), getVersion())
+		os.Exit(0)
+	}
 
 	if flag.NArg() > 1 {
 		flag.Usage()
@@ -77,6 +84,13 @@ func main() {
 	if err := out.Close(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		return info.Main.Version
+	}
+	return "(unknown)"
 }
 
 type stringFlags []string

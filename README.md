@@ -104,6 +104,8 @@ Usage: wasm2go [option]... [input.wasm]
         go:build tags to include in the generated file
   -unsafe
         allow importing unsafe
+  -version
+        print version and exit
 ```
 
 ## Bugs

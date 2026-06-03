@@ -14,6 +14,8 @@ import (
 	"log"
 	"maps"
 	"os"
+	"path/filepath"
+	"runtime/debug"
 	"slices"
 	"strings"
 
@@ -24,20 +26,26 @@ import (
 var src embed.FS
 
 var (
-	output = flag.String("o", "", "output file (default stdout)")
-	wasm   = flag.String("wasm", "", "input.wasm file")
-	pkg    = flag.String("pkg", "main", "package name")
-	m64    = flag.Bool("m64", false, "use 64-bit pointers (int64)")
-	deref  = flag.Bool("deref-mem", false, "dereference memory (*m.memory instead of m.memory)")
-	cout   = flag.String("c-out", "", "extract libc C source and header files to directory")
+	output  = flag.String("o", "", "output file (default stdout)")
+	wasm    = flag.String("wasm", "", "input.wasm file")
+	pkg     = flag.String("pkg", "main", "package name")
+	m64     = flag.Bool("m64", false, "use 64-bit pointers (int64)")
+	deref   = flag.Bool("deref-mem", false, "dereference memory (*m.memory instead of m.memory)")
+	cout    = flag.String("c-out", "", "extract libc C source and header files to directory")
+	version = flag.Bool("version", false, "print version and exit")
 )
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [option]... [func]...\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [option]... [func]...\n", filepath.Base(os.Args[0]))
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+
+	if *version {
+		fmt.Fprintln(flag.CommandLine.Output(), filepath.Base(os.Args[0]), getVersion())
+		os.Exit(0)
+	}
 
 	if *cout != "" {
 		s, err := fs.Sub(src, "c")
@@ -359,4 +367,11 @@ func readLEB128(b []byte) (uint64, []byte) {
 func readString(b []byte) (string, []byte) {
 	l, b := readLEB128(b)
 	return string(b[:l]), b[l:]
+}
+
+func getVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		return info.Main.Version
+	}
+	return "(unknown)"
 }
