@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"go/ast"
 	"go/token"
 	"maps"
@@ -348,6 +349,9 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 	decls := make([]ast.Decl, 0, len(ifaces))
 	for _, name := range slices.Sorted(maps.Keys(ifaces)) {
 		methods := ifaces[name]
+		slices.SortFunc(methods, func(a, b *ast.Field) int {
+			return cmp.Compare(a.Names[0].Name, b.Names[0].Name)
+		})
 		decls = append(decls, &ast.GenDecl{
 			Tok: token.TYPE,
 			Specs: []ast.Spec{&ast.TypeSpec{

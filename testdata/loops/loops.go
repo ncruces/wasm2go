@@ -26,9 +26,9 @@ func New(v0 Xenv) *Module {
 }
 
 type Xenv = interface {
+	Xbuffer() Memory
 	Xlog_i32(v0 int32)
 	Xrand_i32() int32
-	Xbuffer() Memory
 }
 type Memory = interface {
 	Slice() *[]byte
