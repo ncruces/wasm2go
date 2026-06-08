@@ -515,7 +515,7 @@ func memory_zero[T uint32 | uint64](mem []byte, dest, n T) {
 	clear(mem[x:y])
 }
 
-func table_init[T int32 | int64](tab, elems []any, dest, src, n T) {
+func table_init[T1, T2, T3 int32 | int64](tab, elems []any, dest T1, src T2, n T3) {
 	x := uint(dest)
 	z := uint(src)
 	y := x + uint(n)

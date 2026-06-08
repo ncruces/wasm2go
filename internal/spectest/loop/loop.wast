@@ -425,17 +425,6 @@
     )
     (drop) (drop) (drop)
   )
-
-  (func (export "br-implicit-drop") (result i32)
-    (local $i i32)
-    (i32.const 1)
-    (loop $loop
-      (local.set $i (i32.add (local.get $i) (i32.const 1)))
-      (i32.const 2)
-      (br_if $loop (i32.lt_s (local.get $i) (i32.const 10)))
-      (drop)
-    )
-  )
 )
 
 (assert_return (invoke "empty"))
@@ -532,8 +521,6 @@
 (assert_return (invoke "nesting" (f32.const 7) (f32.const 101)) (f32.const 2601))
 
 (assert_return (invoke "type-use"))
-
-(assert_return (invoke "br-implicit-drop") (i32.const 1))
 
 (assert_malformed
   (module quote

@@ -16,13 +16,19 @@ import (
 	"strings"
 )
 
-const wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
+const (
+	wg20 = "https://github.com/WebAssembly/spec/archive/refs/tags/wg-2.0.tar.gz"
+	wg30 = "https://github.com/WebAssembly/spec/archive/refs/tags/wg-3.0.tar.gz"
+	wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
+)
 
 func main() {
 	log.SetFlags(0)
 
 	chdir()
-	download()
+	download(wg20, wg20Files)
+	download(wg30, wg30Files)
+	install()
 	generate()
 }
 
@@ -36,7 +42,7 @@ func chdir() {
 	}
 }
 
-func download() {
+func install() {
 	log.Printf("downloading %s...", wabt)
 	resp, err := http.Get(wabt)
 	if err != nil {
@@ -56,7 +62,7 @@ func download() {
 
 	tr := tar.NewReader(gzr)
 
-	log.Println("extracting wast2json...")
+	log.Print("extracting wast2json...")
 	for {
 		hdr, err := tr.Next()
 		if err == io.EOF {
@@ -78,7 +84,62 @@ func download() {
 			return
 		}
 	}
-	log.Fatalf("failed to extract wast2json")
+	log.Fatal("failed to extract wast2json")
+}
+
+func download(spec string, files set[string]) {
+	log.Printf("downloading %s...", spec)
+	resp, err := http.Get(spec)
+	if err != nil {
+		log.Fatalf("failed to download: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("bad status: %s", resp.Status)
+	}
+
+	gzr, err := gzip.NewReader(resp.Body)
+	if err != nil {
+		log.Fatalf("failed to create gzip reader: %v", err)
+	}
+	defer gzr.Close()
+
+	tr := tar.NewReader(gzr)
+
+	log.Print("extracting wast files...")
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("tar read error: %v", err)
+		}
+		_, name, ok := strings.Cut(hdr.Name, "/test/core/")
+		if !ok {
+			continue
+		}
+		if !files.has(name) {
+			if strings.HasSuffix(name, ".wast") {
+				log.Printf("Skipping %s", name)
+			}
+			continue
+		}
+		files.del(name)
+		target := filepath.Join(strings.TrimSuffix(name, ".wast"), filepath.Base(name))
+		f, err := os.Create(target)
+		if err != nil {
+			log.Fatalf("file open error: %v", err)
+		}
+		defer f.Close()
+		if _, err := io.Copy(f, tr); err != nil {
+			log.Fatalf("file copy error: %v", err)
+		}
+	}
+	if len(files) > 0 {
+		log.Fatalf("failed to extract wast files: %v", files)
+	}
 }
 
 func generate() {
@@ -182,4 +243,128 @@ type specTest struct {
 		Type     string `json:"type"`
 		Filename string `json:"filename"`
 	} `json:"commands"`
+}
+
+var wg20Files = set[string]{
+	"align.wast":           {},
+	"br_if.wast":           {},
+	"br_table.wast":        {},
+	"elem.wast":            {},
+	"func.wast":            {},
+	"global.wast":          {},
+	"linking.wast":         {},
+	"local_tee.wast":       {},
+	"memory.wast":          {},
+	"ref_is_null.wast":     {},
+	"ref_null.wast":        {},
+	"select.wast":          {},
+	"table.wast":           {},
+	"unreached-valid.wast": {},
+}
+
+var wg30Files = set[string]{
+	"address.wast":              {},
+	"block.wast":                {},
+	"br.wast":                   {},
+	"call.wast":                 {},
+	"call_indirect.wast":        {},
+	"conversions.wast":          {},
+	"endianness.wast":           {},
+	"f32.wast":                  {},
+	"f32_cmp.wast":              {},
+	"f32_bitwise.wast":          {},
+	"f64.wast":                  {},
+	"f64_cmp.wast":              {},
+	"f64_bitwise.wast":          {},
+	"fac.wast":                  {},
+	"float_exprs.wast":          {},
+	"float_literals.wast":       {},
+	"float_memory.wast":         {},
+	"float_misc.wast":           {},
+	"forward.wast":              {},
+	"func_ptrs.wast":            {},
+	"i32.wast":                  {},
+	"i64.wast":                  {},
+	"if.wast":                   {},
+	"int_exprs.wast":            {},
+	"int_literals.wast":         {},
+	"labels.wast":               {},
+	"left-to-right.wast":        {},
+	"load.wast":                 {},
+	"local_get.wast":            {},
+	"local_set.wast":            {},
+	"loop.wast":                 {},
+	"memory_grow.wast":          {},
+	"memory_redundancy.wast":    {},
+	"memory_size.wast":          {},
+	"memory_trap.wast":          {},
+	"names.wast":                {},
+	"nop.wast":                  {},
+	"ref_func.wast":             {},
+	"return.wast":               {},
+	"return_call.wast":          {},
+	"return_call_indirect.wast": {},
+	"stack.wast":                {},
+	"start.wast":                {},
+	"store.wast":                {},
+	"switch.wast":               {},
+	"table_get.wast":            {},
+	"table_grow.wast":           {},
+	"table_set.wast":            {},
+	"table_size.wast":           {},
+	"traps.wast":                {},
+	"unreachable.wast":          {},
+	"unwind.wast":               {},
+
+	"bulk-memory/bulk.wast":        {},
+	"bulk-memory/memory_copy.wast": {},
+	"bulk-memory/memory_fill.wast": {},
+	"bulk-memory/memory_init.wast": {},
+	"bulk-memory/table_copy.wast":  {},
+	"bulk-memory/table_fill.wast":  {},
+	"bulk-memory/table_init.wast":  {},
+
+	"memory64/address64.wast":           {},
+	"memory64/bulk64.wast":              {},
+	"memory64/call_indirect64.wast":     {},
+	"memory64/endianness64.wast":        {},
+	"memory64/float_memory64.wast":      {},
+	"memory64/load64.wast":              {},
+	"memory64/memory_copy64.wast":       {},
+	"memory64/memory_fill64.wast":       {},
+	"memory64/memory_grow64.wast":       {},
+	"memory64/memory_init64.wast":       {},
+	"memory64/memory_redundancy64.wast": {},
+	"memory64/memory_trap64.wast":       {},
+	"memory64/table_copy_mixed.wast":    {},
+	"memory64/table_copy64.wast":        {},
+	"memory64/table_fill64.wast":        {},
+	"memory64/table_get64.wast":         {},
+	"memory64/table_grow64.wast":        {},
+	"memory64/table_init64.wast":        {},
+	"memory64/table_set64.wast":         {},
+	"memory64/table_size64.wast":        {},
+}
+
+type set[T comparable] map[T]struct{}
+
+func (s set[T]) add(t T) bool {
+	if _, ok := s[t]; ok {
+		return false
+	}
+	s[t] = struct{}{}
+	return true
+}
+
+func (s set[T]) del(t T) bool {
+	if _, ok := s[t]; ok {
+		delete(s, t)
+		return true
+	}
+	return false
+}
+
+func (s set[T]) has(t T) bool {
+	_, ok := s[t]
+	return ok
 }
