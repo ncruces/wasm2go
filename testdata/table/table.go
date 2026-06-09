@@ -13,9 +13,9 @@ func New(v0 Xenv) *Module {
 	m._env = v0
 	m.t0 = make([]any, 32)
 	m.elements = [][]any{{fn1}, {m.fn0}}
-	copy(m.t0[i32(16):], m.elements[0])
+	table_init(m.t0, m.elements[0], i32(16), 0, len(m.elements[0]))
 	m.elements[0] = nil
-	copy(m.t0[i32(17):], m.elements[1])
+	table_init(m.t0, m.elements[1], i32(17), 0, len(m.elements[1]))
 	m.elements[1] = nil
 	if i, ok := any(v0).(interface {
 		Init(any)
@@ -46,3 +46,11 @@ func (m *Module) Xtimes3(v0 int32) int32 {
 
 //go:nosplit
 func i32(x int32) int32 { return x }
+
+func table_init[T1, T2, T3 int | int32 | int64](tab, elems []any, dest T1, src T2, n T3) {
+	x := uint64(dest)
+	z := uint64(src)
+	y := x + uint64(n)
+	w := z + uint64(n)
+	copy(tab[x:y], elems[z:w])
+}

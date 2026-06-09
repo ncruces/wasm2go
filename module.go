@@ -239,19 +239,21 @@ func (t *translator) createNewFunc() ast.Decl {
 			if t.tables[elem.index].imported {
 				tab = &ast.StarExpr{X: tab}
 			}
+			elems := &ast.IndexExpr{
+				X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
+				Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}
+			t.helpers.add("table_init")
 			body.List = append(body.List,
 				&ast.ExprStmt{X: &ast.CallExpr{
-					Fun: newID("copy"),
+					Fun: newID("table_init"),
 					Args: []ast.Expr{
-						&ast.SliceExpr{X: tab, Low: elem.offset},
-						&ast.IndexExpr{
-							X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-							Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}}}},
+						tab, elems,
+						convert(elem.offset, t.tables[elem.index].stype()),
+						&ast.BasicLit{Kind: token.INT, Value: "0"},
+						&ast.CallExpr{Fun: newID("len"), Args: []ast.Expr{elems}}}}},
 				&ast.AssignStmt{
 					Tok: token.ASSIGN,
-					Lhs: []ast.Expr{&ast.IndexExpr{
-						X:     &ast.SelectorExpr{X: newID("m"), Sel: newID("elements")},
-						Index: &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(i)}}},
+					Lhs: []ast.Expr{elems},
 					Rhs: []ast.Expr{newID("nil")}})
 		}
 	}
@@ -260,14 +262,16 @@ func (t *translator) createNewFunc() ast.Decl {
 		if seg.passive || seg.merged {
 			continue
 		}
+		t.helpers.add("memory_init")
 		body.List = append(body.List, &ast.ExprStmt{
 			X: &ast.CallExpr{
-				Fun: newID("copy"),
+				Fun: newID("memory_init"),
 				Args: []ast.Expr{
-					&ast.SliceExpr{
-						X:   t.memory.selector,
-						Low: convert(seg.offset, t.memory.utype())},
-					t.dataExpr(i)}}})
+					t.memory.selector,
+					t.dataExpr(i),
+					convert(seg.offset, t.memory.utype()),
+					&ast.BasicLit{Kind: token.INT, Value: "0"},
+					&ast.CallExpr{Fun: newID("len"), Args: []ast.Expr{t.dataExpr(i)}}}}})
 	}
 	// Create and initialize owned globals.
 	for _, g := range t.globals {

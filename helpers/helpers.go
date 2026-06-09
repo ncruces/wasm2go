@@ -479,7 +479,7 @@ func memory_grow(mem *[]byte, delta, max int64) int64 {
 	return old
 }
 
-func memory_init[T uint32 | uint64](mem []byte, data string, dest T, src, n uint32) {
+func memory_init[T1, T2 int | uint32 | uint64](mem []byte, data string, dest T1, src, n T2) {
 	x := uint(min(uint64(dest), math.MaxUint))
 	z := uint(src)
 	y := x + uint(n)
@@ -515,48 +515,25 @@ func memory_zero[T uint32 | uint64](mem []byte, dest, n T) {
 	clear(mem[x:y])
 }
 
-func table_init[T1, T2, T3 int32 | int64](tab, elems []any, dest T1, src T2, n T3) {
-	x := uint(dest)
-	z := uint(src)
-	y := x + uint(n)
-	w := z + uint(n)
+func table_init[T1, T2, T3 int | int32 | int64](tab, elems []any, dest T1, src T2, n T3) {
+	x := uint64(dest)
+	z := uint64(src)
+	y := x + uint64(n)
+	w := z + uint64(n)
 	copy(tab[x:y], elems[z:w])
 }
 
 func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3) {
-	x := uint(dest)
-	z := uint(src)
-	y := x + uint(n)
-	w := z + uint(n)
+	x := uint64(dest)
+	z := uint64(src)
+	y := x + uint64(n)
+	w := z + uint64(n)
 	copy(dst[x:y], tab[z:w])
 }
 
-func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {
-	buf := *tab
-	len := len(buf)
-	old := T(len)
-	if delta == 0 {
-		return old
-	}
-	new := old + delta
-	add := int(new) - len
-	if new > max || add < 0 {
-		return -1
-	}
-	buf = append(buf, make([]any, add)...)
-	if val != nil {
-		cpy := buf[len:]
-		for i := range cpy {
-			cpy[i] = val
-		}
-	}
-	*tab = buf
-	return old
-}
-
 func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
-	x := uint(dest)
-	y := x + uint(n)
+	x := uint64(dest)
+	y := x + uint64(n)
 	buf := tab[x:y]
 	if val == nil {
 		clear(buf)
@@ -565,6 +542,27 @@ func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
 	for i := range buf {
 		buf[i] = val
 	}
+}
+
+func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {
+	buf := *tab
+	len := len(buf)
+	if delta == 0 {
+		return T(len)
+	}
+	if new := int64(len) + int64(delta); new < int64(len) ||
+		(max >= 0 && new > int64(max)) {
+		return -1
+	}
+	buf = append(buf, make([]any, delta)...)
+	if val != nil {
+		cpy := buf[len:]
+		for i := range cpy {
+			cpy[i] = val
+		}
+	}
+	*tab = buf
+	return T(len)
 }
 
 //go:nosplit

@@ -10,7 +10,8 @@ var (
 	global_f32 float32 = 666.6
 	global_f64 float64 = 666.6
 
-	table []any = make([]any, 10, 20)
+	table  []any  = make([]any, 10, 20)
+	memory []byte = make([]byte, 65536)
 )
 
 type Host struct{ *testing.T }
@@ -38,4 +39,33 @@ func (h Host) Xprint_i32_f32(v0 int32, v1 float32) {
 
 func (h Host) Xprint_f64_f64(v0 int64, v1 float64) {
 	h.Log(v0, v1)
+}
+
+func (h Host) Xmemory() Memory {
+	return h
+}
+
+func (h Host) Slice() *[]byte {
+	return &memory
+}
+
+func (h Host) Grow(delta, max int64) int64 {
+	buf := memory
+	len := len(buf)
+	old := int64(len) >> 16
+	if delta == 0 {
+		return old
+	}
+	new := old + delta
+	add := int(new)<<16 - len
+	if new > max || add < 0 {
+		return -1
+	}
+	memory = append(buf, make([]byte, add)...)
+	return old
+}
+
+type Memory = interface {
+	Slice() *[]byte
+	Grow(delta, max int64) int64
 }

@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	wg10 = "https://github.com/WebAssembly/spec/archive/refs/tags/wg-1.0.tar.gz"
 	wg20 = "https://github.com/WebAssembly/spec/archive/refs/tags/wg-2.0.tar.gz"
 	wg30 = "https://github.com/WebAssembly/spec/archive/refs/tags/wg-3.0.tar.gz"
 	wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
@@ -26,8 +27,14 @@ func main() {
 	log.SetFlags(0)
 
 	chdir()
-	download(wg20, wg20Files)
-	download(wg30, wg30Files)
+	download(wg10, 10)
+	download(wg20, 20)
+	download(wg30, 30)
+	for f, i := range files {
+		if i > 0 {
+			log.Fatalf("missing wast file: %s", f)
+		}
+	}
 	install()
 	generate()
 }
@@ -87,7 +94,7 @@ func install() {
 	log.Fatal("failed to extract wast2json")
 }
 
-func download(spec string, files set[string]) {
+func download(spec string, version byte) {
 	log.Printf("downloading %s...", spec)
 	resp, err := http.Get(spec)
 	if err != nil {
@@ -120,13 +127,13 @@ func download(spec string, files set[string]) {
 		if !ok {
 			continue
 		}
-		if !files.has(name) {
-			if strings.HasSuffix(name, ".wast") {
-				log.Printf("Skipping %s", name)
+		if v, ok := files[name]; v != version {
+			if !ok && strings.HasSuffix(name, ".wast") {
+				log.Printf("skipping %s", name)
 			}
 			continue
 		}
-		files.del(name)
+		files[name] = 0
 		target := filepath.Join(strings.TrimSuffix(name, ".wast"), filepath.Base(name))
 		f, err := os.Create(target)
 		if err != nil {
@@ -136,9 +143,6 @@ func download(spec string, files set[string]) {
 		if _, err := io.Copy(f, tr); err != nil {
 			log.Fatalf("file copy error: %v", err)
 		}
-	}
-	if len(files) > 0 {
-		log.Fatalf("failed to extract wast files: %v", files)
 	}
 }
 
@@ -245,126 +249,111 @@ type specTest struct {
 	} `json:"commands"`
 }
 
-var wg20Files = set[string]{
-	"align.wast":           {},
-	"br_if.wast":           {},
-	"br_table.wast":        {},
-	"elem.wast":            {},
-	"func.wast":            {},
-	"global.wast":          {},
-	"linking.wast":         {},
-	"local_tee.wast":       {},
-	"memory.wast":          {},
-	"ref_is_null.wast":     {},
-	"ref_null.wast":        {},
-	"select.wast":          {},
-	"table.wast":           {},
-	"unreached-valid.wast": {},
-}
+var files = map[string]byte{
+	"break-drop.wast": 10,
+	"globals.wast":    10,
 
-var wg30Files = set[string]{
-	"address.wast":              {},
-	"block.wast":                {},
-	"br.wast":                   {},
-	"call.wast":                 {},
-	"call_indirect.wast":        {},
-	"conversions.wast":          {},
-	"endianness.wast":           {},
-	"f32.wast":                  {},
-	"f32_cmp.wast":              {},
-	"f32_bitwise.wast":          {},
-	"f64.wast":                  {},
-	"f64_cmp.wast":              {},
-	"f64_bitwise.wast":          {},
-	"fac.wast":                  {},
-	"float_exprs.wast":          {},
-	"float_literals.wast":       {},
-	"float_memory.wast":         {},
-	"float_misc.wast":           {},
-	"forward.wast":              {},
-	"func_ptrs.wast":            {},
-	"i32.wast":                  {},
-	"i64.wast":                  {},
-	"if.wast":                   {},
-	"int_exprs.wast":            {},
-	"int_literals.wast":         {},
-	"labels.wast":               {},
-	"left-to-right.wast":        {},
-	"load.wast":                 {},
-	"local_get.wast":            {},
-	"local_set.wast":            {},
-	"loop.wast":                 {},
-	"memory_grow.wast":          {},
-	"memory_redundancy.wast":    {},
-	"memory_size.wast":          {},
-	"memory_trap.wast":          {},
-	"names.wast":                {},
-	"nop.wast":                  {},
-	"ref_func.wast":             {},
-	"return.wast":               {},
-	"return_call.wast":          {},
-	"return_call_indirect.wast": {},
-	"stack.wast":                {},
-	"start.wast":                {},
-	"store.wast":                {},
-	"switch.wast":               {},
-	"table_get.wast":            {},
-	"table_grow.wast":           {},
-	"table_set.wast":            {},
-	"table_size.wast":           {},
-	"traps.wast":                {},
-	"unreachable.wast":          {},
-	"unwind.wast":               {},
+	"align.wast":             20,
+	"br_if.wast":             20,
+	"br_table.wast":          20,
+	"elem.wast":              20,
+	"data.wast":              20,
+	"func.wast":              20,
+	"global.wast":            20,
+	"linking.wast":           20,
+	"local_tee.wast":         20,
+	"memory.wast":            20,
+	"ref_is_null.wast":       20,
+	"ref_null.wast":          20,
+	"select.wast":            20,
+	"table.wast":             20,
+	"unreached-valid.wast":   20,
+	"unreached-invalid.wast": 20,
 
-	"bulk-memory/bulk.wast":        {},
-	"bulk-memory/memory_copy.wast": {},
-	"bulk-memory/memory_fill.wast": {},
-	"bulk-memory/memory_init.wast": {},
-	"bulk-memory/table_copy.wast":  {},
-	"bulk-memory/table_fill.wast":  {},
-	"bulk-memory/table_init.wast":  {},
+	"address.wast":              30,
+	"block.wast":                30,
+	"br.wast":                   30,
+	"call.wast":                 30,
+	"call_indirect.wast":        30,
+	"comments.wast":             30,
+	"conversions.wast":          30,
+	"const.wast":                30,
+	"custom.wast":               30,
+	"endianness.wast":           30,
+	"f32.wast":                  30,
+	"f32_cmp.wast":              30,
+	"f32_bitwise.wast":          30,
+	"f64.wast":                  30,
+	"f64_cmp.wast":              30,
+	"f64_bitwise.wast":          30,
+	"fac.wast":                  30,
+	"float_exprs.wast":          30,
+	"float_literals.wast":       30,
+	"float_memory.wast":         30,
+	"float_misc.wast":           30,
+	"forward.wast":              30,
+	"func_ptrs.wast":            30,
+	"i32.wast":                  30,
+	"i64.wast":                  30,
+	"if.wast":                   30,
+	"int_exprs.wast":            30,
+	"int_literals.wast":         30,
+	"labels.wast":               30,
+	"left-to-right.wast":        30,
+	"load.wast":                 30,
+	"local_get.wast":            30,
+	"local_set.wast":            30,
+	"loop.wast":                 30,
+	"memory_grow.wast":          30,
+	"memory_redundancy.wast":    30,
+	"memory_size.wast":          30,
+	"memory_trap.wast":          30,
+	"names.wast":                30,
+	"nop.wast":                  30,
+	"ref_func.wast":             30,
+	"return.wast":               30,
+	"return_call.wast":          30,
+	"return_call_indirect.wast": 30,
+	"stack.wast":                30,
+	"start.wast":                30,
+	"store.wast":                30,
+	"switch.wast":               30,
+	"table_get.wast":            30,
+	"table_grow.wast":           30,
+	"table_set.wast":            30,
+	"table_size.wast":           30,
+	"token.wast":                30,
+	"traps.wast":                30,
+	"type.wast":                 30,
+	"unreachable.wast":          30,
+	"unwind.wast":               30,
 
-	"memory64/address64.wast":           {},
-	"memory64/bulk64.wast":              {},
-	"memory64/call_indirect64.wast":     {},
-	"memory64/endianness64.wast":        {},
-	"memory64/float_memory64.wast":      {},
-	"memory64/load64.wast":              {},
-	"memory64/memory_copy64.wast":       {},
-	"memory64/memory_fill64.wast":       {},
-	"memory64/memory_grow64.wast":       {},
-	"memory64/memory_init64.wast":       {},
-	"memory64/memory_redundancy64.wast": {},
-	"memory64/memory_trap64.wast":       {},
-	"memory64/table_copy_mixed.wast":    {},
-	"memory64/table_copy64.wast":        {},
-	"memory64/table_fill64.wast":        {},
-	"memory64/table_get64.wast":         {},
-	"memory64/table_grow64.wast":        {},
-	"memory64/table_init64.wast":        {},
-	"memory64/table_set64.wast":         {},
-	"memory64/table_size64.wast":        {},
-}
+	"bulk-memory/bulk.wast":        30,
+	"bulk-memory/memory_copy.wast": 30,
+	"bulk-memory/memory_fill.wast": 30,
+	"bulk-memory/memory_init.wast": 30,
+	"bulk-memory/table_copy.wast":  30,
+	"bulk-memory/table_fill.wast":  30,
+	"bulk-memory/table_init.wast":  30,
 
-type set[T comparable] map[T]struct{}
-
-func (s set[T]) add(t T) bool {
-	if _, ok := s[t]; ok {
-		return false
-	}
-	s[t] = struct{}{}
-	return true
-}
-
-func (s set[T]) del(t T) bool {
-	if _, ok := s[t]; ok {
-		delete(s, t)
-		return true
-	}
-	return false
-}
-
-func (s set[T]) has(t T) bool {
-	_, ok := s[t]
-	return ok
+	"memory64/address64.wast":           30,
+	"memory64/bulk64.wast":              30,
+	"memory64/call_indirect64.wast":     30,
+	"memory64/endianness64.wast":        30,
+	"memory64/float_memory64.wast":      30,
+	"memory64/load64.wast":              30,
+	"memory64/memory_copy64.wast":       30,
+	"memory64/memory_fill64.wast":       30,
+	"memory64/memory_grow64.wast":       30,
+	"memory64/memory_init64.wast":       30,
+	"memory64/memory_redundancy64.wast": 30,
+	"memory64/memory_trap64.wast":       30,
+	"memory64/table_copy_mixed.wast":    30,
+	"memory64/table_copy64.wast":        30,
+	"memory64/table_fill64.wast":        30,
+	"memory64/table_get64.wast":         30,
+	"memory64/table_grow64.wast":        30,
+	"memory64/table_init64.wast":        30,
+	"memory64/table_set64.wast":         30,
+	"memory64/table_size64.wast":        30,
 }

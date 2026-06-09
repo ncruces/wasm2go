@@ -16,7 +16,7 @@ func New() *Module {
 	m := new(Module)
 	m.maxMem = 100
 	m.memory = make([]byte, 65536)
-	copy(m.memory[uint32(i32(0)):], data0)
+	memory_init(m.memory, data0, uint32(i32(0)), 0, len(data0))
 	return m
 }
 
@@ -77,6 +77,14 @@ func memory_grow(mem *[]byte, delta, max int64) int64 {
 	}
 	*mem = append(buf, make([]byte, add)...)
 	return old
+}
+
+func memory_init[T1, T2 int | uint32 | uint64](mem []byte, data string, dest T1, src, n T2) {
+	x := uint(min(uint64(dest), math.MaxUint))
+	z := uint(src)
+	y := x + uint(n)
+	w := z + uint(n)
+	copy(mem[x:y], data[z:w])
 }
 
 func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
