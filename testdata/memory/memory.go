@@ -65,14 +65,15 @@ func load32(b []byte) uint32 {
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
-	len := len(buf)
-	old := int64(len) >> 16
+	len := int64(len(buf))
+	old := len >> 16
 	if delta == 0 {
 		return old
 	}
 	new := old + delta
-	add := int(new)<<16 - len
-	if new > max || add < 0 {
+	add := new<<16 - len
+	max = min(max, int64(math.MaxInt)>>16)
+	if new > max || new < old || add < 0 {
 		return -1
 	}
 	*mem = append(buf, make([]byte, add)...)
@@ -80,16 +81,16 @@ func memory_grow(mem *[]byte, delta, max int64) int64 {
 }
 
 func memory_init[T1, T2 int | uint32 | uint64](mem []byte, data string, dest T1, src, n T2) {
-	x := uint(min(uint64(dest), math.MaxUint))
-	z := uint(src)
-	y := x + uint(n)
-	w := z + uint(n)
+	x := uint64(dest)
+	z := uint64(src)
+	y := x + uint64(n)
+	w := z + uint64(n)
 	copy(mem[x:y], data[z:w])
 }
 
 func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
-	x := uint(min(uint64(dest), math.MaxUint))
-	y := x + uint(min(uint64(n), math.MaxUint))
+	x := uint64(dest)
+	y := x + uint64(n)
 	buf := mem[x:y]
 	if len(buf) > 0 {
 		buf[0] = byte(val)

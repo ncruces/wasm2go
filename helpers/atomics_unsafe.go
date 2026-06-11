@@ -761,7 +761,7 @@ func atomic_memory_grow(mem *[]byte, delta, max int64) int64 {
 	}
 
 	hdr := (*slice)(unsafe.Pointer(mem))
-	max = min(max<<16, int64(hdr.cap))
+	max = min(max, int64(hdr.cap)>>16)
 	for {
 		len := int64(hdr.len.Load())
 		old := len >> 16
@@ -769,12 +769,12 @@ func atomic_memory_grow(mem *[]byte, delta, max int64) int64 {
 			return old
 		}
 
-		new := (old + delta) << 16
-		if new > max || new < len || int(new) < 0 {
+		new := old + delta
+		if new > max || new < old {
 			return -1
 		}
 
-		if hdr.len.CompareAndSwap(uintptr(len), uintptr(new)) {
+		if hdr.len.CompareAndSwap(uintptr(len), uintptr(new<<16)) {
 			return old
 		}
 	}

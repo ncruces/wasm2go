@@ -208,4 +208,9 @@ func (e *loopsEnv) Xrand_i32() int32 { return rand.Int31n(10000) }
 
 func (e *loopsEnv) Slice() *[]byte { b := e.mem[:]; return &b }
 
-func (e *loopsEnv) Grow(delta, max int64) int64 { return -1 }
+func (e *loopsEnv) Grow(delta, _ int64) int64 {
+	if delta == 0 {
+		return int64(len(e.mem) >> 16)
+	}
+	return -1
+}

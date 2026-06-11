@@ -2,7 +2,10 @@
 
 package wasm2go
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"math"
+)
 
 type Module struct {
 	memory []byte
@@ -45,14 +48,15 @@ func store32(b []byte, v uint32) {
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
-	len := len(buf)
-	old := int64(len) >> 16
+	len := int64(len(buf))
+	old := len >> 16
 	if delta == 0 {
 		return old
 	}
 	new := old + delta
-	add := int(new)<<16 - len
-	if new > max || add < 0 {
+	add := new<<16 - len
+	max = min(max, int64(math.MaxInt)>>16)
+	if new > max || new < old || add < 0 {
 		return -1
 	}
 	*mem = append(buf, make([]byte, add)...)

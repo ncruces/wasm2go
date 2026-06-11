@@ -1,6 +1,9 @@
 package spectest
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 // https://github.com/WebAssembly/spec/tree/main/interpreter#spectest-host-module
 
@@ -51,14 +54,15 @@ func (h Host) Slice() *[]byte {
 
 func (h Host) Grow(delta, max int64) int64 {
 	buf := memory
-	len := len(buf)
-	old := int64(len) >> 16
+	len := int64(len(buf))
+	old := len >> 16
 	if delta == 0 {
 		return old
 	}
 	new := old + delta
-	add := int(new)<<16 - len
-	if new > max || add < 0 {
+	add := new<<16 - len
+	max = min(max, int64(math.MaxInt)>>16)
+	if new > max || new < old || add < 0 {
 		return -1
 	}
 	memory = append(buf, make([]byte, add)...)
