@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"golang.org/x/tools/go/ast/astutil"
+	"golang.org/x/tools/go/cfg"
 )
 
 // RemoveUnusedLocals replaces unused local variables with the blank identifier.
@@ -105,6 +106,8 @@ func RemoveBlankAssigns(n ast.Node) {
 	})
 }
 
+// Replaces or deletes assignements with a simpler version,
+// i.e. removing some or all variables.
 func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
 	if len(lhs) == 0 {
 		if c.Index() < 0 {
@@ -262,9 +265,8 @@ func InlineGotoReturn(fn *ast.FuncDecl) {
 		return
 	}
 
-	found := set[string]{}
-
 	// Find all labels that point directly to a naked return and remove the label.
+	found := set[string]{}
 	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
 		if ls, ok := c.Node().(*ast.LabeledStmt); ok {
 			if ret, ok := ls.Stmt.(*ast.ReturnStmt); ok && len(ret.Results) == 0 {
@@ -274,7 +276,6 @@ func InlineGotoReturn(fn *ast.FuncDecl) {
 		}
 		return true
 	})
-
 	if len(found) == 0 {
 		return
 	}
@@ -285,6 +286,112 @@ func InlineGotoReturn(fn *ast.FuncDecl) {
 		if branch, ok := c.Node().(*ast.BranchStmt); ok && branch.Tok == token.GOTO {
 			if found.has(branch.Label.Name) {
 				c.Replace(ret)
+			}
+		}
+		return true
+	})
+}
+
+// InlineSingleGoto replaces a goto with its target,
+// if the label can only be reached by that goto,
+// and the target is a simple terminating block.
+func InlineSingleGoto(fn *ast.FuncDecl) {
+	// The CFG package only creates a KindLabel blocks
+	// for blocks that are the labeled targets
+	// of branch statements.
+
+	// If we find a labeled block with no successors
+	// and a single reachable predecessor,
+	// and a goto statement with a matching label,
+	// we have a basic block that can't be reached
+	// by any other means and which always terminates.
+
+	g := cfg.New(fn.Body, func(call *ast.CallExpr) bool {
+		id, ok := call.Fun.(*ast.Ident)
+		return !ok || id.Name != "panic"
+	})
+
+	// Reachable the predecessors of labeled blocks.
+	preds := map[*cfg.Block]int{}
+	for _, b := range g.Blocks {
+		if b.Kind == cfg.KindUnreachable || !b.Live {
+			continue
+		}
+		for _, s := range b.Succs {
+			if s.Kind == cfg.KindLabel {
+				preds[s]++
+			}
+		}
+	}
+
+	// Goto statements targeting a label.
+	gotos := map[string]int{}
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		if bs, ok := n.(*ast.BranchStmt); ok && bs.Tok == token.GOTO {
+			gotos[bs.Label.Name]++
+		}
+		return true
+	})
+
+	// Labeled blocks to inline, nodes to delete.
+	toInline := map[string]*cfg.Block{}
+	toDelete := set[ast.Node]{}
+	for _, b := range g.Blocks {
+		// Labeled block, no successors.
+		if b.Kind != cfg.KindLabel || len(b.Succs) != 0 {
+			continue
+		}
+		ls := b.Stmt.(*ast.LabeledStmt)
+		// A single reachable predecessor and a single goto.
+		if preds[b] == 1 && gotos[ls.Label.Name] == 1 {
+			toInline[ls.Label.Name] = b
+			for _, n := range b.Nodes {
+				toDelete.add(n)
+			}
+		}
+	}
+	if len(toInline) == 0 {
+		return
+	}
+
+	// Apply the transform.
+	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+		n := c.Node()
+
+		switch n := n.(type) {
+		case *ast.LabeledStmt:
+			if _, ok := toInline[n.Label.Name]; ok {
+				if c.Index() < 0 {
+					c.Replace(n.Stmt)
+				} else {
+					c.Delete()
+				}
+			}
+
+		case *ast.BranchStmt:
+			if b, ok := toInline[n.Label.Name]; ok {
+				if len(b.Nodes) == 1 {
+					c.Replace(b.Nodes[0])
+				} else if c.Index() >= 0 {
+					for _, n := range b.Nodes {
+						c.InsertBefore(n)
+					}
+					c.Delete()
+				} else {
+					blk := &ast.BlockStmt{}
+					for _, n := range b.Nodes {
+						blk.List = append(blk.List, n.(ast.Stmt))
+					}
+					c.Replace(blk)
+				}
+			}
+		}
+
+		if toDelete.has(n) {
+			if c.Index() < 0 {
+				c.Replace(&ast.EmptyStmt{})
+			} else {
+				c.Delete()
 			}
 		}
 		return true
@@ -331,7 +438,7 @@ func RemoveParens(n ast.Node) {
 
 // Counts uses of an identifier.
 func countUses(n ast.Node) map[string]int {
-	uses := make(map[string]int)
+	uses := map[string]int{}
 	ast.Inspect(n, func(n ast.Node) bool {
 		if id, ok := n.(*ast.Ident); ok {
 			uses[id.Name]++
@@ -343,7 +450,7 @@ func countUses(n ast.Node) map[string]int {
 
 // Counts writes to an identifier.
 func countWrites(n ast.Node) map[string]int {
-	writes := make(map[string]int)
+	writes := map[string]int{}
 	ast.Inspect(n, func(node ast.Node) bool {
 		switch n := node.(type) {
 		case *ast.ValueSpec:

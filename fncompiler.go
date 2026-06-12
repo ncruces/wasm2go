@@ -625,6 +625,8 @@ func (fn *funcCompiler) cleanup() {
 	passes.RemoveEmptyStmts(fn.decl)
 	passes.InlineGotoEnd(fn.decl)
 	passes.InlineGotoReturn(fn.decl)
+	passes.InlineSingleGoto(fn.decl)
+	passes.UnnestBlocks(fn.decl)
 
 	if passes.RemoveReceiver(fn.decl) {
 		fn.call.(*ast.ParenExpr).X = fn.decl.Name
