@@ -1,3 +1,5 @@
+//go:build ignore
+
 #include <stdint.h>
 
 // https://oeis.org/A000796

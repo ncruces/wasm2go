@@ -1,20 +1,20 @@
 //go:build ignore
+
 /*
-wasi-sdk-33.0-x86_64-linux/bin/wasm32-wasip1-clang \
-  -g -O0 \
+wasm32-wasip1-clang -g -O0 \
   -ffreestanding -nostdlib \
+  testdata/dwarfline/dwarfline.c \
+  -o testdata/dwarfline/dwarfline.wasm \
   -ffile-prefix-map=$(pwd)/= \
   -fdebug-compilation-dir=. \
+  -Wl,--no-entry \
   -Wl,--import-undefined \
   -Wl,--export=simple_call \
   -Wl,--export=expr_call \
   -Wl,--export=chain_call \
   -Wl,--export=branch_call \
   -Wl,--export=loop_call \
-  -Wl,--export=multi_call \
-  -Wl,--no-entry \
-  -o testdata/dwarfline/dwarfline.wasm \
-  testdata/dwarfline/dwarfline.c
+  -Wl,--export=multi_call
 */
 
 extern void env_sink(int);

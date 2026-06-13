@@ -18,43 +18,48 @@ func RemoveUnusedLocals(n ast.Node) {
 	// replace it with the blank identifier.
 	// If no names are being defined,
 	// turn the definition into an assignment.
-	astutil.Apply(n,
-		func(c *astutil.Cursor) bool {
-			switch n := c.Node().(type) {
-			case *ast.ValueSpec:
-				for i, id := range n.Names {
-					if uses[id.Name] == 1 {
-						n.Names[i] = blank
-					}
-				}
-			case *ast.AssignStmt:
-				if n.Tok != token.DEFINE {
-					break
-				}
-				var any bool
-				for i := range n.Lhs {
-					if id, ok := n.Lhs[i].(*ast.Ident); ok {
-						if uses[id.Name] == 1 {
-							n.Lhs[i] = blank
-						} else if id.Name != blank.Name {
-							any = true
-						}
-					}
-				}
-				if !any {
-					n.Tok = token.ASSIGN
+	astutil.Apply(n, func(c *astutil.Cursor) bool {
+		switch n := c.Node().(type) {
+		case *ast.ValueSpec:
+			for i, id := range n.Names {
+				if uses[id.Name] == 1 {
+					n.Names[i] = blank
 				}
 			}
-			return true
-		}, nil)
+		case *ast.AssignStmt:
+			if n.Tok != token.DEFINE {
+				break
+			}
+			var any bool
+			for i := range n.Lhs {
+				if id, ok := n.Lhs[i].(*ast.Ident); ok {
+					if uses[id.Name] == 1 {
+						n.Lhs[i] = blank
+					} else if id.Name != blank.Name {
+						any = true
+					}
+				}
+			}
+			if !any {
+				n.Tok = token.ASSIGN
+			}
+		}
+		return true
+	}, nil)
 }
 
 // RemoveSelfAssigns removes self assignments to variables.
 func RemoveSelfAssigns(n ast.Node) {
 	astutil.Apply(n, func(c *astutil.Cursor) bool {
 		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
+			// Skip multi-value assignments of a call.
+			if len(n.Lhs) != len(n.Rhs) {
+				return true
+			}
+
 			var lhs, rhs []ast.Expr
 			for i, expr := range n.Rhs {
+				// Skip self assignments.
 				if idL, ok := n.Lhs[i].(*ast.Ident); ok {
 					if idR, ok := expr.(*ast.Ident); ok && idL.Name == idR.Name {
 						continue
@@ -78,6 +83,11 @@ func RemoveBlankAssigns(n ast.Node) {
 
 	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
 		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
+			// Skip multi-value assignments of a call.
+			if len(n.Lhs) != len(n.Rhs) {
+				return true
+			}
+			// Skip non-blank assignments.
 			for _, expr := range n.Lhs {
 				if id, ok := expr.(*ast.Ident); !ok || id.Name != "_" {
 					return true
@@ -105,6 +115,8 @@ func RemoveBlankAssigns(n ast.Node) {
 	})
 }
 
+// Replaces or deletes assignements with a simpler version,
+// i.e. removing some or all variables.
 func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
 	if len(lhs) == 0 {
 		if c.Index() < 0 {
@@ -120,37 +132,38 @@ func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
 
 // RemoveEmptyStmts removes empty statements preceded by labels.
 func RemoveEmptyStmts(n ast.Node) {
-	astutil.Apply(n, nil,
-		func(c *astutil.Cursor) bool {
-			// Iterate backwards so once we find a label with an empty statement
-			// we can attach it to the next statement, if it's not a declaration.
-			if block, ok := c.Node().(*ast.BlockStmt); ok && len(block.List) > 0 {
-				stmts := make([]ast.Stmt, 0, len(block.List))
-				for i := len(block.List) - 1; i >= 0; i-- {
-					stmt := block.List[i]
-					if ls, ok := stmt.(*ast.LabeledStmt); ok {
-						if _, ok := ls.Stmt.(*ast.EmptyStmt); ok && len(stmts) > 0 {
-							nextStmt := stmts[len(stmts)-1]
-							if _, ok := nextStmt.(*ast.DeclStmt); !ok {
-								ls.Stmt = nextStmt
-								stmts[len(stmts)-1] = ls
-								// If the next statement was already labeled,
-								// merge the two labels into one.
-								if inner, ok := ls.Stmt.(*ast.LabeledStmt); ok {
-									ls.Label.Name = inner.Label.Name
-									stmts[len(stmts)-1] = inner
-								}
-								continue
+	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+		// Iterate backwards so once we find a label with an empty statement
+		// we can attach it to the next statement, if it's not a declaration.
+		if block, ok := c.Node().(*ast.BlockStmt); ok && len(block.List) > 0 {
+			stmts := make([]ast.Stmt, 0, len(block.List))
+			for i := len(block.List) - 1; i >= 0; i-- {
+				stmt := block.List[i]
+				if ls, ok := stmt.(*ast.LabeledStmt); ok {
+					if _, ok := ls.Stmt.(*ast.EmptyStmt); ok && len(stmts) > 0 {
+						nextStmt := stmts[len(stmts)-1]
+						if _, ok := nextStmt.(*ast.DeclStmt); !ok {
+							ls.Stmt = nextStmt
+							stmts[len(stmts)-1] = ls
+							// If the next statement was already labeled,
+							// merge the two labels into one.
+							// This works because branches share the
+							// identifer instance with the label.
+							if inner, ok := ls.Stmt.(*ast.LabeledStmt); ok {
+								ls.Label.Name = inner.Label.Name
+								stmts[len(stmts)-1] = inner
 							}
+							continue
 						}
 					}
-					stmts = append(stmts, stmt)
 				}
-				slices.Reverse(stmts)
-				block.List = stmts
+				stmts = append(stmts, stmt)
 			}
-			return true
-		})
+			slices.Reverse(stmts)
+			block.List = stmts
+		}
+		return true
+	})
 }
 
 // UnnestBlocks removes block statements that do not contain variable declarations.
@@ -333,8 +346,15 @@ func RemoveParens(n ast.Node) {
 func countUses(n ast.Node) map[string]int {
 	uses := make(map[string]int)
 	ast.Inspect(n, func(n ast.Node) bool {
-		if id, ok := n.(*ast.Ident); ok {
-			uses[id.Name]++
+		switch n := n.(type) {
+		case *ast.Ident:
+			uses[n.Name]++
+		case *ast.SelectorExpr:
+			uses[n.Sel.Name]--
+		case *ast.KeyValueExpr:
+			if id, ok := n.Key.(*ast.Ident); ok {
+				uses[id.Name]--
+			}
 		}
 		return true
 	})
