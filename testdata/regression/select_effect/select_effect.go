@@ -12,12 +12,14 @@ func New() *Module {
 	return m
 }
 func (m *Module) fn0() int32 {
-	t0 := m.g0
+	var t0 int32
+	t0 = m.g0
 	m.g0 = t0 + i32(1)
 	return i32(100)
 }
 func (m *Module) Xtest(v0 int32) int32 {
-	t0 := m.fn0()
+	var t0 int32
+	t0 = m.fn0()
 	p1 := i32(5)
 	if v0 != 0 {
 		p1 = t0
@@ -25,7 +27,8 @@ func (m *Module) Xtest(v0 int32) int32 {
 	return p1
 }
 func (m *Module) Xcounter() int32 {
-	t0 := m.g0
+	var t0 int32
+	t0 = m.g0
 	return t0
 }
 

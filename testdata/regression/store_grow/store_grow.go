@@ -23,13 +23,15 @@ func (m *Module) fn0() int32 {
 	return i32(12345)
 }
 func (m *Module) Xtest() int32 {
-	t0 := m.fn0()
+	var t0, t1 int32
+	t0 = m.fn0()
 	store32(m.memory[uint32(i32(0)):], uint32(t0))
-	t1 := int32(load32(m.memory[uint32(i32(0)):]))
+	t1 = int32(load32(m.memory[uint32(i32(0)):]))
 	return t1
 }
 func (m *Module) Xsize() int32 {
-	t0 := int32(len(m.memory) >> 16)
+	var t0 int32
+	t0 = int32(len(m.memory) >> 16)
 	return t0
 }
 

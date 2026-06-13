@@ -36,11 +36,13 @@ func fn1(v0 int32) int32 {
 	return v0 + v0
 }
 func (m *Module) Xtimes2(v0 int32) int32 {
-	t0 := m.t0[uint(i32(16))].(func(int32) int32)(v0)
+	var t0 int32
+	t0 = m.t0[uint(i32(16))].(func(int32) int32)(v0)
 	return t0
 }
 func (m *Module) Xtimes3(v0 int32) int32 {
-	t0 := m.t0[uint(i32(17))].(func(int32) int32)(v0)
+	var t0 int32
+	t0 = m.t0[uint(i32(17))].(func(int32) int32)(v0)
 	return t0
 }
 

@@ -29,61 +29,57 @@ func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xsin(v0 float64) float64 {
-	var v1, v2 float64
+	var t0, p1, p2, v1, v2 float64
 	var v3 int32
 	var v4 int64
 	if v0 == float64(0) {
 		return v0
 	}
 	v1 = math.Float64frombits(0x7ff8000000000000)
-	{
-		if uint64(int64(math.Float64bits(v0))&i64(0x7fffffffffffffff)) > uint64(i64(0x7fefffffffffffff)) {
-			goto l0
-		}
-		t0 := v0
-		v4 = i64_trunc_sat_f64_s(float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0)))
-		v1 = float64(t0 + float64(float64(v4)*float64(-1.5707963267948966)))
-		var p1 float64
-	l1:
-		{
-			var p2 float64
-			if math.Abs(v1) > float64(0x1p-27) {
-				v3 = v3 + i32(1)
-				v1 = float64(v1 * float64(0.5))
-				goto l1
-			} else {
-				v0 = float64(1)
-			l2:
-				if v3 != 0 {
-					v3 = v3 - i32(1)
-					v2 = float64(v1 * v1)
-					v0 = float64(v0 * v1)
-					v1 = float64(v0 + v0)
-					v0 = float64(float64(1) - float64(v2+v2))
-					goto l2
-				} else {
-					switch int32(v4)&i32(3) - i32(1) {
-					case 0:
-						goto l3
-					case 1:
-						goto l4
-					case 2:
-						goto l5
-					default:
-						goto l0
-					}
-				l3:
-				}
-				return v0
-			l4:
-				return -v1
-			l5:
-				p2 = -v0
-			}
-			p1 = p2
-		}
-		v1 = p1
+	if uint64(int64(math.Float64bits(v0))&i64(0x7fffffffffffffff)) > uint64(i64(0x7fefffffffffffff)) {
+		goto l0
 	}
+	t0 = v0
+	v4 = i64_trunc_sat_f64_s(float64(float64(v0*float64(0.6366197723675814)) + math.Copysign(float64(0.5), v0)))
+	v1 = float64(t0 + float64(float64(v4)*float64(-1.5707963267948966)))
+	p1 = 0
+l1:
+	p2 = 0
+	if math.Abs(v1) > float64(0x1p-27) {
+		v3 = v3 + i32(1)
+		v1 = float64(v1 * float64(0.5))
+		goto l1
+	} else {
+		v0 = float64(1)
+	l2:
+		if v3 != 0 {
+			v3 = v3 - i32(1)
+			v2 = float64(v1 * v1)
+			v0 = float64(v0 * v1)
+			v1 = float64(v0 + v0)
+			v0 = float64(float64(1) - float64(v2+v2))
+			goto l2
+		} else {
+			switch int32(v4)&i32(3) - i32(1) {
+			case 0:
+				goto l3
+			case 1:
+				goto l4
+			case 2:
+				goto l5
+			default:
+				goto l0
+			}
+		l3:
+		}
+		return v0
+	l4:
+		return -v1
+	l5:
+		p2 = -v0
+	}
+	p1 = p2
+	v1 = p1
 l0:
 	return v1
 }

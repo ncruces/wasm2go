@@ -42,32 +42,28 @@ func (m *Module) fn1() int32 {
 	return m._env.Xrand_i32()
 }
 func (m *Module) Xadd_all(v0, v1 int32) int32 {
-	var v2, v3, v4 int32
+	var t0, v2, v3, v4 int32
 	v2 = i32(0)
 l1:
-	{
-		if v2 >= v1 {
-			goto l0
-		}
-		v3 = v0 + v2*i32(4)
-		t0 := int32(load32((*m.memory)[uint32(v3):]))
-		v4 = v4 + t0
-		v2 = v2 + i32(1)
-		goto l1
+	if v2 >= v1 {
+		goto l0
 	}
+	v3 = v0 + v2*i32(4)
+	t0 = int32(load32((*m.memory)[uint32(v3):]))
+	v4 = v4 + t0
+	v2 = v2 + i32(1)
+	goto l1
 l0:
 	return v4
 }
 func (m *Module) Xrand_multiple_of_10() int32 {
-	var v0 int32
+	var t0, t1, v0 int32
 l0:
-	{
-		t0 := m.fn1()
-		v0 = t0
-		t1 := int32(uint32(v0) % uint32(i32(10)))
-		if t1 != i32(0) {
-			goto l0
-		}
+	t0 = m.fn1()
+	v0 = t0
+	t1 = int32(uint32(v0) % uint32(i32(10)))
+	if t1 != i32(0) {
+		goto l0
 	}
 	return v0
 }

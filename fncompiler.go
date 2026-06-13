@@ -47,10 +47,7 @@ func (fn *funcCompiler) flush() {
 		switch e.kind {
 		case entryExpr:
 			tmp := fn.newTempVal()
-			fn.blocks.top().emit(&ast.AssignStmt{
-				Tok: token.DEFINE,
-				Lhs: []ast.Expr{tmp},
-				Rhs: []ast.Expr{e.expr}})
+			fn.blocks.top().emit(defineTemp(tmp, e.typ, e.expr))
 			e.kind = entryConst
 			e.expr = tmp
 		case entryCond:
@@ -241,12 +238,19 @@ func (fn *funcCompiler) push(expr ast.Expr, typ string) {
 	}
 
 	tmp := fn.newTempVal()
-	fn.blocks.top().emit(&ast.AssignStmt{
-		Tok: token.DEFINE,
-		Lhs: []ast.Expr{tmp},
-		Rhs: []ast.Expr{expr}})
+	fn.blocks.top().emit(defineTemp(tmp, typ, expr))
 	fn.pushConst(tmp, typ)
 }
+
+// defineTemp builds the statement introducing a materialized temp: the long
+// form `var tmp typ = expr`, which HoistVars can hoist; or, if the type is
+// somehow unknown, the short form `tmp := expr` (left in place, not hoisted).
+func defineTemp(tmp *ast.Ident, typ string, expr ast.Expr) ast.Stmt {
+	if typ == "" {
+		return &ast.AssignStmt{Tok: token.DEFINE, Lhs: []ast.Expr{tmp}, Rhs: []ast.Expr{expr}}
+	}
+	return &ast.DeclStmt{Decl: &ast.GenDecl{Tok: token.VAR, Specs: []ast.Spec{
+		&ast.ValueSpec{Names: []*ast.Ident{tmp}, Type: newID(typ), Values: []ast.Expr{expr}}}}}
 }
 
 // Drops a value from the value stack.
@@ -598,10 +602,12 @@ func (fn *funcCompiler) cleanup() {
 	passes.RemoveSelfAssigns(fn.decl)
 	passes.RemoveBlankAssigns(fn.decl)
 	passes.RemoveUnusedLocals(fn.decl)
+	passes.HoistVars(fn.decl)
 	passes.UnnestBlocks(fn.decl)
 	passes.RemoveEmptyStmts(fn.decl)
 	passes.InlineGotoEnd(fn.decl)
 	passes.InlineGotoReturn(fn.decl)
+	passes.GroupDecls(fn.decl)
 
 	if passes.RemoveReceiver(fn.decl) {
 		fn.call.(*ast.ParenExpr).X = fn.decl.Name
