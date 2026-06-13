@@ -21,6 +21,8 @@ type funcCompiler struct {
 	labels int
 	temps  int
 
+	localTypes []string // Go type of each local (params first), for typing local.get
+
 	provided bool
 }
 
@@ -34,6 +36,7 @@ const (
 
 type stackEntry struct {
 	kind entryKind
+	typ  string // Go type of expr, if known ("" = unknown); enables long-form temps
 	expr ast.Expr
 }
 
@@ -189,17 +192,18 @@ func (fn *funcCompiler) store(typ string, offset uint64) ast.Stmt {
 			val}}}
 }
 
-// Pushes expr (a literal, constant or materialized temporary) to the value stack.
-func (fn *funcCompiler) pushConst(expr ast.Expr) {
-	fn.stack.append(stackEntry{expr: expr, kind: entryConst})
+// Pushes expr (a literal, constant or materialized temporary) of Go type typ
+// to the value stack.
+func (fn *funcCompiler) pushConst(expr ast.Expr, typ string) {
+	fn.stack.append(stackEntry{expr: expr, kind: entryConst, typ: typ})
 }
 
 // Pushes a pure expression (no observable side effects, including traps) to the value stack.
-func (fn *funcCompiler) pushPure(expr ast.Expr) {
+func (fn *funcCompiler) pushPure(expr ast.Expr, typ string) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	fn.stack.append(stackEntry{expr: expr, kind: entryExpr})
+	fn.stack.append(stackEntry{expr: expr, kind: entryExpr, typ: typ})
 	if *noopt {
 		fn.flush()
 	}
@@ -210,18 +214,18 @@ func (fn *funcCompiler) pushCond(cond ast.Expr) {
 	if fn.blocks.top().unreachable {
 		return
 	}
-	fn.stack.append(stackEntry{expr: cond, kind: entryCond})
+	fn.stack.append(stackEntry{expr: cond, kind: entryCond, typ: "int32"})
 	if *noopt {
 		fn.flush()
 	}
 }
 
 // Calls push or pushPure.
-func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
+func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr, typ string) {
 	if pure {
-		fn.pushPure(expr)
+		fn.pushPure(expr, typ)
 	} else {
-		fn.push(expr)
+		fn.push(expr, typ)
 	}
 }
 
@@ -231,7 +235,7 @@ func (fn *funcCompiler) pushPureIf(pure bool, expr ast.Expr) {
 // This should be the default, since treating an expression as pure
 // could result in it being evaluated conditionally or
 // being reordered relative to other side-effectful operations.
-func (fn *funcCompiler) push(expr ast.Expr) {
+func (fn *funcCompiler) push(expr ast.Expr, typ string) {
 	if fn.blocks.top().unreachable {
 		return
 	}
@@ -241,7 +245,8 @@ func (fn *funcCompiler) push(expr ast.Expr) {
 		Tok: token.DEFINE,
 		Lhs: []ast.Expr{tmp},
 		Rhs: []ast.Expr{expr}})
-	fn.pushConst(tmp)
+	fn.pushConst(tmp, typ)
+}
 }
 
 // Drops a value from the value stack.
@@ -329,84 +334,79 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.
 func (fn *funcCompiler) convert(types ...string) {
-	fn.pushPure(convert(fn.pop(), types...))
+	fn.pushPureConvert(fn.pop(), types...)
+}
+
+// pushConvert converts expr through types and pushes it; the final type is the
+// pushed value's type, so it is threaded to the stack. pushConvert is for
+// effectful/trapping conversions (e.g. loads); pushPureConvert for pure ones.
+func (fn *funcCompiler) pushConvert(expr ast.Expr, types ...string) {
+	fn.push(convert(expr, types...), types[len(types)-1])
+}
+
+func (fn *funcCompiler) pushPureConvert(expr ast.Expr, types ...string) {
+	fn.pushPure(convert(expr, types...), types[len(types)-1])
+}
+
+// topType returns the Go type of the top stack value -- the operand type, which
+// unary and binary wasm ops preserve and so reproduce as their result. The value
+// stack is moot in unreachable code (as in pop/popCond), so return "" there.
+func (fn *funcCompiler) topType() string {
+	if fn.blocks.top().unreachable {
+		return ""
+	}
+	return fn.stack.top().typ
 }
 
 // Executes a binary operator.
 func (fn *funcCompiler) binOp(op token.Token) {
-	fn.pushPureIf(op != token.QUO && op != token.REM,
-		&ast.BinaryExpr{
-			Y:  fn.pop(),
-			X:  fn.pop(),
-			Op: op})
+	t := fn.topType()
+	expr := &ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op}
+	fn.pushPureIf(op != token.QUO && op != token.REM, expr, t)
 }
 
 // Executes a binary uint32 operator.
 // Requires casts to unsigned and back.
 func (fn *funcCompiler) binOpU32(op token.Token) {
-	fn.pushPureIf(op != token.QUO && op != token.REM,
-		convert(&ast.BinaryExpr{
-			Y:  convert(fn.pop(), "uint32"),
-			X:  convert(fn.pop(), "uint32"),
-			Op: op,
-		}, "int32"))
+	// QUO/REM can trap (divide by zero), so they are pushed eagerly.
+	expr := convert(&ast.BinaryExpr{Y: convert(fn.pop(), "uint32"), X: convert(fn.pop(), "uint32"), Op: op}, "int32")
+	fn.pushPureIf(op != token.QUO && op != token.REM, expr, "int32")
 }
 
 // Executes a binary uint64 operator.
 // Requires casts to unsigned and back.
 func (fn *funcCompiler) binOpU64(op token.Token) {
-	fn.pushPureIf(op != token.QUO && op != token.REM,
-		convert(&ast.BinaryExpr{
-			Y:  convert(fn.pop(), "uint64"),
-			X:  convert(fn.pop(), "uint64"),
-			Op: op,
-		}, "int64"))
+	expr := convert(&ast.BinaryExpr{Y: convert(fn.pop(), "uint64"), X: convert(fn.pop(), "uint64"), Op: op}, "int64")
+	fn.pushPureIf(op != token.QUO && op != token.REM, expr, "int64")
 }
 
 // Executes a binary float64 operator.
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF64(op token.Token) {
-	fn.pushPure(
-		convert(&ast.BinaryExpr{
-			Y:  fn.pop(),
-			X:  fn.pop(),
-			Op: op,
-		}, "float64"))
+	fn.pushPureConvert(&ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op}, "float64")
 }
 
 // Executes a binary float32 operator.
 // Requires casting the result,
 // to avoid operations being combined against the Wasm spec.
 func (fn *funcCompiler) binOpF32(op token.Token) {
-	fn.pushPure(
-		convert(&ast.BinaryExpr{
-			Y:  fn.pop(),
-			X:  fn.pop(),
-			Op: op,
-		}, "float32"))
+	fn.pushPureConvert(&ast.BinaryExpr{Y: fn.pop(), X: fn.pop(), Op: op}, "float32")
 }
 
 // Executes a unary bitwise call.
 func (fn *funcCompiler) bitOp(name string) {
 	bits := name[len(name)-2:]
-
-	fn.pushPure(
-		convert(&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("bits"),
-				Sel: newID(name)},
-			Args: []ast.Expr{convert(fn.pop(), "uint"+bits)},
-		}, "int"+bits))
+	fn.pushPureConvert(&ast.CallExpr{
+		Fun:  &ast.SelectorExpr{X: newID("bits"), Sel: newID(name)},
+		Args: []ast.Expr{convert(fn.pop(), "uint"+bits)}}, "int"+bits)
 }
 
 // Executes a unary float64 math call.
 func (fn *funcCompiler) uniMath64(name string) {
 	fn.pushPure(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID(name)},
-		Args: []ast.Expr{fn.pop()}})
+		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID(name)},
+		Args: []ast.Expr{fn.pop()}}, "float64")
 }
 
 // Executes a binary float64 math call.
@@ -414,103 +414,85 @@ func (fn *funcCompiler) binMath64(name string) {
 	y := fn.pop()
 	x := fn.pop()
 	fn.pushPure(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID(name)},
-		Args: []ast.Expr{x, y}})
+		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID(name)},
+		Args: []ast.Expr{x, y}}, "float64")
 }
 
 // Executes a unary float32 math call.
 func (fn *funcCompiler) uniMath32(name string) {
-	fn.pushPure(
-		convert(&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID(name)},
-			Args: []ast.Expr{convert(fn.pop(), "float64")},
-		}, "float32"))
+	fn.pushPureConvert(&ast.CallExpr{
+		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID(name)},
+		Args: []ast.Expr{convert(fn.pop(), "float64")}}, "float32")
 }
 
 // Executes a Float32bits call.
 func (fn *funcCompiler) float32bits() {
-	fn.pushPure(
-		convert(&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID("Float32bits")},
-			Args: []ast.Expr{fn.pop()},
-		}, "int32"))
+	fn.pushPureConvert(&ast.CallExpr{
+		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32bits")},
+		Args: []ast.Expr{fn.pop()}}, "int32")
 }
 
 // Executes a Float64bits call.
 func (fn *funcCompiler) float64bits() {
-	fn.pushPure(
-		convert(&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID("Float64bits")},
-			Args: []ast.Expr{fn.pop()},
-		}, "int64"))
+	fn.pushPureConvert(&ast.CallExpr{
+		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64bits")},
+		Args: []ast.Expr{fn.pop()}}, "int64")
 }
 
 // Executes a Float32frombits call.
 func (fn *funcCompiler) float32frombits() {
 	fn.pushPure(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID("Float32frombits")},
-		Args: []ast.Expr{convert(fn.pop(), "uint32")}})
+		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float32frombits")},
+		Args: []ast.Expr{convert(fn.pop(), "uint32")}}, "float32")
 }
 
 // Executes a Float64frombits call.
 func (fn *funcCompiler) float64frombits() {
 	fn.pushPure(&ast.CallExpr{
-		Fun: &ast.SelectorExpr{
-			X:   newID("math"),
-			Sel: newID("Float64frombits")},
-		Args: []ast.Expr{convert(fn.pop(), "uint64")}})
+		Fun:  &ast.SelectorExpr{X: newID("math"), Sel: newID("Float64frombits")},
+		Args: []ast.Expr{convert(fn.pop(), "uint64")}}, "float64")
 }
 
 // Executes a unary helper call.
 func (fn *funcCompiler) uniHelper(name string) {
 	fn.helpers.add(name)
+	t := fn.topType()
 	fn.pushPureIf(pureHelpers.has(name),
-		&ast.CallExpr{
-			Fun:  newID(name),
-			Args: []ast.Expr{fn.pop()}})
+		&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{fn.pop()}}, t)
 }
 
 // Executes a binary helper call.
 func (fn *funcCompiler) binHelper(name string) {
 	fn.helpers.add(name)
+	t := fn.topType()
 	y := fn.pop()
 	x := fn.pop()
 	fn.pushPureIf(pureHelpers.has(name),
-		&ast.CallExpr{
-			Fun:  newID(name),
-			Args: []ast.Expr{x, y}})
+		&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}}, t)
 }
 
 // Executes a signed division helper.
 func (fn *funcCompiler) divHelper(typ string) {
+	t := fn.topType()
 	y := fn.pop()
 	x := fn.pop()
 	if v, ok := islit(y, typ); !ok {
 		name := typ + "_div_s"
 		fn.helpers.add(name)
-		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}})
+		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}}, t)
 	} else if v == -1 {
 		name := typ + "_neg_s"
 		fn.helpers.add(name)
-		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x}})
+		fn.push(&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x}}, t)
 	} else {
-		fn.pushPureIf(v != 0, &ast.BinaryExpr{Op: token.QUO, X: x, Y: y})
+		fn.pushPureIf(v != 0, &ast.BinaryExpr{Op: token.QUO, X: x, Y: y}, t)
 	}
 }
 
 // Executes a bitwise shift helper.
 func (fn *funcCompiler) bitHelper(name string) {
 	typ, op, _ := strings.Cut(name, "_")
+	t := fn.topType()
 	y := fn.pop()
 	x := fn.pop()
 
@@ -518,9 +500,7 @@ func (fn *funcCompiler) bitHelper(name string) {
 	if !ok {
 		fn.helpers.add(name)
 		fn.pushPureIf(pureHelpers.has(name),
-			&ast.CallExpr{
-				Fun:  newID(name),
-				Args: []ast.Expr{x, y}})
+			&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}}, t)
 		return
 	}
 
@@ -528,12 +508,11 @@ func (fn *funcCompiler) bitHelper(name string) {
 		v &= 31
 	}
 	y = &ast.BasicLit{Kind: token.INT, Value: strconv.FormatInt(v&63, 10)}
-	var expr ast.Expr
 	switch op {
 	case "shl":
-		expr = &ast.BinaryExpr{Op: token.SHL, X: x, Y: y}
+		fn.pushPure(&ast.BinaryExpr{Op: token.SHL, X: x, Y: y}, t)
 	case "shr_s":
-		expr = &ast.BinaryExpr{Op: token.SHR, X: x, Y: y}
+		fn.pushPure(&ast.BinaryExpr{Op: token.SHR, X: x, Y: y}, t)
 	case "shr_u":
 		s := "int32"
 		u := "uint32"
@@ -541,19 +520,17 @@ func (fn *funcCompiler) bitHelper(name string) {
 			s = "int64"
 			u = "uint64"
 		}
-		expr = convert(&ast.BinaryExpr{Op: token.SHR, X: convert(x, u), Y: y}, s)
+		fn.pushPureConvert(&ast.BinaryExpr{Op: token.SHR, X: convert(x, u), Y: y}, s)
 	}
-	fn.pushPure(expr)
 }
 
 // Executes a binary builtin call.
 func (fn *funcCompiler) binBuiltin(name string) {
+	t := fn.topType()
 	y := fn.pop()
 	x := fn.pop()
 	fn.pushPureIf(name == "min" || name == "max",
-		&ast.CallExpr{
-			Fun:  newID(name),
-			Args: []ast.Expr{x, y}})
+		&ast.CallExpr{Fun: newID(name), Args: []ast.Expr{x, y}}, t)
 }
 
 // Executes a zero equality comparison operator.

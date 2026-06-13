@@ -187,7 +187,7 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 			Fun: newID("table_grow"),
 			Args: []ast.Expr{
 				tab, val, delta,
-				&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.tables[idx].max)}}})
+				&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.tables[idx].max)}}}, t.tables[idx].stype())
 
 	case 0x10: // table.size
 		idx, err := readLEB128(t.in)
@@ -198,10 +198,10 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 		if t.tables[idx].imported {
 			tab = &ast.StarExpr{X: tab}
 		}
-		fn.push(convert(&ast.CallExpr{
+		fn.pushConvert(&ast.CallExpr{
 			Fun:  newID("len"),
 			Args: []ast.Expr{tab},
-		}, t.tables[idx].stype()))
+		}, t.tables[idx].stype())
 
 	case 0x11: // table.fill
 		idx, err := readLEB128(t.in)
@@ -268,6 +268,6 @@ func (fn *funcCompiler) wideHelper(name string) {
 		Tok: token.DEFINE,
 		Lhs: []ast.Expr{lo, hi},
 		Rhs: []ast.Expr{&ast.CallExpr{Fun: newID(name), Args: args}}})
-	fn.pushConst(lo)
-	fn.pushConst(hi)
+	fn.pushConst(lo, "int64")
+	fn.pushConst(hi, "int64")
 }

@@ -881,7 +881,7 @@ func (t *translator) readConstExpr() (ast.Expr, error) {
 			}
 			stack.append(expr)
 		case 0x23: // global.get
-			expr, _, err := t.globalGet()
+			expr, _, _, err := t.globalGet()
 			if err != nil {
 				return nil, err
 			}

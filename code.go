@@ -43,6 +43,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 	// Declare local variables.
 	// Parameters are predeclared locals.
+	for _, b := range []byte(fn.typ.params) {
+		fn.localTypes = append(fn.localTypes, wasmType(b).ident().Name)
+	}
 	vars := make([]ast.Expr, 0, numVars)
 	numLocals := len(fn.typ.params)
 	for range numVars {
@@ -59,6 +62,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		for i := range int(n) {
 			ids[i] = localVar(numLocals)
 			vars = append(vars, ids[i])
+			fn.localTypes = append(fn.localTypes, wasmType(typ).ident().Name)
 			numLocals++
 		}
 		body.List = append(body.List, &ast.DeclStmt{
@@ -165,8 +169,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				}
 				// The variables only change at block re-entry (loop).
 				childBlk.params = lhs
-				for _, p := range lhs {
-					fn.pushConst(p)
+				for i, p := range lhs {
+					fn.pushConst(p, wasmType(bt.params[i]).ident().Name)
 				}
 				fn.emit(&ast.AssignStmt{
 					Tok: token.DEFINE,
@@ -214,8 +218,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			// Push the if's arguments again for the else branch.
 			// These were constant.
-			for _, p := range blk.params {
-				fn.pushConst(p)
+			for i, p := range blk.params {
+				fn.pushConst(p, wasmType(blk.typ.params[i]).ident().Name)
 			}
 			// Create a new block at the same level,
 			// make it the else branch.
@@ -266,8 +270,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			// Push the results again, for the parent block.
 			// The variables never change again.
-			for _, r := range blk.results {
-				fn.pushConst(r)
+			for i, r := range blk.results {
+				fn.pushConst(r, wasmType(blk.typ.results[i]).ident().Name)
 			}
 
 			fn.blocks.pop()
@@ -429,7 +433,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				case 0:
 					fn.emit(&ast.ExprStmt{X: call})
 				case 1:
-					fn.push(call)
+					fn.push(call, wasmType(typ.results[0]).ident().Name)
 				default:
 					lhs := make([]ast.Expr, n)
 					for i := range lhs {
@@ -439,8 +443,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Lhs: lhs,
 						Tok: token.DEFINE,
 						Rhs: []ast.Expr{call}})
-					for _, r := range lhs {
-						fn.pushConst(r)
+					for i, r := range lhs {
+						fn.pushConst(r, wasmType(typ.results[i]).ident().Name)
 					}
 				}
 			}
@@ -467,6 +471,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 		case 0x1b: // select
 			cond := fn.popCond()
+			t := fn.topType()
 			tmp := fn.newTempVar()
 			fn.emit(&ast.AssignStmt{
 				Tok: token.DEFINE,
@@ -481,7 +486,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Rhs: []ast.Expr{fn.pop()}}}},
 			})
 			// This variable never changes again.
-			fn.pushConst(tmp)
+			fn.pushConst(tmp, t)
 
 		case 0x1c: // select (typed)
 			n, err := readLEB128(t.in)
@@ -504,7 +509,9 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 			vf := make([]ast.Expr, n)
+			vft := make([]string, n)
 			for i := int(n) - 1; i >= 0; i-- {
+				vft[i] = fn.topType()
 				vf[i] = fn.pop()
 			}
 
@@ -531,8 +538,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Rhs: vt}}}})
 
 			// These variables never change again.
-			for _, t := range tmp {
-				fn.pushConst(t)
+			for i, t := range tmp {
+				fn.pushConst(t, vft[i])
 			}
 
 		case 0x20: // local.get
@@ -540,7 +547,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
+			fn.pushPure(localVar(i), fn.localTypes[i]) // Pure because assigning locals flushes.
 
 		case 0x21: // local.set
 			i, err := readLEB128(t.in)
@@ -561,14 +568,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				Lhs: []ast.Expr{localVar(i)},
 				Rhs: []ast.Expr{fn.pop()},
 				Tok: token.ASSIGN})
-			fn.pushPure(localVar(i)) // Pure because assigning locals flushes.
+			fn.pushPure(localVar(i), fn.localTypes[i]) // Pure because assigning locals flushes.
 
 		case 0x23: // global.get
-			e, mut, err := t.globalGet()
+			e, typ, mut, err := t.globalGet()
 			if err != nil {
 				return err
 			}
-			fn.pushPureIf(!mut, e)
+			fn.pushPureIf(!mut, e, typ)
 
 		case 0x24: // global.set
 			i, err := readLEB128(t.in)
@@ -594,7 +601,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if t.tables[i].imported {
 				tab = &ast.StarExpr{X: tab}
 			}
-			fn.push(&ast.IndexExpr{X: tab, Index: fn.pop()})
+			fn.push(&ast.IndexExpr{X: tab, Index: fn.pop()}, "any")
 
 		case 0x26: // table.set
 			i, err := readLEB128(t.in)
@@ -623,13 +630,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			idx := fn.load8(offset)
 			switch opcode {
 			case 0x2c: // i32.load8_s
-				fn.push(convert(idx, "int8", "int32"))
+				fn.pushConvert(idx, "int8", "int32")
 			case 0x2d: // i32.load8_u
-				fn.push(convert(idx, "int32"))
+				fn.pushConvert(idx, "int32")
 			case 0x30: // i64.load8_s
-				fn.push(convert(idx, "int8", "int64"))
+				fn.pushConvert(idx, "int8", "int64")
 			case 0x31: // i64.load8_u
-				fn.push(convert(idx, "int64"))
+				fn.pushConvert(idx, "int64")
 			}
 
 		case 0x28, 0x29, 0x2a, 0x2b, 0x2e, 0x2f, 0x32, 0x33, 0x34, 0x35: // load
@@ -644,25 +651,25 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 
 			switch opcode {
 			case 0x28: // i32.load
-				fn.push(fn.load("int32", offset))
+				fn.push(fn.load("int32", offset), "int32")
 			case 0x29: // i64.load
-				fn.push(fn.load("int64", offset))
+				fn.push(fn.load("int64", offset), "int64")
 			case 0x2a: // f32.load
-				fn.push(fn.load("float32", offset))
+				fn.push(fn.load("float32", offset), "float32")
 			case 0x2b: // f64.load
-				fn.push(fn.load("float64", offset))
+				fn.push(fn.load("float64", offset), "float64")
 			case 0x2e: // i32.load16_s
-				fn.push(convert(fn.load("int16", offset), "int32"))
+				fn.pushConvert(fn.load("int16", offset), "int32")
 			case 0x2f: // i32.load16_u
-				fn.push(convert(fn.load("uint16", offset), "int32"))
+				fn.pushConvert(fn.load("uint16", offset), "int32")
 			case 0x32: // i64.load16_s
-				fn.push(convert(fn.load("int16", offset), "int64"))
+				fn.pushConvert(fn.load("int16", offset), "int64")
 			case 0x33: // i64.load16_u
-				fn.push(convert(fn.load("uint16", offset), "int64"))
+				fn.pushConvert(fn.load("uint16", offset), "int64")
 			case 0x34: // i64.load32_s
-				fn.push(convert(fn.load("int32", offset), "int64"))
+				fn.pushConvert(fn.load("int32", offset), "int64")
 			case 0x35: // i64.load32_u
-				fn.push(convert(fn.load("uint32", offset), "int64"))
+				fn.pushConvert(fn.load("uint32", offset), "int64")
 			}
 
 		case 0x3a, 0x3c: // store8
@@ -716,35 +723,35 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			switch {
 			case !t.memory.shared:
-				fn.push(convert(
+				fn.pushConvert(
 					&ast.BinaryExpr{
 						X: &ast.CallExpr{
 							Fun:  newID("len"),
 							Args: []ast.Expr{t.memory.selector}},
 						Op: token.SHR,
 						Y:  literal16,
-					}, t.memory.stype()))
+					}, t.memory.stype())
 
 			case t.memory.imported:
-				fn.push(convert(&ast.CallExpr{
+				fn.pushConvert(&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")},
 						Sel: newID("Grow")},
 					Args: []ast.Expr{
 						literal0,
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
-					t.memory.stype()))
+					t.memory.stype())
 
 			default:
 				needsUnsafe("shared memory")
 				fn.helpers.add("atomic_memory_grow")
-				fn.push(convert(&ast.CallExpr{
+				fn.pushConvert(&ast.CallExpr{
 					Fun: newID("atomic_memory_grow"),
 					Args: []ast.Expr{
 						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
 						literal0,
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
-					t.memory.stype()))
+					t.memory.stype())
 			}
 
 		case 0x40: // memory.grow
@@ -753,14 +760,14 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				return err
 			}
 			if fn.memory.imported {
-				fn.push(convert(&ast.CallExpr{
+				fn.pushConvert(&ast.CallExpr{
 					Fun: &ast.SelectorExpr{
 						X:   &ast.SelectorExpr{X: newID("m"), Sel: newID("memImp")},
 						Sel: newID("Grow")},
 					Args: []ast.Expr{
 						convert(fn.pop(), "int64"),
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
-					t.memory.stype()))
+					t.memory.stype())
 			} else {
 				name := "memory_grow"
 				if t.memory.shared {
@@ -768,13 +775,13 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					needsUnsafe("shared memory")
 				}
 				fn.helpers.add(name)
-				fn.push(convert(&ast.CallExpr{
+				fn.pushConvert(&ast.CallExpr{
 					Fun: newID(name),
 					Args: []ast.Expr{
 						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
 						convert(fn.pop(), "int64"),
 						&ast.SelectorExpr{X: newID("m"), Sel: newID("maxMem")}}},
-					t.memory.stype()))
+					t.memory.stype())
 			}
 
 		case 0x41: // i32.const
@@ -782,28 +789,28 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushConst(e)
+			fn.pushConst(e, "int32")
 
 		case 0x42: // i64.const
 			e, err := t.constI64()
 			if err != nil {
 				return err
 			}
-			fn.pushConst(e)
+			fn.pushConst(e, "int64")
 
 		case 0x43: // f32.const
 			e, err := t.constF32()
 			if err != nil {
 				return err
 			}
-			fn.pushConst(e)
+			fn.pushConst(e, "float32")
 
 		case 0x44: // f64.const
 			e, err := t.constF64()
 			if err != nil {
 				return err
 			}
-			fn.pushConst(e)
+			fn.pushConst(e, "float64")
 
 		case 0x45: // i32.eqz
 			fn.eqzOp()
@@ -954,7 +961,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x8b: // f32.abs
 			fn.uniHelper("f32_abs")
 		case 0x8c: // f32.neg
-			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()}, "float32")
 		case 0x8d: // f32.ceil
 			fn.uniMath32("Ceil")
 		case 0x8e: // f32.floor
@@ -991,7 +998,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0x99: // f64.abs
 			fn.uniMath64("Abs")
 		case 0x9a: // f64.neg
-			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()})
+			fn.pushPure(&ast.UnaryExpr{Op: token.SUB, X: fn.pop()}, "float64")
 		case 0x9b: // f64.ceil
 			fn.uniMath64("Ceil")
 		case 0x9c: // f64.floor
@@ -1098,7 +1105,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushConst(newID("nil"))
+			fn.pushConst(newID("nil"), "any")
 		case 0xd1: // ref.is_null
 			fn.pushCond(&ast.BinaryExpr{
 				X:  fn.pop(),
@@ -1110,7 +1117,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				return err
 			}
 			// Push to materialize the reference.
-			fn.push(t.functions[index].call)
+			fn.push(t.functions[index].call, "any")
 
 		case 0xfb: // GC
 			code, err := readLEB128(t.in)
