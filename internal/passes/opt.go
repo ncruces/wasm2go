@@ -3,14 +3,13 @@ package passes
 import (
 	"go/ast"
 	"go/token"
-	"slices"
 
 	"golang.org/x/tools/go/ast/astutil"
 )
 
 // RemoveUnusedLocals replaces unused local variables with the blank identifier.
-func RemoveUnusedLocals(n ast.Node) {
-	uses := countUses(n)
+func RemoveUnusedLocals(fn *ast.FuncDecl) {
+	uses := countUses(fn)
 	blank := ast.NewIdent("_")
 
 	// If an identifer only shows up once,
@@ -18,7 +17,7 @@ func RemoveUnusedLocals(n ast.Node) {
 	// replace it with the blank identifier.
 	// If no names are being defined,
 	// turn the definition into an assignment.
-	astutil.Apply(n, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, func(c *astutil.Cursor) bool {
 		switch n := c.Node().(type) {
 		case *ast.ValueSpec:
 			for i, id := range n.Names {
@@ -49,8 +48,8 @@ func RemoveUnusedLocals(n ast.Node) {
 }
 
 // RemoveSelfAssigns removes self assignments to variables.
-func RemoveSelfAssigns(n ast.Node) {
-	astutil.Apply(n, func(c *astutil.Cursor) bool {
+func RemoveSelfAssigns(fn *ast.FuncDecl) {
+	astutil.Apply(fn, func(c *astutil.Cursor) bool {
 		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
 			// Skip multi-value assignments of a call.
 			if len(n.Lhs) != len(n.Rhs) {
@@ -77,11 +76,11 @@ func RemoveSelfAssigns(n ast.Node) {
 
 // RemoveBlankAssigns removes redundant blank assignments from a variable
 // when the variable is read elsewhere.
-func RemoveBlankAssigns(n ast.Node) {
-	uses := countUses(n)
-	writes := countWrites(n)
+func RemoveBlankAssigns(fn *ast.FuncDecl) {
+	uses := countUses(fn)
+	writes := countWrites(fn)
 
-	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
 			// Skip multi-value assignments of a call.
 			if len(n.Lhs) != len(n.Rhs) {
@@ -115,60 +114,43 @@ func RemoveBlankAssigns(n ast.Node) {
 	})
 }
 
-// Replaces or deletes assignements with a simpler version,
-// i.e. removing some or all variables.
-func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
-	if len(lhs) == 0 {
-		if c.Index() < 0 {
-			c.Replace(&ast.EmptyStmt{})
-		} else {
-			c.Delete()
-		}
-	} else if len(lhs) < len(n.Lhs) {
-		n.Lhs = lhs
-		n.Rhs = rhs
-	}
-}
-
 // RemoveEmptyStmts removes empty statements preceded by labels.
-func RemoveEmptyStmts(n ast.Node) {
-	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+func RemoveEmptyStmts(fn *ast.FuncDecl) {
+	postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
+		if len(stmts) <= 1 {
+			return stmts
+		}
 		// Iterate backwards so once we find a label with an empty statement
 		// we can attach it to the next statement, if it's not a declaration.
-		if block, ok := c.Node().(*ast.BlockStmt); ok && len(block.List) > 0 {
-			stmts := make([]ast.Stmt, 0, len(block.List))
-			for i := len(block.List) - 1; i >= 0; i-- {
-				stmt := block.List[i]
-				if ls, ok := stmt.(*ast.LabeledStmt); ok {
-					if _, ok := ls.Stmt.(*ast.EmptyStmt); ok && len(stmts) > 0 {
-						nextStmt := stmts[len(stmts)-1]
-						if _, ok := nextStmt.(*ast.DeclStmt); !ok {
-							ls.Stmt = nextStmt
-							stmts[len(stmts)-1] = ls
-							// If the next statement was already labeled,
-							// merge the two labels into one.
-							// This works because branches share the
-							// identifer instance with the label.
-							if inner, ok := ls.Stmt.(*ast.LabeledStmt); ok {
-								ls.Label.Name = inner.Label.Name
-								stmts[len(stmts)-1] = inner
-							}
-							continue
-						}
+		next := len(stmts) - 1
+		for i := len(stmts) - 2; i >= 0; i-- {
+			stmt := stmts[i]
+			if ls, ok := stmt.(*ast.LabeledStmt); ok && is[*ast.EmptyStmt](ls.Stmt) {
+				nextStmt := stmts[next]
+				if !is[*ast.DeclStmt](nextStmt) {
+					ls.Stmt = nextStmt
+					stmts[next] = ls
+					// If the next statement was already labeled,
+					// merge the two labels into one.
+					// This works because branches share the
+					// identifer instance with the label.
+					if inner, ok := ls.Stmt.(*ast.LabeledStmt); ok {
+						ls.Label.Name = inner.Label.Name
+						stmts[next] = inner
 					}
+					continue
 				}
-				stmts = append(stmts, stmt)
 			}
-			slices.Reverse(stmts)
-			block.List = stmts
+			next--
+			stmts[next] = stmt
 		}
-		return true
+		return stmts[next:]
 	})
 }
 
 // UnnestBlocks removes block statements that do not contain variable declarations.
-func UnnestBlocks(n ast.Node) {
-	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+func UnnestBlocks(fn *ast.FuncDecl) {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		// Only unnest if the node is part of a statement list.
 		if c.Index() < 0 {
 			return true
@@ -177,13 +159,13 @@ func UnnestBlocks(n ast.Node) {
 		var blk *ast.BlockStmt
 		var lbl *ast.LabeledStmt
 		// Find blocks, and blocks preceded by labels.
-		if b, ok := c.Node().(*ast.BlockStmt); ok {
+		n := c.Node()
+		if l, ok := n.(*ast.LabeledStmt); ok {
+			n = l.Stmt
+			lbl = l
+		}
+		if b, ok := n.(*ast.BlockStmt); ok {
 			blk = b
-		} else if l, ok := c.Node().(*ast.LabeledStmt); ok {
-			if b, ok := l.Stmt.(*ast.BlockStmt); ok {
-				blk = b
-				lbl = l
-			}
 		}
 		if blk == nil {
 			return true
@@ -199,7 +181,7 @@ func UnnestBlocks(n ast.Node) {
 				}
 			}
 			// Check for declarations.
-			if _, ok := s.(*ast.DeclStmt); ok {
+			if is[*ast.DeclStmt](s) {
 				return true
 			}
 			if assign, ok := s.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
@@ -221,7 +203,7 @@ func UnnestBlocks(n ast.Node) {
 			lbl.Stmt = &ast.EmptyStmt{}
 		} else {
 			lbl.Stmt = blk.List[0]
-			for i := len(blk.List) - 1; i >= 1; i-- {
+			for i := len(blk.List) - 1; i > 0; i-- {
 				c.InsertAfter(blk.List[i])
 			}
 		}
@@ -238,7 +220,7 @@ func InlineGotoEnd(fn *ast.FuncDecl) {
 		return
 	}
 	// A return statement at the end.
-	if _, ok := fn.Body.List[last].(*ast.ReturnStmt); ok {
+	if is[*ast.ReturnStmt](fn.Body.List[last]) {
 		fn.Body.List = fn.Body.List[:last]
 		return
 	}
@@ -340,44 +322,4 @@ func RemoveParens(n ast.Node) {
 		}
 		return true
 	})
-}
-
-// Counts uses of an identifier.
-func countUses(n ast.Node) map[string]int {
-	uses := make(map[string]int)
-	ast.Inspect(n, func(n ast.Node) bool {
-		switch n := n.(type) {
-		case *ast.Ident:
-			uses[n.Name]++
-		case *ast.SelectorExpr:
-			uses[n.Sel.Name]--
-		case *ast.KeyValueExpr:
-			if id, ok := n.Key.(*ast.Ident); ok {
-				uses[id.Name]--
-			}
-		}
-		return true
-	})
-	return uses
-}
-
-// Counts writes to an identifier.
-func countWrites(n ast.Node) map[string]int {
-	writes := make(map[string]int)
-	ast.Inspect(n, func(node ast.Node) bool {
-		switch n := node.(type) {
-		case *ast.ValueSpec:
-			for _, id := range n.Names {
-				writes[id.Name]++
-			}
-		case *ast.AssignStmt:
-			for i := range n.Lhs {
-				if id, ok := n.Lhs[i].(*ast.Ident); ok {
-					writes[id.Name]++
-				}
-			}
-		}
-		return true
-	})
-	return writes
 }
