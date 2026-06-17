@@ -2,6 +2,7 @@ package passes
 
 import (
 	"go/ast"
+	"go/token"
 
 	"golang.org/x/tools/go/ast/astutil"
 )
@@ -85,7 +86,18 @@ func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
 	}
 }
 
-// http://go.dev/issue/65846
+// Checks if an AST has a break statement anywhere.
+func hasBreak(n ast.Node) (found bool) {
+	ast.Inspect(n, func(n ast.Node) bool {
+		if br, ok := n.(*ast.BranchStmt); ok && br.Tok == token.BREAK {
+			found = true
+		}
+		return !found
+	})
+	return found
+}
+
+// is builtin: http://go.dev/issue/65846
 func is[T any](n any) bool {
 	_, ok := n.(T)
 	return ok
