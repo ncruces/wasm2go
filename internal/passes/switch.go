@@ -69,7 +69,7 @@ func findSwitchStmt(s ast.Stmt) *ast.SwitchStmt {
 // returns -1 if inlining it would be invalid.
 func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int) {
 	// If such a case clause is found,
-	// it will be moved to the end of the switch statement,
+	// it should move to the end of the switch statement,
 	// and the label will be "inlined" into the case clause.
 	//
 	// To move the clause to the end of the switch statement,
@@ -98,20 +98,25 @@ func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int) {
 		}
 		switch c := cc.Body[len(cc.Body)-1].(type) {
 		case *ast.ReturnStmt:
-			// This clause terminates.
 			hadFallthrough = false
 		case *ast.BranchStmt:
-			// This clause terminates, but is it just goto label and can it be moved?
-			if len(cc.Body) == 1 && c.Tok == token.GOTO && c.Label.Name == label && !hadFallthrough {
+			// Is the body just `goto label`?
+			// Does it need to move, and can it be moved?
+			if (c.Tok == token.GOTO && c.Label.Name == label && len(cc.Body) == 1) &&
+				(i == len(sw.Body.List)-1 || !hadFallthrough) {
 				idx = i
 			}
 			hadFallthrough = c.Tok == token.FALLTHROUGH
 		default:
-			// This clause might not terminate, but is it the final one?
+			if !canComplete(c) {
+				hadFallthrough = false
+				break
+			}
+			// Check that this is the final clause.
 			if i != len(sw.Body.List)-1 {
 				return -1
 			}
-			// If it is the final one, we need to add a fallthrough.
+			// If so, we need to add a fallthrough.
 			if hasDefault && idx >= 0 {
 				cc.Body = append(cc.Body, &ast.BranchStmt{Tok: token.FALLTHROUGH})
 				return idx
@@ -133,4 +138,32 @@ func inlineSwitchCase(sw *ast.SwitchStmt, i int, stmts []ast.Stmt) {
 	// Move i to the end of the list, inplace.
 	copy(cases[i:], cases[i+1:])
 	cases[len(cases)-1] = cc
+}
+
+// Checks if s can possibly complete normally.
+// It's OK to always return true.
+func canComplete(s ast.Stmt) bool {
+	switch s := s.(type) {
+	case *ast.ReturnStmt, *ast.BranchStmt:
+		return false
+	case *ast.LabeledStmt:
+		return canComplete(s.Stmt)
+	case *ast.BlockStmt:
+		return len(s.List) == 0 || canComplete(s.List[len(s.List)-1])
+	case *ast.IfStmt:
+		return s.Else == nil || canComplete(s.Body) || canComplete(s.Else)
+	case *ast.SwitchStmt:
+		var hasDefault bool
+		for _, c := range s.Body.List {
+			cc := c.(*ast.CaseClause)
+			if len(cc.Body) == 0 || hasBreak(cc) || canComplete(cc.Body[len(cc.Body)-1]) {
+				return true
+			}
+			if cc.List == nil {
+				hasDefault = true
+			}
+		}
+		return !hasDefault
+	}
+	return true
 }
