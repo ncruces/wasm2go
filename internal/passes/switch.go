@@ -8,12 +8,8 @@ import (
 // InlineSwitchGotos inlines switch cases that consist of a single goto,
 // to an otherwise unused label.
 func InlineSwitchGotos(fn *ast.FuncDecl) {
-	if fn.Body == nil {
-		return
-	}
-
 	uses := map[string]int{}
-	ast.Inspect(fn.Body, func(n ast.Node) bool {
+	ast.Inspect(fn, func(n ast.Node) bool {
 		if br, ok := n.(*ast.BranchStmt); ok {
 			uses[br.Label.Name]++
 		}
@@ -24,8 +20,8 @@ func InlineSwitchGotos(fn *ast.FuncDecl) {
 	// re-verifying conditions after every modification.
 	for modified := true; modified; {
 		modified = false
-		postApplyStmts(fn.Body, func(stmts []ast.Stmt) []ast.Stmt {
-			for i := 0; i+1 < len(stmts) && !modified; i++ {
+		postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
+			for i := 0; i+1 < len(stmts); i++ {
 				// A labeled statement, followed by an empty statement,
 				// only used once as a goto target.
 				ls, ok := stmts[i+1].(*ast.LabeledStmt)
@@ -46,6 +42,7 @@ func InlineSwitchGotos(fn *ast.FuncDecl) {
 				inlineSwitchCase(sw, id, stmts[i+2:])
 				stmts = stmts[:i+1]
 				modified = true
+				break
 			}
 			return stmts
 		})

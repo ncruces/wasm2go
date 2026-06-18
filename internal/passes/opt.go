@@ -13,7 +13,7 @@ func RemoveUnusedLocals(fn *ast.FuncDecl) {
 	blank := ast.NewIdent("_")
 
 	// If an identifer only shows up once,
-	// in the left side of an definition,
+	// in the left side of a definition,
 	// replace it with the blank identifier.
 	// If no names are being defined,
 	// turn the definition into an assignment.
@@ -254,7 +254,7 @@ func InlineGotoEnd(fn *ast.FuncDecl) {
 	fn.Body.List = fn.Body.List[:last]
 
 	// Fix the branches.
-	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		if branch, ok := c.Node().(*ast.BranchStmt); ok &&
 			branch.Tok == token.GOTO && branch.Label.Name == ls.Label.Name {
 			c.Replace(&ast.ReturnStmt{})
@@ -265,14 +265,10 @@ func InlineGotoEnd(fn *ast.FuncDecl) {
 
 // InlineGotoReturn replaces a goto to a label with a naked return with a direct return.
 func InlineGotoReturn(fn *ast.FuncDecl) {
-	if fn.Body == nil {
-		return
-	}
-
 	found := set[string]{}
 
 	// Find all labels that point directly to a naked return and remove the label.
-	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		if ls, ok := c.Node().(*ast.LabeledStmt); ok {
 			if ret, ok := ls.Stmt.(*ast.ReturnStmt); ok && len(ret.Results) == 0 {
 				found.add(ls.Label.Name)
@@ -288,7 +284,7 @@ func InlineGotoReturn(fn *ast.FuncDecl) {
 
 	// Replace gotos to those labels with a naked return.
 	ret := &ast.ReturnStmt{}
-	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		if branch, ok := c.Node().(*ast.BranchStmt); ok && branch.Tok == token.GOTO {
 			if found.has(branch.Label.Name) {
 				c.Replace(ret)
