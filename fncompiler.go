@@ -623,6 +623,7 @@ func (fn *funcCompiler) cleanup() {
 	passes.RemoveUnusedLocals(fn.decl)
 	passes.InlineSwitchGotos(fn.decl)
 	passes.UnnestBlocks(fn.decl)
+	passes.UnnestCases(fn.decl)
 	passes.RemoveEmptyStmts(fn.decl)
 	passes.InlineGotoEnd(fn.decl)
 	passes.InlineGotoReturn(fn.decl)

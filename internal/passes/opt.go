@@ -211,6 +211,18 @@ func UnnestBlocks(fn *ast.FuncDecl) {
 	})
 }
 
+// UnnestCases removes block statements that are the only statement in a case clause.
+func UnnestCases(fn *ast.FuncDecl) {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
+		if cc, ok := c.Node().(*ast.CaseClause); ok && len(cc.Body) == 1 {
+			if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
+				cc.Body = b.List
+			}
+		}
+		return true
+	})
+}
+
 // InlineGotoEnd replaces a goto to the end of a function with return.
 func InlineGotoEnd(fn *ast.FuncDecl) {
 	last := len(fn.Body.List) - 1
