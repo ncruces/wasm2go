@@ -8,13 +8,7 @@ import (
 // InlineSwitchGotos inlines switch cases that consist of a single goto,
 // to an otherwise unused label.
 func InlineSwitchGotos(fn *ast.FuncDecl) {
-	uses := map[string]int{}
-	ast.Inspect(fn, func(n ast.Node) bool {
-		if br, ok := n.(*ast.BranchStmt); ok {
-			uses[br.Label.Name]++
-		}
-		return true
-	})
+	uses := countBranches(fn)
 
 	// This loop applies the optimization iteratively,
 	// re-verifying conditions after every modification.
@@ -34,15 +28,14 @@ func InlineSwitchGotos(fn *ast.FuncDecl) {
 					continue
 				}
 				// Find the case label, and validate the optimization.
-				id := findSwitchCase(sw, ls.Label.Name)
+				id, fthrough := findSwitchCase(sw, ls.Label.Name)
 				if id < 0 {
 					continue
 				}
 				// Perform the optimization, and try again.
-				inlineSwitchCase(sw, id, stmts[i+2:])
+				inlineSwitchCase(sw, id, fthrough, stmts[i+2:])
 				stmts = stmts[:i+1]
 				modified = true
-				break
 			}
 			return stmts
 		})
@@ -64,7 +57,7 @@ func findSwitchStmt(s ast.Stmt) *ast.SwitchStmt {
 
 // Finds the index of a case clause whose body is goto label;
 // returns -1 if inlining it would be invalid.
-func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int) {
+func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int, fthrough bool) {
 	// If such a case clause is found,
 	// it should move to the end of the switch statement,
 	// and the label will be "inlined" into the case clause.
@@ -90,8 +83,8 @@ func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int) {
 			hasDefault = true
 		}
 		// Check that the case is neither empty nor breaks.
-		if len(cc.Body) == 0 || hasBreak(cc) {
-			return -1
+		if len(cc.Body) == 0 || canBreak(cc) {
+			return -1, false
 		}
 		switch c := cc.Body[len(cc.Body)-1].(type) {
 		case *ast.ReturnStmt:
@@ -111,33 +104,37 @@ func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int) {
 			}
 			// Check that this is the final clause.
 			if i != len(sw.Body.List)-1 {
-				return -1
+				return -1, false
 			}
 			// If so, we need to add a fallthrough.
 			if hasDefault && idx >= 0 {
-				cc.Body = append(cc.Body, &ast.BranchStmt{Tok: token.FALLTHROUGH})
-				return idx
+				fthrough = true
 			}
 		}
 	}
 	if !hasDefault {
-		return -1
+		return -1, false
 	}
-	return idx
+	return idx, fthrough
 }
 
 // Inlines stmts into case clause i of the switch statement.
-func inlineSwitchCase(sw *ast.SwitchStmt, i int, stmts []ast.Stmt) {
+func inlineSwitchCase(sw *ast.SwitchStmt, idx int, fthrough bool, stmts []ast.Stmt) {
 	cases := sw.Body.List
 	// Replace the body with stmts.
-	cc := cases[i].(*ast.CaseClause)
+	cc := cases[idx].(*ast.CaseClause)
 	cc.Body = append(cc.Body[:0], stmts...)
+	// Add fallthrough if needed.
+	if fthrough {
+		cc := cases[len(cases)-1].(*ast.CaseClause)
+		cc.Body = append(cc.Body, &ast.BranchStmt{Tok: token.FALLTHROUGH})
+	}
 	// Move i to the end of the list, inplace.
-	copy(cases[i:], cases[i+1:])
+	copy(cases[idx:], cases[idx+1:])
 	cases[len(cases)-1] = cc
 }
 
-// Checks if s can possibly complete normally.
+// Checks if s can complete normally.
 // It's OK to always return true.
 func canComplete(s ast.Stmt) bool {
 	switch s := s.(type) {
@@ -153,7 +150,7 @@ func canComplete(s ast.Stmt) bool {
 		var hasDefault bool
 		for _, c := range s.Body.List {
 			cc := c.(*ast.CaseClause)
-			if len(cc.Body) == 0 || hasBreak(cc) || canComplete(cc.Body[len(cc.Body)-1]) {
+			if len(cc.Body) == 0 || canBreak(cc) || canComplete(cc.Body[len(cc.Body)-1]) {
 				return true
 			}
 			if cc.List == nil {
