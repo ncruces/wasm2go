@@ -32,6 +32,9 @@ func InlineSwitchGotos(fn *ast.FuncDecl) {
 				if id < 0 {
 					continue
 				}
+				if !inlinableIntoSwitch(stmts[i+2:], uses) {
+					continue
+				}
 				// Perform the optimization, and try again.
 				inlineSwitchCase(sw, id, fthrough, stmts[i+2:])
 				stmts = stmts[:i+1]
@@ -118,6 +121,42 @@ func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int, fthrough bool) {
 	return idx, fthrough
 }
 
+// Checks if stmts can be safely inlined into a switch.
+func inlinableIntoSwitch(stmts []ast.Stmt, branches map[string]int) bool {
+	if len(stmts) == 0 {
+		return true
+	}
+
+	// Fallthrough at the end of stmts would change meaning.
+	if br, ok := stmts[len(stmts)-1].(*ast.BranchStmt); ok && br.Tok == token.FALLTHROUGH {
+		return false
+	}
+
+	labels := set[string]{}
+	for _, s := range stmts {
+		// Collect labels.
+		for ls, ok := s.(*ast.LabeledStmt); ok; {
+			labels.add(ls.Label.Name)
+			ls, ok = ls.Stmt.(*ast.LabeledStmt)
+		}
+		// Unlabeled break would change meaning.
+		if canBreak(s) {
+			return false
+		}
+	}
+
+	// Labels become invalid if used outside stmts.
+	if len(labels) > 0 {
+		local := countBranches(&ast.BlockStmt{List: stmts})
+		for name := range labels {
+			if branches[name] > local[name] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // Inlines stmts into case clause i of the switch statement.
 func inlineSwitchCase(sw *ast.SwitchStmt, idx int, fthrough bool, stmts []ast.Stmt) {
 	cases := sw.Body.List
@@ -129,13 +168,13 @@ func inlineSwitchCase(sw *ast.SwitchStmt, idx int, fthrough bool, stmts []ast.St
 		cc := cases[len(cases)-1].(*ast.CaseClause)
 		cc.Body = append(cc.Body, &ast.BranchStmt{Tok: token.FALLTHROUGH})
 	}
-	// Move i to the end of the list, inplace.
+	// Move idx to the end of the list, inplace.
 	copy(cases[idx:], cases[idx+1:])
 	cases[len(cases)-1] = cc
 }
 
 // Checks if s can complete normally.
-// It's OK to always return true.
+// It's acceptable to always return true.
 func canComplete(s ast.Stmt) bool {
 	switch s := s.(type) {
 	case *ast.ReturnStmt, *ast.BranchStmt:
