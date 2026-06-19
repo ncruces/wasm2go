@@ -613,24 +613,25 @@ func (fn *funcCompiler) cleanup() {
 	ast.Inspect(fn.decl, fn.resolveImports)
 	passes.CheckMaterialized(fn.decl)
 
-	if *noopt {
-		passes.RemoveUnusedLocals(fn.decl)
-		return
+	if !*noopt {
+		// These two are strictly ordered.
+		passes.RemoveSelfAssigns(fn.decl)
+		passes.RemoveBlankAssigns(fn.decl)
+
+		passes.InlineSwitchGotos(fn.decl)
+		passes.UnnestBlocks(fn.decl)
+		passes.UnnestCases(fn.decl)
+		passes.RemoveEmptyStmts(fn.decl)
+		passes.InlineGotoEnd(fn.decl)
+		passes.InlineGotoReturn(fn.decl)
+
+		if passes.RemoveReceiver(fn.decl) {
+			fn.call.(*ast.ParenExpr).X = fn.decl.Name
+		}
 	}
 
-	passes.RemoveSelfAssigns(fn.decl)
-	passes.RemoveBlankAssigns(fn.decl)
+	// This is needed for correctness.
 	passes.RemoveUnusedLocals(fn.decl)
-	passes.InlineSwitchGotos(fn.decl)
-	passes.UnnestBlocks(fn.decl)
-	passes.UnnestCases(fn.decl)
-	passes.RemoveEmptyStmts(fn.decl)
-	passes.InlineGotoEnd(fn.decl)
-	passes.InlineGotoReturn(fn.decl)
-
-	if passes.RemoveReceiver(fn.decl) {
-		fn.call.(*ast.ParenExpr).X = fn.decl.Name
-	}
 }
 
 type funcBlock struct {
