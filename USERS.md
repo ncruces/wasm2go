@@ -11,6 +11,9 @@ An incomplete list of libraries using wasm2go.
 - [**github.com/pgaskin/go-pcapfilter**](https://github.com/pgaskin/go-pcapfilter) \
   Go bindings for [libpcap](https://github.com/the-tcpdump-group/libpcap) to compile tcpdump-style BPF filters.
 
+- [**github.com/pgaskin/go-woff2**](https://github.com/pgaskin/go-woff2) \
+  Go bindings for [woff2](https://github.com/google/woff2).
+
 - [**github.com/lbe/wasm2go-wasi-host**](https://github.com/lbe/wasm2go-wasi-host) \
   Implementation of [WASI snapshot-preview1](https://github.com/WebAssembly/WASI/tree/wasi-0.1) for wasm2go.
 
