@@ -49,6 +49,9 @@ func RemoveUnusedLocals(fn *ast.FuncDecl) {
 
 // RemoveSelfAssigns removes self assignments to variables.
 func RemoveSelfAssigns(fn *ast.FuncDecl) {
+	uses := countUses(fn)
+	writes := countWrites(fn)
+
 	astutil.Apply(fn, func(c *astutil.Cursor) bool {
 		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
 			// Skip multi-value assignments of a call.
@@ -61,7 +64,14 @@ func RemoveSelfAssigns(fn *ast.FuncDecl) {
 				// Skip self assignments.
 				if idL, ok := n.Lhs[i].(*ast.Ident); ok {
 					if idR, ok := expr.(*ast.Ident); ok && idL.Name == idR.Name {
-						continue
+						u := uses[idL.Name] - 2
+						w := writes[idL.Name] - 1
+						// Don't remove the last read.
+						if u > w {
+							uses[idL.Name] = u
+							writes[idL.Name] = w
+							continue
+						}
 					}
 				}
 				lhs = append(lhs, n.Lhs[i])
@@ -214,9 +224,18 @@ func UnnestBlocks(fn *ast.FuncDecl) {
 // UnnestCases removes block statements that are the only statement in a case clause.
 func UnnestCases(fn *ast.FuncDecl) {
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
-		if cc, ok := c.Node().(*ast.CaseClause); ok && len(cc.Body) == 1 {
-			if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
-				cc.Body = b.List
+		switch cc := c.Node().(type) {
+		case *ast.CaseClause:
+			if len(cc.Body) == 1 {
+				if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
+					cc.Body = b.List
+				}
+			}
+		case *ast.CommClause:
+			if len(cc.Body) == 1 {
+				if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
+					cc.Body = b.List
+				}
 			}
 		}
 		return true
