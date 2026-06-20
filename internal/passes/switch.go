@@ -10,8 +10,7 @@ import (
 func InlineSwitchGotos(fn *ast.FuncDecl) {
 	uses := countBranches(fn)
 
-	// This loop applies the optimization iteratively,
-	// re-verifying conditions after every modification.
+	// This loop retries the optimization iteratively.
 	for modified := true; modified; {
 		modified = false
 		postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
@@ -62,7 +61,7 @@ func findSwitchStmt(s ast.Stmt) *ast.SwitchStmt {
 // returns -1 if inlining it would be invalid.
 func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int, fthrough bool) {
 	// If such a case clause is found,
-	// it should move to the end of the switch statement,
+	// it must move to the end of the switch statement,
 	// and the label will be "inlined" into the case clause.
 	//
 	// To move the clause to the end of the switch statement,
@@ -157,7 +156,7 @@ func inlinableIntoSwitch(stmts []ast.Stmt, branches map[string]int) bool {
 	return true
 }
 
-// Inlines stmts into case clause i of the switch statement.
+// Inlines stmts into case clause idx of the switch statement.
 func inlineSwitchCase(sw *ast.SwitchStmt, idx int, fthrough bool, stmts []ast.Stmt) {
 	cases := sw.Body.List
 	// Replace the body with stmts.
