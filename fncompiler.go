@@ -622,12 +622,14 @@ func (fn *funcCompiler) cleanup() {
 		passes.RemoveBlankAssigns(fn.decl)
 		passes.RemoveUnusedLocals(fn.decl)
 		passes.InlineSwitchGotos(fn.decl)
-		passes.InlineSingleGotos(fn.decl)
-		passes.UnnestBlocks(fn.decl)
-		passes.UnnestCases(fn.decl)
-		passes.RemoveEmptyStmts(fn.decl)
-		passes.InlineGotoEnd(fn.decl)
-		passes.InlineGotoReturn(fn.decl)
+		for range 2 {
+			passes.RemoveEmptyStmts(fn.decl)
+			passes.InlineGotoEnd(fn.decl)
+			passes.InlineGotoReturn(fn.decl)
+			passes.InlineSingleGotos(fn.decl)
+			passes.UnnestBlocks(fn.decl)
+			passes.UnnestCases(fn.decl)
+		}
 		if passes.RemoveReceiver(fn.decl) {
 			fn.call.(*ast.ParenExpr).X = fn.decl.Name
 		}
