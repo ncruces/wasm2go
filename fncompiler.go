@@ -610,25 +610,29 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 }
 
 func (fn *funcCompiler) cleanup() {
+	// Resolve imports.
 	ast.Inspect(fn.decl, fn.resolveImports)
+
+	// Sanity checks.
 	passes.CheckMaterialized(fn.decl)
 
-	if *noopt {
+	if !*noopt {
+		passes.RemoveSelfAssigns(fn.decl)
+		passes.RemoveBlankAssigns(fn.decl)
 		passes.RemoveUnusedLocals(fn.decl)
-		return
+		passes.InlineSwitchGotos(fn.decl)
+		passes.UnnestBlocks(fn.decl)
+		passes.UnnestCases(fn.decl)
+		passes.RemoveEmptyStmts(fn.decl)
+		passes.InlineGotoEnd(fn.decl)
+		passes.InlineGotoReturn(fn.decl)
+		if passes.RemoveReceiver(fn.decl) {
+			fn.call.(*ast.ParenExpr).X = fn.decl.Name
+		}
 	}
 
-	passes.RemoveSelfAssigns(fn.decl)
-	passes.RemoveBlankAssigns(fn.decl)
+	// Go requires this.
 	passes.RemoveUnusedLocals(fn.decl)
-	passes.UnnestBlocks(fn.decl)
-	passes.RemoveEmptyStmts(fn.decl)
-	passes.InlineGotoEnd(fn.decl)
-	passes.InlineGotoReturn(fn.decl)
-
-	if passes.RemoveReceiver(fn.decl) {
-		fn.call.(*ast.ParenExpr).X = fn.decl.Name
-	}
 }
 
 type funcBlock struct {

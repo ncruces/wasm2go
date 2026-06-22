@@ -13,7 +13,7 @@ func RemoveUnusedLocals(fn *ast.FuncDecl) {
 	blank := ast.NewIdent("_")
 
 	// If an identifer only shows up once,
-	// in the left side of an definition,
+	// in the left side of a definition,
 	// replace it with the blank identifier.
 	// If no names are being defined,
 	// turn the definition into an assignment.
@@ -49,6 +49,9 @@ func RemoveUnusedLocals(fn *ast.FuncDecl) {
 
 // RemoveSelfAssigns removes self assignments to variables.
 func RemoveSelfAssigns(fn *ast.FuncDecl) {
+	uses := countUses(fn)
+	writes := countWrites(fn)
+
 	astutil.Apply(fn, func(c *astutil.Cursor) bool {
 		if n, ok := c.Node().(*ast.AssignStmt); ok && n.Tok == token.ASSIGN {
 			// Skip multi-value assignments of a call.
@@ -61,7 +64,14 @@ func RemoveSelfAssigns(fn *ast.FuncDecl) {
 				// Skip self assignments.
 				if idL, ok := n.Lhs[i].(*ast.Ident); ok {
 					if idR, ok := expr.(*ast.Ident); ok && idL.Name == idR.Name {
-						continue
+						u := uses[idL.Name] - 2
+						w := writes[idL.Name] - 1
+						// Don't remove the last read.
+						if u > w {
+							uses[idL.Name] = u
+							writes[idL.Name] = w
+							continue
+						}
 					}
 				}
 				lhs = append(lhs, n.Lhs[i])
@@ -211,6 +221,27 @@ func UnnestBlocks(fn *ast.FuncDecl) {
 	})
 }
 
+// UnnestCases removes block statements that are the only statement in a case clause.
+func UnnestCases(fn *ast.FuncDecl) {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
+		switch cc := c.Node().(type) {
+		case *ast.CaseClause:
+			if len(cc.Body) == 1 {
+				if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
+					cc.Body = b.List
+				}
+			}
+		case *ast.CommClause:
+			if len(cc.Body) == 1 {
+				if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
+					cc.Body = b.List
+				}
+			}
+		}
+		return true
+	})
+}
+
 // InlineGotoEnd replaces a goto to the end of a function with return.
 func InlineGotoEnd(fn *ast.FuncDecl) {
 	last := len(fn.Body.List) - 1
@@ -242,7 +273,7 @@ func InlineGotoEnd(fn *ast.FuncDecl) {
 	fn.Body.List = fn.Body.List[:last]
 
 	// Fix the branches.
-	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		if branch, ok := c.Node().(*ast.BranchStmt); ok &&
 			branch.Tok == token.GOTO && branch.Label.Name == ls.Label.Name {
 			c.Replace(&ast.ReturnStmt{})
@@ -253,14 +284,10 @@ func InlineGotoEnd(fn *ast.FuncDecl) {
 
 // InlineGotoReturn replaces a goto to a label with a naked return with a direct return.
 func InlineGotoReturn(fn *ast.FuncDecl) {
-	if fn.Body == nil {
-		return
-	}
-
 	found := set[string]{}
 
 	// Find all labels that point directly to a naked return and remove the label.
-	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		if ls, ok := c.Node().(*ast.LabeledStmt); ok {
 			if ret, ok := ls.Stmt.(*ast.ReturnStmt); ok && len(ret.Results) == 0 {
 				found.add(ls.Label.Name)
@@ -276,7 +303,7 @@ func InlineGotoReturn(fn *ast.FuncDecl) {
 
 	// Replace gotos to those labels with a naked return.
 	ret := &ast.ReturnStmt{}
-	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		if branch, ok := c.Node().(*ast.BranchStmt); ok && branch.Tok == token.GOTO {
 			if found.has(branch.Label.Name) {
 				c.Replace(ret)

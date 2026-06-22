@@ -143,7 +143,7 @@ func main() {
 		keep = append(keep, fd)
 
 		// Search for other internal dependencies inside this one's scope
-		ast.Inspect(fd.Body, func(n ast.Node) bool {
+		ast.Inspect(fd, func(n ast.Node) bool {
 			if call, ok := n.(*ast.CallExpr); ok {
 				if id, ok := call.Fun.(*ast.Ident); ok {
 					if _, exists := available[id.Name]; exists {
