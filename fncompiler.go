@@ -617,10 +617,12 @@ func (fn *funcCompiler) cleanup() {
 	passes.CheckMaterialized(fn.decl)
 
 	if !*noopt {
+		passes.RemoveDeadCode(fn.decl)
 		passes.RemoveSelfAssigns(fn.decl)
 		passes.RemoveBlankAssigns(fn.decl)
 		passes.RemoveUnusedLocals(fn.decl)
 		passes.InlineSwitchGotos(fn.decl)
+		passes.InlineSingleGotos(fn.decl)
 		passes.UnnestBlocks(fn.decl)
 		passes.UnnestCases(fn.decl)
 		passes.RemoveEmptyStmts(fn.decl)
