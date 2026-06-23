@@ -9,37 +9,6 @@ import (
 	"golang.org/x/tools/go/cfg"
 )
 
-// RemoveDeadCode eliminates unreachable statements.
-func RemoveDeadCode(fn *ast.FuncDecl) {
-	g := cfg.New(fn.Body, callMayReturn)
-
-	dead := set[ast.Node]{}
-	for _, b := range g.Blocks {
-		if !b.Live {
-			for _, n := range b.Nodes {
-				dead.add(n)
-			}
-		}
-	}
-
-	if len(dead) == 0 {
-		return
-	}
-
-	astutil.Apply(fn.Body, nil, func(c *astutil.Cursor) bool {
-		if dead.has(c.Node()) {
-			if c.Index() < 0 {
-				c.Replace(&ast.EmptyStmt{})
-			} else {
-				c.Delete()
-			}
-			// Don't traverse inside deleted nodes
-			return true
-		}
-		return true
-	})
-}
-
 // InlineSingleGotos replaces a goto with its target,
 // if the label can only be reached by that goto,
 // and the target is a simple terminating block.
@@ -56,21 +25,20 @@ func InlineSingleGotos(fn *ast.FuncDecl) {
 
 	g := cfg.New(fn.Body, callMayReturn)
 
-	// Count the reachable predecessors of labeled blocks.
+	// Count the live predecessors of labeled blocks.
 	preds := map[*cfg.Block]int{}
 	for _, b := range g.Blocks {
-		if b.Kind == cfg.KindUnreachable || !b.Live {
-			continue
-		}
-		for _, s := range b.Succs {
-			if s.Kind == cfg.KindLabel {
-				preds[s]++
+		if b.Live {
+			for _, s := range b.Succs {
+				if s.Kind == cfg.KindLabel {
+					preds[s]++
+				}
 			}
 		}
 	}
 
 	// Count the goto statements targeting each label.
-	uses := countBranches(fn)
+	gotos := countBranches(fn)
 
 	// Identify labeled blocks to inline, nodes to delete.
 	toInline := map[string][]ast.Node{}
@@ -82,11 +50,9 @@ func InlineSingleGotos(fn *ast.FuncDecl) {
 		}
 		ls := b.Stmt.(*ast.LabeledStmt)
 
-		// A single reachable predecessor, a single goto, only statements.
-		if preds[b] != 1 || uses[ls.Label.Name] != 1 || slices.ContainsFunc(b.Nodes, func(n ast.Node) bool {
-			_, ok := n.(ast.Stmt)
-			return !ok
-		}) {
+		// A single live predecessor, a single goto, only statements.
+		if preds[b] != 1 || gotos[ls.Label.Name] != 1 ||
+			slices.ContainsFunc(b.Nodes, func(n ast.Node) bool { return !is[ast.Stmt](n) }) {
 			continue
 		}
 
