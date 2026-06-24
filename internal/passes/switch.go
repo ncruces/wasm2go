@@ -184,6 +184,9 @@ func canComplete(s ast.Stmt) bool {
 		return len(s.List) == 0 || canComplete(s.List[len(s.List)-1])
 	case *ast.IfStmt:
 		return s.Else == nil || canComplete(s.Body) || canComplete(s.Else)
+	case *ast.ExprStmt:
+		ce, ok := s.X.(*ast.CallExpr)
+		return !ok || callMayReturn(ce)
 	case *ast.SwitchStmt:
 		var hasDefault bool
 		for _, c := range s.Body.List {

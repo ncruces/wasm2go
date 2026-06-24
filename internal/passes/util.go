@@ -115,6 +115,12 @@ func canBreak(n ast.Node) (found bool) {
 	return found
 }
 
+// Checks if an call can return.
+func callMayReturn(call *ast.CallExpr) bool {
+	id, ok := call.Fun.(*ast.Ident)
+	return !ok || id.Name != "panic"
+}
+
 // is builtin: http://go.dev/issue/65846
 func is[T any](n any) bool {
 	_, ok := n.(T)
