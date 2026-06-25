@@ -126,9 +126,9 @@ func RemoveBlankAssigns(fn *ast.FuncDecl) {
 
 // RemoveEmptyStmts removes empty statements preceded by labels.
 func RemoveEmptyStmts(fn *ast.FuncDecl) {
-	postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
+	postApplyStmts(fn, func(stmts []ast.Stmt) ([]ast.Stmt, bool) {
 		if len(stmts) == 0 {
-			return nil
+			return nil, true
 		}
 		// Iterate backwards so once we find a label with an empty statement
 		// we can attach it to the next statement, if it's not a declaration.
@@ -154,7 +154,7 @@ func RemoveEmptyStmts(fn *ast.FuncDecl) {
 			next--
 			stmts[next] = stmt
 		}
-		return stmts[next:]
+		return stmts[next:], true
 	})
 }
 
@@ -174,6 +174,16 @@ func UnnestSimple(fn *ast.FuncDecl) {
 // UnnestBlocks removes block statements that
 // do not contain variable declarations.
 func UnnestBlocks(fn *ast.FuncDecl) {
+	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
+		// A block inside another block.
+		if b, ok := c.Node().(*ast.BlockStmt); ok && len(b.List) == 1 {
+			if s, ok := b.List[0].(*ast.BlockStmt); ok {
+				c.Replace(s)
+			}
+		}
+		return true
+	})
+
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		// Only unnest if the node is part of a statement list.
 		if c.Index() < 0 {

@@ -9,17 +9,19 @@ import (
 
 // Traverses a tree recursively, applying fn in post-order
 // to all statement lists.
-func postApplyStmts(n ast.Node, fn func([]ast.Stmt) []ast.Stmt) {
-	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
+func postApplyStmts(n ast.Node, fn func([]ast.Stmt) ([]ast.Stmt, bool)) {
+	astutil.Apply(n, nil, func(c *astutil.Cursor) (cont bool) {
 		switch node := c.Node().(type) {
 		case *ast.BlockStmt:
-			node.List = fn(node.List)
+			node.List, cont = fn(node.List)
 		case *ast.CaseClause:
-			node.Body = fn(node.Body)
+			node.Body, cont = fn(node.Body)
 		case *ast.CommClause:
-			node.Body = fn(node.Body)
+			node.Body, cont = fn(node.Body)
+		default:
+			return true
 		}
-		return true
+		return cont
 	})
 }
 
@@ -98,6 +100,11 @@ func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
 	}
 }
 
+// Checks if any unlabeled branch escapes n.
+func hasEscapingBranch(n ast.Node) bool {
+	return canBreak(n) || canContinue(n) || canFallthrough(n)
+}
+
 // Checks if an unlabeled break escapes n.
 func canBreak(n ast.Node) (found bool) {
 	ast.Inspect(n, func(n ast.Node) bool {
@@ -107,6 +114,40 @@ func canBreak(n ast.Node) (found bool) {
 			return false
 		case *ast.BranchStmt:
 			if n.Tok == token.BREAK && n.Label == nil {
+				found = true
+			}
+		}
+		return !found
+	})
+	return found
+}
+
+// Checks if an unlabeled continue escapes n.
+func canContinue(n ast.Node) (found bool) {
+	ast.Inspect(n, func(n ast.Node) bool {
+		switch n := n.(type) {
+		// These reset the scope for unlabeled continues.
+		case *ast.ForStmt, *ast.RangeStmt, *ast.FuncLit:
+			return false
+		case *ast.BranchStmt:
+			if n.Tok == token.CONTINUE && n.Label == nil {
+				found = true
+			}
+		}
+		return !found
+	})
+	return found
+}
+
+// Checks if a fallthrough escapes n.
+func canFallthrough(n ast.Node) (found bool) {
+	ast.Inspect(n, func(n ast.Node) bool {
+		switch n := n.(type) {
+		// These reset the scope for fallthroughs.
+		case *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.FuncLit:
+			return false
+		case *ast.BranchStmt:
+			if n.Tok == token.FALLTHROUGH {
 				found = true
 			}
 		}
