@@ -16,7 +16,7 @@ func InlineSwitchGotos(fn *ast.FuncDecl) {
 		postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
 			for i := 0; i+1 < len(stmts); i++ {
 				// A labeled statement, followed by an empty statement,
-				// only used once as a goto target.
+				// only used once as a (goto) target.
 				ls, ok := stmts[i+1].(*ast.LabeledStmt)
 				if !ok || !is[*ast.EmptyStmt](ls.Stmt) || uses[ls.Label.Name] != 1 {
 					continue
@@ -122,18 +122,20 @@ func findSwitchCase(sw *ast.SwitchStmt, label string) (idx int, fthrough bool) {
 
 // Checks if stmts can be safely inlined into a switch.
 func inlinableIntoSwitch(stmts []ast.Stmt, branches map[string]int) bool {
+	// Empty is inlinable.
 	if len(stmts) == 0 {
 		return true
 	}
 
-	// Fallthrough at the end of stmts would change meaning.
+	// Fallthrough at the end would change meaning.
+	// We could handle this, but it's not common enough to be worth it.
 	if br, ok := stmts[len(stmts)-1].(*ast.BranchStmt); ok && br.Tok == token.FALLTHROUGH {
 		return false
 	}
 
 	labels := set[string]{}
 	for _, s := range stmts {
-		// Collect labels.
+		// Collect top level labels.
 		for ls, ok := s.(*ast.LabeledStmt); ok; {
 			labels.add(ls.Label.Name)
 			ls, ok = ls.Stmt.(*ast.LabeledStmt)
@@ -144,8 +146,9 @@ func inlinableIntoSwitch(stmts []ast.Stmt, branches map[string]int) bool {
 		}
 	}
 
-	// Labels become invalid if used outside stmts.
+	// Can't have outside branches to those labels.
 	if len(labels) > 0 {
+		// Count local branches.
 		local := countBranches(&ast.BlockStmt{List: stmts})
 		for name := range labels {
 			if branches[name] > local[name] {
@@ -170,35 +173,4 @@ func inlineSwitchCase(sw *ast.SwitchStmt, idx int, fthrough bool, stmts []ast.St
 	// Move idx to the end of the list, inplace.
 	copy(cases[idx:], cases[idx+1:])
 	cases[len(cases)-1] = cc
-}
-
-// Checks if s can complete normally.
-// It's acceptable to always return true.
-func canComplete(s ast.Stmt) bool {
-	switch s := s.(type) {
-	case *ast.ReturnStmt, *ast.BranchStmt:
-		return false
-	case *ast.LabeledStmt:
-		return canComplete(s.Stmt)
-	case *ast.BlockStmt:
-		return len(s.List) == 0 || canComplete(s.List[len(s.List)-1])
-	case *ast.IfStmt:
-		return s.Else == nil || canComplete(s.Body) || canComplete(s.Else)
-	case *ast.ExprStmt:
-		ce, ok := s.X.(*ast.CallExpr)
-		return !ok || callMayReturn(ce)
-	case *ast.SwitchStmt:
-		var hasDefault bool
-		for _, c := range s.Body.List {
-			cc := c.(*ast.CaseClause)
-			if len(cc.Body) == 0 || canBreak(cc) || canComplete(cc.Body[len(cc.Body)-1]) {
-				return true
-			}
-			if cc.List == nil {
-				hasDefault = true
-			}
-		}
-		return !hasDefault
-	}
-	return true
 }

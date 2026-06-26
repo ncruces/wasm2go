@@ -127,8 +127,8 @@ func RemoveBlankAssigns(fn *ast.FuncDecl) {
 // RemoveEmptyStmts removes empty statements preceded by labels.
 func RemoveEmptyStmts(fn *ast.FuncDecl) {
 	postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
-		if len(stmts) <= 1 {
-			return stmts
+		if len(stmts) == 0 {
+			return nil
 		}
 		// Iterate backwards so once we find a label with an empty statement
 		// we can attach it to the next statement, if it's not a declaration.
@@ -158,7 +158,21 @@ func RemoveEmptyStmts(fn *ast.FuncDecl) {
 	})
 }
 
-// UnnestBlocks removes block statements that do not contain variable declarations.
+// UnnestSimple removes block statements that
+// are the only statement in a statement list.
+func UnnestSimple(fn *ast.FuncDecl) {
+	postApplyStmts(fn, func(s []ast.Stmt) []ast.Stmt {
+		if len(s) == 1 {
+			if b, ok := s[0].(*ast.BlockStmt); ok {
+				return b.List
+			}
+		}
+		return s
+	})
+}
+
+// UnnestBlocks removes block statements that
+// do not contain variable declarations.
 func UnnestBlocks(fn *ast.FuncDecl) {
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		// Only unnest if the node is part of a statement list.
@@ -215,27 +229,6 @@ func UnnestBlocks(fn *ast.FuncDecl) {
 			lbl.Stmt = blk.List[0]
 			for i := len(blk.List) - 1; i > 0; i-- {
 				c.InsertAfter(blk.List[i])
-			}
-		}
-		return true
-	})
-}
-
-// UnnestCases removes block statements that are the only statement in a case clause.
-func UnnestCases(fn *ast.FuncDecl) {
-	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
-		switch cc := c.Node().(type) {
-		case *ast.CaseClause:
-			if len(cc.Body) == 1 {
-				if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
-					cc.Body = b.List
-				}
-			}
-		case *ast.CommClause:
-			if len(cc.Body) == 1 {
-				if b, ok := cc.Body[0].(*ast.BlockStmt); ok {
-					cc.Body = b.List
-				}
 			}
 		}
 		return true

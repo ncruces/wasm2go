@@ -102,17 +102,48 @@ func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
 func canBreak(n ast.Node) (found bool) {
 	ast.Inspect(n, func(n ast.Node) bool {
 		switch n := n.(type) {
-		case *ast.ForStmt, *ast.RangeStmt, *ast.SelectStmt, *ast.SwitchStmt, *ast.TypeSwitchStmt:
+		// These reset the scope for unlabeled breaks.
+		case *ast.ForStmt, *ast.RangeStmt, *ast.SelectStmt, *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.FuncLit:
 			return false
 		case *ast.BranchStmt:
 			if n.Tok == token.BREAK && n.Label == nil {
 				found = true
-				return false
 			}
 		}
 		return !found
 	})
 	return found
+}
+
+// Checks if s can complete normally.
+// It's acceptable to always return true.
+func canComplete(s ast.Stmt) bool {
+	switch s := s.(type) {
+	case *ast.ReturnStmt, *ast.BranchStmt:
+		return false
+	case *ast.LabeledStmt:
+		return canComplete(s.Stmt)
+	case *ast.BlockStmt:
+		return len(s.List) == 0 || canComplete(s.List[len(s.List)-1])
+	case *ast.IfStmt:
+		return s.Else == nil || canComplete(s.Body) || canComplete(s.Else)
+	case *ast.ExprStmt:
+		ce, ok := s.X.(*ast.CallExpr)
+		return !ok || callMayReturn(ce)
+	case *ast.SwitchStmt:
+		var hasDefault bool
+		for _, c := range s.Body.List {
+			cc := c.(*ast.CaseClause)
+			if len(cc.Body) == 0 || canBreak(cc) || canComplete(cc.Body[len(cc.Body)-1]) {
+				return true
+			}
+			if cc.List == nil {
+				hasDefault = true
+			}
+		}
+		return !hasDefault
+	}
+	return true
 }
 
 // Checks if an call can return.
