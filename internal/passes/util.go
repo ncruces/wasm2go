@@ -100,11 +100,6 @@ func simplifyAssign(c *astutil.Cursor, n *ast.AssignStmt, lhs, rhs []ast.Expr) {
 	}
 }
 
-// Checks if any unlabeled branch escapes n.
-func hasEscapingBranch(n ast.Node) bool {
-	return canBreak(n) || canContinue(n) || canFallthrough(n)
-}
-
 // Checks if an unlabeled break escapes n.
 func canBreak(n ast.Node) (found bool) {
 	ast.Inspect(n, func(n ast.Node) bool {
@@ -131,23 +126,6 @@ func canContinue(n ast.Node) (found bool) {
 			return false
 		case *ast.BranchStmt:
 			if n.Tok == token.CONTINUE && n.Label == nil {
-				found = true
-			}
-		}
-		return !found
-	})
-	return found
-}
-
-// Checks if a fallthrough escapes n.
-func canFallthrough(n ast.Node) (found bool) {
-	ast.Inspect(n, func(n ast.Node) bool {
-		switch n := n.(type) {
-		// These reset the scope for fallthroughs.
-		case *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.FuncLit:
-			return false
-		case *ast.BranchStmt:
-			if n.Tok == token.FALLTHROUGH {
 				found = true
 			}
 		}
