@@ -161,29 +161,19 @@ func RemoveEmptyStmts(fn *ast.FuncDecl) {
 // UnnestSimple removes block statements that
 // are the only statement in a statement list.
 func UnnestSimple(fn *ast.FuncDecl) {
-	postApplyStmts(fn, func(s []ast.Stmt) []ast.Stmt {
+	postApplyStmts(fn, func(s []ast.Stmt) ([]ast.Stmt, bool) {
 		if len(s) == 1 {
 			if b, ok := s[0].(*ast.BlockStmt); ok {
-				return b.List
+				return b.List, true
 			}
 		}
-		return s
+		return s, true
 	})
 }
 
 // UnnestBlocks removes block statements that
 // do not contain variable declarations.
 func UnnestBlocks(fn *ast.FuncDecl) {
-	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
-		// A block inside another block.
-		if b, ok := c.Node().(*ast.BlockStmt); ok && len(b.List) == 1 {
-			if s, ok := b.List[0].(*ast.BlockStmt); ok {
-				c.Replace(s)
-			}
-		}
-		return true
-	})
-
 	astutil.Apply(fn, nil, func(c *astutil.Cursor) bool {
 		// Only unnest if the node is part of a statement list.
 		if c.Index() < 0 {

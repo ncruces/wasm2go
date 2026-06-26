@@ -2,6 +2,7 @@ package passes
 
 import (
 	"go/ast"
+	"go/token"
 
 	"golang.org/x/tools/go/ast/astutil"
 )
@@ -15,12 +16,13 @@ func InlineSingleGotos(fn *ast.FuncDecl) {
 		postApplyStmts(fn, func(stmts []ast.Stmt) ([]ast.Stmt, bool) {
 			for i := 0; i+2 < len(stmts); i++ {
 				// A labeled statement, followed by an empty statement,
-				// only used once as a goto target.
+				// only used once as a (goto) target.
 				ls, ok := stmts[i+1].(*ast.LabeledStmt)
 				if !ok || !is[*ast.EmptyStmt](ls.Stmt) || uses[ls.Label.Name] != 1 {
 					continue
 				}
-				// Neither the previous statement, nor the last, can complete.
+				// Neither the previous statement,
+				// nor the last to inline, can complete.
 				if canComplete(stmts[i]) || canComplete(stmts[len(stmts)-1]) {
 					continue
 				}
@@ -56,29 +58,37 @@ func InlineSingleGotos(fn *ast.FuncDecl) {
 }
 
 func inlinableBlock(stmts []ast.Stmt, ls *ast.LabeledStmt, branches map[string]int) bool {
-	block := &ast.BlockStmt{List: stmts}
-	local := countBranches(block)
+	// A fallthrough can't be moved.
+	if bs, ok := stmts[len(stmts)-1].(*ast.BranchStmt); ok && bs.Tok == token.FALLTHROUGH {
+		return false
+	}
 
-	// Can't inline into itself.
+	// Count local branches.
+	local := countBranches(&ast.BlockStmt{List: stmts})
+
+	// Can't inline a block into itself.
 	if _, ok := local[ls.Label.Name]; ok {
 		return false
 	}
 
-	// Collect labels.
 	labels := set[string]{}
 	for _, s := range stmts {
+		// Collect top level labels.
 		for ls, ok := s.(*ast.LabeledStmt); ok; {
 			labels.add(ls.Label.Name)
 			ls, ok = ls.Stmt.(*ast.LabeledStmt)
 		}
+		// Unlabeled branches might change meaning.
+		if canBreak(s) || canContinue(s) {
+			return false
+		}
 	}
-	// Can't have outside branches to the labels.
+
+	// Can't have outside branches to those labels.
 	for name := range labels {
 		if branches[name] > local[name] {
 			return false
 		}
 	}
-
-	// Unlabeled branches might change meaning.
-	return !hasEscapingBranch(block)
+	return true
 }
