@@ -13,7 +13,7 @@ func InlineSwitchGotos(fn *ast.FuncDecl) {
 	// This loop retries the optimization iteratively.
 	for modified := true; modified; {
 		modified = false
-		postApplyStmts(fn, func(stmts []ast.Stmt) ([]ast.Stmt, bool) {
+		postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
 			for i := 0; i+1 < len(stmts); i++ {
 				// A labeled statement, followed by an empty statement,
 				// only used once as a (goto) target.
@@ -39,7 +39,7 @@ func InlineSwitchGotos(fn *ast.FuncDecl) {
 				stmts = stmts[:i+1]
 				modified = true
 			}
-			return stmts, true
+			return stmts
 		})
 	}
 }

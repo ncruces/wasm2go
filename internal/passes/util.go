@@ -9,19 +9,17 @@ import (
 
 // Traverses a tree recursively, applying fn in post-order
 // to all statement lists.
-func postApplyStmts(n ast.Node, fn func([]ast.Stmt) ([]ast.Stmt, bool)) {
-	astutil.Apply(n, nil, func(c *astutil.Cursor) (cont bool) {
+func postApplyStmts(n ast.Node, fn func([]ast.Stmt) []ast.Stmt) {
+	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
 		switch node := c.Node().(type) {
 		case *ast.BlockStmt:
-			node.List, cont = fn(node.List)
+			node.List = fn(node.List)
 		case *ast.CaseClause:
-			node.Body, cont = fn(node.Body)
+			node.Body = fn(node.Body)
 		case *ast.CommClause:
-			node.Body, cont = fn(node.Body)
-		default:
-			return true
+			node.Body = fn(node.Body)
 		}
-		return cont
+		return true
 	})
 }
 
