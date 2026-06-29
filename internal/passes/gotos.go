@@ -10,6 +10,7 @@ import (
 func InlineSingleGotos(fn *ast.FuncDecl) {
 	uses := countBranches(fn)
 
+	// This loop retries the optimization iteratively.
 	for modified := true; modified; {
 		modified = false
 		postApplyStmts(fn, func(stmts []ast.Stmt) []ast.Stmt {
@@ -26,7 +27,7 @@ func InlineSingleGotos(fn *ast.FuncDecl) {
 					continue
 				}
 				// Validate the optimization.
-				if !inlinableBlock(stmts[i+2:], ls, uses) {
+				if !inlinableBlock(stmts[i+2:], ls.Label.Name, uses) {
 					continue
 				}
 				// Perform the optimization, and try again.
@@ -39,7 +40,8 @@ func InlineSingleGotos(fn *ast.FuncDecl) {
 	}
 }
 
-func inlinableBlock(stmts []ast.Stmt, ls *ast.LabeledStmt, branches map[string]int) bool {
+// Checks if stmts can be safely moved.
+func inlinableBlock(stmts []ast.Stmt, label string, branches map[string]int) bool {
 	// A fallthrough can't be moved.
 	if bs, ok := stmts[len(stmts)-1].(*ast.BranchStmt); ok && bs.Tok == token.FALLTHROUGH {
 		return false
@@ -49,7 +51,7 @@ func inlinableBlock(stmts []ast.Stmt, ls *ast.LabeledStmt, branches map[string]i
 	local := countBranches(&ast.BlockStmt{List: stmts})
 
 	// Can't inline a block into itself.
-	if _, ok := local[ls.Label.Name]; ok {
+	if _, ok := local[label]; ok {
 		return false
 	}
 
@@ -75,6 +77,7 @@ func inlinableBlock(stmts []ast.Stmt, ls *ast.LabeledStmt, branches map[string]i
 	return true
 }
 
+// Inlines stmts into the goto statement.
 func inlineBlock(n ast.Node, label string, block []ast.Stmt) {
 	astutil.Apply(n, nil, func(c *astutil.Cursor) bool {
 		// Find the goto branch.
