@@ -45,8 +45,13 @@ func Test_translate(t *testing.T) {
 }
 
 func Test_translateSpecTest(t *testing.T) {
+	name := *pkg
 	*nanbox = true
-	t.Cleanup(func() { *nanbox = false })
+	*pkg = "wasm2go"
+	t.Cleanup(func() {
+		*nanbox = false
+		*pkg = name
+	})
 
 	slices.Sort(skipModules)
 	slices.Sort(specHostModules)

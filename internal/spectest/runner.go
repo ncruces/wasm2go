@@ -60,17 +60,17 @@ func runAssertions(t *testing.T, mod reflect.Value, spec *specTest, name string)
 				for i, arg := range cmd.Action.Args {
 					switch arg.Type {
 					case "i32":
-						v, err := strconv.ParseUint(arg.Value, 10, 32)
+						v, err := parseInt[int32](arg.Value)
 						if err != nil {
 							t.Fatal(err)
 						}
-						args[i] = reflect.ValueOf(int32(v))
+						args[i] = reflect.ValueOf(v)
 					case "i64":
-						v, err := strconv.ParseUint(arg.Value, 10, 64)
+						v, err := parseInt[int64](arg.Value)
 						if err != nil {
 							t.Fatal(err)
 						}
-						args[i] = reflect.ValueOf(int64(v))
+						args[i] = reflect.ValueOf(v)
 					case "f32":
 						v, err := strconv.ParseUint(arg.Value, 10, 32)
 						if err != nil {
@@ -103,27 +103,27 @@ func runAssertions(t *testing.T, mod reflect.Value, spec *specTest, name string)
 					for i, exp := range cmd.Expected {
 						switch exp.Type {
 						case "i32":
-							v, err := strconv.ParseUint(exp.Value, 10, 32)
+							v, err := parseInt[int32](exp.Value)
 							if err != nil {
 								t.Fatal(err)
 							}
-							if i := res[i].Interface().(int32); i != int32(v) {
-								if skipFloatBits(name) && isInfOrNaN32(uint32(v)) && isInfOrNaN32(uint32(i)) {
-									t.Logf("got %d, want %d", i, int32(v))
+							if i := res[i].Interface().(int32); i != v {
+								if skipFloatBits(name) && isInfOrNaN32(v) && isInfOrNaN32(i) {
+									t.Logf("got %d, want %d", i, v)
 								} else {
-									t.Errorf("got %d, want %d", i, int32(v))
+									t.Errorf("got %d, want %d", i, v)
 								}
 							}
 						case "i64":
-							v, err := strconv.ParseUint(exp.Value, 10, 64)
+							v, err := parseInt[int64](exp.Value)
 							if err != nil {
 								t.Fatal(err)
 							}
-							if i := res[i].Interface().(int64); i != int64(v) {
-								if skipFloatBits(name) && isInfOrNaN64(uint64(v)) && isInfOrNaN64(uint64(i)) {
-									t.Logf("got %d, want %d", i, int64(v))
+							if i := res[i].Interface().(int64); i != v {
+								if skipFloatBits(name) && isInfOrNaN64(v) && isInfOrNaN64(i) {
+									t.Logf("got %d, want %d", i, v)
 								} else {
-									t.Errorf("got %d, want %d", i, int64(v))
+									t.Errorf("got %d, want %d", i, v)
 								}
 							}
 						case "f32":
@@ -234,6 +234,33 @@ func RecoverTrap(t testing.TB, want string) {
 	t.Fatalf("got trap %q, want %q", got, want)
 }
 
+func parseInt[T int32 | int64](s string) (T, error) {
+	v, err := strconv.ParseInt(s, 10, 64)
+	if err == nil {
+		return T(v), nil
+	}
+	if u, err := strconv.ParseUint(s, 10, 64); err == nil {
+		return T(u), nil
+	}
+	return 0, err
+}
+
+func isNaN32[T int32 | uint32](bits T) bool {
+	return uint32(bits&0x7FFFFFFF) > 0x7F800000
+}
+
+func isNaN64[T int64 | uint64](bits T) bool {
+	return uint64(bits&0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000
+}
+
+func isInfOrNaN32[T int32 | uint32](bits T) bool {
+	return uint32(bits&0x7FFFFFFF) >= 0x7F800000
+}
+
+func isInfOrNaN64[T int64 | uint64](bits T) bool {
+	return uint64(bits&0x7FFFFFFFFFFFFFFF) >= 0x7FF0000000000000
+}
+
 // We only check for canonical NaNs on amd64 and arm64.
 func skipCanonical() bool {
 	switch runtime.GOARCH {
@@ -251,20 +278,4 @@ func skipFloatBits(name string) bool {
 			strings.Contains(name, "f64"))
 	}
 	return false
-}
-
-func isNaN32(bits uint32) bool {
-	return (bits & 0x7FFFFFFF) > 0x7F800000
-}
-
-func isNaN64(bits uint64) bool {
-	return (bits & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000
-}
-
-func isInfOrNaN32(bits uint32) bool {
-	return (bits & 0x7FFFFFFF) >= 0x7F800000
-}
-
-func isInfOrNaN64(bits uint64) bool {
-	return (bits & 0x7FFFFFFFFFFFFFFF) >= 0x7FF0000000000000
 }

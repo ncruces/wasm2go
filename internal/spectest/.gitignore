@@ -1,3 +1,4 @@
 *.[0-9]*.go
 gen_test.go
+wasm-tools
 wast2json

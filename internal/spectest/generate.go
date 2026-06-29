@@ -21,6 +21,7 @@ const (
 	wg20 = "https://github.com/WebAssembly/spec/archive/refs/tags/wg-2.0.tar.gz"
 	wg30 = "https://github.com/WebAssembly/spec/archive/refs/tags/wg-3.0.tar.gz"
 	wabt = "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz"
+	wsmt = "https://github.com/bytecodealliance/wasm-tools/releases/download/v1.252.0/wasm-tools-1.252.0-x86_64-linux.tar.gz"
 )
 
 func main() {
@@ -35,7 +36,8 @@ func main() {
 			log.Fatalf("missing wast file: %s", f)
 		}
 	}
-	install()
+	install("wast2json", wabt)
+	install("wasm-tools", wsmt)
 	generate()
 }
 
@@ -49,9 +51,9 @@ func chdir() {
 	}
 }
 
-func install() {
-	log.Printf("downloading %s...", wabt)
-	resp, err := http.Get(wabt)
+func install(file, url string) {
+	log.Printf("downloading %s...", url)
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("failed to download: %v", err)
 	}
@@ -69,7 +71,7 @@ func install() {
 
 	tr := tar.NewReader(gzr)
 
-	log.Print("extracting wast2json...")
+	log.Printf("extracting %s...", file)
 	for {
 		hdr, err := tr.Next()
 		if err == io.EOF {
@@ -79,8 +81,8 @@ func install() {
 			log.Fatalf("tar read error: %v", err)
 		}
 
-		if filepath.Base(hdr.Name) == "wast2json" {
-			f, err := os.OpenFile("wast2json", os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0755)
+		if filepath.Base(hdr.Name) == file {
+			f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0755)
 			if err != nil {
 				log.Fatalf("file open error: %v", err)
 			}
@@ -91,7 +93,7 @@ func install() {
 			return
 		}
 	}
-	log.Fatal("failed to extract wast2json")
+	log.Fatalf("failed to extract %s", file)
 }
 
 func download(spec string, version byte) {
@@ -147,12 +149,7 @@ func download(spec string, version byte) {
 }
 
 func generate() {
-	exe, err := filepath.Abs("wast2json")
-	if err != nil {
-		log.Fatalf("failed to resolve wast2json: %v", err)
-	}
-
-	err = filepath.WalkDir(".", func(path string, d os.DirEntry, err error) error {
+	err := filepath.WalkDir(".", func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -164,8 +161,10 @@ func generate() {
 		}
 
 		if filepath.Ext(path) == ".wast" {
-			wast2json(exe, path)
-			processJSON(strings.TrimSuffix(path, ".wast") + ".json")
+			json := strings.TrimSuffix(path, ".wast") + ".json"
+			// wasm_tools(path, json)
+			wast2json(path)
+			processJSON(json)
 		}
 		return nil
 	})
@@ -174,7 +173,12 @@ func generate() {
 	}
 }
 
-func wast2json(exe, path string) {
+func wast2json(path string) {
+	exe, err := filepath.Abs("wast2json")
+	if err != nil {
+		log.Fatalf("failed to resolve wast2json: %v", err)
+	}
+
 	log.Printf("running wast2json on %s...", path)
 
 	cmd := exec.Command(exe, filepath.Base(path),
@@ -186,6 +190,24 @@ func wast2json(exe, path string) {
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		log.Fatalf("failed to run wast2json on %s: %v", path, err)
+	}
+}
+
+func wasm_tools(wast, json string) {
+	exe, err := filepath.Abs("wasm-tools")
+	if err != nil {
+		log.Fatalf("failed to resolve wasm-tools: %v", err)
+	}
+
+	log.Printf("running wasm-tools on %s...", wast)
+
+	cmd := exec.Command(exe, "wast2json",
+		"-o", filepath.Base(json), filepath.Base(wast))
+	cmd.Dir = filepath.Dir(wast)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		log.Fatalf("failed to run wasm-tools on %s: %v", wast, err)
 	}
 }
 
@@ -208,9 +230,22 @@ func processJSON(path string) {
 			if err := root.Remove(cmd.Filename); err != nil && !os.IsNotExist(err) {
 				log.Fatalf("failed to remove %s: %v", cmd.Filename, err)
 			}
+			if cmd.Binary == "" {
+				break
+			}
+			if err := root.Remove(cmd.Binary); err != nil && !os.IsNotExist(err) {
+				log.Fatalf("failed to remove %s: %v", cmd.Filename, err)
+			}
 
 		case "module", "assert_unlinkable", "assert_uninstantiable":
 			ext := filepath.Ext(cmd.Filename)
+			if ext == ".wat" && cmd.Binary != "" {
+				if err := root.Remove(cmd.Filename); err != nil && !os.IsNotExist(err) {
+					log.Fatalf("failed to remove %s: %v", cmd.Filename, err)
+				}
+				ext = filepath.Ext(cmd.Binary)
+				cmd.Filename = cmd.Binary
+			}
 			if ext != ".wasm" {
 				log.Fatalf("unexpected extension: %s", ext)
 			}
@@ -246,6 +281,7 @@ type specTest struct {
 	Commands []struct {
 		Type     string `json:"type"`
 		Filename string `json:"filename"`
+		Binary   string `json:"binary_filename"`
 	} `json:"commands"`
 }
 
