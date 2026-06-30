@@ -162,8 +162,8 @@ func generate() {
 
 		if filepath.Ext(path) == ".wast" {
 			json := strings.TrimSuffix(path, ".wast") + ".json"
-			// wasm_tools(path, json)
-			wast2json(path)
+			wasm_tools(path, json)
+			// wast2json(path)
 			processJSON(json)
 		}
 		return nil
@@ -289,31 +289,27 @@ var files = map[string]byte{
 	"break-drop.wast": 10,
 	"globals.wast":    10,
 
-	"align.wast":             20,
-	"br_if.wast":             20,
-	"br_table.wast":          20,
-	"elem.wast":              20,
-	"data.wast":              20,
-	"func.wast":              20,
-	"global.wast":            20,
-	"linking.wast":           20,
-	"local_tee.wast":         20,
-	"memory.wast":            20,
-	"ref_is_null.wast":       20,
-	"ref_null.wast":          20,
-	"select.wast":            20,
-	"table.wast":             20,
-	"unreached-valid.wast":   20,
-	"unreached-invalid.wast": 20,
+	"br_table.wast":        20,
+	"elem.wast":            20,
+	"data.wast":            20,
+	"global.wast":          20,
+	"linking.wast":         20,
+	"memory.wast":          20,
+	"ref_is_null.wast":     20,
+	"ref_null.wast":        20,
+	"table.wast":           20,
+	"unreached-valid.wast": 20,
 
 	"address.wast":              30,
+	"align.wast":                30,
 	"block.wast":                30,
 	"br.wast":                   30,
+	"br_if.wast":                30,
 	"call.wast":                 30,
 	"call_indirect.wast":        30,
 	"comments.wast":             30,
-	"conversions.wast":          30,
 	"const.wast":                30,
+	"conversions.wast":          30,
 	"custom.wast":               30,
 	"endianness.wast":           30,
 	"f32.wast":                  30,
@@ -328,6 +324,7 @@ var files = map[string]byte{
 	"float_memory.wast":         30,
 	"float_misc.wast":           30,
 	"forward.wast":              30,
+	"func.wast":                 30,
 	"func_ptrs.wast":            30,
 	"i32.wast":                  30,
 	"i64.wast":                  30,
@@ -339,6 +336,7 @@ var files = map[string]byte{
 	"load.wast":                 30,
 	"local_get.wast":            30,
 	"local_set.wast":            30,
+	"local_tee.wast":            30,
 	"loop.wast":                 30,
 	"memory_grow.wast":          30,
 	"memory_redundancy.wast":    30,
@@ -350,6 +348,7 @@ var files = map[string]byte{
 	"return.wast":               30,
 	"return_call.wast":          30,
 	"return_call_indirect.wast": 30,
+	"select.wast":               30,
 	"stack.wast":                30,
 	"start.wast":                30,
 	"store.wast":                30,
@@ -362,6 +361,7 @@ var files = map[string]byte{
 	"traps.wast":                30,
 	"type.wast":                 30,
 	"unreachable.wast":          30,
+	"unreached-invalid.wast":    30,
 	"unwind.wast":               30,
 
 	"bulk-memory/bulk.wast":        30,
@@ -373,6 +373,7 @@ var files = map[string]byte{
 	"bulk-memory/table_init.wast":  30,
 
 	"memory64/address64.wast":           30,
+	"memory64/align64.wast":             30,
 	"memory64/bulk64.wast":              30,
 	"memory64/call_indirect64.wast":     30,
 	"memory64/endianness64.wast":        30,

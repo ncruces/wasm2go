@@ -363,7 +363,7 @@ func (t *translator) readTypeSection() error {
 		}
 
 		if form != 0x60 {
-			return fmt.Errorf("unsupported form: %x", form)
+			return fmt.Errorf("unsupported form: 0x%02X", form)
 		}
 
 		// Parse parameter types.
@@ -540,7 +540,7 @@ func (t *translator) readImportSection() error {
 				return err
 			}
 			if !wasmType(typ).ref() {
-				return fmt.Errorf("unsupported table type: %x", typ)
+				return fmt.Errorf("unsupported table type: 0x%02X", typ)
 			}
 
 			min, max, _, is64, err := t.readLimits(65536) // 1 MiB
@@ -563,7 +563,7 @@ func (t *translator) readImportSection() error {
 			})
 
 		default:
-			return fmt.Errorf("unsupported import kind: %x", kind)
+			return fmt.Errorf("unsupported import kind: 0x%02X", kind)
 		}
 	}
 	return nil
@@ -611,7 +611,7 @@ func (t *translator) readTableSection() error {
 			return err
 		}
 		if !wasmType(typ).ref() {
-			return fmt.Errorf("unsupported table type: %x", typ)
+			return fmt.Errorf("unsupported table type: 0x%02X", typ)
 		}
 
 		min, max, _, is64, err := t.readLimits(65536) // 1 MiB
@@ -756,7 +756,7 @@ func (t *translator) readElementSection() error {
 				return err
 			}
 			if hasExpr && !wasmType(typ).ref() || !hasExpr && typ != 0x00 {
-				return fmt.Errorf("unsupported element type: %x", typ)
+				return fmt.Errorf("unsupported element type: 0x%02X", typ)
 			}
 		}
 
@@ -891,7 +891,7 @@ func (t *translator) readConstExpr() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			stack.append(newID("nil"))
+			stack.append(convert(newID("nil"), "any"))
 		case 0xd2: // ref.func
 			index, err := readLEB128(t.in)
 			if err != nil {

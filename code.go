@@ -1098,7 +1098,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			if err != nil {
 				return err
 			}
-			fn.pushConst(newID("nil"))
+			fn.pushConst(convert(newID("nil"), "any"))
 		case 0xd1: // ref.is_null
 			fn.pushCond(&ast.BinaryExpr{
 				X:  fn.pop(),

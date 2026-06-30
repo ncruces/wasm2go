@@ -33,7 +33,7 @@ func (t wasmType) ident() *ast.Ident {
 	case funcref, externref:
 		return newID("any")
 	}
-	panic(fmt.Sprintf("unsupported type: %x", byte(t)))
+	panic(fmt.Sprintf("unsupported type: 0x%02X", byte(t)))
 }
 
 type funcType struct {

@@ -311,7 +311,7 @@ func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
 			Op: token.OR,
 			X: &ast.BinaryExpr{
 				X: addr, Op: token.ADD,
-				Y: &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}},
+				Y: &ast.BasicLit{Kind: token.INT, Value: formatInt(int64(offset))}},
 			Y: &ast.BinaryExpr{
 				X: addr, Op: token.SHR, Y: literal63}}
 	}
