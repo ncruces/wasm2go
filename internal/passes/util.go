@@ -115,6 +115,23 @@ func canBreak(n ast.Node) (found bool) {
 	return found
 }
 
+// Checks if an unlabeled continue escapes n.
+func canContinue(n ast.Node) (found bool) {
+	ast.Inspect(n, func(n ast.Node) bool {
+		switch n := n.(type) {
+		// These reset the scope for unlabeled continues.
+		case *ast.ForStmt, *ast.RangeStmt, *ast.FuncLit:
+			return false
+		case *ast.BranchStmt:
+			if n.Tok == token.CONTINUE && n.Label == nil {
+				found = true
+			}
+		}
+		return !found
+	})
+	return found
+}
+
 // Checks if s can complete normally.
 // It's acceptable to always return true.
 func canComplete(s ast.Stmt) bool {
