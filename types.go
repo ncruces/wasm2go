@@ -20,6 +20,15 @@ func (t wasmType) ref() bool {
 	return t == funcref || t == externref
 }
 
+func (t wasmType) check() error {
+	switch t {
+	case i32, i64, f32, f64, funcref, externref:
+		return nil
+	default:
+		return fmt.Errorf("unsupported type: 0x%02X", byte(t))
+	}
+}
+
 func (t wasmType) ident() *ast.Ident {
 	switch t {
 	case i32:
@@ -39,6 +48,20 @@ func (t wasmType) ident() *ast.Ident {
 type funcType struct {
 	params  string // wasmType of parameters
 	results string // wasmType of results
+}
+
+func (t funcType) check() error {
+	for _, t := range []byte(t.params) {
+		if err := wasmType(t).check(); err != nil {
+			return err
+		}
+	}
+	for _, t := range []byte(t.results) {
+		if err := wasmType(t).check(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (t funcType) toAST(names bool) *ast.FuncType {

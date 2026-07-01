@@ -304,7 +304,7 @@ func readHeader(r io.Reader) error {
 	return nil
 }
 
-func (t *translator) readSection() error {
+func (t *translator) readSection() (err error) {
 	id, err := t.in.ReadByte()
 	if err != nil {
 		return err
@@ -314,6 +314,16 @@ func (t *translator) readSection() error {
 	if err != nil {
 		return err
 	}
+
+	start := t.in.Offset()
+	defer func() {
+		if err != nil {
+			return
+		}
+		if read := t.in.Offset() - start; read != size {
+			err = fmt.Errorf("section %d size mismatch: want %d, read %d", id, size, read)
+		}
+	}()
 
 	switch sectionID(id) {
 	case sectionType:
@@ -391,6 +401,10 @@ func (t *translator) readTypeSection() error {
 		}
 		t.types[i].results = buf.String()
 		buf.Reset()
+
+		if err := t.types[i].check(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -513,6 +527,9 @@ func (t *translator) readImportSection() error {
 		case externGlobal:
 			typ, err := t.in.ReadByte()
 			if err != nil {
+				return err
+			}
+			if err := wasmType(typ).check(); err != nil {
 				return err
 			}
 			mut, err := t.in.ReadByte()
@@ -692,6 +709,9 @@ func (t *translator) readGlobalSection() error {
 			return err
 		}
 		g.typ = wasmType(typ)
+		if err := g.typ.check(); err != nil {
+			return err
+		}
 
 		mut, err := t.in.ReadByte()
 		if err != nil {
