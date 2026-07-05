@@ -64,7 +64,7 @@ func (m *Module) Xsin(v0 float64) float64 {
 				} else {
 					switch int32(v4)&i32(3) - i32(1) {
 					case 1:
-						goto l4
+						return -v1
 					case 2:
 						goto l5
 					default:
@@ -73,8 +73,6 @@ func (m *Module) Xsin(v0 float64) float64 {
 					}
 				}
 				return v0
-			l4:
-				return -v1
 			l5:
 				p2 = -v0
 			}
