@@ -31,3 +31,6 @@ An incomplete list of libraries using wasm2go.
 
 - [**github.com/luist18/sqlite-vec-go**](https://github.com/luist18/sqlite-vec-go) \
   Bindings to use [sqlite-vec](https://github.com/asg017/sqlite-vec) with [go-sqlite3](https://github.com/ncruces/go-sqlite3).
+
+- [**github.com/msuozzo/bonsai**](https://github.com/msuozzo/bonsai) \
+  Go bindings for [treesitter](https://github.com/tree-sitter/tree-sitter).
