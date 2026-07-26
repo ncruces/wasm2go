@@ -14,6 +14,12 @@ An incomplete list of libraries using wasm2go.
 - [**github.com/pgaskin/go-pcapfilter**](https://github.com/pgaskin/go-pcapfilter) \
   Go bindings for [libpcap](https://github.com/the-tcpdump-group/libpcap) to compile tcpdump-style BPF filters.
 
+- [**github.com/pgaskin/go-hbsubset**](https://github.com/pgaskin/go-hbsubset) \
+  Go bindings for [HarfBuzz](https://github.com/harfbuzz/harfbuzz)'s font subsetter.
+
+- [**github.com/pgaskin/go-lightningcss**](https://github.com/pgaskin/go-lightningcss) \
+  Go bindings for [LightningCSS](https://github.com/parcel-bundler/lightningcss).
+
 - [**github.com/pgaskin/go-woff2**](https://github.com/pgaskin/go-woff2) \
   Go bindings for [woff2](https://github.com/google/woff2).
 
