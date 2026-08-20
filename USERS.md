@@ -25,6 +25,21 @@ An incomplete list of libraries using wasm2go.
 
 - [**github.com/pgaskin/go-libz**](https://github.com/pgaskin/go-libz) \
   Go bindings for [sortix libz](https://gitlab.com/sortix/libz).
+
+- [**github.com/gen2brain/heic**](https://github.com/gen2brain/heic) \
+  Go bindings for the [heic](https://crates.io/crates/heic) crate.
+
+- [**github.com/gen2brain/jpegli**](https://github.com/gen2brain/jpegli) \
+  Go bindings for [jpegli](https://github.com/google/jpegli).
+
+- [**github.com/gen2brain/jpegxl**](https://github.com/gen2brain/jpegxl) \
+  Go bindings for [libjxl](https://github.com/libjxl/libjxl).
+
+- [**github.com/gen2brain/webp**](https://github.com/gen2brain/webp) \
+  Go bindings for [libwebp](https://github.com/webmproject/libwebp).
+
+- [**github.com/gen2brain/avif**](https://github.com/gen2brain/avif) \
+  Go bindings for [libavif](https://github.com/AOMediaCodec/libavif) with [aom](https://aomedia.googlesource.com/aom/) and [dav1d](https://code.videolan.org/videolan/dav1d).
   
 - [**github.com/lbe/wasm2go-wasi-host**](https://github.com/lbe/wasm2go-wasi-host) \
   Implementation of [WASI snapshot-preview1](https://github.com/WebAssembly/WASI/tree/wasi-0.1) for wasm2go.
