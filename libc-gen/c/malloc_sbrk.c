@@ -52,5 +52,7 @@ static void init_allocator(void) {
   init_top(gm, (mchunkptr)__heap_base, heap_size - TOP_FOOT_SIZE);
 }
 
-__attribute__((alias("memalign")))
-void* aligned_alloc(size_t align, size_t size);
+void* aligned_alloc(size_t align, size_t size) {
+  if (align <= 0 || ((align | size) & (align - 1))) return NULL;
+  return memalign(align, size);
+}
