@@ -1,24 +1,16 @@
 #include <stdlib.h>
 
-__attribute__((always_inline)) void abort(void) { __builtin_trap(); }
+inline void abort(void) { __builtin_trap(); }
 
-__attribute__((always_inline)) int(abs)(int x) { return __builtin_abs(x); }
+inline int(abs)(int x) { return __builtin_abs(x); }
 
-__attribute__((always_inline)) int(atoi)(const char* s) {
-  return (int)strtol(s, NULL, 10);
-}
+inline int(atoi)(const char* s) { return (int)strtol(s, NULL, 10); }
 
-__attribute__((always_inline)) long(atol)(const char* s) {
-  return strtol(s, NULL, 10);
-}
+inline long(atol)(const char* s) { return strtol(s, NULL, 10); }
 
-__attribute__((always_inline)) long long(atoll)(const char* s) {
-  return strtoll(s, NULL, 10);
-}
+inline long long(atoll)(const char* s) { return strtoll(s, NULL, 10); }
 
-__attribute__((always_inline)) double(atof)(const char* s) {
-  return strtod(s, NULL);
-}
+inline double(atof)(const char* s) { return strtod(s, NULL); }
 
 void* bsearch(const void* key, const void* base, size_t nel, size_t width,
               int (*comp)(const void*, const void*)) {

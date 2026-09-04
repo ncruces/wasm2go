@@ -9,13 +9,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define PAGESIZE 65536
-
 #define LACKS_FCNTL_H
 #define LACKS_SCHED_H
 #define LACKS_SYS_MMAN_H
 #define LACKS_SYS_PARAM_H
-#define LACKS_TIME_H // prefer determinism
+#define LACKS_TIME_H  // prefer determinism
 
 #define HAVE_MMAP 0
 #define MALLOC_ALIGNMENT 16

@@ -43,7 +43,28 @@ int vprintf(const char* restrict fmt, va_list va) {
   return vfprintf(stdout, fmt, va);
 }
 
-#ifdef SQLITE3_H
+#ifdef STB_SPRINTF_H_INCLUDE
+
+static char* vfprintf_cb(const char* buf, void* user, int len) {
+  fwrite(buf, 1, len, (FILE*)user);
+  return (char*)buf;
+}
+
+int vfprintf(FILE* restrict stream, const char* restrict fmt, va_list va) {
+  char buf[STB_SPRINTF_MIN];
+  return STB_SPRINTF_DECORATE(vsprintfcb)(vfprintf_cb, stream, buf, fmt, va);
+}
+
+int vsprintf(char* restrict buf, const char* restrict fmt, va_list va) {
+  return STB_SPRINTF_DECORATE(vsprintf)(buf, fmt, va);
+}
+
+int vsnprintf(char* restrict buf, size_t count, const char* restrict fmt,
+              va_list va) {
+  return STB_SPRINTF_DECORATE(vsnprintf)(buf, (int)count, fmt, va);
+}
+
+#elif defined(SQLITE3_H)
 
 #define SQLITE_MAX_LENGTH 1000000000
 
@@ -90,27 +111,6 @@ int vsnprintf(char* restrict buf, size_t count, const char* restrict fmt,
   }
   sqlite3_free(str);
   return (int)len;
-}
-
-#elif defined(STB_SPRINTF_H_INCLUDE)
-
-static char* vfprintf_cb(const char* buf, void* user, int len) {
-  fwrite(buf, 1, len, (FILE*)user);
-  return (char*)buf;
-}
-
-int vfprintf(FILE* restrict stream, const char* restrict fmt, va_list va) {
-  char buf[STB_SPRINTF_MIN];
-  return STB_SPRINTF_DECORATE(vsprintfcb)(vfprintf_cb, stream, buf, fmt, va);
-}
-
-int vsprintf(char* restrict buf, const char* restrict fmt, va_list va) {
-  return STB_SPRINTF_DECORATE(vsprintf)(buf, fmt, va);
-}
-
-int vsnprintf(char* restrict buf, size_t count, const char* restrict fmt,
-              va_list va) {
-  return STB_SPRINTF_DECORATE(vsnprintf)(buf, (int)count, fmt, va);
 }
 
 #endif

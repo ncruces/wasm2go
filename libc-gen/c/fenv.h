@@ -1,6 +1,6 @@
 #pragma once
 
-#define FE_TONEAREST  0
+#define FE_TONEAREST 0
 
 int fegetround(void);
 int fesetround(int);

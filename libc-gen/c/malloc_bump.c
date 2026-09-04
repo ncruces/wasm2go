@@ -16,7 +16,7 @@ extern char __heap_end[];
 static char* __arena_beg = __heap_base;
 static char* __arena_end = __heap_end;
 
-__attribute__((always_inline)) void free(void*) {}
+inline void free(void*) {}
 
 void* malloc(size_t size) {
   if (size == 0) return NULL;
