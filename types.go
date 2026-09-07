@@ -12,6 +12,7 @@ const (
 	i64
 	f32
 	f64
+	v128      wasmType = 0x7b
 	funcref   wasmType = 0x70
 	externref wasmType = 0x6f
 )
@@ -22,7 +23,7 @@ func (t wasmType) ref() bool {
 
 func (t wasmType) check() error {
 	switch t {
-	case i32, i64, f32, f64, funcref, externref:
+	case i32, i64, f32, f64, v128, funcref, externref:
 		return nil
 	default:
 		return fmt.Errorf("unsupported type: 0x%02X", byte(t))
@@ -39,6 +40,8 @@ func (t wasmType) ident() *ast.Ident {
 		return newID("float32")
 	case f64:
 		return newID("float64")
+	case v128:
+		return newID("v128")
 	case funcref, externref:
 		return newID("any")
 	}
