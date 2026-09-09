@@ -17,7 +17,7 @@ extern char __heap_end[];
 static char* __arena_beg = __heap_base;
 static char* __arena_end = __heap_end;
 
-inline void free(void* ptr) {}
+__attribute__((always_inline)) void free(void* ptr) {}
 
 size_t malloc_good_size(size_t size) {
   if (size == 0 || size > PTRDIFF_MAX) return size;
@@ -51,9 +51,9 @@ void* malloc(size_t size) {
   return res;
 }
 
-void* aligned_alloc(size_t align, size_t size) {
+void* memalign(size_t align, size_t size) {
   if (size == 0 || size > PTRDIFF_MAX) return NULL;
-  if (align <= 0 || ((align | size) & (align - 1))) return NULL;
+  if (align <= 0 || (align & (align - 1))) return NULL;
   if (align <= ALIGN_SIZE) return malloc(size);
 
   size_t need;

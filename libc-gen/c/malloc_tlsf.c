@@ -472,6 +472,4 @@ size_t malloc_good_size(size_t size) {
 extern char __heap_base[];
 extern char __heap_end[];
 
-static void init_allocator(void) {
-  tlsf_add_pool(__heap_base, __heap_end);
-}
+static void init_allocator(void) { tlsf_add_pool(__heap_base, __heap_end); }
