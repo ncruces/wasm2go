@@ -6,6 +6,7 @@
 // and expects it to be contiguous,
 // but can cope with non-contiguities.
 
+#include <stdalign.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -16,7 +17,7 @@
 #define LACKS_TIME_H  // prefer determinism
 
 #define HAVE_MMAP 0
-#define MALLOC_ALIGNMENT 16
+#define MALLOC_ALIGNMENT alignof(max_align_t)
 #define MALLOC_FAILURE_ACTION
 #define MORECORE_CANNOT_TRIM 1
 #define NO_MALLINFO 1
