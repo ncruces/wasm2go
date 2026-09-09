@@ -97,23 +97,34 @@ func translate(r io.Reader, w io.Writer) error {
 	t.provided = set[string]{}
 	t.helpers = set[string]{}
 
+	helperNames, err := t.findHelpers(fset, helpersSrc, helpersAtomicsSrc)
 	for _, file := range provided {
 		f, err := parser.ParseFile(fset, file, nil, 0)
 		if err != nil {
 			return err
 		}
 		for _, decl := range f.Decls {
-			// Check if the receiver type is *Module.
-			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Recv != nil {
-				if star, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
-					if id, ok := star.X.(*ast.Ident); ok && id.Name == "Module" {
-						t.provided.add(fn.Name.Name)
+			if fn, ok := decl.(*ast.FuncDecl); ok {
+				// Check if the receiver type is *Module.
+				if fn.Recv != nil {
+					if star, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
+						if id, ok := star.X.(*ast.Ident); ok && id.Name == "Module" {
+							t.provided.add(fn.Name.Name)
+						}
 					}
 				}
+				// Provided files may call helpers by name.
+				ast.Inspect(fn.Body, func(n ast.Node) bool {
+					if call, ok := n.(*ast.CallExpr); ok {
+						if id, ok := call.Fun.(*ast.Ident); ok && helperNames.has(id.Name) {
+							t.helpers.add(id.Name)
+						}
+					}
+					return true
+				})
 			}
 		}
 	}
-
 	// Load Wasm.
 	for {
 		if err := t.readSection(); err != nil {
@@ -1222,6 +1233,22 @@ func (t *translator) readDylink0Section(r *bytes.Reader) error {
 		}
 	}
 	return nil
+}
+
+func (t *translator) findHelpers(fset *token.FileSet, src ...string) (set[string], error) {
+	names := set[string]{}
+	for src := range src {
+		f, err := parser.ParseFile(fset, "", src, 0)
+		if err != nil {
+			return nil, err
+		}
+		for _, decl := range f.Decls {
+			if fn, ok := decl.(*ast.FuncDecl); ok {
+				names.add(fn.Name.Name)
+			}
+		}
+	}
+	return names, nil
 }
 
 func (t *translator) addHelpers(fset *token.FileSet, filename, src string) error {
