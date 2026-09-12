@@ -54,6 +54,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		if err != nil {
 			return err
 		}
+		t.useType(typ)
 
 		ids := make([]*ast.Ident, n)
 		for i := range int(n) {
@@ -1126,11 +1127,10 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0xfd: // SIMD
-			code, err := readLEB128(t.in)
+			err := t.readOpcodeSimd(fn)
 			if err != nil {
 				return err
 			}
-			return fmt.Errorf("unsupported opcode (SIMD): 0xFD 0x%02X", code)
 
 		case 0xfe: // Atomics
 			err := t.readOpcodeAtomic(fn)

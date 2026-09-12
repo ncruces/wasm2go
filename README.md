@@ -80,6 +80,17 @@ Another knob is whether to attempt to ensure float operations
 This is tested to work on both `amd64` and `arm64`,
 but is known to be broken on most other CPU architectures.
 
+Wasm fixed-width SIMD is supported.
+Every `v128` op compiles to a portable, self-contained Go helper,
+so generated code keeps building on every `GOOS`/`GOARCH`.
+Go has no portable vector type, so a `v128` is a pair of `uint64`
+words, and the helpers do [SWAR](https://en.wikipedia.org/wiki/SWAR)
+(SIMD within a register) arithmetic: a lane op is a few 64-bit steps
+applied to both words rather than a loop over lanes.
+Expect a solid speedup over scalar code on vector-heavy modules,
+not native SIMD throughput; `go test -bench V128 ./helpers`
+measures the helpers in isolation.
+
 ## Usage
 
 ```

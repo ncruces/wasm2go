@@ -22,8 +22,32 @@ type specCommand struct {
 }
 
 type specArg struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
+	Type     string  `json:"type"`
+	LaneType string  `json:"lane_type"`
+	Value    specVal `json:"value"`
+}
+
+// specVal is a scalar value, or a list of lane values for v128.
+type specVal []string
+
+func (v *specVal) UnmarshalJSON(b []byte) error {
+	if len(b) > 0 && b[0] == '[' {
+		return json.Unmarshal(b, (*[]string)(v))
+	}
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	*v = specVal{s}
+	return nil
+}
+
+// one returns the single scalar value.
+func (v specVal) one() string {
+	if len(v) == 1 {
+		return v[0]
+	}
+	return ""
 }
 
 func parseSpec(file string) (*specTest, error) {

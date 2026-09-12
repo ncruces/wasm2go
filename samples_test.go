@@ -14,6 +14,7 @@ import (
 	loops_test "github.com/ncruces/wasm2go/testdata/loops"
 	primes_test "github.com/ncruces/wasm2go/testdata/primes"
 	recursion_test "github.com/ncruces/wasm2go/testdata/recursion"
+	simd_test "github.com/ncruces/wasm2go/testdata/simd"
 	stack_test "github.com/ncruces/wasm2go/testdata/stack"
 	table_test "github.com/ncruces/wasm2go/testdata/table"
 	trig_test "github.com/ncruces/wasm2go/testdata/trig"
@@ -130,6 +131,37 @@ func Test_table(t *testing.T) {
 type tableEnv struct{}
 
 func (t tableEnv) Xjstimes3(v0 int32) int32 { return v0 * 3 }
+
+func Test_simd(t *testing.T) {
+	m := simd_test.New()
+
+	// sum16 splats a byte and reduces it with extadd_pairwise.
+	for _, x := range []int32{0, 1, 7, 127, 200, 255, -1} {
+		if got, want := m.Xsum16(x), 16*(x&0xff); got != want {
+			t.Errorf("sum16(%d): got %d, want %d", x, got, want)
+		}
+	}
+
+	// addsat saturates signed byte addition.
+	addsat := [][3]int32{{3, 4, 7}, {100, 100, 127}, {-100, -100, -128}, {-1, 1, 0}}
+	for _, c := range addsat {
+		if got := m.Xaddsat(c[0], c[1]); got != c[2] {
+			t.Errorf("addsat(%d, %d): got %d, want %d", c[0], c[1], got, c[2])
+		}
+	}
+
+	if got := m.Xmulf(1.5, 2.5); got != 3.75 {
+		t.Errorf("mulf(1.5, 2.5): got %v", got)
+	}
+
+	// memrt stores a splat vector to memory, reloads it, takes its bitmask.
+	if got := m.Xmemrt(-1); got != 15 {
+		t.Errorf("memrt(-1): got %d, want 15", got)
+	}
+	if got := m.Xmemrt(1); got != 0 {
+		t.Errorf("memrt(1): got %d, want 0", got)
+	}
+}
 
 func Test_trig(t *testing.T) {
 	want := []float32{
