@@ -17,7 +17,7 @@ type Module struct {
 
 func New() *Module {
 	m := new(Module)
-	m.maxMem = 65536
+	m.maxMem = 4096
 	m.memory = make([]byte, 0x20000)
 	memory_init(m.memory, data0, uint32(i32(65538)), 0, len(data0))
 	return m
@@ -101,7 +101,7 @@ l0:
 	return v3
 }
 func (m *Module) Xrealloc(v0, v1 int32) int32 {
-	var v2, v3 int32
+	var v2, v3, v4 int32
 	if v0 == 0 {
 		t0 := m.Xmalloc(v1)
 		return t0
@@ -110,7 +110,8 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 		return v0
 	}
 	t1 := int32(load32(m.memory[uint32(i32(65540)):]))
-	v3 = t1 - v0
+	v4 = t1
+	v3 = v4 - v0
 	if v3 == i32(16) {
 		store32(m.memory[uint32(i32(65540)):], uint32(v0))
 	}
@@ -118,7 +119,12 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 		t2 := m.Xmalloc(v1)
 		v2 = t2
 		if v2 == 0 {
-			goto l0
+			v2 = i32(0)
+			if v3 != i32(16) {
+				goto l0
+			}
+			store32(m.memory[uint32(i32(65540)):], uint32(v4))
+			return i32(0)
 		}
 		if v0 == v2 {
 			goto l0

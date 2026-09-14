@@ -15,7 +15,7 @@ for ALLOC in bump sbrk tlsf; do
 
 	"$WASI_SDK/clang" --target=wasm32 -ffreestanding -nostdlib -std=c23 -g0 -Oz \
 		-Wall -Wextra -Wno-unused-parameter -Wno-unused-function \
-		-o alloc "$LIBC/malloc_$ALLOC.c" -I"$LIBC" \
+		-o alloc "$LIBC/malloc_$ALLOC.c" "$LIBC/libc.c" -I"$LIBC" \
 		-mexec-model=reactor \
 		-mmutable-globals -mmultivalue \
 		-mnontrapping-fptoint -msign-ext \
@@ -24,6 +24,7 @@ for ALLOC in bump sbrk tlsf; do
 		-mwide-arithmetic \
 		-Wl,--no-entry \
 		-Wl,--stack-first \
+		-Wl,--max-memory=268435456 \
 		-Wl,--import-undefined \
 		-Wl,--export=free \
 		-Wl,--export=malloc \

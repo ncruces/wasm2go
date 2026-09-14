@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define PAGESIZE 65536
+
 #define LACKS_FCNTL_H
 #define LACKS_SCHED_H
 #define LACKS_SYS_MMAN_H

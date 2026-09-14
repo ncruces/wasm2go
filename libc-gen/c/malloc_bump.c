@@ -76,10 +76,15 @@ void* realloc(void* ptr, size_t size) {
   // Worst case size of existing object.
   size_t copy = __arena_beg - (char*)ptr;
   // Rewind the last chunk.
+  char* arena_beg = __arena_beg;
   if (copy == ALIGN_SIZE) __arena_beg = (char*)ptr;
 
   void* res = malloc(size);
-  if (res != NULL && res != ptr) {
+  if (res == NULL) {  // Allocation failed.
+    if (copy == ALIGN_SIZE) __arena_beg = arena_beg;
+    return NULL;
+  }
+  if (res != ptr) {  // Allocation moved.
     if (copy > size) copy = size;
     __builtin_memcpy(res, ptr, copy);
   }

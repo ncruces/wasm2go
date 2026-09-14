@@ -13,26 +13,15 @@ import (
 type Module struct {
 	memory []byte
 	maxMem int64
-	_env   Xenv
 }
 
-func New(v0 Xenv) *Module {
+func New() *Module {
 	m := new(Module)
-	m._env = v0
-	m.maxMem = 65536
+	m.maxMem = 4096
 	m.memory = make([]byte, 0x20000)
-	if i, ok := any(v0).(interface {
-		Init(any)
-	}); ok {
-		i.Init(m)
-	}
 	return m
 }
 
-type Xenv = interface {
-	Xabort()
-	Xsbrk(v0 int32) int32
-}
 type Memory = interface {
 	Slice() *[]byte
 	Grow(delta, max int64) int64
@@ -44,12 +33,6 @@ func (m *wasmMemory) Slice() *[]byte {
 }
 func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
-}
-func (m *Module) _sbrk(v0 int32) int32 {
-	return m._env.Xsbrk(v0)
-}
-func (m *Module) _abort() {
-	m._env.Xabort()
 }
 func (m *Module) Xmalloc(v0 int32) int32 {
 	var v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11 int32
@@ -106,7 +89,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 				if v1 != 0 {
 					{
 						v2 = i32_shl(i32(2), v0)
-						v0 = (v2 | (i32(0) - v2)) & i32_shl(v1, v0)
+						v0 = (i32(0) - v2 | v2) & i32_shl(v1, v0)
 						p10 := i32(-1)
 						if v0&(i32(0)-v0) != 0 {
 							p10 = int32(bits.TrailingZeros32(uint32(v0)))
@@ -471,7 +454,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 				}
 				v0 = i32(0)
 				v2 = i32_shl(i32(2), v7)
-				v2 = (v2 | (i32(0) - v2)) & v8
+				v2 = (i32(0) - v2 | v2) & v8
 				if v2 == 0 {
 					v4 = i32(0)
 					goto l20
@@ -812,7 +795,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 		t111 := int32(load32(m.memory[uint32(i32(66008)):]))
 		if t111 == 0 {
 			store64(m.memory[uint32(i32(66020)):], uint64(i64(-1)))
-			store64(m.memory[uint32(i32(66012)):], uint64(i64(0x100000001000)))
+			store64(m.memory[uint32(i32(66012)):], uint64(i64(0x1000000010000)))
 			store32(m.memory[uint32(i32(66008)):], uint32(i32(0x5555aaa8)))
 			store32(m.memory[uint32(i32(66028)):], uint32(i32(0)))
 			store32(m.memory[uint32(i32(65980)):], uint32(i32(0)))
@@ -1385,7 +1368,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 				m._init_top(v1, v2-i32(56))
 				t197 := v5
 				v4 = v0 + v3
-				v0 = v4 + (i32(55)-v4)&i32(15) - i32(63)
+				v0 = (i32(55)-v4)&i32(15) + v4 - i32(63)
 				p198 := v0
 				if uint32(v0) < uint32(v5+i32(16)) {
 					p198 = t197
@@ -1555,7 +1538,6 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 		return v0
 	}
 l1:
-	m._abort()
 	panic("unreachable")
 l2:
 	return v0 + i32(8)
@@ -2129,7 +2111,6 @@ func (m *Module) Xfree(v0 int32) {
 	}
 	return
 l1:
-	m._abort()
 	panic("unreachable")
 }
 func (m *Module) Xrealloc(v0, v1 int32) int32 {
@@ -2426,7 +2407,6 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 			goto l3
 		}
 	l1:
-		m._abort()
 		panic("unreachable")
 	l3:
 		v2 = v5
@@ -2960,7 +2940,6 @@ func (m *Module) _dispose_chunk(v0, v1 int32) {
 	}
 	return
 l2:
-	m._abort()
 	panic("unreachable")
 }
 func (m *Module) Xmemalign(v0, v1 int32) int32 {
@@ -2976,7 +2955,7 @@ func (m *Module) Xmemalign(v0, v1 int32) int32 {
 			p1 = i32(16)
 		}
 		v2 = p1
-		if v2&(v2-i32(1)) == 0 {
+		if (v2-i32(1))&v2 == 0 {
 			v0 = v2
 			goto l0
 		}
@@ -3014,13 +2993,13 @@ l0:
 			t4 := int32(load32(m.memory[uint32(v5):]))
 			v6 = t4
 			t5 := v6 & i32(-8)
-			v2 = (v0+v2-i32(1))&(i32(0)-v0) - i32(8)
-			t7 := v2
-			p6 := i32(0)
-			if uint32(v2-v1) <= uint32(i32(15)) {
-				p6 = v0
+			t6 := v0
+			v0 = (v0+v2-i32(1))&(i32(0)-v0) - i32(8)
+			p7 := i32(0)
+			if uint32(v0-v1) <= uint32(i32(15)) {
+				p7 = t6
 			}
-			v0 = t7 + p6
+			v0 = p7 + v0
 			v2 = v0 - v1
 			v4 = t5 - v2
 			if v6&i32(3) == 0 {
@@ -3067,6 +3046,22 @@ l0:
 	}
 l2:
 	return v1
+}
+func (m *Module) _sbrk(v0 int32) int32 {
+	if v0 == 0 {
+		t0 := int32(len(m.memory) >> 16)
+		return t0 << 16
+	}
+	if v0&i32(-0x7fff0001) == 0 {
+		t1 := int32(memory_grow(&m.memory, int64(int32(uint32(v0)>>16)), m.maxMem))
+		v0 = t1
+		p2 := v0 << 16
+		if v0 == i32(-1) {
+			p2 = i32(-1)
+		}
+		return p2
+	}
+	panic("unreachable")
 }
 func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)
