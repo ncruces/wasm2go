@@ -19,7 +19,7 @@ func New() *Module {
 	m := new(Module)
 	m.maxMem = 1024
 	m.memory = make([]byte, 0x20000)
-	memory_init(m.memory, data0, uint32(i32(65538)), 0, len(data0))
+	memory_init(m.memory, data0, uint32(i32(65536)), 0, len(data0))
 	return m
 }
 
@@ -36,6 +36,15 @@ func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xfree(v0 int32) {
+	if v0 == 0 {
+		return
+	}
+	t0 := int32(load32(m.memory, uint32(i32(65544))))
+	if v0 != t0 {
+		return
+	}
+	store32(m.memory, uint32(i32(65536)), uint32(v0))
+	store32(m.memory, uint32(i32(65544)), uint32(i32(0)))
 }
 func (m *Module) Xmalloc(v0 int32) int32 {
 	var v1, v2, v3, v4, v5, v6 int32
@@ -43,16 +52,16 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 		if v0 <= i32(0) {
 			goto l0
 		}
-		v2 = (v0 + i32(15)) & i32(-16)
-		t0 := int32(load32(m.memory[uint32(i32(65536)):]))
+		v3 = (v0 + i32(15)) & i32(-16)
+		t0 := int32(load32(m.memory, uint32(i32(65540))))
 		v1 = t0
-		t1 := int32(load32(m.memory[uint32(i32(65540)):]))
-		v3 = t1
-		v0 = v3
+		t1 := int32(load32(m.memory, uint32(i32(65536))))
+		v2 = t1
+		v0 = v2
 	l2:
 		v0 = v1 - v0
-		if uint32(v0) < uint32(v2) {
-			v5 = v2 - v0 + i32(0xffff)
+		if uint32(v0) < uint32(v3) {
+			v5 = v3 - v0 + i32(0xffff)
 			v6 = int32(uint32(v5) >> 16)
 			t2 := int32(memory_grow(&m.memory, int64(v6), m.maxMem))
 			v4 = t2
@@ -62,16 +71,17 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 			t3 := v1
 			v0 = v4 << 16
 			if t3 != v0 {
-				store32(m.memory[uint32(i32(65540)):], uint32(v0))
+				store32(m.memory, uint32(i32(65536)), uint32(v0))
 				v1 = (v4 + v6) << 16
-				store32(m.memory[uint32(i32(65536)):], uint32(v1))
-				v3 = v0
+				store32(m.memory, uint32(i32(65540)), uint32(v1))
+				v2 = v0
 				goto l2
 			}
-			store32(m.memory[uint32(i32(65536)):], uint32(v1+v5&i32(-65536)))
+			store32(m.memory, uint32(i32(65540)), uint32(v1+v5&i32(-65536)))
 		}
-		store32(m.memory[uint32(i32(65540)):], uint32(v2+v3))
-		return v3
+		store32(m.memory, uint32(i32(65544)), uint32(v2))
+		store32(m.memory, uint32(i32(65536)), uint32(v2+v3))
+		return v2
 	}
 l0:
 	return i32(0)
@@ -90,50 +100,63 @@ func (m *Module) Xmemalign(v0, v1 int32) int32 {
 			return t0
 		}
 		t1 := m.Xmalloc(v0 + v1 - i32(16))
-		v2 = t1
-		if v2 == 0 {
+		v3 = t1
+		if v3 == 0 {
 			goto l0
 		}
-		v3 = (v0 + v2 - i32(1)) & (i32(0) - v0)
-		store32(m.memory[uint32(i32(65540)):], uint32((v3+v1+i32(15))&i32(-16)))
+		v2 = (v0 + v3 - i32(1)) & (i32(0) - v0)
+		store32(m.memory, uint32(i32(65544)), uint32(v2))
+		store32(m.memory, uint32(i32(65536)), uint32((v1+v2+i32(15))&i32(-16)))
 	}
 l0:
-	return v3
+	return v2
 }
 func (m *Module) Xrealloc(v0, v1 int32) int32 {
-	var v2, v3, v4 int32
+	var v2, v3 int32
 	if v0 == 0 {
 		t0 := m.Xmalloc(v1)
 		return t0
 	}
-	if uint32(v1) < uint32(i32(17)) {
-		return v0
-	}
-	t1 := int32(load32(m.memory[uint32(i32(65540)):]))
-	v4 = t1
-	v3 = v4 - v0
-	if v3 == i32(16) {
-		store32(m.memory[uint32(i32(65540)):], uint32(v0))
-	}
 	{
-		t2 := m.Xmalloc(v1)
-		v2 = t2
-		if v2 == 0 {
-			v2 = i32(0)
-			if v3 != i32(16) {
+		if v1 == 0 {
+			t1 := int32(load32(m.memory, uint32(i32(65544))))
+			if v0 != t1 {
 				goto l0
 			}
-			store32(m.memory[uint32(i32(65540)):], uint32(v4))
+			store32(m.memory, uint32(i32(65536)), uint32(v0))
+			store32(m.memory, uint32(i32(65544)), uint32(i32(0)))
+			return i32(0)
+		}
+		t2 := int32(load32(m.memory, uint32(i32(65544))))
+		v2 = t2
+		if uint32(v1) > uint32(i32(16)) {
+			goto l1
+		}
+		if v0 == v2 {
+			goto l1
+		}
+		return v0
+	l1:
+		t3 := int32(load32(m.memory, uint32(i32(65536))))
+		v3 = t3
+		if v0 == v2 {
+			store32(m.memory, uint32(i32(65536)), uint32(v0))
+		}
+		t4 := m.Xmalloc(v1)
+		v2 = t4
+		if v2 == 0 {
+			store32(m.memory, uint32(i32(65536)), uint32(v3))
 			return i32(0)
 		}
 		if v0 == v2 {
 			goto l0
 		}
-		p3 := v1
+		v3 = v3 - v0
+		p5 := v1
 		if uint32(v1) > uint32(v3) {
-			p3 = v3
+			p5 = v3
 		}
-		v1 = p3
+		v1 = p5
 		if v1 == 0 {
 			goto l0
 		}
@@ -170,27 +193,29 @@ const (
 )
 
 //go:nosplit
-func load32(b []byte) uint32 {
+func load32[T uint32 | int64](mem []byte, addr T) uint32 {
 	if !unalignedOK {
-		return binary.LittleEndian.Uint32(b)
+		return binary.LittleEndian.Uint32(mem[addr:])
 	}
-	v := *(*uint32)(unsafe.Pointer((*[4]byte)(b)))
+	_ = (*[4]byte)(mem[addr:])
+	val := *(*uint32)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr)))
 	if big {
-		return bits.ReverseBytes32(v)
+		return bits.ReverseBytes32(val)
 	}
-	return v
+	return val
 }
 
 //go:nosplit
-func store32(b []byte, v uint32) {
+func store32[T uint32 | int64](mem []byte, addr T, val uint32) {
 	if !unalignedOK {
-		binary.LittleEndian.PutUint32(b, v)
+		binary.LittleEndian.PutUint32(mem[addr:], val)
 		return
 	}
 	if big {
-		v = bits.ReverseBytes32(v)
+		val = bits.ReverseBytes32(val)
 	}
-	*(*uint32)(unsafe.Pointer((*[4]byte)(b))) = v
+	_ = (*[4]byte)(mem[addr:])
+	*(*uint32)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr))) = val
 }
 
 //go:nosplit
@@ -229,4 +254,4 @@ func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
 	copy(mem[x:y], mem[z:w])
 }
 
-const data0 = "\x02\x00\x10\x00\x01"
+const data0 = "\x10\x00\x01\x00\x00\x00\x02"

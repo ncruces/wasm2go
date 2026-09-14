@@ -19,7 +19,7 @@ and host-provided capabilities.
 a minimal C library containing header files,
 and some bits best implemented in C,
 such as a novel `qsort` implementation, STB's `sprintf`,
-Doug Lea's `malloc` (or a simple bump allocator).
+or Doug Lea's `malloc`.
 
 2. **Go host functions**:
 a code generator that emits testable Go methods
@@ -56,8 +56,11 @@ Besides, the C component should not grow much beyond:
 - _macros_ and _function declarations_ added to header files;
 - _simple one-liners_ added to source files.
 
-The big exception was `malloc`, as it is best implemented in C,
-and Doug Lea's public domain `malloc` is excellent for Wasm.
+The big exception is `malloc`, as it's best implemented in C.
+I provide 3 alternative implementations:
+- Doug Lea's public domain [allocator](https://gee.cs.oswego.edu/dl/html/malloc.html), configured for Wasm;
+- a simple bump allocator for short lived modules;
+- a newly developed [TLSF](http://www.gii.upv.es/tlsf/main/docs.html) allocator.
 
 The Go component will contain stuff that's best implemented in Go:
 - `math.h` for `double` using package `math`;

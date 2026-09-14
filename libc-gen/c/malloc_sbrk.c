@@ -59,3 +59,9 @@ void* aligned_alloc(size_t align, size_t size) {
   if (align <= 0 || ((align | size) & (align - 1))) return NULL;
   return memalign(align, size);
 }
+
+void* reallocarray(void* ptr, size_t nelem, size_t elsize) {
+  size_t need;
+  if (__builtin_mul_overflow(nelem, elsize, &need)) return NULL;
+  return realloc(ptr, need);
+}

@@ -75,7 +75,7 @@ static struct {
   fl_bitmap_t fl_bitmap;
   sl_bitmap_t sl_bitmap[FL_INDEX_COUNT];
   free_block_t* blocks[FL_INDEX_COUNT][SL_INDEX_COUNT];
-  char* heap_end;
+  char* pool_end;
 } g_tlsf;
 
 // The zero-based index of the highest set bit.
@@ -95,7 +95,7 @@ static inline void tlsf_block_set_size(block_header_t* block, size_t size) {
 }
 
 static inline size_t* tlsf_block_get_footer(const block_header_t* block) {
-  return (size_t*)((char*)block + tlsf_block_get_size(block) - sizeof(size_t));
+  return (size_t*)((char*)block + tlsf_block_get_size(block)) - 1;
 }
 
 static inline bool tlsf_block_is_free(const block_header_t* block) {
@@ -130,7 +130,7 @@ static inline block_header_t* tlsf_block_next_phys(
 
 static inline block_header_t* tlsf_block_prev_phys(
     const block_header_t* block) {
-  size_t prev_size = *(const size_t*)((const char*)block - sizeof(size_t));
+  size_t prev_size = *((const size_t*)block - 1);
   return (block_header_t*)((char*)block - prev_size);
 }
 
@@ -287,7 +287,7 @@ static void tlsf_block_free(block_header_t* block) {
 
 static void tlsf_add_pool(char* pool_start, char* pool_end) {
   // Are we adding a contiguous pool?
-  bool is_contiguous = pool_start == g_tlsf.heap_end;
+  bool is_contiguous = pool_start == g_tlsf.pool_end;
   block_header_t* block;
 
   if (is_contiguous) {
@@ -315,7 +315,7 @@ static void tlsf_add_pool(char* pool_start, char* pool_end) {
   tlsf_block_set_size(block, (char*)sentinel - (char*)block);
   tlsf_block_free(block);
 
-  g_tlsf.heap_end = pool_end;
+  g_tlsf.pool_end = pool_end;
 }
 
 // Takes a requested allocation size and rounds it up to
@@ -460,6 +460,12 @@ void* aligned_alloc(size_t align, size_t size) {
   return memalign(align, size);
 }
 
+void* reallocarray(void* ptr, size_t nelem, size_t elsize) {
+  size_t need;
+  if (__builtin_mul_overflow(nelem, elsize, &need)) return NULL;
+  return realloc(ptr, need);
+}
+
 size_t malloc_usable_size(void* ptr) {
   if (ptr == NULL) return 0;
   block_header_t* block = tlsf_payload_to_block(ptr);
@@ -475,6 +481,6 @@ extern char __heap_base[];
 extern char __heap_end[];
 
 static void init_allocator(void) {
-  assert(g_tlsf.heap_end == 0);
+  assert(g_tlsf.pool_end == 0);
   tlsf_add_pool(__heap_base, __heap_end);
 }
