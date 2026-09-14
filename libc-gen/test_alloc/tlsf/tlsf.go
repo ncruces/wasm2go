@@ -18,7 +18,7 @@ type Module struct {
 
 func New() *Module {
 	m := new(Module)
-	m.maxMem = 4096
+	m.maxMem = 1024
 	m.memory = make([]byte, 0x20000)
 	m.___stack_pointer = i32(65536)
 	return m

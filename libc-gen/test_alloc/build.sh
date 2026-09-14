@@ -24,7 +24,7 @@ for ALLOC in bump sbrk tlsf; do
 		-mwide-arithmetic \
 		-Wl,--no-entry \
 		-Wl,--stack-first \
-		-Wl,--max-memory=268435456 \
+		-Wl,--max-memory=67108864 \
 		-Wl,--import-undefined \
 		-Wl,--export=free \
 		-Wl,--export=malloc \
