@@ -53,12 +53,51 @@ func (m *Module) Xst32(v0, v1 int32) {
 func (m *Module) Xst64(v0 int32, v1 int64) {
 	store64(m.memory, uint32(v0), uint64(v1))
 }
+func (m *Module) Xld128(v0 int32) int64 {
+	t0 := load128(m.memory[uint32(v0):])
+	return i64x2_extract_lane(t0, 1)
+}
+func (m *Module) Xst128(v0 int32, v1 int64) {
+	store128(m.memory[uint32(v0):], i64x2_splat(v1))
+}
 func (m *Module) Xgrow(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }
 func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)
+}
+
+// The Wasm v128 type as two little-endian 64-bit words: lane i of width w
+// occupies bits [w*i, w*i+w) of lo for w*i < 64, of hi otherwise. Structs of two
+// integer fields are register-assigned by the Go ABI and SSA-able, unlike [16]byte.
+type v128 struct{ lo, hi uint64 }
+
+//go:nosplit
+func load128(b []byte) v128 {
+	_ = b[15]
+	return v128{binary.LittleEndian.Uint64(b), binary.LittleEndian.Uint64(b[8:])}
+}
+
+//go:nosplit
+func store128(b []byte, v v128) {
+	_ = b[15]
+	binary.LittleEndian.PutUint64(b, v.lo)
+	binary.LittleEndian.PutUint64(b[8:], v.hi)
+}
+
+//go:nosplit
+func i64x2_splat(x int64) v128 {
+	w := uint64(x)
+	return v128{w, w}
+}
+
+//go:nosplit
+func i64x2_extract_lane(v v128, l int) int64 {
+	if l == 0 {
+		return int64(v.lo)
+	}
+	return int64(v.hi)
 }
 
 //go:nosplit

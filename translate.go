@@ -32,6 +32,8 @@ var (
 	helpersAtomicsSrc string
 	//go:embed helpers/cpuarch_unsafe.go
 	helpersCpuArchSrc string
+	//go:embed helpers/simd.go
+	helpersSimdSrc string
 )
 
 // These helpers can never trap.
@@ -97,7 +99,7 @@ func translate(r io.Reader, w io.Writer) error {
 	t.provided = set[string]{}
 	t.helpers = set[string]{}
 
-	helperNames, err := t.findHelpers(fset, helpersSrc, helpersAtomicsSrc)
+	helperNames, err := t.findHelpers(fset, helpersSrc, helpersAtomicsSrc, helpersSimdSrc)
 	if err != nil {
 		return err
 	}
@@ -200,6 +202,9 @@ func translate(r io.Reader, w io.Writer) error {
 			if err := t.resolveHelpers(fset, "atomics_unsafe.go", helpersAtomicsSrc); err != nil {
 				return err
 			}
+		}
+		if err := t.resolveHelpers(fset, "simd.go", helpersSimdSrc); err != nil {
+			return err
 		}
 		if err := t.resolveHelpers(fset, "helpers.go", helpersSrc); err != nil {
 			return err
@@ -419,6 +424,8 @@ func (t *translator) readTypeSection() error {
 		if err := t.types[i].check(); err != nil {
 			return err
 		}
+		t.useTypes(t.types[i].params)
+		t.useTypes(t.types[i].results)
 	}
 	return nil
 }
@@ -546,6 +553,7 @@ func (t *translator) readImportSection() error {
 			if err := wasmType(typ).check(); err != nil {
 				return err
 			}
+			t.useType(typ)
 			mut, err := t.in.ReadByte()
 			if err != nil {
 				return err
@@ -726,6 +734,7 @@ func (t *translator) readGlobalSection() error {
 		if err := g.typ.check(); err != nil {
 			return err
 		}
+		t.useType(typ)
 
 		mut, err := t.in.ReadByte()
 		if err != nil {
@@ -933,6 +942,20 @@ func (t *translator) readConstExpr() (ast.Expr, error) {
 			}
 			stack.append(t.functions[index].call)
 
+		case 0xfd: // SIMD
+			code, err := readLEB128(t.in)
+			if err != nil {
+				return nil, err
+			}
+			if code != 0x0c { // v128.const
+				return nil, fmt.Errorf("unsupported opcode in constant expression: 0xFD 0x%02X", code)
+			}
+			expr, err := t.constV128()
+			if err != nil {
+				return nil, err
+			}
+			stack.append(expr)
+
 		case 0x6a, 0x7c: // i32.add, i64.add
 			stack.append(&ast.BinaryExpr{Y: stack.pop(), X: stack.pop(), Op: token.ADD})
 		case 0x6b, 0x7d: // i32.sub, i64.sub
@@ -957,12 +980,26 @@ func (t *translator) readBlockType() (typ funcType, err error) {
 	switch {
 	case i >= 0:
 		return t.types[i], nil
-	case i >= -4 || i == -16 || i == -17:
+	case i >= -5 || i == -16 || i == -17:
 		typ.results = string([]wasmType{wasmType(i + 128)})
+		t.useTypes(typ.results)
 	case i != -64:
 		err = fmt.Errorf("unsupported block type: %d", i)
 	}
 	return
+}
+
+// Registers helpers required to declare values of the given types.
+func (t *translator) useTypes(types string) {
+	for _, b := range []byte(types) {
+		t.useType(b)
+	}
+}
+
+func (t *translator) useType(typ byte) {
+	if wasmType(typ) == v128 {
+		t.helpers.add("v128")
+	}
 }
 
 func (t *translator) readDataCountSection() error {

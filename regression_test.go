@@ -71,6 +71,14 @@ func Test_regression_oob_trap(t *testing.T) {
 	mustTrap("st32 straddling end", func() { m.Xst32(65533, 0) })
 	mustTrap("st64 first past end", func() { m.Xst64(65536, 0) })
 
+	// v128 accesses at the edge and straddling it.
+	m.Xst128(65520, 0x0102030405060708)
+	if got := m.Xld128(65520); got != 0x0102030405060708 {
+		t.Errorf("ld128(65520) = %#x after st128, want 0x0102030405060708", got)
+	}
+	mustTrap("st128 straddling end", func() { m.Xst128(65528, 0) })
+	mustTrap("ld128 straddling end", func() { m.Xld128(65521) })
+
 	// Huge static offset: effective address up to 2^33-2 must trap, not wrap.
 	mustTrap("static offset 0xffffffff", func() { m.Xld32o(0) })
 	mustTrap("static offset at max address", func() { m.Xld32o(-1) })
@@ -85,6 +93,15 @@ func Test_regression_oob_trap(t *testing.T) {
 		t.Errorf("ld32(65536) = %d after grow, want 42", got)
 	}
 	mustTrap("ld32 past grown end", func() { m.Xld32(131073) })
+
+	// The grown slice has spare capacity; 16-byte accesses must still trap
+	// at the memory's length, not its capacity.
+	m.Xst128(131056, 42)
+	if got := m.Xld128(131056); got != 42 {
+		t.Errorf("ld128(131056) = %d after grow, want 42", got)
+	}
+	mustTrap("st128 past grown end", func() { m.Xst128(131064, 0) })
+	mustTrap("ld128 past grown end", func() { m.Xld128(131064) })
 }
 
 func Test_regression_provided_helper(t *testing.T) {
