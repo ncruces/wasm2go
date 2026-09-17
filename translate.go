@@ -33,7 +33,9 @@ var (
 	//go:embed helpers/cpuarch_unsafe.go
 	helpersCpuArchSrc string
 	//go:embed helpers/simd.go
-	helpersSimdSrc string
+	helpersSIMDSrc string
+	//go:embed helpers/simd_unsafe.go
+	helpersSIMDUnsafeSrc string
 )
 
 // These helpers can never trap.
@@ -99,7 +101,7 @@ func translate(r io.Reader, w io.Writer) error {
 	t.provided = set[string]{}
 	t.helpers = set[string]{}
 
-	helperNames, err := t.findHelpers(fset, helpersSrc, helpersAtomicsSrc, helpersSimdSrc)
+	helperNames, err := t.findHelpers(fset, helpersSrc, helpersSIMDSrc, helpersAtomicsSrc)
 	if err != nil {
 		return err
 	}
@@ -202,8 +204,11 @@ func translate(r io.Reader, w io.Writer) error {
 			if err := t.resolveHelpers(fset, "atomics_unsafe.go", helpersAtomicsSrc); err != nil {
 				return err
 			}
+			if err := t.resolveHelpers(fset, "simd_unsafe.go", helpersSIMDUnsafeSrc); err != nil {
+				return err
+			}
 		}
-		if err := t.resolveHelpers(fset, "simd.go", helpersSimdSrc); err != nil {
+		if err := t.resolveHelpers(fset, "simd.go", helpersSIMDSrc); err != nil {
 			return err
 		}
 		if err := t.resolveHelpers(fset, "helpers.go", helpersSrc); err != nil {

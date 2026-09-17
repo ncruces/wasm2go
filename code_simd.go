@@ -8,7 +8,7 @@ import (
 	"io"
 )
 
-func (t *translator) readOpcodeSimd(fn *funcCompiler) error {
+func (t *translator) readOpcodeSIMD(fn *funcCompiler) error {
 	code, err := readLEB128(t.in)
 	if err != nil {
 		return err
@@ -569,9 +569,7 @@ func (fn *funcCompiler) simdBin(name string) {
 
 // Returns an expression that loads a v128 from memory.
 func (fn *funcCompiler) loadV128(offset uint64) ast.Expr {
-	return fn.simdCall("load128", &ast.SliceExpr{
-		X:   fn.memory.selector,
-		Low: fn.popAddr(offset)})
+	return fn.simdCall("load128", fn.memory.selector, fn.popAddr(offset))
 }
 
 // Returns a statement that stores a v128 to memory.
@@ -579,9 +577,8 @@ func (fn *funcCompiler) storeV128(offset uint64) ast.Stmt {
 	val := fn.pop()
 	addr := fn.popAddr(offset)
 	return &ast.ExprStmt{X: fn.simdCall("store128",
-		&ast.SliceExpr{
-			X:   fn.memory.selector,
-			Low: addr},
+		fn.memory.selector,
+		addr,
 		val)}
 }
 
