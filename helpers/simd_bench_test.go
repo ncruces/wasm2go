@@ -62,7 +62,7 @@ var (
 	sinkV  v128
 	sinkI  int32
 	benchA = bytes128{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
-	benchV = load128(benchA[:])
+	benchV = load128[uint32](benchA[:], 0)
 	benchM = make([]byte, 4096)
 )
 
@@ -123,7 +123,7 @@ func BenchmarkV128(b *testing.B) {
 		b.SetBytes(16)
 		q := i8x16_splat('"')
 		for i := 0; i < b.N; i++ {
-			v := load128(benchM[i&4095&^15:])
+			v := load128[uint32](benchM[i&4095&^15:], 0)
 			sinkI += i8x16_bitmask(v128_and(i8x16_eq(v, q), sinkV))
 		}
 	})
@@ -137,7 +137,7 @@ func BenchmarkV128(b *testing.B) {
 	b.Run("copy16/words", func(b *testing.B) {
 		b.SetBytes(16)
 		for i := 0; i < b.N; i++ {
-			store128(benchM[(i+1)&4095&^15:], load128(benchM[i&4095&^15:]))
+			store128[uint32](benchM[(i+1)&4095&^15:], 0, load128[uint32](benchM[i&4095&^15:], 0))
 		}
 	})
 }

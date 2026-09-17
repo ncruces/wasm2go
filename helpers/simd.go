@@ -31,16 +31,18 @@ import (
 type v128 struct{ lo, hi uint64 }
 
 //go:nosplit
-func load128(b []byte) v128 {
-	_ = b[15]
-	return v128{binary.LittleEndian.Uint64(b), binary.LittleEndian.Uint64(b[8:])}
+func load128[T uint32 | uint64](mem []byte, addr T) v128 {
+	b := (*[16]byte)(mem[addr:])
+	return v128{
+		binary.LittleEndian.Uint64(b[:8]),
+		binary.LittleEndian.Uint64(b[8:])}
 }
 
 //go:nosplit
-func store128(b []byte, v v128) {
-	_ = b[15]
-	binary.LittleEndian.PutUint64(b, v.lo)
-	binary.LittleEndian.PutUint64(b[8:], v.hi)
+func store128[T uint32 | uint64](mem []byte, addr T, val v128) {
+	b := (*[16]byte)(mem[addr:])
+	binary.LittleEndian.PutUint64(b[:8], val.lo)
+	binary.LittleEndian.PutUint64(b[8:], val.hi)
 }
 
 //go:nosplit

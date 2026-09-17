@@ -1127,7 +1127,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 
 		case 0xfd: // SIMD
-			err := t.readOpcodeSimd(fn)
+			err := t.readOpcodeSIMD(fn)
 			if err != nil {
 				return err
 			}

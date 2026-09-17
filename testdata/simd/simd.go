@@ -5,6 +5,7 @@ package wasm2go
 import (
 	"encoding/binary"
 	"math"
+	"math/bits"
 )
 
 type Module struct {
@@ -34,51 +35,51 @@ func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xv128_load_dip896(v0 int32) v128 {
-	t0 := load128(m.memory[int64(uint32(v0))+8:])
+	t0 := load128(m.memory, uint64(uint32(v0))+8)
 	return t0
 }
 func (m *Module) Xv128_load8x8_s_mwwu9f(v0 int32) v128 {
-	t0 := v128_load8x8_s(load64(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load8x8_s(load64(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xv128_load8x8_u_veubbv(v0 int32) v128 {
-	t0 := v128_load8x8_u(load64(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load8x8_u(load64(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xv128_load16x4_s_3pbnu7(v0 int32) v128 {
-	t0 := v128_load16x4_s(load64(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load16x4_s(load64(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xv128_load16x4_u_c78f47(v0 int32) v128 {
-	t0 := v128_load16x4_u(load64(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load16x4_u(load64(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xv128_load32x2_s_s4naq3(v0 int32) v128 {
-	t0 := v128_load32x2_s(load64(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load32x2_s(load64(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xv128_load32x2_u_how89v(v0 int32) v128 {
-	t0 := v128_load32x2_u(load64(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load32x2_u(load64(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xv128_load8_splat_jg6ein(v0 int32) v128 {
-	t0 := i8x16_splat(int32(m.memory[int64(uint32(v0))+8]))
+	t0 := i8x16_splat(int32(m.memory[uint64(uint32(v0))+8]))
 	return t0
 }
 func (m *Module) Xv128_load16_splat_fu6t3v(v0 int32) v128 {
-	t0 := i16x8_splat(int32(load16(m.memory, int64(uint32(v0))+8)))
+	t0 := i16x8_splat(int32(load16(m.memory, uint64(uint32(v0))+8)))
 	return t0
 }
 func (m *Module) Xv128_load32_splat_41cz0k(v0 int32) v128 {
-	t0 := i32x4_splat(int32(load32(m.memory, int64(uint32(v0))+8)))
+	t0 := i32x4_splat(int32(load32(m.memory, uint64(uint32(v0))+8)))
 	return t0
 }
 func (m *Module) Xv128_load64_splat_5cob4f(v0 int32) v128 {
-	t0 := i64x2_splat(int64(load64(m.memory, int64(uint32(v0))+8)))
+	t0 := i64x2_splat(int64(load64(m.memory, uint64(uint32(v0))+8)))
 	return t0
 }
 func (m *Module) Xv128_store_lkozsu(v0 int32, v1 v128) {
-	store128(m.memory[int64(uint32(v0))+8:], v1)
+	store128(m.memory, uint64(uint32(v0))+8, v1)
 }
 func (m *Module) Xv128_const_t9ir8q() v128 {
 	return v128{0x5566778811223344, 0xddeeff0099aabbcc}
@@ -297,39 +298,39 @@ func (m *Module) Xv128_any_true_1s203v(v0 v128) int32 {
 	return v128_any_true(v0)
 }
 func (m *Module) Xv128_load8_lane_bcsgmf(v0 int32, v1 v128) v128 {
-	t0 := i8x16_replace_lane(v1, 15, int32(m.memory[int64(uint32(v0))+4]))
+	t0 := i8x16_replace_lane(v1, 15, int32(m.memory[uint64(uint32(v0))+4]))
 	return t0
 }
 func (m *Module) Xv128_load16_lane_fe04fe(v0 int32, v1 v128) v128 {
-	t0 := i16x8_replace_lane(v1, 7, int32(load16(m.memory, int64(uint32(v0))+4)))
+	t0 := i16x8_replace_lane(v1, 7, int32(load16(m.memory, uint64(uint32(v0))+4)))
 	return t0
 }
 func (m *Module) Xv128_load32_lane_ozaljh(v0 int32, v1 v128) v128 {
-	t0 := i32x4_replace_lane(v1, 3, int32(load32(m.memory, int64(uint32(v0))+4)))
+	t0 := i32x4_replace_lane(v1, 3, int32(load32(m.memory, uint64(uint32(v0))+4)))
 	return t0
 }
 func (m *Module) Xv128_load64_lane_zc6d5s(v0 int32, v1 v128) v128 {
-	t0 := i64x2_replace_lane(v1, 1, int64(load64(m.memory, int64(uint32(v0))+4)))
+	t0 := i64x2_replace_lane(v1, 1, int64(load64(m.memory, uint64(uint32(v0))+4)))
 	return t0
 }
 func (m *Module) Xv128_store8_lane_jftylf(v0 int32, v1 v128) {
-	m.memory[int64(uint32(v0))+4] = byte(i8x16_extract_lane_u(v1, 15))
+	m.memory[uint64(uint32(v0))+4] = byte(i8x16_extract_lane_u(v1, 15))
 }
 func (m *Module) Xv128_store16_lane_hjllv1(v0 int32, v1 v128) {
-	store16(m.memory, int64(uint32(v0))+4, uint16(i16x8_extract_lane_u(v1, 7)))
+	store16(m.memory, uint64(uint32(v0))+4, uint16(i16x8_extract_lane_u(v1, 7)))
 }
 func (m *Module) Xv128_store32_lane_q0rn62(v0 int32, v1 v128) {
-	store32(m.memory, int64(uint32(v0))+4, uint32(i32x4_extract_lane(v1, 3)))
+	store32(m.memory, uint64(uint32(v0))+4, uint32(i32x4_extract_lane(v1, 3)))
 }
 func (m *Module) Xv128_store64_lane_x6eaw7(v0 int32, v1 v128) {
-	store64(m.memory, int64(uint32(v0))+4, uint64(i64x2_extract_lane(v1, 1)))
+	store64(m.memory, uint64(uint32(v0))+4, uint64(i64x2_extract_lane(v1, 1)))
 }
 func (m *Module) Xv128_load32_zero_ugbgud(v0 int32) v128 {
-	t0 := v128_load32_zero(load32(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load32_zero(load32(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xv128_load64_zero_ku7gdk(v0 int32) v128 {
-	t0 := v128_load64_zero(load64(m.memory, int64(uint32(v0))+8))
+	t0 := v128_load64_zero(load64(m.memory, uint64(uint32(v0))+8))
 	return t0
 }
 func (m *Module) Xf32x4_demote_f64x2_zero_jndnwx(v0 v128) v128 {
@@ -780,8 +781,8 @@ func (m *Module) Xmulf(v0, v1 float32) float32 {
 	return f32x4_extract_lane(f32x4_mul(f32x4_splat(v0), f32x4_splat(v1)), 2)
 }
 func (m *Module) Xmemrt(v0 int32) int32 {
-	store128(m.memory[uint32(i32(16)):], i32x4_splat(v0))
-	t0 := load128(m.memory[uint32(i32(16)):])
+	store128(m.memory, uint32(i32(16)), i32x4_splat(v0))
+	t0 := load128(m.memory, uint32(i32(16)))
 	return i32x4_bitmask(t0)
 }
 func (m *Module) Xmem() Memory {
@@ -794,16 +795,18 @@ func (m *Module) Xmem() Memory {
 type v128 struct{ lo, hi uint64 }
 
 //go:nosplit
-func load128(b []byte) v128 {
-	_ = b[15]
-	return v128{binary.LittleEndian.Uint64(b), binary.LittleEndian.Uint64(b[8:])}
+func load128[T uint32 | uint64](mem []byte, addr T) v128 {
+	b := (*[16]byte)(mem[addr:])
+	return v128{
+		binary.LittleEndian.Uint64(b[:8]),
+		binary.LittleEndian.Uint64(b[8:])}
 }
 
 //go:nosplit
-func store128(b []byte, v v128) {
-	_ = b[15]
-	binary.LittleEndian.PutUint64(b, v.lo)
-	binary.LittleEndian.PutUint64(b[8:], v.hi)
+func store128[T uint32 | uint64](mem []byte, addr T, val v128) {
+	b := (*[16]byte)(mem[addr:])
+	binary.LittleEndian.PutUint64(b[:8], val.lo)
+	binary.LittleEndian.PutUint64(b[8:], val.hi)
 }
 
 //go:nosplit
@@ -4111,48 +4114,47 @@ func i64x2_abs(a v128) v128 {
 func i32(x int32) int32 { return x }
 
 //go:nosplit
-func load16[T uint32 | int64](mem []byte, addr T) uint16 {
+func load16[T uint32 | uint64](mem []byte, addr T) uint16 {
 	return binary.LittleEndian.Uint16(mem[addr:])
 }
 
 //go:nosplit
-func store16[T uint32 | int64](mem []byte, addr T, val uint16) {
+func store16[T uint32 | uint64](mem []byte, addr T, val uint16) {
 	binary.LittleEndian.PutUint16(mem[addr:], val)
 }
 
 //go:nosplit
-func load32[T uint32 | int64](mem []byte, addr T) uint32 {
+func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
 	return binary.LittleEndian.Uint32(mem[addr:])
 }
 
 //go:nosplit
-func store32[T uint32 | int64](mem []byte, addr T, val uint32) {
+func store32[T uint32 | uint64](mem []byte, addr T, val uint32) {
 	binary.LittleEndian.PutUint32(mem[addr:], val)
 }
 
 //go:nosplit
-func load64[T uint32 | int64](mem []byte, addr T) uint64 {
+func load64[T uint32 | uint64](mem []byte, addr T) uint64 {
 	return binary.LittleEndian.Uint64(mem[addr:])
 }
 
 //go:nosplit
-func store64[T uint32 | int64](mem []byte, addr T, val uint64) {
+func store64[T uint32 | uint64](mem []byte, addr T, val uint64) {
 	binary.LittleEndian.PutUint64(mem[addr:], val)
 }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
 	buf := *mem
-	len := int64(len(buf))
+	len := len(buf)
 	old := len >> 16
 	if delta == 0 {
-		return old
+		return int64(old)
 	}
-	new := old + delta
-	add := new<<16 - len
-	max = min(max, int64(math.MaxInt)>>16)
-	if new > max || new < old || add < 0 {
+	max = int64(min(uint64(max), math.MaxInt>>16))
+	new, c := bits.Add64(uint64(old), uint64(delta), 0)
+	if c != 0 || new > uint64(max) {
 		return -1
 	}
-	*mem = append(buf, make([]byte, add)...)
-	return old
+	*mem = append(buf, make([]byte, int(new<<16)-len)...)
+	return int64(old)
 }

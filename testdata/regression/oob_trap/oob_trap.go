@@ -55,11 +55,11 @@ func (m *Module) Xst64(v0 int32, v1 int64) {
 	store64(m.memory, uint32(v0), uint64(v1))
 }
 func (m *Module) Xld128(v0 int32) int64 {
-	t0 := load128(m.memory[uint32(v0):])
+	t0 := load128(m.memory, uint32(v0))
 	return i64x2_extract_lane(t0, 1)
 }
 func (m *Module) Xst128(v0 int32, v1 int64) {
-	store128(m.memory[uint32(v0):], i64x2_splat(v1))
+	store128(m.memory, uint32(v0), i64x2_splat(v1))
 }
 func (m *Module) Xgrow(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
@@ -75,16 +75,18 @@ func (m *Module) Xmemory() Memory {
 type v128 struct{ lo, hi uint64 }
 
 //go:nosplit
-func load128(b []byte) v128 {
-	_ = b[15]
-	return v128{binary.LittleEndian.Uint64(b), binary.LittleEndian.Uint64(b[8:])}
+func load128[T uint32 | uint64](mem []byte, addr T) v128 {
+	b := (*[16]byte)(mem[addr:])
+	return v128{
+		binary.LittleEndian.Uint64(b[:8]),
+		binary.LittleEndian.Uint64(b[8:])}
 }
 
 //go:nosplit
-func store128(b []byte, v v128) {
-	_ = b[15]
-	binary.LittleEndian.PutUint64(b, v.lo)
-	binary.LittleEndian.PutUint64(b[8:], v.hi)
+func store128[T uint32 | uint64](mem []byte, addr T, val v128) {
+	b := (*[16]byte)(mem[addr:])
+	binary.LittleEndian.PutUint64(b[:8], val.lo)
+	binary.LittleEndian.PutUint64(b[8:], val.hi)
 }
 
 //go:nosplit

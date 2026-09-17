@@ -887,12 +887,12 @@ func TestShuffleSwizzle(t *testing.T) {
 // Vector loads: extension, splat, zero forms.
 func TestLoads(t *testing.T) {
 	buf := []byte{0x01, 0x82, 0x03, 0x84, 0x05, 0x86, 0x07, 0x88, 0x09, 0x8a, 0x0b, 0x8c, 0x0d, 0x8e, 0x0f, 0x90}
-	v := load128(buf)
+	v := load128[uint32](buf, 0)
 	if v != vecOf([16]uint8(buf)) {
 		t.Errorf("load128: got %v, want %v", v, buf)
 	}
 	var out [16]byte
-	store128(out[:], v)
+	store128[uint32](out[:], 0, v)
 	if out != [16]byte(buf) {
 		t.Errorf("store128: got %v, want %v", out, buf)
 	}
@@ -943,7 +943,7 @@ func TestLoads(t *testing.T) {
 		t.Errorf("load64_zero: got %v, want %v", got, want)
 	}
 
-	load128(buf[:15]) // panics
+	load128[uint32](buf[:15], 0) // panics
 }
 
 // Float lane cases: NaNs, signed zeros, infinities, denormals, and exact values.
