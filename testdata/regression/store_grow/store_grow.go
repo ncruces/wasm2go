@@ -24,8 +24,8 @@ func (m *Module) fn0() int32 {
 }
 func (m *Module) Xtest() int32 {
 	t0 := m.fn0()
-	store32(m.memory, uint32(i32(0)), uint32(t0))
-	t1 := int32(load32(m.memory, uint32(i32(0))))
+	store32(m.memory, uint64(uint32(i32(0))), uint32(t0))
+	t1 := int32(load32(m.memory, uint64(uint32(i32(0)))))
 	return t1
 }
 func (m *Module) Xsize() int32 {
@@ -37,12 +37,12 @@ func (m *Module) Xsize() int32 {
 func i32(x int32) int32 { return x }
 
 //go:nosplit
-func load32[T uint32 | int64](mem []byte, addr T) uint32 {
+func load32(mem []byte, addr uint64) uint32 {
 	return binary.LittleEndian.Uint32(mem[addr:])
 }
 
 //go:nosplit
-func store32[T uint32 | int64](mem []byte, addr T, val uint32) {
+func store32(mem []byte, addr uint64, val uint32) {
 	binary.LittleEndian.PutUint32(mem[addr:], val)
 }
 

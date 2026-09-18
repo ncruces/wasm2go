@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"strconv"
 	"strings"
 )
 
@@ -187,7 +186,7 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 			Fun: newID("table_grow"),
 			Args: []ast.Expr{
 				tab, val, delta,
-				&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(t.tables[idx].max)}}})
+				&ast.BasicLit{Kind: token.INT, Value: formatUint(t.tables[idx].max)}}})
 
 	case 0x10: // table.size
 		idx, err := readLEB128(t.in)

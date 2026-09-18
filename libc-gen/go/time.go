@@ -3,19 +3,19 @@ package libc
 import "time"
 
 func localtime_r(timer, buf ptr) ptr {
-	t := load64(memory, uptr(timer))
+	t := load64(memory, uint64(uptr(timer)))
 	storetime_r(memory[uptr(buf):], time.Unix(int64(t), 0))
 	return buf
 }
 
 func gmtime_r(timer, buf ptr) ptr {
-	t := load64(memory, uptr(timer))
+	t := load64(memory, uint64(uptr(timer)))
 	storetime_r(memory[uptr(buf):], time.Unix(int64(t), 0).UTC())
 	return buf
 }
 
 func storetime_r(buf []byte, t time.Time) {
-	const size uptr = 32 / 8
+	const size uint64 = 32 / 8
 	var isdst uint32
 	if t.IsDST() {
 		isdst = 1
@@ -23,6 +23,7 @@ func storetime_r(buf []byte, t time.Time) {
 	_, zone := t.Zone()
 
 	// https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/time.h.html
+	store32(buf, 10*size, 0)
 	store32(buf, 0*size, uint32(t.Second()))
 	store32(buf, 1*size, uint32(t.Minute()))
 	store32(buf, 2*size, uint32(t.Hour()))
@@ -33,14 +34,13 @@ func storetime_r(buf []byte, t time.Time) {
 	store32(buf, 7*size, uint32(t.YearDay()-1))
 	store32(buf, 8*size, isdst)
 	store32(buf, 9*size, uint32(zone))
-	store32(buf, 10*size, 0)
 }
 
 func gettimeofday(arg, _ ptr) int32 {
 	if arg != 0 {
 		now := time.Now()
-		store64(memory, uptr(arg), uint64(now.Unix()))
-		store32(memory, uptr(arg)+8, uint32(now.Nanosecond()/1000))
+		store32(memory, uint64(uptr(arg))+8, uint32(now.Nanosecond()/1000))
+		store64(memory, uint64(uptr(arg))+0, uint64(now.Unix()))
 	}
 	return 0
 }

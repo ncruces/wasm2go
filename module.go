@@ -132,7 +132,7 @@ func (t *translator) createNewFunc() ast.Decl {
 				Fun: newID("make"),
 				Args: []ast.Expr{
 					&ast.ArrayType{Elt: newID("any")},
-					&ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(tab.min)}}}}})
+					&ast.BasicLit{Kind: token.INT, Value: formatUint(tab.min)}}}}})
 	}
 	// Create owned memory.
 	if t.memory != nil {
@@ -142,14 +142,14 @@ func (t *translator) createNewFunc() ast.Decl {
 				X:   newID("m"),
 				Sel: newID("maxMem")}},
 			Rhs: []ast.Expr{
-				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max)}}})
+				&ast.BasicLit{Kind: token.INT, Value: formatUint(t.memory.max)}}})
 		if !t.memory.imported {
 			args := []ast.Expr{
 				&ast.ArrayType{Elt: newID("byte")},
-				&ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.min << 16)},
+				&ast.BasicLit{Kind: token.INT, Value: formatUint(t.memory.min << 16)},
 			}
 			if t.memory.shared {
-				args = append(args, &ast.BasicLit{Kind: token.INT, Value: formatInt(t.memory.max << 16)})
+				args = append(args, &ast.BasicLit{Kind: token.INT, Value: formatUint(t.memory.max << 16)})
 			}
 			body.List = append(body.List, &ast.AssignStmt{
 				Tok: token.ASSIGN,

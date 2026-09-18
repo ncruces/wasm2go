@@ -29,12 +29,12 @@ func Test_strtod(t *testing.T) {
 			endptr := ptr(4)
 
 			writeString(start, tc.input)
-			store32(memory, uptr(endptr), 0)
+			store32(memory, uint64(uptr(endptr)), 0)
 
 			got := strtod(start, endptr)
 			checkFloat(t, got, tc.want)
 
-			end := ptr(load32(memory, uptr(endptr)))
+			end := ptr(load32(memory, uint64(uptr(endptr))))
 			if tc.offset != end-start {
 				t.Errorf("got %d, want %v endptr offset", end-start, tc.offset)
 			}
@@ -68,14 +68,14 @@ func Test_strtol(t *testing.T) {
 			endptr := ptr(4)
 
 			writeString(start, tc.input)
-			store32(memory, uptr(endptr), 0)
+			store32(memory, uint64(uptr(endptr)), 0)
 
 			got := strtol(start, endptr, tc.base)
 			if got != tc.want {
 				t.Fatalf("got %v, want %v", got, tc.want)
 			}
 
-			end := ptr(load32(memory, uptr(endptr)))
+			end := ptr(load32(memory, uint64(uptr(endptr))))
 			if tc.offset != end-start {
 				t.Errorf("got %d, want %v endptr offset", end-start, tc.offset)
 			}
@@ -111,14 +111,14 @@ func Test_strtoul(t *testing.T) {
 			endptr := ptr(4)
 
 			writeString(start, tc.input)
-			store32(memory, uptr(endptr), 0)
+			store32(memory, uint64(uptr(endptr)), 0)
 
 			got := strtoul(start, endptr, tc.base)
 			if got != tc.want {
 				t.Fatalf("got %v, want %v", got, tc.want)
 			}
 
-			end := ptr(load32(memory, uptr(endptr)))
+			end := ptr(load32(memory, uint64(uptr(endptr))))
 			if tc.offset != end-start {
 				t.Errorf("got %d, want %v endptr offset", end-start, tc.offset)
 			}

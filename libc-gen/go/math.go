@@ -51,13 +51,13 @@ func lgamma(x float64) float64 {
 
 func lgamma_r(x float64, sptr ptr) float64 {
 	x, sign := math.Lgamma(x)
-	store32(memory, uptr(sptr), uint32(sign))
+	store32(memory, uint64(uptr(sptr)), uint32(sign))
 	return x
 }
 
 func frexp(x float64, eptr ptr) float64 {
 	x, exp := math.Frexp(x)
-	store32(memory, uptr(eptr), uint32(exp))
+	store32(memory, uint64(uptr(eptr)), uint32(exp))
 	return x
 }
 
@@ -67,7 +67,7 @@ func modf(x float64, iptr ptr) (f float64) {
 	} else {
 		x, f = math.Modf(x)
 	}
-	store64(memory, uptr(iptr), math.Float64bits(x))
+	store64(memory, uint64(uptr(iptr)), math.Float64bits(x))
 	return f
 }
 

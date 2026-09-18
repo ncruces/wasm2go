@@ -126,8 +126,8 @@ type tableDef struct {
 	id       *ast.Ident
 	imported bool
 	is64     bool
-	min      int
-	max      int
+	min      uint64
+	max      uint64
 }
 
 func (m *tableDef) stype() string {
@@ -143,8 +143,8 @@ type memoryDef struct {
 	imported bool
 	shared   bool
 	is64     bool
-	min      int64
-	max      int64
+	min      uint64
+	max      uint64
 }
 
 func (m *memoryDef) stype() string {

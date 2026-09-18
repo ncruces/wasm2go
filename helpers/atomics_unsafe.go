@@ -12,7 +12,7 @@ import (
 // Use nosplit only on functions with no loops.
 
 //go:nosplit
-func atomic_load32[T uint32 | int64](mem []byte, addr T) uint32 {
+func atomic_load32(mem []byte, addr uint64) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	val := atomic.LoadUint32(ptr)
 	if big {
@@ -22,7 +22,7 @@ func atomic_load32[T uint32 | int64](mem []byte, addr T) uint32 {
 }
 
 //go:nosplit
-func atomic_load64[T uint32 | int64](mem []byte, addr T) uint64 {
+func atomic_load64(mem []byte, addr uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	val := atomic.LoadUint64(ptr)
 	if big {
@@ -32,7 +32,7 @@ func atomic_load64[T uint32 | int64](mem []byte, addr T) uint64 {
 }
 
 //go:nosplit
-func atomic_store32[T uint32 | int64](mem []byte, addr T, val uint32) {
+func atomic_store32(mem []byte, addr uint64, val uint32) {
 	ptr := atomic_ptr32(mem, addr)
 	if big {
 		val = bits.ReverseBytes32(val)
@@ -41,7 +41,7 @@ func atomic_store32[T uint32 | int64](mem []byte, addr T, val uint32) {
 }
 
 //go:nosplit
-func atomic_store64[T uint32 | int64](mem []byte, addr T, val uint64) {
+func atomic_store64(mem []byte, addr uint64, val uint64) {
 	ptr := atomic_ptr64(mem, addr)
 	if big {
 		val = bits.ReverseBytes64(val)
@@ -50,7 +50,7 @@ func atomic_store64[T uint32 | int64](mem []byte, addr T, val uint64) {
 }
 
 //go:nosplit
-func atomic_xchg32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
+func atomic_xchg32(mem []byte, addr uint64, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if big {
 		val = bits.ReverseBytes32(val)
@@ -63,7 +63,7 @@ func atomic_xchg32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 }
 
 //go:nosplit
-func atomic_xchg64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+func atomic_xchg64(mem []byte, addr uint64, val uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	if big {
 		val = bits.ReverseBytes64(val)
@@ -76,7 +76,7 @@ func atomic_xchg64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
 }
 
 //go:nosplit
-func atomic_and32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
+func atomic_and32(mem []byte, addr uint64, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if big {
 		val = bits.ReverseBytes32(val)
@@ -89,7 +89,7 @@ func atomic_and32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 }
 
 //go:nosplit
-func atomic_and64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+func atomic_and64(mem []byte, addr uint64, val uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	if big {
 		val = bits.ReverseBytes64(val)
@@ -102,7 +102,7 @@ func atomic_and64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
 }
 
 //go:nosplit
-func atomic_or32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
+func atomic_or32(mem []byte, addr uint64, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if big {
 		val = bits.ReverseBytes32(val)
@@ -115,7 +115,7 @@ func atomic_or32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 }
 
 //go:nosplit
-func atomic_or64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+func atomic_or64(mem []byte, addr uint64, val uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	if big {
 		val = bits.ReverseBytes64(val)
@@ -127,7 +127,7 @@ func atomic_or64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
 	return old
 }
 
-func atomic_xor32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
+func atomic_xor32(mem []byte, addr uint64, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if big {
 		val = bits.ReverseBytes32(val)
@@ -143,7 +143,7 @@ func atomic_xor32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 	}
 }
 
-func atomic_xor64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+func atomic_xor64(mem []byte, addr uint64, val uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	if big {
 		val = bits.ReverseBytes64(val)
@@ -159,7 +159,7 @@ func atomic_xor64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
 	}
 }
 
-func atomic_add32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
+func atomic_add32(mem []byte, addr uint64, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if little {
 		return atomic.AddUint32(ptr, +val) - val
@@ -173,7 +173,7 @@ func atomic_add32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 	}
 }
 
-func atomic_add64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+func atomic_add64(mem []byte, addr uint64, val uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	if little {
 		return atomic.AddUint64(ptr, +val) - val
@@ -187,7 +187,7 @@ func atomic_add64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
 	}
 }
 
-func atomic_sub32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
+func atomic_sub32(mem []byte, addr uint64, val uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	if little {
 		return atomic.AddUint32(ptr, -val) + val
@@ -201,7 +201,7 @@ func atomic_sub32[T uint32 | int64](mem []byte, addr T, val uint32) uint32 {
 	}
 }
 
-func atomic_sub64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
+func atomic_sub64(mem []byte, addr uint64, val uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	if little {
 		return atomic.AddUint64(ptr, -val) + val
@@ -215,7 +215,7 @@ func atomic_sub64[T uint32 | int64](mem []byte, addr T, val uint64) uint64 {
 	}
 }
 
-func atomic_cmpxchg32[T uint32 | int64](mem []byte, addr T, old, new uint32) uint32 {
+func atomic_cmpxchg32(mem []byte, addr uint64, old, new uint32) uint32 {
 	ptr := atomic_ptr32(mem, addr)
 	exp := old
 	if big {
@@ -235,7 +235,7 @@ func atomic_cmpxchg32[T uint32 | int64](mem []byte, addr T, old, new uint32) uin
 	}
 }
 
-func atomic_cmpxchg64[T uint32 | int64](mem []byte, addr T, old, new uint64) uint64 {
+func atomic_cmpxchg64(mem []byte, addr uint64, old, new uint64) uint64 {
 	ptr := atomic_ptr64(mem, addr)
 	exp := old
 	if big {
@@ -256,7 +256,7 @@ func atomic_cmpxchg64[T uint32 | int64](mem []byte, addr T, old, new uint64) uin
 }
 
 //go:nosplit
-func atomic_load8[T uint32 | int64](mem []byte, addr T) uint8 {
+func atomic_load8(mem []byte, addr uint64) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 	v := atomic.LoadUint32(ptr)
 	if big {
@@ -266,7 +266,7 @@ func atomic_load8[T uint32 | int64](mem []byte, addr T) uint8 {
 }
 
 //go:nosplit
-func atomic_load16[T uint32 | int64](mem []byte, addr T) uint16 {
+func atomic_load16(mem []byte, addr uint64) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 	v := atomic.LoadUint32(ptr)
 	if big {
@@ -276,7 +276,7 @@ func atomic_load16[T uint32 | int64](mem []byte, addr T) uint16 {
 }
 
 //go:nosplit
-func atomic_or8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
+func atomic_or8(mem []byte, addr uint64, val uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mval := uint32(val) << shift
@@ -292,7 +292,7 @@ func atomic_or8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 }
 
 //go:nosplit
-func atomic_or16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
+func atomic_or16(mem []byte, addr uint64, val uint16) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mval := uint32(val) << shift
@@ -308,7 +308,7 @@ func atomic_or16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
 }
 
 //go:nosplit
-func atomic_and8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
+func atomic_and8(mem []byte, addr uint64, val uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mval := uint32(val)<<shift | ^(255 << shift)
@@ -324,7 +324,7 @@ func atomic_and8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 }
 
 //go:nosplit
-func atomic_and16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
+func atomic_and16(mem []byte, addr uint64, val uint16) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mval := uint32(val)<<shift | ^(65535 << shift)
@@ -339,7 +339,7 @@ func atomic_and16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
 	return uint16(old >> shift)
 }
 
-func atomic_store8[T uint32 | int64](mem []byte, addr T, val uint8) {
+func atomic_store8(mem []byte, addr uint64, val uint8) {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mval := uint32(val) << shift
@@ -357,7 +357,7 @@ func atomic_store8[T uint32 | int64](mem []byte, addr T, val uint8) {
 	}
 }
 
-func atomic_store16[T uint32 | int64](mem []byte, addr T, val uint16) {
+func atomic_store16(mem []byte, addr uint64, val uint16) {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mval := uint32(val) << shift
@@ -375,7 +375,7 @@ func atomic_store16[T uint32 | int64](mem []byte, addr T, val uint16) {
 	}
 }
 
-func atomic_xchg8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
+func atomic_xchg8(mem []byte, addr uint64, val uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mval := uint32(val) << shift
@@ -396,7 +396,7 @@ func atomic_xchg8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 	}
 }
 
-func atomic_xchg16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
+func atomic_xchg16(mem []byte, addr uint64, val uint16) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mval := uint32(val) << shift
@@ -417,7 +417,7 @@ func atomic_xchg16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
 	}
 }
 
-func atomic_xor8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
+func atomic_xor8(mem []byte, addr uint64, val uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mval := uint32(val) << shift
@@ -436,7 +436,7 @@ func atomic_xor8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 	}
 }
 
-func atomic_xor16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
+func atomic_xor16(mem []byte, addr uint64, val uint16) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mval := uint32(val) << shift
@@ -455,7 +455,7 @@ func atomic_xor16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
 	}
 }
 
-func atomic_add8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
+func atomic_add8(mem []byte, addr uint64, val uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mval := uint32(val) << shift
@@ -477,7 +477,7 @@ func atomic_add8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 	}
 }
 
-func atomic_sub8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
+func atomic_sub8(mem []byte, addr uint64, val uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mval := uint32(val) << shift
@@ -499,7 +499,7 @@ func atomic_sub8[T uint32 | int64](mem []byte, addr T, val uint8) uint8 {
 	}
 }
 
-func atomic_add16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
+func atomic_add16(mem []byte, addr uint64, val uint16) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mval := uint32(val) << shift
@@ -524,7 +524,7 @@ func atomic_add16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
 	}
 }
 
-func atomic_sub16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
+func atomic_sub16(mem []byte, addr uint64, val uint16) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mval := uint32(val) << shift
@@ -549,7 +549,7 @@ func atomic_sub16[T uint32 | int64](mem []byte, addr T, val uint16) uint16 {
 	}
 }
 
-func atomic_cmpxchg8[T uint32 | int64](mem []byte, addr T, old, new uint8) uint8 {
+func atomic_cmpxchg8(mem []byte, addr uint64, old, new uint8) uint8 {
 	ptr, shift := atomic_ptr8(mem, addr)
 
 	mold := uint32(old) << shift
@@ -575,7 +575,7 @@ func atomic_cmpxchg8[T uint32 | int64](mem []byte, addr T, old, new uint8) uint8
 	}
 }
 
-func atomic_cmpxchg16[T uint32 | int64](mem []byte, addr T, old, new uint16) uint16 {
+func atomic_cmpxchg16(mem []byte, addr uint64, old, new uint16) uint16 {
 	ptr, shift := atomic_ptr16(mem, addr)
 
 	mold := uint32(old) << shift
@@ -601,7 +601,7 @@ func atomic_cmpxchg16[T uint32 | int64](mem []byte, addr T, old, new uint16) uin
 	}
 }
 
-func atomic_notify[T uint32 | int64](mem []byte, addr T, count int32, waiters *sync.Map) int32 {
+func atomic_notify(mem []byte, addr uint64, count int32, waiters *sync.Map) int32 {
 	_ = atomic_ptr32(mem, addr)
 
 	if waiters == nil {
@@ -627,7 +627,7 @@ func atomic_notify[T uint32 | int64](mem []byte, addr T, count int32, waiters *s
 }
 
 //go:nosplit
-func atomic_wait32[T uint32 | int64](mem []byte, addr T, exp uint32, timeout int64, waiters *sync.Map) int32 {
+func atomic_wait32(mem []byte, addr uint64, exp uint32, timeout int64, waiters *sync.Map) int32 {
 	if big {
 		exp = bits.ReverseBytes32(exp)
 	}
@@ -638,7 +638,7 @@ func atomic_wait32[T uint32 | int64](mem []byte, addr T, exp uint32, timeout int
 }
 
 //go:nosplit
-func atomic_wait64[T uint32 | int64](mem []byte, addr T, exp uint64, timeout int64, waiters *sync.Map) int32 {
+func atomic_wait64(mem []byte, addr uint64, exp uint64, timeout int64, waiters *sync.Map) int32 {
 	if big {
 		exp = bits.ReverseBytes64(exp)
 	}
@@ -712,14 +712,14 @@ func atomic_wait(addr, timeout int64, waiters *sync.Map, equal func() bool) int3
 }
 
 //go:nosplit
-func atomic_ptr8[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint32) {
+func atomic_ptr8(mem []byte, addr uint64) (ptr *uint32, shift uint32) {
 	ptr = (*uint32)(unsafe.Pointer((*[4]byte)(mem[addr&^3:])))
 	shift = (uint32(addr) & 3) * 8
 	return
 }
 
 //go:nosplit
-func atomic_ptr16[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint32) {
+func atomic_ptr16(mem []byte, addr uint64) (ptr *uint32, shift uint32) {
 	if uint32(addr)&1 != 0 {
 		panic("unaligned atomic")
 	}
@@ -729,7 +729,7 @@ func atomic_ptr16[T uint32 | int64](mem []byte, addr T) (ptr *uint32, shift uint
 }
 
 //go:nosplit
-func atomic_ptr32[T uint32 | int64](mem []byte, addr T) *uint32 {
+func atomic_ptr32(mem []byte, addr uint64) *uint32 {
 	if uint32(addr)&3 != 0 {
 		panic("unaligned atomic")
 	}
@@ -737,7 +737,7 @@ func atomic_ptr32[T uint32 | int64](mem []byte, addr T) *uint32 {
 }
 
 //go:nosplit
-func atomic_ptr64[T uint32 | int64](mem []byte, addr T) *uint64 {
+func atomic_ptr64(mem []byte, addr uint64) *uint64 {
 	if uint32(addr)&7 != 0 {
 		panic("unaligned atomic")
 	}

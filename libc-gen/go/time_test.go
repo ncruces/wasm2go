@@ -12,7 +12,7 @@ func Test_gmtime_r(t *testing.T) {
 
 	// 1234567890 = 2009-02-13 23:31:30 UTC
 	ts := int64(1234567890)
-	store64(memory, uptr(timer), uint64(ts))
+	store64(memory, uint64(uptr(timer)), uint64(ts))
 
 	res := gmtime_r(timer, buf)
 	if res != buf {
@@ -34,7 +34,7 @@ func Test_gmtime_r(t *testing.T) {
 	}
 
 	for i, want := range wantFields {
-		got := load32(memory, uptr(buf)+uptr(i)*4)
+		got := load32(memory, uint64(uptr(buf))+uint64(uptr(i))*4)
 		if got != want {
 			t.Errorf("field %d: got %v, want %v", i, got, want)
 		}
@@ -47,7 +47,7 @@ func Test_localtime_r(t *testing.T) {
 	buf := ptr(16)
 
 	ts := int64(1234567890)
-	store64(memory, uptr(timer), uint64(ts))
+	store64(memory, uint64(uptr(timer)), uint64(ts))
 
 	res := localtime_r(timer, buf)
 	if res != buf {
@@ -77,7 +77,7 @@ func Test_localtime_r(t *testing.T) {
 	}
 
 	for i, want := range wantFields {
-		got := load32(memory, uptr(buf)+uptr(i)*4)
+		got := load32(memory, uint64(uptr(buf))+uint64(uptr(i))*4)
 		if got != want {
 			t.Errorf("field %d: got %v, want %v", i, got, want)
 		}

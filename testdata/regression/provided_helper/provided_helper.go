@@ -44,7 +44,7 @@ func (m *Module) Xmemory() Memory {
 func i32(x int32) int32 { return x }
 
 //go:nosplit
-func load64[T uint32 | int64](mem []byte, addr T) uint64 {
+func load64(mem []byte, addr uint64) uint64 {
 	return binary.LittleEndian.Uint64(mem[addr:])
 }
 

@@ -293,32 +293,25 @@ func (fn *funcCompiler) popEntry() (entryKind, ast.Expr) {
 }
 
 // Pops an address from the stack, adds an offset, and returns it.
-func (fn *funcCompiler) popAddr(offset uint64) (expr ast.Expr) {
+func (fn *funcCompiler) popAddr(offset uint64) ast.Expr {
+	offset = min(offset, fn.memory.max<<16)
 	addr := fn.pop()
 
+	// Ensures wrap-around traps correctly.
 	if fn.memory.is64 {
-		if offset == 0 {
-			return addr
-		}
-		// Ensures wrap-around traps correctly.
-		return &ast.BinaryExpr{
-			Op: token.OR,
-			X: &ast.BinaryExpr{
-				X: addr, Op: token.ADD,
-				Y: &ast.BasicLit{Kind: token.INT, Value: formatInt(int64(offset))}},
-			Y: &ast.BinaryExpr{
-				X: addr, Op: token.SHR, Y: literal63}}
+		addr = convert(addr, "uint64")
+		addr = &ast.BinaryExpr{Op: token.SHR, X: addr,
+			Y: &ast.BinaryExpr{Op: token.SHR, X: addr, Y: literal63}}
+	} else {
+		addr = convert(addr, "uint32", "uint64")
 	}
 
-	expr = convert(addr, "uint32")
 	if offset == 0 {
-		return expr
+		return addr
 	}
-	// Ensures wrap-around traps correctly.
 	return &ast.BinaryExpr{
-		Op: token.ADD,
-		X:  convert(expr, "int64"),
-		Y:  &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}}
+		Op: token.ADD, X: addr,
+		Y: &ast.BasicLit{Kind: token.INT, Value: formatUint(offset)}}
 }
 
 // Executes a type conversion, first to types[0], then to types[1] and so on.

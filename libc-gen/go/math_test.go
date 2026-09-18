@@ -22,7 +22,7 @@ func Test_lgamma_r(t *testing.T) {
 
 	checkFloat(t, got, want)
 
-	gotSign := int32(load32(memory, uptr(sptr)))
+	gotSign := int32(load32(memory, uint64(uptr(sptr))))
 	if gotSign != int32(sign) {
 		t.Errorf("want sign %v, got %v", sign, gotSign)
 	}
@@ -37,7 +37,7 @@ func Test_frexp(t *testing.T) {
 
 	checkFloat(t, got, want)
 
-	gotExp := int32(load32(memory, uptr(eptr)))
+	gotExp := int32(load32(memory, uint64(uptr(eptr))))
 	if gotExp != int32(exp) {
 		t.Errorf("want exp %v, got %v", exp, gotExp)
 	}
@@ -64,9 +64,9 @@ func Test_modf(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			store64(memory, uptr(iptr), 0)
+			store64(memory, uint64(uptr(iptr)), 0)
 			gotF := modf(tc.x, iptr)
-			gotI := math.Float64frombits(load64(memory, uptr(iptr)))
+			gotI := math.Float64frombits(load64(memory, uint64(uptr(iptr))))
 
 			checkFloat(t, gotI, tc.wantI)
 			checkFloat(t, gotF, tc.wantF)

@@ -519,15 +519,15 @@ func (t *translator) readImportSection() error {
 			if t.memory != nil {
 				return errors.New("multiple memories not supported")
 			}
-			min, max, shared, is64, err := t.readLimits(65536) // 4 GiB
+			min, max, shared, is64, err := t.readLimits()
 			if err != nil {
 				return err
 			}
 			id := &ast.Ident{}
 			t.memory = &memoryDef{
 				id:       id,
-				min:      int64(min),
-				max:      int64(max),
+				min:      min,
+				max:      max,
 				imported: true,
 				shared:   shared,
 				is64:     is64,
@@ -574,15 +574,15 @@ func (t *translator) readImportSection() error {
 				return fmt.Errorf("unsupported table type: 0x%02X", typ)
 			}
 
-			min, max, _, is64, err := t.readLimits(65536) // 1 MiB
+			min, max, _, is64, err := t.readLimits()
 			if err != nil {
 				return err
 			}
 			idx := len(t.tables)
 			t.tables = append(t.tables, tableDef{
 				id:       &ast.Ident{},
-				min:      int(min),
-				max:      int(max),
+				min:      min,
+				max:      max,
 				is64:     is64,
 				imported: true,
 			})
@@ -645,15 +645,15 @@ func (t *translator) readTableSection() error {
 			return fmt.Errorf("unsupported table type: 0x%02X", typ)
 		}
 
-		min, max, _, is64, err := t.readLimits(65536) // 1 MiB
+		min, max, _, is64, err := t.readLimits()
 		if err != nil {
 			return err
 		}
 
 		t.tables[i] = tableDef{
 			id:   &ast.Ident{},
-			min:  int(min),
-			max:  int(max),
+			min:  min,
+			max:  max,
 			is64: is64,
 		}
 	}
@@ -673,18 +673,18 @@ func (t *translator) readMemorySection() error {
 	}
 
 	id := &ast.Ident{}
-	min, max, shared, is64, err := t.readLimits(65536) // 4 GiB
+	min, max, shared, is64, err := t.readLimits()
 	t.memory = &memoryDef{
 		id:       id,
-		min:      int64(min),
-		max:      int64(max),
+		min:      min,
+		max:      max,
 		shared:   shared,
 		is64:     is64,
 		selector: &ast.SelectorExpr{X: newID("m"), Sel: id}}
 	return err
 }
 
-func (t *translator) readLimits(def uint64) (min, max uint64, shared, is64 bool, err error) {
+func (t *translator) readLimits() (min, max uint64, shared, is64 bool, err error) {
 	flags, err := readLEB128(t.in)
 	if err != nil {
 		return
@@ -695,12 +695,18 @@ func (t *translator) readLimits(def uint64) (min, max uint64, shared, is64 bool,
 	if err != nil {
 		return
 	}
-	max = def
-	if is64 && def == 65536 {
+	max = 65536
+	if is64 {
 		max = 1 << 48
 	}
 	if flags&1 == 1 {
 		max, err = readLEB128(t.in)
+	}
+	if min > 1<<32 {
+		min = 1 << 32
+	}
+	if max > 1<<32 {
+		max = 1 << 32
 	}
 	return
 }

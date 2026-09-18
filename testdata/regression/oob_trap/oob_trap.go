@@ -32,26 +32,26 @@ func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
 func (m *Module) Xld16(v0 int32) int32 {
-	t0 := int32(load16(m.memory, uint32(v0)))
+	t0 := int32(load16(m.memory, uint64(uint32(v0))))
 	return t0
 }
 func (m *Module) Xld32(v0 int32) int32 {
-	t0 := int32(load32(m.memory, uint32(v0)))
+	t0 := int32(load32(m.memory, uint64(uint32(v0))))
 	return t0
 }
 func (m *Module) Xld64(v0 int32) int64 {
-	t0 := int64(load64(m.memory, uint32(v0)))
+	t0 := int64(load64(m.memory, uint64(uint32(v0))))
 	return t0
 }
 func (m *Module) Xld32o(v0 int32) int32 {
-	t0 := int32(load32(m.memory, int64(uint32(v0))+0xffffffff))
+	t0 := int32(load32(m.memory, uint64(uint32(v0))+0xffffffff))
 	return t0
 }
 func (m *Module) Xst32(v0, v1 int32) {
-	store32(m.memory, uint32(v0), uint32(v1))
+	store32(m.memory, uint64(uint32(v0)), uint32(v1))
 }
 func (m *Module) Xst64(v0 int32, v1 int64) {
-	store64(m.memory, uint32(v0), uint64(v1))
+	store64(m.memory, uint64(uint32(v0)), uint64(v1))
 }
 func (m *Module) Xgrow(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
@@ -62,27 +62,27 @@ func (m *Module) Xmemory() Memory {
 }
 
 //go:nosplit
-func load16[T uint32 | int64](mem []byte, addr T) uint16 {
+func load16(mem []byte, addr uint64) uint16 {
 	return binary.LittleEndian.Uint16(mem[addr:])
 }
 
 //go:nosplit
-func load32[T uint32 | int64](mem []byte, addr T) uint32 {
+func load32(mem []byte, addr uint64) uint32 {
 	return binary.LittleEndian.Uint32(mem[addr:])
 }
 
 //go:nosplit
-func store32[T uint32 | int64](mem []byte, addr T, val uint32) {
+func store32(mem []byte, addr uint64, val uint32) {
 	binary.LittleEndian.PutUint32(mem[addr:], val)
 }
 
 //go:nosplit
-func load64[T uint32 | int64](mem []byte, addr T) uint64 {
+func load64(mem []byte, addr uint64) uint64 {
 	return binary.LittleEndian.Uint64(mem[addr:])
 }
 
 //go:nosplit
-func store64[T uint32 | int64](mem []byte, addr T, val uint64) {
+func store64(mem []byte, addr uint64, val uint64) {
 	binary.LittleEndian.PutUint64(mem[addr:], val)
 }
 

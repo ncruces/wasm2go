@@ -432,32 +432,32 @@ func i64_mul_wide_s(x, y int64) (int64, int64) {
 // Multi-byte loads/stores.
 
 //go:nosplit
-func load16[T uint32 | int64](mem []byte, addr T) uint16 {
+func load16(mem []byte, addr uint64) uint16 {
 	return binary.LittleEndian.Uint16(mem[addr:])
 }
 
 //go:nosplit
-func store16[T uint32 | int64](mem []byte, addr T, val uint16) {
+func store16(mem []byte, addr uint64, val uint16) {
 	binary.LittleEndian.PutUint16(mem[addr:], val)
 }
 
 //go:nosplit
-func load32[T uint32 | int64](mem []byte, addr T) uint32 {
+func load32(mem []byte, addr uint64) uint32 {
 	return binary.LittleEndian.Uint32(mem[addr:])
 }
 
 //go:nosplit
-func store32[T uint32 | int64](mem []byte, addr T, val uint32) {
+func store32(mem []byte, addr uint64, val uint32) {
 	binary.LittleEndian.PutUint32(mem[addr:], val)
 }
 
 //go:nosplit
-func load64[T uint32 | int64](mem []byte, addr T) uint64 {
+func load64(mem []byte, addr uint64) uint64 {
 	return binary.LittleEndian.Uint64(mem[addr:])
 }
 
 //go:nosplit
-func store64[T uint32 | int64](mem []byte, addr T, val uint64) {
+func store64(mem []byte, addr uint64, val uint64) {
 	binary.LittleEndian.PutUint64(mem[addr:], val)
 }
 
