@@ -5,7 +5,7 @@ import (
 	"math/bits"
 )
 
-func memchr(s, c, n ptr) ptr {
+func memchr(s ptr, c int32, n ptr) ptr {
 	b := memory[uptr(s):]
 	if uint(len(b)) > uint(uptr(n)) {
 		b = b[:uptr(n)]
@@ -28,6 +28,9 @@ func memmem(haystack, hn, needle, nn ptr) ptr {
 }
 
 func memcmp(s1, s2, n ptr) int32 {
+	if s1 == s2 {
+		return 0
+	}
 	e1, e2 := s1+n, s2+n
 	b1 := memory[uptr(s1):uptr(e1)]
 	b2 := memory[uptr(s2):uptr(e2)]
@@ -35,6 +38,9 @@ func memcmp(s1, s2, n ptr) int32 {
 }
 
 func bcmp(s1, s2, n ptr) int32 {
+	if s1 == s2 {
+		return 0
+	}
 	e1, e2 := s1+n, s2+n
 	b1 := memory[uptr(s1):uptr(e1)]
 	b2 := memory[uptr(s2):uptr(e2)]
@@ -48,7 +54,7 @@ func strlen(s ptr) ptr {
 	return ptr(bytes.IndexByte(memory[uptr(s):], 0))
 }
 
-func strchr(s, c ptr) ptr {
+func strchr(s ptr, c int32) ptr {
 	s = strchrnul(s, c)
 	if memory[uptr(s)] == byte(c) {
 		return s
@@ -56,7 +62,7 @@ func strchr(s, c ptr) ptr {
 	return 0
 }
 
-func strchrnul(s, c ptr) ptr {
+func strchrnul(s ptr, c int32) ptr {
 	b := memory[uptr(s):]
 	b = b[:bytes.IndexByte(b, 0)]
 	sz := len(b)
@@ -68,7 +74,7 @@ func strchrnul(s, c ptr) ptr {
 	return s + ptr(sz)
 }
 
-func strrchr(s, c ptr) ptr {
+func strrchr(s ptr, c int32) ptr {
 	b := memory[uptr(s):]
 	b = b[:bytes.IndexByte(b, 0)+1]
 	if i := bytes.LastIndexByte(b, byte(c)); i >= 0 {
@@ -90,20 +96,26 @@ func strstr(haystack, needle ptr) ptr {
 }
 
 func strcmp(s1, s2 ptr) int32 {
+	if s1 == s2 {
+		return 0
+	}
 	b1 := memory[uptr(s1):]
 	b2 := memory[uptr(s2):]
 	sz := min(len(b1), len(b2))
-	if i := bytes.IndexByte(b1[:sz], 0); i >= 0 {
+	if i := bytes.IndexByte(b2[:sz], 0); i >= 0 {
 		sz = i + 1
 	}
 	return int32(bytes.Compare(b1[:sz], b2[:sz]))
 }
 
 func strncmp(s1, s2, n ptr) int32 {
+	if s1 == s2 {
+		return 0
+	}
 	b1 := memory[uptr(s1):]
 	b2 := memory[uptr(s2):]
 	sz := int(min(uint(len(b1)), uint(len(b2)), uint(uptr(n))))
-	if i := bytes.IndexByte(b1[:sz], 0); i >= 0 {
+	if i := bytes.IndexByte(b2[:sz], 0); i >= 0 {
 		sz = i + 1
 	}
 	return int32(bytes.Compare(b1[:sz], b2[:sz]))
