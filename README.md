@@ -48,6 +48,11 @@ including the following features:
 [^1]: `wasm2go` does **not** guarantee tail behavior;
 judge for yourself if using tail calls generates better code.
 
+This includes full support for the [Lime1](https://github.com/WebAssembly/tool-conventions/blob/main/Lime.md#lime1) target.
+
+There's minimal support for [dynamic linking](https://github.com/WebAssembly/tool-conventions/blob/main/DynamicLinking.md),
+and [DWARF](https://github.com/WebAssembly/tool-conventions/blob/main/Dwarf.md).
+
 ## Generated code
 
 Generating human-readable Go code is a non-goal:

@@ -110,21 +110,34 @@ func injectDwarfLines(buf []byte, sections map[string][]byte) ([]byte, error) {
 		return nil, err
 	}
 
-	file, err := filepath.Abs(*output)
+	abs, err := filepath.Abs(*output)
 	if err != nil {
 		return nil, err
 	}
 
+	// Report paths relative to output.
+	dir, file := filepath.Split(abs)
+	for i := range lines {
+		a, err := filepath.Abs(lines[i].file)
+		if err != nil {
+			continue
+		}
+		p, err := filepath.Rel(dir, a)
+		if err != nil {
+			continue
+		}
+		lines[i].file = p
+	}
+
 	var (
 		out    bytes.Buffer
-		prev   *dwarfLine
 		cur    *dwarfLine
+		prev   dwarfLine
 		lineNo int
 		inCode bool
 	)
 	for raw := range bytes.Lines(buf) {
 		trimmed := string(bytes.TrimRight(bytes.TrimLeft(raw, "\t"), "\n"))
-		oldcur := cur
 
 		switch {
 		case trimmed == dwarfPCStart:
@@ -158,19 +171,33 @@ func injectDwarfLines(buf []byte, sections map[string][]byte) ([]byte, error) {
 			cur = &dwarfLine{file: file, line: lineNo, col: 1}
 		}
 
-		if cur != nil && !strings.HasPrefix(trimmed, "/*") && !strings.HasPrefix(trimmed, "//") {
-			out.WriteString("/*line ")
-			if prev == nil || prev.file != cur.file {
-				out.WriteString(cur.file)
+		if cur != nil && len(trimmed) > 0 &&
+			!strings.HasPrefix(trimmed, "/*") &&
+			!strings.HasPrefix(trimmed, "//") {
+			var file string
+			if cur.file != "" && cur.file != prev.file {
+				prev.file = cur.file
+				file = cur.file
 			}
-			out.WriteByte(':')
-			out.WriteString(strconv.Itoa(max(1, cur.line)))
-			out.WriteByte(':')
-			// Note: column numbers in stack traces will be misleading
-			// since Go increments it for columns in the generated code.
-			out.WriteString(strconv.Itoa(max(1, cur.col)))
-			out.WriteString("*/")
-			prev = oldcur
+			line, col := cur.line, cur.col
+			if line > 0 {
+				prev.line = line
+			} else {
+				line = prev.line
+			}
+			if line > 0 {
+				out.WriteString("/*line ")
+				if file != "" {
+					out.WriteString(file)
+				}
+				out.WriteByte(':')
+				out.WriteString(strconv.Itoa(line))
+				if col > 0 {
+					out.WriteByte(':')
+					out.WriteString(strconv.Itoa(col))
+				}
+				out.WriteString("*/")
+			}
 		}
 		out.Write(raw)
 	}

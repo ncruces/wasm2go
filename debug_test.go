@@ -16,14 +16,15 @@ func Test_dwarfline(t *testing.T) {
 	}
 
 	// Find expected line numbers.
-	want := map[int]bool{}
-	for i, line := range strings.Split(string(src), "\n") {
-		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "extern") {
+	want := set[int]{}
+	for i, line := range bytes.Split(src, []byte("\n")) {
+		trimmed := bytes.TrimSpace(line)
+		if bytes.HasPrefix(trimmed, []byte("extern")) {
 			continue
 		}
-		if strings.Contains(line, "_sink(") || strings.Contains(line, "_source(") {
-			want[i+1] = true
+		if bytes.Contains(line, []byte("_sink(")) ||
+			bytes.Contains(line, []byte("_source(")) {
+			want.add(i + 1)
 		}
 	}
 	if len(want) == 0 {
@@ -45,34 +46,35 @@ func Test_dwarfline(t *testing.T) {
 	}
 
 	// Scan the output for /*line FILE:N:M*/ annotations on matching lines.
-	got := map[int]bool{}
-	curFile := ""
-	lineRe := regexp.MustCompile(`^/\*line ([^:]*):(\d+):\d+\*/`)
-	for line := range strings.Lines(out.String()) {
-		m := lineRe.FindStringSubmatch(line)
+	got := set[int]{}
+	var curFile string
+	lineRe := regexp.MustCompile(`^/\*line ([^:]*):(\d+)(:\d+)?\*/`)
+	for line := range bytes.Lines(out.Bytes()) {
+		m := lineRe.FindSubmatch(line)
 		if m == nil {
 			continue
 		}
-		if m[1] != "" {
-			curFile = m[1]
+		if len(m[1]) != 0 {
+			curFile = string(m[1])
 		}
 		if !strings.HasSuffix(curFile, "dwarfline.c") {
 			continue
 		}
 		code := line[len(m[0]):]
-		if strings.Contains(code, "_sink(") || strings.Contains(code, "_source(") {
-			n, _ := strconv.Atoi(m[2])
-			got[n] = true
+		if bytes.Contains(code, []byte("_sink(")) ||
+			bytes.Contains(code, []byte("_source(")) {
+			n, _ := strconv.Atoi(string(m[2]))
+			got.add(n)
 		}
 	}
 
 	for line := range want {
-		if !got[line] {
+		if !got.has(line) {
 			t.Errorf("c line %d not found in -dwarfline output", line)
 		}
 	}
 	for line := range got {
-		if !want[line] {
+		if !want.has(line) {
 			t.Errorf("unexpected c line %d in -dwarfline output", line)
 		}
 	}
