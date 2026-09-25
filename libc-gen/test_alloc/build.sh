@@ -5,8 +5,8 @@ cd -P -- "$(dirname -- "$0")"
 
 ROOT=../../
 LIBC="$ROOT/libc-gen/c/"
-BINARYEN="./tools/binaryen/bin/"
-WASI_SDK="./tools/wasi-sdk/bin/"
+BINARYEN="$ROOT/libc-gen/tools/binaryen/bin/"
+WASI_SDK="$ROOT/libc-gen/tools/wasi-sdk/bin/"
 
 trap 'rm -f alloc alloc.wasm' EXIT
 

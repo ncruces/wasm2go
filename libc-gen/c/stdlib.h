@@ -1,5 +1,6 @@
 #pragma once
 
+#include <alloca.h>
 #include <stddef.h>
 
 __attribute__((noreturn)) void abort(void);
@@ -21,7 +22,6 @@ unsigned long strtoul(const char* restrict, char** restrict, int);
 unsigned long long strtoull(const char* restrict, char** restrict, int);
 
 #define abs(x) (__builtin_abs(x))
-#define alloca(x) (__builtin_alloca(x))
 
 void free(void*);
 __attribute__((malloc)) void* malloc(size_t);
