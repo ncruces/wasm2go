@@ -89,7 +89,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 				if v1 != 0 {
 					{
 						v2 = i32_shl(i32(2), v0)
-						v0 = (i32(0) - v2 | v2) & i32_shl(v1, v0)
+						v0 = (v2 | (i32(0) - v2)) & i32_shl(v1, v0)
 						p10 := i32(-1)
 						if v0&(i32(0)-v0) != 0 {
 							p10 = int32(bits.TrailingZeros32(uint32(v0)))
@@ -454,7 +454,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 				}
 				v0 = i32(0)
 				v2 = i32_shl(i32(2), v7)
-				v2 = (i32(0) - v2 | v2) & v8
+				v2 = (v2 | (i32(0) - v2)) & v8
 				if v2 == 0 {
 					v4 = i32(0)
 					goto l20
@@ -1368,7 +1368,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 				m._init_top(v1, v2-i32(56))
 				t197 := v5
 				v4 = v0 + v3
-				v0 = (i32(55)-v4)&i32(15) + v4 - i32(63)
+				v0 = v4 + (i32(55)-v4)&i32(15) - i32(63)
 				p198 := v0
 				if uint32(v0) < uint32(v5+i32(16)) {
 					p198 = t197
@@ -2949,102 +2949,93 @@ func (m *Module) Xmemalign(v0, v1 int32) int32 {
 		return t0
 	}
 	v3 = v1
-	{
-		p1 := v0
-		if uint32(v0) <= uint32(i32(16)) {
-			p1 = i32(16)
-		}
-		v2 = p1
-		if (v2-i32(1))&v2 == 0 {
-			v0 = v2
-			goto l0
-		}
+	v2 = v0
+	if v0&(v0-i32(1)) != 0 {
 		v1 = i32(32)
-	l1:
+	l0:
 		v0 = v1
 		v1 = v0 << 1
 		if uint32(v0) < uint32(v2) {
-			goto l1
+			goto l0
 		}
 	}
-l0:
 	v1 = i32(0)
 	{
 		if uint32(v3) >= uint32(i32(-64)-v0) {
-			goto l2
+			goto l1
 		}
-		p2 := (v3 + i32(19)) & i32(-16)
+		p1 := (v3 + i32(19)) & i32(-16)
 		if uint32(v3) < uint32(i32(11)) {
-			p2 = i32(16)
+			p1 = i32(16)
 		}
-		v3 = p2
-		t3 := m.Xmalloc(v3 + v0 + i32(12))
-		v2 = t3
+		v3 = p1
+		t2 := m.Xmalloc(v3 + v0 + i32(12))
+		v2 = t2
 		if v2 == 0 {
-			goto l2
+			goto l1
 		}
 		v1 = v2 - i32(8)
 		{
 			if (v0-i32(1))&v2 == 0 {
 				v0 = v1
-				goto l3
+				goto l2
 			}
 			v5 = v2 - i32(4)
-			t4 := int32(load32(m.memory, uint32(v5)))
-			v6 = t4
-			t5 := v6 & i32(-8)
-			t6 := v0
-			v0 = (v0+v2-i32(1))&(i32(0)-v0) - i32(8)
-			p7 := i32(0)
-			if uint32(v0-v1) <= uint32(i32(15)) {
-				p7 = t6
+			t3 := int32(load32(m.memory, uint32(v5)))
+			v6 = t3
+			t4 := v6 & i32(-8)
+			v2 = (v0+v2-i32(1))&(i32(0)-v0) - i32(8)
+			t6 := v2
+			p5 := i32(0)
+			if uint32(v2-v1) <= uint32(i32(15)) {
+				p5 = v0
 			}
-			v0 = p7 + v0
+			v0 = t6 + p5
 			v2 = v0 - v1
-			v4 = t5 - v2
+			v4 = t4 - v2
 			if v6&i32(3) == 0 {
 				store32(m.memory, uint64(uint32(v0))+4, uint32(v4))
-				t8 := int32(load32(m.memory, uint32(v1)))
-				store32(m.memory, uint32(v0), uint32(t8+v2))
-				goto l3
+				t7 := int32(load32(m.memory, uint32(v1)))
+				store32(m.memory, uint32(v0), uint32(t7+v2))
+				goto l2
 			}
-			t9 := int32(load32(m.memory, uint64(uint32(v0))+4))
-			store32(m.memory, uint64(uint32(v0))+4, uint32(v4|t9&i32(1)|i32(2)))
+			t8 := int32(load32(m.memory, uint64(uint32(v0))+4))
+			store32(m.memory, uint64(uint32(v0))+4, uint32(v4|t8&i32(1)|i32(2)))
 			v4 = v0 + v4
-			t10 := int32(load32(m.memory, uint64(uint32(v4))+4))
-			store32(m.memory, uint64(uint32(v4))+4, uint32(t10|i32(1)))
-			t11 := int32(load32(m.memory, uint32(v5)))
-			store32(m.memory, uint32(v5), uint32(v2|t11&i32(1)|i32(2)))
+			t9 := int32(load32(m.memory, uint64(uint32(v4))+4))
+			store32(m.memory, uint64(uint32(v4))+4, uint32(t9|i32(1)))
+			t10 := int32(load32(m.memory, uint32(v5)))
+			store32(m.memory, uint32(v5), uint32(v2|t10&i32(1)|i32(2)))
 			v4 = v1 + v2
-			t12 := int32(load32(m.memory, uint64(uint32(v4))+4))
-			store32(m.memory, uint64(uint32(v4))+4, uint32(t12|i32(1)))
+			t11 := int32(load32(m.memory, uint64(uint32(v4))+4))
+			store32(m.memory, uint64(uint32(v4))+4, uint32(t11|i32(1)))
 			m._dispose_chunk(v1, v2)
 		}
-	l3:
+	l2:
 		{
-			t13 := int32(load32(m.memory, uint64(uint32(v0))+4))
-			v1 = t13
+			t12 := int32(load32(m.memory, uint64(uint32(v0))+4))
+			v1 = t12
 			if v1&i32(3) == 0 {
-				goto l4
+				goto l3
 			}
 			v2 = v1 & i32(-8)
 			if uint32(v2) <= uint32(v3+i32(16)) {
-				goto l4
+				goto l3
 			}
 			store32(m.memory, uint64(uint32(v0))+4, uint32(v3|v1&i32(1)|i32(2)))
 			v1 = v0 + v3
-			t14 := v1
+			t13 := v1
 			v3 = v2 - v3
-			store32(m.memory, uint64(uint32(t14))+4, uint32(v3|i32(3)))
+			store32(m.memory, uint64(uint32(t13))+4, uint32(v3|i32(3)))
 			v2 = v0 + v2
-			t15 := int32(load32(m.memory, uint64(uint32(v2))+4))
-			store32(m.memory, uint64(uint32(v2))+4, uint32(t15|i32(1)))
+			t14 := int32(load32(m.memory, uint64(uint32(v2))+4))
+			store32(m.memory, uint64(uint32(v2))+4, uint32(t14|i32(1)))
 			m._dispose_chunk(v1, v3)
 		}
-	l4:
+	l3:
 		v1 = v0 + i32(8)
 	}
-l2:
+l1:
 	return v1
 }
 func (m *Module) _sbrk(v0 int32) int32 {

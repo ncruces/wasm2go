@@ -38,7 +38,7 @@ Usage: libc-gen [option]... [func]...
   -o string
         output file (default stdout)
   -pkg string
-        package name (default "main")
+        package name (default module name, or wasm2go)
   -version
         print version and exit
   -wasm string
