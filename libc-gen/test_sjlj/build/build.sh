@@ -12,7 +12,7 @@ trap 'rm -f sjlj sjlj.wasm' EXIT
 
 "$WASI_SDK/clang" --target=wasm32 -ffreestanding -nostdlib -std=c23 -g0 -Oz \
 	-Wall -Wextra -Wno-unused-parameter -Wno-unused-function \
-	-o sjlj "main.c" "$LIBC/libc.c" "$LIBC/setjmp_em.c" -I"$LIBC" \
+	-o sjlj main.c "$LIBC/libc.c" "$LIBC/setjmp_em.c" -I"$LIBC" \
 	-mllvm -enable-emscripten-sjlj \
 	-mexec-model=reactor \
 	-mmutable-globals -mmultivalue \
@@ -23,7 +23,6 @@ trap 'rm -f sjlj sjlj.wasm' EXIT
 	-Wl,--no-entry \
 	-Wl,--stack-first \
 	-Wl,--export-table \
-	-Wl,--max-memory=67108864 \
 	-Wl,--import-undefined \
 	-Wl,--export=__stack_pointer \
 	-Wl,--export=test
@@ -39,4 +38,4 @@ trap 'rm -f sjlj sjlj.wasm' EXIT
 	--strip --strip-producers
 
 go run "$ROOT/libc-gen" -wasm sjlj.wasm -o ../libc.go
-go run "$ROOT" -unsafe -provided ../libc.go -o "../sjlj.go" sjlj.wasm
+go run "$ROOT" -unsafe -provided ../libc.go -o ../sjlj.go sjlj.wasm

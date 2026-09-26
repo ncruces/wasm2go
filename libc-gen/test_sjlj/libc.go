@@ -5,12 +5,12 @@ package sjlj
 func (m *Module) __throw_longjmp() { panic("emscripten_longjmp") }
 func (m *Module) __catch_longjmp(sp int32) {
 	if r := recover(); r == "emscripten_longjmp" {
-		m.___stack_pointer = sp
+		*m.X__stack_pointer() = sp
 	} else if r != nil {
 		panic(r)
 	}
 }
 func (m *Module) _invoke_vii(idx int32, v1 int32, v2 int32) {
-	defer m.__catch_longjmp(m.___stack_pointer)
-	m.t0[idx].(func(int32, int32))(v1, v2)
+	defer m.__catch_longjmp(*m.X__stack_pointer())
+	(*m.X__indirect_function_table())[idx].(func(int32, int32))(v1, v2)
 }

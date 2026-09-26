@@ -21,7 +21,7 @@ type Module struct {
 func New() *Module {
 	m := new(Module)
 	m.t0 = make([]any, 2)
-	m.maxMem = 1024
+	m.maxMem = 65536
 	m.memory = make([]byte, 0x20000)
 	m.elements = [][]any{{m._emscripten_longjmp}}
 	table_init(m.t0, m.elements[0], i32(1), 0, len(m.elements[0]))

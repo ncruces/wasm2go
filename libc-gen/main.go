@@ -28,7 +28,7 @@ var src embed.FS
 var (
 	output  = flag.String("o", "", "output file (default stdout)")
 	wasm    = flag.String("wasm", "", "input.wasm file")
-	pkg     = flag.String("pkg", "main", "package name")
+	pkg     = flag.String("pkg", "", "package name (default module name, or wasm2go)")
 	m64     = flag.Bool("m64", false, "use 64-bit pointers (int64)")
 	deref   = flag.Bool("deref-mem", false, "dereference memory (*m.memory instead of m.memory)")
 	cout    = flag.String("c-out", "", "extract libc C source and header files to directory")
@@ -65,6 +65,9 @@ func main() {
 	funcs := flag.Args()
 	if *wasm != "" {
 		funcs = readWasm()
+	}
+	if *pkg == "" {
+		*pkg = "wasm2go"
 	}
 	if len(funcs) == 0 {
 		return
@@ -279,6 +282,9 @@ func readWasm() (funcs []string) {
 
 		switch id {
 		case 0: // custom
+			if *pkg != "" {
+				break
+			}
 			name, sec := readString(content)
 			if name == "name" {
 				for len(sec) > 0 {
@@ -429,8 +435,8 @@ func generateInvoke(fset *token.FileSet, sig string) *ast.FuncDecl {
 	src := fmt.Sprintf(`
 		package p
 		func (m *Module) _invoke_%s(%s)%s {
-			defer m.__catch_longjmp(m.___stack_pointer)
-			%s m.t0[idx].(func(%s)%s)(%s)
+			defer m.__catch_longjmp(*m.X__stack_pointer())
+			%s (*m.X__indirect_function_table())[idx].(func(%s)%s)(%s)
 		}`,
 		sig, strings.Join(params, ","), retType,
 		retKeyword, strings.Join(tableParams, ","), retType, strings.Join(callArgs, ","))
@@ -447,7 +453,7 @@ func generateCatch(fset *token.FileSet) *ast.FuncDecl {
 		package p
 		func (m *Module) __catch_longjmp(sp %s) {
 			if r := recover(); r == "emscripten_longjmp" {
-				m.___stack_pointer = sp
+				*m.X__stack_pointer() = sp
 			} else if r != nil {
 				panic(r)
 			}
