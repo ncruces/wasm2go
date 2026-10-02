@@ -17,7 +17,7 @@ import (
 
 func Test_translate(t *testing.T) {
 	tests := []string{
-		"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig",
+		"fib", "loops", "memory", "primes", "recursion", "simd", "stack", "table", "trig",
 		"regression/bulk_grow", "regression/oob_trap", "regression/select_effect", "regression/store_grow", "regression/tee_self_loop",
 	}
 	for _, name := range tests {
@@ -245,6 +245,7 @@ var skipModules = []string{
 	"memory_grow/memory_grow.6",
 	"memory_grow/memory_grow.7",
 	"ref_func/ref_func.1",
+	"simd/simd_linking/simd_linking.1",
 	"table/table.8",
 	"table_grow/table_grow.6",
 	"table_grow/table_grow.7",
