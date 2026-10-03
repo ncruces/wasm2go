@@ -197,4 +197,29 @@ func Test_strcspn(t *testing.T) {
 	if got, want := strcspn(10, 40), len("hello world"); got != sptr_t(want) {
 		t.Errorf("got %v, want %d", got, want)
 	}
+	for _, tt := range []struct {
+		name, s, reject string
+		want            sptr_t
+	}{
+		{"empty reject", "abc", "", 3},
+		{"one reject", "abc", "b", 1},
+		{"two reject first", "abc", "bx", 1},
+		{"two reject second", "abc", "xb", 1},
+		{"two reject absent", "abc", "xy", 3},
+		{"duplicate reject", "abc", "bb", 1},
+		{"high byte", "ab\xffc", "\xffx", 2},
+		{"input NUL", "ab\x00c", "cx", 2},
+		{"past scalar prefix", "abcdefghijklmnopq", "qz", 16},
+		{"absent past scalar prefix", "abcdefghijklmnopq", "xz", 17},
+		{"long reject", "abc", "xyzb", 1},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			memory = make([]byte, 1024)
+			writeString(10, tt.s)
+			writeString(400, tt.reject)
+			if got := strcspn(10, 400); got != tt.want {
+				t.Errorf("got %d, want %d", got, tt.want)
+			}
+		})
+	}
 }
