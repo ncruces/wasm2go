@@ -605,26 +605,28 @@ func (fn *funcCompiler) cleanup() {
 	// Sanity checks.
 	passes.CheckMaterialized(fn.decl)
 
-	if !*noopt {
-		passes.RemoveSelfAssigns(fn.decl)
-		passes.RemoveBlankAssigns(fn.decl)
+	// Go requires this one.
+	if *noopt {
 		passes.RemoveUnusedLocals(fn.decl)
-		passes.InlineSwitchGotos(fn.decl)
-		passes.InlineSingleGotos(fn.decl)
-		passes.UnnestSimple(fn.decl)
-		passes.UnnestBlocks(fn.decl)
-		passes.InlineSingleGotos(fn.decl)
-		passes.RemoveEmptyStmts(fn.decl)
-		passes.InlineGotoEnd(fn.decl)
-		passes.InlineGotoReturn(fn.decl)
-		passes.UnnestSimple(fn.decl)
-		if passes.RemoveReceiver(fn.decl) {
-			fn.call.(*ast.ParenExpr).X = fn.decl.Name
-		}
+		return
 	}
 
-	// Go requires this.
+	// Optimization passes.
+	passes.RemoveSelfAssigns(fn.decl)
+	passes.RemoveBlankAssigns(fn.decl)
 	passes.RemoveUnusedLocals(fn.decl)
+	passes.InlineSwitchGotos(fn.decl)
+	passes.InlineSingleGotos(fn.decl)
+	passes.UnnestSimple(fn.decl)
+	passes.UnnestBlocks(fn.decl)
+	passes.InlineSingleGotos(fn.decl)
+	passes.RemoveEmptyStmts(fn.decl)
+	passes.InlineGotoEnd(fn.decl)
+	passes.InlineGotoReturn(fn.decl)
+	passes.UnnestSimple(fn.decl)
+	if passes.RemoveReceiver(fn.decl) {
+		fn.call.(*ast.ParenExpr).X = fn.decl.Name
+	}
 }
 
 type funcBlock struct {

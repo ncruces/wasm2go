@@ -9,6 +9,9 @@ import (
 // to an otherwise unused label.
 func InlineSwitchGotos(fn *ast.FuncDecl) {
 	uses := countBranches(fn)
+	if len(uses) == 0 {
+		return
+	}
 
 	// This loop retries the optimization iteratively.
 	for modified := true; modified; {
