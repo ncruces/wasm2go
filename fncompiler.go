@@ -609,14 +609,20 @@ func (fn *funcCompiler) cleanup() {
 		passes.RemoveSelfAssigns(fn.decl)
 		passes.RemoveBlankAssigns(fn.decl)
 		passes.RemoveUnusedLocals(fn.decl)
-		passes.InlineSwitchGotos(fn.decl)
-		passes.InlineSingleGotos(fn.decl)
+		if fn.labels > 0 {
+			passes.InlineSwitchGotos(fn.decl)
+			passes.InlineSingleGotos(fn.decl)
+		}
 		passes.UnnestSimple(fn.decl)
 		passes.UnnestBlocks(fn.decl)
-		passes.InlineSingleGotos(fn.decl)
-		passes.RemoveEmptyStmts(fn.decl)
+		if fn.labels > 0 {
+			passes.InlineSingleGotos(fn.decl)
+			passes.RemoveEmptyStmts(fn.decl)
+		}
 		passes.InlineGotoEnd(fn.decl)
-		passes.InlineGotoReturn(fn.decl)
+		if fn.labels > 0 {
+			passes.InlineGotoReturn(fn.decl)
+		}
 		passes.UnnestSimple(fn.decl)
 		if passes.RemoveReceiver(fn.decl) {
 			fn.call.(*ast.ParenExpr).X = fn.decl.Name
@@ -624,7 +630,9 @@ func (fn *funcCompiler) cleanup() {
 	}
 
 	// Go requires this.
-	passes.RemoveUnusedLocals(fn.decl)
+	if *noopt {
+		passes.RemoveUnusedLocals(fn.decl)
+	}
 }
 
 type funcBlock struct {
