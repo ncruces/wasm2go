@@ -85,13 +85,13 @@ func memory_init[T1, T2 int | uint32 | uint64](mem []byte, data string, dest T1,
 	z := uint64(src)
 	y := x + uint64(n)
 	w := z + uint64(n)
-	copy(mem[x:y], data[z:w])
+	copy(mem[x:y:len(mem)], data[z:w])
 }
 
 func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
 	x := uint64(dest)
 	y := x + uint64(n)
-	buf := mem[x:y]
+	buf := mem[x:y:len(mem)]
 	if len(buf) > 0 {
 		buf[0] = byte(val)
 		for i := 1; i < len(buf); {

@@ -487,7 +487,7 @@ func memory_init[T1, T2 int | uint32 | uint64](mem []byte, data string, dest T1,
 	z := uint64(src)
 	y := x + uint64(n)
 	w := z + uint64(n)
-	copy(mem[x:y], data[z:w])
+	copy(mem[x:y:len(mem)], data[z:w])
 }
 
 func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
@@ -495,13 +495,13 @@ func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
 	z := uint64(src)
 	y := x + uint64(n)
 	w := z + uint64(n)
-	copy(mem[x:y], mem[z:w])
+	copy(mem[x:y:len(mem)], mem[z:w:len(mem)])
 }
 
 func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
 	x := uint64(dest)
 	y := x + uint64(n)
-	buf := mem[x:y]
+	buf := mem[x:y:len(mem)]
 	if len(buf) > 0 {
 		buf[0] = byte(val)
 		for i := 1; i < len(buf); {
@@ -514,7 +514,7 @@ func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
 func memory_zero[T uint32 | uint64](mem []byte, dest, n T) {
 	x := uint64(dest)
 	y := x + uint64(n)
-	clear(mem[x:y])
+	clear(mem[x:y:len(mem)])
 }
 
 func table_init[T1, T2, T3 int | int32 | int64](tab, elems []any, dest T1, src T2, n T3) {
@@ -522,7 +522,7 @@ func table_init[T1, T2, T3 int | int32 | int64](tab, elems []any, dest T1, src T
 	z := uint64(src)
 	y := x + uint64(n)
 	w := z + uint64(n)
-	copy(tab[x:y], elems[z:w])
+	copy(tab[x:y:len(tab)], elems[z:w])
 }
 
 func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3) {
@@ -530,13 +530,13 @@ func table_copy[T1, T2, T3 int32 | int64](dst, tab []any, dest T1, src T2, n T3)
 	z := uint64(src)
 	y := x + uint64(n)
 	w := z + uint64(n)
-	copy(dst[x:y], tab[z:w])
+	copy(dst[x:y:len(dst)], tab[z:w:len(tab)])
 }
 
 func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
 	x := uint64(dest)
 	y := x + uint64(n)
-	buf := tab[x:y]
+	buf := tab[x:y:len(tab)]
 	if val == nil {
 		clear(buf)
 		return
