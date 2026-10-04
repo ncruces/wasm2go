@@ -3,21 +3,21 @@
 package wasm2go
 
 import (
-	"encoding/binary"
 	"math"
 	"math/bits"
 )
 
 type Module struct {
+	t0     []any
 	memory []byte
 	maxMem int64
 }
 
 func New() *Module {
 	m := new(Module)
-	m.maxMem = 100
+	m.t0 = make([]any, 1)
+	m.maxMem = 65536
 	m.memory = make([]byte, 65536)
-	memory_init(m.memory, data0, uint32(i32(0)), 0, len(data0))
 	return m
 }
 
@@ -33,35 +33,32 @@ func (m *wasmMemory) Slice() *[]byte {
 func (m *wasmMemory) Grow(delta, max int64) int64 {
 	return memory_grow((*[]byte)(m), delta, max)
 }
-func (m *Module) Xwasm_grow(v0 int32) int32 {
+func (m *Module) Xgrow(v0 int32) int32 {
 	t0 := int32(memory_grow(&m.memory, int64(v0), m.maxMem))
 	return t0
 }
-func (m *Module) Xwasm_size() int32 {
-	t0 := int32(len(m.memory) >> 16)
-	return t0
-}
-func (m *Module) Xwasm_fill(v0, v1, v2 int32) {
-	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
-}
-func (m *Module) Xread_as_i32(v0 int32) int32 {
-	t0 := int32(load32(m.memory, uint32(v0)))
-	return t0
-}
-func (m *Module) Xread_as_i8u(v0 int32) int32 {
+func (m *Module) Xld8(v0 int32) int32 {
 	t0 := int32(m.memory[uint32(v0)])
 	return t0
 }
+func (m *Module) Xfill(v0, v1, v2 int32) {
+	memory_fill(m.memory, uint32(v0), v1, uint32(v2))
+}
+func (m *Module) Xcopy(v0, v1, v2 int32) {
+	memory_copy(m.memory, uint32(v0), uint32(v1), uint32(v2))
+}
+func (m *Module) Xinit(v0, v1, v2 int32) {
+	memory_init(m.memory, data0, uint32(v0), uint32(v1), uint32(v2))
+}
+func (m *Module) Xtgrow(v0 int32) int32 {
+	t0 := table_grow(&m.t0, any(nil), v0, 65536)
+	return t0
+}
+func (m *Module) Xtfill(v0, v1 int32) {
+	table_fill(m.t0, v0, any(nil), v1)
+}
 func (m *Module) Xmemory() Memory {
 	return (*wasmMemory)(&m.memory)
-}
-
-//go:nosplit
-func i32(x int32) int32 { return x }
-
-//go:nosplit
-func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
-	return binary.LittleEndian.Uint32(mem[addr:])
 }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {
@@ -88,6 +85,14 @@ func memory_init[T1, T2 int | uint32 | uint64](mem []byte, data string, dest T1,
 	copy(mem[x:y:len(mem)], data[z:w])
 }
 
+func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
+	x := uint64(dest)
+	z := uint64(src)
+	y := x + uint64(n)
+	w := z + uint64(n)
+	copy(mem[x:y:len(mem)], mem[z:w:len(mem)])
+}
+
 func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
 	x := uint64(dest)
 	y := x + uint64(n)
@@ -101,4 +106,38 @@ func memory_fill[T uint32 | uint64](mem []byte, dest T, val int32, n T) {
 	}
 }
 
-const data0 = "ghip\xaa\xff\xdf\xcb\x12\xa12\xb3\xa5\x1f\x01\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x03\x05\a\t\v\r\x0f"
+func table_fill[T int32 | int64](tab []any, dest T, val any, n T) {
+	x := uint64(dest)
+	y := x + uint64(n)
+	buf := tab[x:y:len(tab)]
+	if val == nil {
+		clear(buf)
+		return
+	}
+	for i := range buf {
+		buf[i] = val
+	}
+}
+
+func table_grow[T int32 | int64](tab *[]any, val any, delta, max T) T {
+	buf := *tab
+	old := len(buf)
+	if delta == 0 {
+		return T(old)
+	}
+	new, c := bits.Add64(uint64(old), uint64(delta), 0)
+	if c != 0 || new > uint64(max) {
+		return -1
+	}
+	buf = append(buf, make([]any, delta)...)
+	if val != nil {
+		cpy := buf[old:]
+		for i := range cpy {
+			cpy[i] = val
+		}
+	}
+	*tab = buf
+	return T(old)
+}
+
+const data0 = "\x01\x02\x03\x04"
