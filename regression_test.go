@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"testing"
 
+	bulk_grow_test "github.com/ncruces/wasm2go/testdata/regression/bulk_grow"
 	oob_trap_test "github.com/ncruces/wasm2go/testdata/regression/oob_trap"
 	provided_helper_test "github.com/ncruces/wasm2go/testdata/regression/provided_helper"
 	select_test "github.com/ncruces/wasm2go/testdata/regression/select_effect"
@@ -85,6 +86,50 @@ func Test_regression_oob_trap(t *testing.T) {
 		t.Errorf("ld32(65536) = %d after grow, want 42", got)
 	}
 	mustTrap("ld32 past grown end", func() { m.Xld32(131073) })
+}
+
+func Test_regression_bulk_grow(t *testing.T) {
+	mustTrap := func(name string, f func()) {
+		t.Helper()
+		defer func() {
+			if recover() == nil {
+				t.Errorf("%s: expected out-of-bounds trap", name)
+			}
+		}()
+		f()
+	}
+
+	m := bulk_grow_test.New()
+
+	// Before any growth the backing slices are exact, so these already trap.
+	mustTrap("memory.fill past end", func() { m.Xfill(65536, 0xAA, 16) })
+	mustTrap("table.fill past end", func() { m.Xtfill(1, 1) })
+
+	// One page of growth: len is 128 KiB, but append leaves cap > len.
+	if got := m.Xgrow(1); got != 1 {
+		t.Fatalf("grow(1) = %d, want 1", got)
+	}
+	mem := *m.Xmemory().Slice()
+	t.Logf("after memory.grow: len=%d cap=%d", len(mem), cap(mem))
+
+	const end = 2 << 16
+	mustTrap("memory.fill past grown end", func() { m.Xfill(end, 0xAA, 16) })
+	mustTrap("memory.copy src past grown end", func() { m.Xcopy(0, end, 16) })
+	mustTrap("memory.copy dst past grown end", func() { m.Xcopy(end, 0, 16) })
+	mustTrap("memory.init past grown end", func() { m.Xinit(end, 0, 4) })
+
+	// If the fill and copy above did not trap, bytes written past the end
+	// were just read back into bounds.
+	if got := m.Xld8(0); got != 0 {
+		t.Errorf("ld8(0) = %#x, want 0: bytes written past the end were read back", got)
+	}
+
+	// Same for tables: 1 -> 2 -> 3 elements leaves cap 4.
+	m.Xtgrow(1)
+	if got := m.Xtgrow(1); got != 2 {
+		t.Fatalf("table.grow(1) = %d, want 2", got)
+	}
+	mustTrap("table.fill past grown end", func() { m.Xtfill(3, 1) })
 }
 
 func Test_regression_provided_helper(t *testing.T) {
