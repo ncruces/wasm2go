@@ -139,6 +139,33 @@ func strcspn(s, reject sptr_t) sptr_t {
 	b := memory[uptr_t(s):]
 	r := memory[uptr_t(reject):]
 	r = r[:bytes.IndexByte(r, 0)+1]
+	if len(r) == 2 || len(r) == 3 {
+		c1, c2 := r[0], r[0]
+		if len(r) == 3 {
+			c2 = r[1]
+		}
+		n := min(len(b), 16)
+		for i, c := range b[:n] {
+			if c == 0 || c == c1 || c == c2 {
+				return sptr_t(i)
+			}
+		}
+		b = b[n:]
+		end := bytes.IndexByte(b, 0)
+		if end < 0 {
+			end = len(b)
+		}
+		b = b[:end]
+		if i := bytes.IndexByte(b, c1); i >= 0 {
+			end = i
+		}
+		if c2 != c1 {
+			if i := bytes.IndexByte(b[:end], c2); i >= 0 {
+				end = i
+			}
+		}
+		return sptr_t(n + end)
+	}
 
 	set := makeByteSet(r)
 	for i, c := range b {
