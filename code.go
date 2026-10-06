@@ -210,7 +210,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			// Reset polymorphic stacks.
 			if blk.unreachable {
-				fn.stack = fn.stack[:blk.stackPos]
+				fn.stack = fn.stack[:blk.stackPos:len(fn.stack)]
 			}
 			// Push the if's arguments again for the else branch.
 			// These were constant.
@@ -262,7 +262,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 			}
 			// Reset polymorphic stacks.
 			if blk.unreachable {
-				fn.stack = fn.stack[:blk.stackPos]
+				fn.stack = fn.stack[:blk.stackPos:len(fn.stack)]
 			}
 			// Push the results again, for the parent block.
 			// The variables never change again.

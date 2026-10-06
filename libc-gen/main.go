@@ -75,14 +75,12 @@ func main() {
 		return
 	}
 
-	wptrType := "uint"
 	sptrType := "int32"
 	uptrType := "uint32"
 	invokeTypes['p'] = "int32"
 	if *m64 {
 		sptrType = "int64"
 		uptrType = "uint64"
-		wptrType = "uint64"
 		invokeTypes['p'] = "int64"
 	}
 
@@ -209,8 +207,6 @@ func main() {
 				}
 			case *ast.Ident:
 				switch x.Name {
-				case "wptr_t":
-					x.Name = wptrType
 				case "sptr_t":
 					x.Name = sptrType
 				case "uptr_t", "cptr_t":

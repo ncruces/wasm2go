@@ -52,5 +52,5 @@ func table_init[T1, T2, T3 int | int32 | int64](tab, elems []any, dest T1, src T
 	z := uint64(src)
 	y := x + uint64(n)
 	w := z + uint64(n)
-	copy(tab[x:y:len(tab)], elems[z:w])
+	copy(tab[x:y:len(tab)], elems[z:w:len(elems)])
 }

@@ -4,10 +4,11 @@ import "encoding/binary"
 
 var memory []byte
 
-type sptr_t int32   // int32  or int64
-type uptr_t uint32  // uint32 or uint64
-type cptr_t uintptr // uint32 or uint64, checked
-type wptr_t uintptr // uint   or uint64
+type (
+	sptr_t int32   // int32  or int64
+	uptr_t uint32  // uint32 or uint64
+	cptr_t uintptr // uint32 or uint64
+)
 
 func load16(mem []byte, addr cptr_t) uint16 {
 	return binary.LittleEndian.Uint16(mem[addr:])
