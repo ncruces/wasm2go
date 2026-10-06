@@ -299,8 +299,8 @@ func (fn *funcCompiler) popAddr(offset uint64) ast.Expr {
 
 	// Ensures wrap-around traps correctly.
 	if fn.memory.is64 {
-		fn.helpers.add("ptr64")
-		addr = convert(addr, "uint64", "ptr64")
+		fn.helpers.add("p64")
+		addr = convert(addr, "p64")
 	} else {
 		addr = convert(addr, "uint32")
 	}

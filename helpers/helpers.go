@@ -34,6 +34,14 @@ func f64(x float64) float64 {
 	return x
 }
 
+// Clears the MSB by halving negative addresses so
+// subsequent offset additions cannot wrap around,
+// while keeping them large enough to reliably
+// trap slice bounds checks.
+
+//go:nosplit
+func p64(x int64) uint64 { return uint64(x) >> (uint64(x) >> 63) }
+
 // Detect signed integer overflow.
 // Folded away for constant y.
 // They generate sub-optimal code on Intel.
@@ -460,9 +468,6 @@ func load64[T uint32 | uint64](mem []byte, addr T) uint64 {
 func store64[T uint32 | uint64](mem []byte, addr T, val uint64) {
 	binary.LittleEndian.PutUint64(mem[addr:], val)
 }
-
-//go:nosplit
-func ptr64(p uint64) uint64 { return p >> (p >> 63) }
 
 // Bulk memory operations.
 

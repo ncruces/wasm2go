@@ -3,13 +3,13 @@ package libc
 import "time"
 
 func localtime_r(timer, buf sptr_t) sptr_t {
-	t := load64(memory, cptr_t(uptr_t(timer)))
+	t := load64(memory, cptr_t(timer))
 	storetime_r(memory[uptr_t(buf):], time.Unix(int64(t), 0))
 	return buf
 }
 
 func gmtime_r(timer, buf sptr_t) sptr_t {
-	t := load64(memory, cptr_t(uptr_t(timer)))
+	t := load64(memory, cptr_t(timer))
 	storetime_r(memory[uptr_t(buf):], time.Unix(int64(t), 0).UTC())
 	return buf
 }
@@ -39,8 +39,8 @@ func storetime_r(buf []byte, t time.Time) {
 func gettimeofday(arg, _ sptr_t) int32 {
 	if arg != 0 {
 		now := time.Now()
-		store64(memory, cptr_t(uptr_t(arg))+0, uint64(now.Unix()))
-		store32(memory, cptr_t(uptr_t(arg))+8, uint32(now.Nanosecond()/1000))
+		store64(memory, cptr_t(arg)+0, uint64(now.Unix()))
+		store32(memory, cptr_t(arg)+8, uint32(now.Nanosecond()/1000))
 	}
 	return 0
 }

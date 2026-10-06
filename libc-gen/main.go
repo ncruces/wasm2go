@@ -177,9 +177,9 @@ func main() {
 			if call, ok := c.Node().(*ast.CallExpr); ok {
 				if id, ok := call.Fun.(*ast.Ident); ok && id.Name == "cptr_t" {
 					if *m64 {
-						id.Name = "ptr64"
+						id.Name = "p64"
 					} else {
-						c.Replace(call.Args[0])
+						id.Name = uptrType
 					}
 				}
 			}

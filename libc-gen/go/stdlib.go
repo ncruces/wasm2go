@@ -51,7 +51,7 @@ func strtod_helper(s, endptr sptr_t, bitSize int) float64 {
 		if digits > 0 {
 			s += sptr_t(prefix + digits)
 		}
-		store32(memory, cptr_t(uptr_t(endptr)), uint32(s))
+		store32(memory, cptr_t(endptr), uint32(s))
 	}
 	return val
 }
@@ -77,7 +77,7 @@ func strtoll_helper(s, endptr sptr_t, base int32, bitSize int) int64 {
 		if digits > 0 {
 			s += sptr_t(prefix + digits)
 		}
-		store32(memory, cptr_t(uptr_t(endptr)), uint32(s))
+		store32(memory, cptr_t(endptr), uint32(s))
 	}
 	return val
 }
@@ -121,7 +121,7 @@ func strtoull_helper(s, endptr sptr_t, base int32, bitSize int) uint64 {
 		if digits > 0 {
 			s += sptr_t(prefix + digits)
 		}
-		store32(memory, cptr_t(uptr_t(endptr)), uint32(s))
+		store32(memory, cptr_t(endptr), uint32(s))
 	}
 	return val
 }
