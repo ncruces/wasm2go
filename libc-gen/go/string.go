@@ -20,11 +20,10 @@ func memmem(haystack, hn, needle, nn sptr_t) sptr_t {
 	hn, nn = haystack+hn, needle+nn
 	h := memory[uptr_t(haystack):uptr_t(hn):len(memory)]
 	n := memory[uptr_t(needle):uptr_t(nn):len(memory)]
-	i := bytes.Index(h, n)
-	if i < 0 {
-		return 0
+	if i := bytes.Index(h, n); i >= 0 {
+		return haystack + sptr_t(i)
 	}
-	return haystack + sptr_t(i)
+	return 0
 }
 
 func memcmp(s1, s2, n sptr_t) int32 {
@@ -63,15 +62,12 @@ func strchr(s sptr_t, c int32) sptr_t {
 }
 
 func strchrnul(s sptr_t, c int32) sptr_t {
-	b := memory[uptr_t(s):]
-	sz := bytes.IndexByte(b, 0)
-	b = b[:sz:len(b)]
-	if c := byte(c); c != 0 {
-		if i := bytes.IndexByte(b, c); i >= 0 {
-			sz = i
+	for i, d := range memory[uptr_t(s):] {
+		if d == 0 || d == byte(c) {
+			return s + sptr_t(i)
 		}
 	}
-	return s + sptr_t(sz)
+	return -1
 }
 
 func strrchr(s sptr_t, c int32) sptr_t {
@@ -88,11 +84,10 @@ func strstr(haystack, needle sptr_t) sptr_t {
 	n := memory[uptr_t(needle):]
 	h = h[:bytes.IndexByte(h, 0):len(h)]
 	n = n[:bytes.IndexByte(n, 0):len(n)]
-	i := bytes.Index(h, n)
-	if i < 0 {
-		return 0
+	if i := bytes.Index(h, n); i >= 0 {
+		return haystack + sptr_t(i)
 	}
-	return haystack + sptr_t(i)
+	return 0
 }
 
 func strcmp(s1, s2 sptr_t) int32 {
@@ -124,7 +119,6 @@ func strncmp(s1, s2, n sptr_t) int32 {
 func strspn(s, accept sptr_t) sptr_t {
 	b := memory[uptr_t(s):]
 	a := memory[uptr_t(accept):]
-	a = a[:bytes.IndexByte(a, 0):len(a)]
 
 	set := makeByteSet(a)
 	for i, c := range b {
@@ -132,25 +126,28 @@ func strspn(s, accept sptr_t) sptr_t {
 			return sptr_t(i)
 		}
 	}
-	return sptr_t(len(b))
+	return -1
 }
 
 func strcspn(s, reject sptr_t) sptr_t {
 	b := memory[uptr_t(s):]
 	r := memory[uptr_t(reject):]
-	r = r[: bytes.IndexByte(r, 0)+1 : len(r)]
 
 	set := makeByteSet(r)
+	set[0] |= 1
 	for i, c := range b {
 		if set[c/bits.UintSize]&(1<<(c%bits.UintSize)) != 0 {
 			return sptr_t(i)
 		}
 	}
-	return sptr_t(len(b))
+	return -1
 }
 
 func makeByteSet(chars []byte) (set [256 / bits.UintSize]uint) {
 	for _, c := range chars {
+		if c == 0 {
+			break
+		}
 		set[c/bits.UintSize] |= 1 << (c % bits.UintSize)
 	}
 	return set
