@@ -41,6 +41,9 @@ An incomplete list of libraries using wasm2go.
 - [**github.com/gregfurman/micropython-go**](https://github.com/gregfurman/micropython-go) \
   Go bindings for [MicroPython](https://github.com/micropython/micropython).
 
+- [**github.com/sagelyone/ebitsvg**](https://github.com/sagelyone/ebitsvg) \
+  Contains Go bindings for [resvg](https://github.com/linebender/resvg).
+
 - [**github.com/luist18/sqlite-vec-go**](https://github.com/luist18/sqlite-vec-go) \
   Bindings to use [sqlite-vec](https://github.com/asg017/sqlite-vec) with [go-sqlite3](https://github.com/ncruces/go-sqlite3).
 
