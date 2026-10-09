@@ -9,6 +9,21 @@ import (
 	"unsafe"
 )
 
+// Atomic loads and stores from a []byte require unsafe.Pointer conversions.
+//
+// However, because Wasm grows memory in multiples of 64 KiB,
+// and addresses are verified to be naturally aligned,
+// a bounds check on the lowest referenced byte
+// is sufficient to ensure safety.
+//
+// Growing memory uses unsafe.Pointer to mutate memory length in place via CAS,
+// ensuring racing goroutines claim disjoint ranges of pages
+// and never receive the same memory.
+//
+// Finally, because shared memory is pre-allocated and length is
+// never allowed to exceed capacity, the backing array is never relocated,
+// preserving pointer stability.
+
 // Use nosplit only on functions with no loops.
 
 //go:nosplit

@@ -9,6 +9,18 @@ import (
 )
 
 // Faster memory access, using unsafe.
+//
+// Any usage of unsafe to dereference an address is preceeded by
+// a bounds check on the highest referenced byte.
+//
+// When called with uint32 addresses, this is trivially safe.
+// However, uint64 addresses present the risk of overflow.
+//
+// As such, these functions assume that adding a small constant to
+// an uint64 addresse cannot cause it to overflow.
+//
+// To ensure this is the case, callers must wrap arbitrary int64
+// addresses with the p64 helper before adding any constant offset.
 
 //go:nosplit
 func load16[T uint32 | uint64](mem []byte, addr T) uint16 {

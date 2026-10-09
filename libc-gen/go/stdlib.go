@@ -6,6 +6,9 @@ import (
 	"unsafe"
 )
 
+// unsafe.String is used to call strconv.ParseFloat/Int/Uint
+// avoiding copies.
+
 func strtod(s, endptr sptr_t) float64 {
 	return strtod_helper(s, endptr, 64)
 }
