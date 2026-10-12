@@ -39,12 +39,12 @@ func i32(x int32) int32 { return x }
 
 //go:nosplit
 func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
-	return binary.LittleEndian.Uint32(mem[:len(mem):len(mem)][uint64(addr) : uint64(addr)+4])
+	return binary.LittleEndian.Uint32(mem[uint64(addr) : uint64(addr)+4 : len(mem)])
 }
 
 //go:nosplit
 func store32[T uint32 | uint64](mem []byte, addr T, val uint32) {
-	binary.LittleEndian.PutUint32(mem[:len(mem):len(mem)][uint64(addr):uint64(addr)+4], val)
+	binary.LittleEndian.PutUint32(mem[uint64(addr):uint64(addr)+4:len(mem)], val)
 }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {

@@ -446,32 +446,32 @@ func i64_mul_wide_s(x, y int64) (int64, int64) {
 
 //go:nosplit
 func load16[T uint32 | uint64](mem []byte, addr T) uint16 {
-	return binary.LittleEndian.Uint16(mem[:len(mem):len(mem)][uint64(addr) : uint64(addr)+2])
+	return binary.LittleEndian.Uint16(mem[uint64(addr):uint64(addr)+2:len(mem)])
 }
 
 //go:nosplit
 func store16[T uint32 | uint64](mem []byte, addr T, val uint16) {
-	binary.LittleEndian.PutUint16(mem[:len(mem):len(mem)][uint64(addr):uint64(addr)+2], val)
+	binary.LittleEndian.PutUint16(mem[uint64(addr):uint64(addr)+2:len(mem)], val)
 }
 
 //go:nosplit
 func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
-	return binary.LittleEndian.Uint32(mem[:len(mem):len(mem)][uint64(addr) : uint64(addr)+4])
+	return binary.LittleEndian.Uint32(mem[uint64(addr):uint64(addr)+4:len(mem)])
 }
 
 //go:nosplit
 func store32[T uint32 | uint64](mem []byte, addr T, val uint32) {
-	binary.LittleEndian.PutUint32(mem[:len(mem):len(mem)][uint64(addr):uint64(addr)+4], val)
+	binary.LittleEndian.PutUint32(mem[uint64(addr):uint64(addr)+4:len(mem)], val)
 }
 
 //go:nosplit
 func load64[T uint32 | uint64](mem []byte, addr T) uint64 {
-	return binary.LittleEndian.Uint64(mem[:len(mem):len(mem)][uint64(addr) : uint64(addr)+8])
+	return binary.LittleEndian.Uint64(mem[uint64(addr):uint64(addr)+8:len(mem)])
 }
 
 //go:nosplit
 func store64[T uint32 | uint64](mem []byte, addr T, val uint64) {
-	binary.LittleEndian.PutUint64(mem[:len(mem):len(mem)][uint64(addr):uint64(addr)+8], val)
+	binary.LittleEndian.PutUint64(mem[uint64(addr):uint64(addr)+8:len(mem)], val)
 }
 
 // Bulk memory operations.
