@@ -438,35 +438,40 @@ func i64_mul_wide_s(x, y int64) (int64, int64) {
 }
 
 // Multi-byte loads/stores.
+// Fixed-width windows let the compiler eliminate encoding/binary's length
+// checks. Cap at len(mem) so spare capacity is not addressable Wasm memory.
+// Widen before adding the width to avoid wrapping uint32 addresses; a wrapped
+// uint64 end still traps because the resulting slice bounds are reversed.
+// https://go.dev/ref/spec#Slice_expressions
 
 //go:nosplit
 func load16[T uint32 | uint64](mem []byte, addr T) uint16 {
-	return binary.LittleEndian.Uint16(mem[addr:])
+	return binary.LittleEndian.Uint16(mem[:len(mem):len(mem)][uint64(addr) : uint64(addr)+2])
 }
 
 //go:nosplit
 func store16[T uint32 | uint64](mem []byte, addr T, val uint16) {
-	binary.LittleEndian.PutUint16(mem[addr:], val)
+	binary.LittleEndian.PutUint16(mem[:len(mem):len(mem)][uint64(addr):uint64(addr)+2], val)
 }
 
 //go:nosplit
 func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
-	return binary.LittleEndian.Uint32(mem[addr:])
+	return binary.LittleEndian.Uint32(mem[:len(mem):len(mem)][uint64(addr) : uint64(addr)+4])
 }
 
 //go:nosplit
 func store32[T uint32 | uint64](mem []byte, addr T, val uint32) {
-	binary.LittleEndian.PutUint32(mem[addr:], val)
+	binary.LittleEndian.PutUint32(mem[:len(mem):len(mem)][uint64(addr):uint64(addr)+4], val)
 }
 
 //go:nosplit
 func load64[T uint32 | uint64](mem []byte, addr T) uint64 {
-	return binary.LittleEndian.Uint64(mem[addr:])
+	return binary.LittleEndian.Uint64(mem[:len(mem):len(mem)][uint64(addr) : uint64(addr)+8])
 }
 
 //go:nosplit
 func store64[T uint32 | uint64](mem []byte, addr T, val uint64) {
-	binary.LittleEndian.PutUint64(mem[addr:], val)
+	binary.LittleEndian.PutUint64(mem[:len(mem):len(mem)][uint64(addr):uint64(addr)+8], val)
 }
 
 // Bulk memory operations.
