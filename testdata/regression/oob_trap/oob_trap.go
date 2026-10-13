@@ -64,27 +64,32 @@ func (m *Module) Xmemory() Memory {
 
 //go:nosplit
 func load16[T uint32 | uint64](mem []byte, addr T) uint16 {
-	return binary.LittleEndian.Uint16(mem[uint64(addr) : uint64(addr)+2 : len(mem)])
+	a := uint64(addr)
+	return binary.LittleEndian.Uint16(mem[:0:len(mem)][a : a+2 : a+2])
 }
 
 //go:nosplit
 func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
-	return binary.LittleEndian.Uint32(mem[uint64(addr) : uint64(addr)+4 : len(mem)])
+	a := uint64(addr)
+	return binary.LittleEndian.Uint32(mem[:0:len(mem)][a : a+4 : a+4])
 }
 
 //go:nosplit
 func store32[T uint32 | uint64](mem []byte, addr T, val uint32) {
-	binary.LittleEndian.PutUint32(mem[uint64(addr):uint64(addr)+4:len(mem)], val)
+	a := uint64(addr)
+	binary.LittleEndian.PutUint32(mem[:0:len(mem)][a:a+4:a+4], val)
 }
 
 //go:nosplit
 func load64[T uint32 | uint64](mem []byte, addr T) uint64 {
-	return binary.LittleEndian.Uint64(mem[uint64(addr) : uint64(addr)+8 : len(mem)])
+	a := uint64(addr)
+	return binary.LittleEndian.Uint64(mem[:0:len(mem)][a : a+8 : a+8])
 }
 
 //go:nosplit
 func store64[T uint32 | uint64](mem []byte, addr T, val uint64) {
-	binary.LittleEndian.PutUint64(mem[uint64(addr):uint64(addr)+8:len(mem)], val)
+	a := uint64(addr)
+	binary.LittleEndian.PutUint64(mem[:0:len(mem)][a:a+8:a+8], val)
 }
 
 func memory_grow(mem *[]byte, delta, max int64) int64 {

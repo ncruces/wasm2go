@@ -85,5 +85,6 @@ func i32(x int32) int32 { return x }
 
 //go:nosplit
 func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
-	return binary.LittleEndian.Uint32(mem[uint64(addr) : uint64(addr)+4 : len(mem)])
+	a := uint64(addr)
+	return binary.LittleEndian.Uint32(mem[:0:len(mem)][a : a+4 : a+4])
 }
