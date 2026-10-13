@@ -61,3 +61,6 @@ An incomplete list of libraries using wasm2go.
 
 - [**github.com/gen2brain/webp**](https://github.com/gen2brain/webp) \
   Go bindings for [libwebp](https://github.com/webmproject/libwebp).
+
+- [**github.com/msuozzo/go-git2**](https://github.com/msuozzo/go-git2) \
+  Git library built on [libgit2](https://github.com/libgit2/libgit2), with an API modeled on [go-git](https://github.com/go-git/go-git).
