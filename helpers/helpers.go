@@ -438,11 +438,6 @@ func i64_mul_wide_s(x, y int64) (int64, int64) {
 }
 
 // Multi-byte loads/stores.
-// Fixed-width windows let the compiler eliminate encoding/binary's length
-// checks. Cap at len(mem) so spare capacity is not addressable Wasm memory.
-// Widen before adding the width to avoid wrapping uint32 addresses; a wrapped
-// uint64 end still traps because the resulting slice bounds are reversed.
-// https://go.dev/ref/spec#Slice_expressions
 
 //go:nosplit
 func load16[T uint32 | uint64](mem []byte, addr T) uint16 {

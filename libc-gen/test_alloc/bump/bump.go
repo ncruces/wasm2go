@@ -195,7 +195,8 @@ const (
 //go:nosplit
 func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
 	if !unalignedOK {
-		return binary.LittleEndian.Uint32(mem[addr:])
+		a := uint64(addr)
+		return binary.LittleEndian.Uint32(mem[:0:len(mem)][a : a+4 : a+4])
 	}
 	_ = mem[uint64(addr)+3]
 	val := *(*uint32)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr)))
@@ -208,7 +209,8 @@ func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
 //go:nosplit
 func store32[T uint32 | uint64](mem []byte, addr T, val uint32) {
 	if !unalignedOK {
-		binary.LittleEndian.PutUint32(mem[addr:], val)
+		a := uint64(addr)
+		binary.LittleEndian.PutUint32(mem[:0:len(mem)][a:a+4:a+4], val)
 		return
 	}
 	if big {
