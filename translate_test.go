@@ -20,6 +20,10 @@ func Test_translate(t *testing.T) {
 		"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig",
 		"regression/bulk_grow", "regression/oob_trap", "regression/select_effect", "regression/store_grow", "regression/tee_self_loop",
 	}
+	if *unsafe {
+		// Shared memory requires unsafe.
+		tests = append(tests, "regression/shared_export")
+	}
 	for _, name := range tests {
 		t.Run(name, func(t *testing.T) {
 			path := "testdata/" + name + "/" + filepath.Base(name)

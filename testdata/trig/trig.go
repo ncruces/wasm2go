@@ -8,7 +8,7 @@ import (
 )
 
 type Module struct {
-	memory []byte
+	wasmMemory
 }
 
 func New() *Module {
@@ -23,13 +23,15 @@ type Memory = interface {
 	Slice() *[]byte
 	Grow(delta, max int64) int64
 }
-type wasmMemory []byte
+type wasmMemory struct {
+	memory []byte
+}
 
 func (m *wasmMemory) Slice() *[]byte {
-	return (*[]byte)(m)
+	return &m.memory
 }
 func (m *wasmMemory) Grow(delta, max int64) int64 {
-	return memory_grow((*[]byte)(m), delta, max)
+	return memory_grow(&m.memory, delta, max)
 }
 func (m *Module) Xsin(v0 float64) float64 {
 	var v1, v2 float64
@@ -87,7 +89,7 @@ l0:
 	return v1
 }
 func (m *Module) Xmemory() Memory {
-	return (*wasmMemory)(&m.memory)
+	return &m.wasmMemory
 }
 
 //go:nosplit

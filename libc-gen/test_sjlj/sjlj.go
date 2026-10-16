@@ -11,9 +11,9 @@ import (
 )
 
 type Module struct {
-	t0               []any
-	elements         [][]any
-	memory           []byte
+	t0       []any
+	elements [][]any
+	wasmMemory
 	___stack_pointer int32
 }
 
@@ -34,13 +34,15 @@ type Memory = interface {
 	Slice() *[]byte
 	Grow(delta, max int64) int64
 }
-type wasmMemory []byte
+type wasmMemory struct {
+	memory []byte
+}
 
 func (m *wasmMemory) Slice() *[]byte {
-	return (*[]byte)(m)
+	return &m.memory
 }
 func (m *wasmMemory) Grow(delta, max int64) int64 {
-	return memory_grow((*[]byte)(m), delta, max)
+	return memory_grow(&m.memory, delta, max)
 }
 func (m *Module) Xtest() int32 {
 	var v0, v1, v2 int32
@@ -103,7 +105,7 @@ func (m *Module) X__stack_pointer() *int32 {
 	return &m.___stack_pointer
 }
 func (m *Module) Xmemory() Memory {
-	return (*wasmMemory)(&m.memory)
+	return &m.wasmMemory
 }
 
 // Compiler error if endianess is unknown.

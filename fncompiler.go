@@ -597,9 +597,6 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 }
 
 func (fn *funcCompiler) cleanup() {
-	// Resolve imports.
-	ast.Inspect(fn.decl, fn.resolveImports)
-
 	// Sanity checks.
 	passes.CheckMaterialized(fn.decl)
 

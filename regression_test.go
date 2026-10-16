@@ -10,6 +10,7 @@ import (
 	oob_trap_test "github.com/ncruces/wasm2go/testdata/regression/oob_trap"
 	provided_helper_test "github.com/ncruces/wasm2go/testdata/regression/provided_helper"
 	select_test "github.com/ncruces/wasm2go/testdata/regression/select_effect"
+	shared_export_test "github.com/ncruces/wasm2go/testdata/regression/shared_export"
 	store_grow_test "github.com/ncruces/wasm2go/testdata/regression/store_grow"
 )
 
@@ -130,6 +131,25 @@ func Test_regression_bulk_grow(t *testing.T) {
 		t.Fatalf("table.grow(1) = %d, want 2", got)
 	}
 	mustTrap("table.fill past grown end", func() { m.Xtfill(3, 1) })
+}
+
+func Test_regression_shared_export(t *testing.T) {
+	m := shared_export_test.New()
+	mem := m.Xmemory()
+
+	// The export must view the module's own memory, not a copy.
+	if mem.Slice() != m.Xmemory().Slice() {
+		t.Error("Slice() is not stable")
+	}
+	if got := mem.Grow(0, 1); got != 1 {
+		t.Errorf("Grow(0) = %d, want 1", got)
+	}
+	if mem.Waiters() == nil {
+		t.Fatal("Waiters() is nil")
+	}
+	if got := m.Xwait0(); got != 2 {
+		t.Errorf("wait0() = %d, want 2 (timed out)", got)
+	}
 }
 
 func Test_regression_provided_helper(t *testing.T) {

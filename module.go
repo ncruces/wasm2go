@@ -32,23 +32,21 @@ func (t *translator) createModuleStruct() ast.Decl {
 			Names: []*ast.Ident{newID("elements")},
 			Type:  &ast.ArrayType{Elt: &ast.ArrayType{Elt: newID("any")}}})
 	}
-	// Memory: owned a []byte; imported a *[]byte and a Memory field.
+	// Memory: owned an embedded wasmMemory; imported a *[]byte and a Memory field.
 	if t.memory != nil {
 		if t.memory.imported {
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{t.memory.id},
 				Type:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
 			}, &ast.Field{Names: []*ast.Ident{newID("memImp")}, Type: newID("Memory")})
+			if t.memory.shared || t.helpers.has("atomic_waiters") {
+				fields = append(fields, &ast.Field{
+					Names: []*ast.Ident{newID("waiters")},
+					Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
+			}
 		} else {
-			fields = append(fields, &ast.Field{
-				Names: []*ast.Ident{t.memory.id},
-				Type:  &ast.ArrayType{Elt: newID("byte")}})
-		}
-		if t.memory.shared || t.helpers.has("atomic_waiters") {
-			fields = append(fields, &ast.Field{
-				Names: []*ast.Ident{newID("waiters")},
-				Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
-			t.packages.add("sync")
+			// The []byte (and waiters) are promoted from wasmMemory.
+			fields = append(fields, &ast.Field{Type: newID("wasmMemory")})
 		}
 	}
 	// Globals: owned/immutable are type; imported *type.
@@ -359,10 +357,10 @@ func (t *translator) createHostInterfaces() []ast.Decl {
 	return decls
 }
 
-func (t *translator) createMemoryTypes() []ast.Decl {
+func (t *translator) createMemoryTypes(exported bool) []ast.Decl {
 	var decls []ast.Decl
 	// Memory interface as a type alias.
-	if !*nohost {
+	if !*nohost && (exported || t.memory.imported) {
 		iface := &ast.InterfaceType{Methods: &ast.FieldList{
 			List: []*ast.Field{{
 				Names: []*ast.Ident{newID("Slice")},
@@ -395,45 +393,53 @@ func (t *translator) createMemoryTypes() []ast.Decl {
 				Specs: []ast.Spec{&ast.TypeSpec{
 					Assign: 1, Name: newID("Memory"), Type: iface}}})
 	}
-	// Memory structure implementing the interface for owned memory.
+	// Memory structure for owned memory.
+	// It is embedded in Module, so its fields are promoted.
 	if !t.memory.imported {
+		fields := []*ast.Field{{
+			Names: []*ast.Ident{t.memory.id},
+			Type:  &ast.ArrayType{Elt: newID("byte")}}}
+		if t.memory.shared || t.helpers.has("atomic_waiters") {
+			fields = append(fields, &ast.Field{
+				Names: []*ast.Ident{newID("waiters")},
+				Type:  &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}})
+		}
+		decls = append(decls, &ast.GenDecl{
+			Tok: token.TYPE,
+			Specs: []ast.Spec{&ast.TypeSpec{
+				Name: newID("wasmMemory"),
+				Type: &ast.StructType{Fields: &ast.FieldList{List: fields}}}}})
+	}
+	// Methods implementing the Memory interface for exported owned memory.
+	if !t.memory.imported && exported {
 		name := "memory_grow"
 		if t.memory.shared {
 			name = "atomic_memory_grow"
 			needsUnsafe("shared memory")
 		}
+		t.helpers.add(name)
 
-		decls = append(decls, &ast.GenDecl{
-			Tok: token.TYPE,
-			Specs: []ast.Spec{&ast.TypeSpec{
-				Name: newID("wasmMemory"),
-				Type: &ast.ArrayType{Elt: newID("byte")}}},
-		}, &ast.FuncDecl{
-			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
+		recv := &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}}
+		mem := &ast.UnaryExpr{Op: token.AND, X: modSel(t.memory.id)}
+
+		decls = append(decls, &ast.FuncDecl{
+			Recv: recv,
 			Name: newID("Slice"),
 			Type: &ast.FuncType{Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}}}}}},
-			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
-				Args: []ast.Expr{newID("m")}}}}}},
+			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{mem}}}},
 		}, &ast.FuncDecl{
-			Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
+			Recv: recv,
 			Name: newID("Grow"),
 			Type: &ast.FuncType{
 				Params:  &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("delta"), newID("max")}, Type: newID("int64")}}},
 				Results: &ast.FieldList{List: []*ast.Field{{Type: newID("int64")}}}},
 			Body: &ast.BlockStmt{List: []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-				Fun: newID(name),
-				Args: []ast.Expr{
-					&ast.CallExpr{
-						Fun:  &ast.StarExpr{X: &ast.ArrayType{Elt: newID("byte")}},
-						Args: []ast.Expr{newID("m")}},
-					newID("delta"),
-					newID("max")}}}}}}})
-		t.helpers.add(name)
+				Fun:  newID(name),
+				Args: []ast.Expr{mem, newID("delta"), newID("max")}}}}}}})
 
 		if t.memory.shared {
 			decls = append(decls, &ast.FuncDecl{
-				Recv: &ast.FieldList{List: []*ast.Field{{Names: []*ast.Ident{newID("m")}, Type: &ast.StarExpr{X: newID("wasmMemory")}}}},
+				Recv: recv,
 				Name: newID("Waiters"),
 				Type: &ast.FuncType{
 					Results: &ast.FieldList{List: []*ast.Field{{Type: &ast.StarExpr{X: &ast.SelectorExpr{X: newID("sync"), Sel: newID("Map")}}}}}},
@@ -501,9 +507,8 @@ func (t *translator) createExportMethods() []ast.Decl {
 			if t.memory.imported {
 				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{modSel(newID("memImp"))}}}
 			} else {
-				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{&ast.CallExpr{
-					Fun:  &ast.ParenExpr{X: &ast.StarExpr{X: newID("wasmMemory")}},
-					Args: []ast.Expr{&ast.UnaryExpr{Op: token.AND, X: &ast.SelectorExpr{X: newID("m"), Sel: t.memory.id}}}}}}}
+				decl.Body.List = []ast.Stmt{&ast.ReturnStmt{Results: []ast.Expr{
+					&ast.UnaryExpr{Op: token.AND, X: modSel(newID("wasmMemory"))}}}}
 			}
 		}
 

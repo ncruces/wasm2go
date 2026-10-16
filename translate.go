@@ -145,8 +145,8 @@ func translate(r io.Reader, w io.Writer) error {
 			break
 		}
 	}
-	if t.memory != nil && (exported || t.memory.imported) {
-		t.out.Decls = append(t.createMemoryTypes(), t.out.Decls...)
+	if t.memory != nil {
+		t.out.Decls = append(t.createMemoryTypes(exported), t.out.Decls...)
 	}
 	if !*nohost && len(t.imports) > 0 {
 		t.out.Decls = append(t.createHostInterfaces(), t.out.Decls...)
@@ -211,7 +211,8 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
-	// Set imports.
+	// Resolve and add imports.
+	ast.Inspect(&t.out, t.resolveImports)
 	if len(t.packages) > 0 {
 		specs := make([]ast.Spec, 0, len(t.data))
 		for _, pkg := range slices.Sorted(maps.Keys(t.packages)) {
@@ -1271,7 +1272,6 @@ func (t *translator) addHelpers(fset *token.FileSet, filename, src string) error
 			continue
 		}
 		t.out.Decls = append(t.out.Decls, decl)
-		ast.Inspect(decl, t.resolveImports)
 	}
 	return nil
 }
@@ -1286,14 +1286,12 @@ func (t *translator) resolveHelpers(fset *token.FileSet, filename, src string) e
 		case *ast.FuncDecl:
 			if t.helpers.has(d.Name.Name) {
 				t.out.Decls = append(t.out.Decls, d)
-				ast.Inspect(d, t.resolveImports)
 				delete(t.helpers, d.Name.Name)
 			}
 		case *ast.GenDecl:
 			for _, spec := range d.Specs {
 				if s, ok := spec.(*ast.TypeSpec); ok && t.helpers.has(s.Name.Name) {
 					t.out.Decls = append(t.out.Decls, d)
-					ast.Inspect(d, t.resolveImports)
 					delete(t.helpers, s.Name.Name)
 					break
 				}

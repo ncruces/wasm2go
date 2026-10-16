@@ -9,7 +9,7 @@ import (
 )
 
 type Module struct {
-	memory []byte
+	wasmMemory
 }
 
 func New() *Module {
@@ -19,6 +19,10 @@ func New() *Module {
 }
 
 const maxMem = 65536
+
+type wasmMemory struct {
+	memory []byte
+}
 
 func (m *Module) fn0() int32 {
 	_ = int32(memory_grow(&m.memory, int64(i32(1)), maxMem))
