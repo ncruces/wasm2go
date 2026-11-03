@@ -44,13 +44,14 @@ func (m *Module) fn1() int32 {
 func (m *Module) Xadd_all(v0, v1 int32) int32 {
 	var v2, v3, v4 int32
 	v2 = i32(0)
+	mem := *m.memory
 l1:
 	{
 		if v2 >= v1 {
 			return v4
 		}
 		v3 = v0 + v2*i32(4)
-		t0 := int32(load32(*m.memory, uint32(v3)))
+		t0 := int32(load32(mem, uint32(v3)))
 		v4 = v4 + t0
 		v2 = v2 + i32(1)
 		goto l1
