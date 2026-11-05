@@ -619,9 +619,37 @@ func (fn *funcCompiler) cleanup() {
 	passes.InlineGotoEnd(fn.decl)
 	passes.InlineGotoReturn(fn.decl)
 	passes.UnnestSimple(fn.decl)
+	// Switch from LoadOnRead to LoadOnWrite before RemoveReceiver,
+	// since loading m.memory into mem uses m.
+	if fn.memory != nil && !fn.memory.shared {
+		if passes.SelectMemoryMode(fn.decl, fn.memory.selector, fn.mayGrowMemory) == passes.LoadOnWrite {
+			passes.LoadMemoryOnWrite(fn.decl, fn.memory.selector, newID("mem"), fn.mayGrowMemory)
+		}
+	}
 	if passes.RemoveReceiver(fn.decl) {
 		fn.call.(*ast.ParenExpr).X = fn.decl.Name
 	}
+}
+
+// Reports whether ce may grow linear memory.
+func (fn *funcCompiler) mayGrowMemory(ce *ast.CallExpr) bool {
+	switch f := ce.Fun.(type) {
+	case *ast.ParenExpr:
+		// Module, provided, or imported function call: (m.fnN)(...)
+		// Receiverless (fnN)(...) calls cannot access m or grow memory.
+		_, ok := f.X.(*ast.SelectorExpr)
+		return ok
+	case *ast.TypeAssertExpr:
+		// Indirect table call: m.t0[i].(func(...))(...)
+		return true
+	case *ast.Ident:
+		return f.Name == "memory_grow"
+	case *ast.SelectorExpr:
+		// Imported memory.grow: m.memImp.Grow(...)
+		_, ok := f.X.(*ast.SelectorExpr)
+		return ok && f.Sel.Name == "Grow"
+	}
+	return false
 }
 
 type funcBlock struct {

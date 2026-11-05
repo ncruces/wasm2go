@@ -27,6 +27,7 @@ import (
 //
 // Method code may have:
 //  - module selector (m)
+//	- local memory slice (mem)
 //	- local variables, arguments (v+number)
 //	- materialized temporaries (t+number)
 //	- temporary variables (p+number)
