@@ -301,15 +301,18 @@ func (fn *funcCompiler) popAddr(offset uint64) ast.Expr {
 	if fn.memory.is64 {
 		fn.helpers.add("p64")
 		addr = convert(addr, "p64")
-	} else {
+	} else if offset == 0 && !*unsafe {
+		// Keep zero-offset safe addresses uint32: safe helpers are not inlined
+		// into large callers, so the uint64 used for -unsafe and nonzero offsets
+		// cannot share bounds-check proofs across calls. Remove this branch once
+		// safe helpers inline (#69).
 		addr = convert(addr, "uint32")
+	} else {
+		// Widen so inlined accesses share a type for bounds-check proofs.
+		addr = convert(addr, "uint32", "uint64")
 	}
 	if offset == 0 {
 		return addr
-	}
-
-	if !fn.memory.is64 {
-		addr = convert(addr, "uint64")
 	}
 	return &ast.BinaryExpr{Op: token.ADD, X: addr, Y: uintLit(offset)}
 }
