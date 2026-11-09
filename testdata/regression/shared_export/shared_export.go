@@ -45,7 +45,7 @@ func (m *wasmMemory) Waiters() *sync.Map {
 	return m.waiters
 }
 func (m *Module) Xwait0() int32 {
-	t0 := atomic_wait32(m.memory, uint32(i32(0)), uint32(i32(0)), i64(0), m.waiters)
+	t0 := atomic_wait32(m.memory, uint64(uint32(i32(0))), uint32(i32(0)), i64(0), m.waiters)
 	return t0
 }
 func (m *Module) Xmemory() Memory {
