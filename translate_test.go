@@ -70,6 +70,51 @@ func Test_translate_provided(t *testing.T) {
 	}
 }
 
+func Test_provided_receiverless(t *testing.T) {
+	prov := filepath.Join(t.TempDir(), "provided.go")
+	const provSrc = `package wasm2go
+import "math"
+func _sin(x float64) float64 { return math.Sin(x) }
+func _inc(x int32) int32 { return x + 1 }
+func Exported(x int32) int32 { return x }
+`
+	if err := os.WriteFile(prov, []byte(provSrc), 0644); err != nil {
+		t.Fatal(err)
+	}
+	provided = stringFlags{prov}
+	t.Cleanup(func() { provided = nil })
+
+	// (module
+	//   (import "env" "sin" (func $sin (param f64) (result f64)))
+	//   (import "env" "inc" (func $inc (param i32) (result i32)))
+	//   (table 1 funcref)
+	//   (elem (i32.const 0) $sin)
+	//   (func (export "f") (param f64 i32) (result f64)
+	//     local.get 0 call $sin
+	//     local.get 1 call $inc f64.convert_i32_s f64.add))
+	wasm := []byte{
+		0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+		0x01, 0x11, 0x03, 0x60, 0x01, 0x7c, 0x01, 0x7c, 0x60, 0x01, 0x7f, 0x01, 0x7f, 0x60, 0x02, 0x7c, 0x7f, 0x01, 0x7c,
+		0x02, 0x15, 0x02, 0x03, 0x65, 0x6e, 0x76, 0x03, 0x73, 0x69, 0x6e, 0x00, 0x00, 0x03, 0x65, 0x6e, 0x76, 0x03, 0x69, 0x6e, 0x63, 0x00, 0x01,
+		0x03, 0x02, 0x01, 0x02,
+		0x04, 0x04, 0x01, 0x70, 0x00, 0x01,
+		0x07, 0x05, 0x01, 0x01, 0x66, 0x00, 0x02,
+		0x09, 0x07, 0x01, 0x00, 0x41, 0x00, 0x0b, 0x01, 0x00,
+		0x0a, 0x0e, 0x01, 0x0c, 0x00, 0x20, 0x00, 0x10, 0x00, 0x20, 0x01, 0x10, 0x01, 0xb7, 0xa0, 0x0b,
+	}
+
+	var out bytes.Buffer
+	if err := translate(bytes.NewReader(wasm), &out); err != nil {
+		t.Fatal(err)
+	}
+	got := out.String()
+	for _, want := range []string{"{_sin}", "_sin(v0)", "_inc(v1)"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("missing %q in:\n%s", want, got)
+		}
+	}
+}
+
 func Test_translateSpecTest(t *testing.T) {
 	name := *pkg
 	*nanbox = true

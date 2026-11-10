@@ -22,6 +22,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 
 	"github.com/ncruces/wasm2go/internal/mangle"
+	"github.com/ncruces/wasm2go/internal/passes"
 )
 
 //go:embed c go
@@ -171,9 +172,15 @@ func main() {
 	}
 
 	usedImports := make(set[string])
+	names := make(map[string]*ast.Ident, len(keep))
+	for _, fd := range keep {
+		names[fd.Name.Name] = mangle.ID(fd.Name.Name, mangle.Internal)
+	}
+	callSites := make(map[*ast.Ident][]*ast.CallExpr)
 
 	// Execute the rewriting permutations
 	for _, fd := range keep {
+		origName := fd.Name.Name
 		fd.Recv = &ast.FieldList{
 			List: []*ast.Field{{
 				Names: []*ast.Ident{ast.NewIdent("m")},
@@ -205,8 +212,10 @@ func main() {
 					x.X = makeMemoryExpr(*deref)
 				}
 			case *ast.CallExpr:
-				if id, ok := x.Fun.(*ast.Ident); ok && available[id.Name] != nil {
-					x.Fun = &ast.SelectorExpr{X: ast.NewIdent("m"), Sel: mangle.ID(id.Name, mangle.Internal)}
+				if id, ok := x.Fun.(*ast.Ident); ok && names[id.Name] != nil {
+					sel := names[id.Name]
+					x.Fun = &ast.SelectorExpr{X: ast.NewIdent("m"), Sel: sel}
+					callSites[sel] = append(callSites[sel], x)
 				}
 				for i, arg := range x.Args {
 					if id, ok := arg.(*ast.Ident); ok && id.Name == "memory" {
@@ -231,7 +240,19 @@ func main() {
 		})
 
 		// Finally mangle the function's own name
-		fd.Name = mangle.ID(fd.Name.Name, mangle.Internal)
+		fd.Name = names[origName]
+	}
+
+	for changed := true; changed; {
+		changed = false
+		for _, fd := range keep {
+			if fd.Recv != nil && passes.RemoveReceiver(fd) {
+				for _, call := range callSites[fd.Name] {
+					call.Fun = fd.Name
+				}
+				changed = true
+			}
+		}
 	}
 
 	// Write the unified file

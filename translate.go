@@ -64,7 +64,7 @@ type translator struct {
 	out ast.File
 	// Dependencies.
 	packages set[string]
-	provided set[string]
+	provided map[string]ast.Expr
 	helpers  set[string]
 	// Sections.
 	types     []funcType
@@ -94,7 +94,7 @@ func translate(r io.Reader, w io.Writer) error {
 
 	fset := token.NewFileSet()
 	t.packages = set[string]{}
-	t.provided = set[string]{}
+	t.provided = map[string]ast.Expr{}
 	t.helpers = set[string]{}
 
 	helperNames, err := t.findHelpers(fset, helpersSrc, helpersAtomicsSrc)
@@ -108,13 +108,15 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 		for _, decl := range f.Decls {
 			if fn, ok := decl.(*ast.FuncDecl); ok {
-				// Check if the receiver type is *Module.
+				// Check if the receiver type is *Module, or if fn is an unexported function.
 				if fn.Recv != nil {
 					if star, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
 						if id, ok := star.X.(*ast.Ident); ok && id.Name == "Module" {
-							t.provided.add(fn.Name.Name)
+							t.provided[fn.Name.Name] = latecall(newID(fn.Name.Name))
 						}
 					}
+				} else if !ast.IsExported(fn.Name.Name) {
+					t.provided[fn.Name.Name] = newID(fn.Name.Name)
 				}
 				// Provided files may call helpers by name.
 				ast.Inspect(fn.Body, func(n ast.Node) bool {
@@ -469,11 +471,11 @@ func (t *translator) readImportSection() error {
 			}
 			typ := t.types[index]
 
-			if n := mangle.Name(name, mangle.Internal); t.provided.has(n) {
+			if n := mangle.Name(name, mangle.Internal); t.provided[n] != nil {
 				id := ast.NewIdent(n)
 				fn := funcCompiler{
 					typ:      typ,
-					call:     latecall(id),
+					call:     t.provided[n],
 					decl:     &ast.FuncDecl{Name: id},
 					provided: true}
 				t.functions = append(t.functions, fn)
