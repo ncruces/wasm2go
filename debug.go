@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 func (t *translator) readDebugSection(name string, r *bytes.Reader) error {
@@ -36,6 +37,9 @@ const (
 	dwarfPCStart  = "_dwarfStart" // start of instruction stream for a function
 	dwarfPCEnd    = "_dwarfEnd"   // end of instruction stream for a function
 	dwarfPCPrefix = "_dwarfPC_"   // prefix for per-instruction offset markers
+
+	// go.dev/src/cmd/compile/internal/syntax/pos.go
+	maxLineCol = 1 << 30
 )
 
 func (fn *funcCompiler) markDebugStart() {
@@ -117,16 +121,14 @@ func injectDwarfLines(buf []byte, sections map[string][]byte) ([]byte, error) {
 
 	// Report paths relative to output.
 	dir, file := filepath.Split(abs)
+	file = sanitizePath(file)
 	for i := range lines {
-		a, err := filepath.Abs(lines[i].file)
-		if err != nil {
-			continue
+		if a, err := filepath.Abs(lines[i].file); err == nil {
+			if p, err := filepath.Rel(dir, a); err == nil {
+				lines[i].file = p
+			}
 		}
-		p, err := filepath.Rel(dir, a)
-		if err != nil {
-			continue
-		}
-		lines[i].file = p
+		lines[i].file = sanitizePath(lines[i].file)
 	}
 
 	var (
@@ -180,7 +182,7 @@ func injectDwarfLines(buf []byte, sections map[string][]byte) ([]byte, error) {
 				file = cur.file
 			}
 			line, col := cur.line, cur.col
-			if line > 0 {
+			if 0 < line && line <= maxLineCol {
 				prev.line = line
 			} else {
 				line = prev.line
@@ -192,7 +194,7 @@ func injectDwarfLines(buf []byte, sections map[string][]byte) ([]byte, error) {
 				}
 				out.WriteByte(':')
 				out.WriteString(strconv.Itoa(line))
-				if col > 0 {
+				if 0 < col && col <= maxLineCol {
 					out.WriteByte(':')
 					out.WriteString(strconv.Itoa(col))
 				}
@@ -202,4 +204,19 @@ func injectDwarfLines(buf []byte, sections map[string][]byte) ([]byte, error) {
 		out.Write(raw)
 	}
 	return out.Bytes(), nil
+}
+
+func sanitizePath(s string) string {
+	return strings.Map(func(r rune) rune {
+		switch r {
+		case '\\': // normalize separators
+			return '/'
+		case '*': // could close block comment
+			return -1
+		}
+		if unicode.IsPrint(r) {
+			return r
+		}
+		return -1
+	}, s)
 }
