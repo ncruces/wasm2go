@@ -41,12 +41,12 @@ func (m *Module) Xfree(v0 int32) {
 	if v0 == 0 {
 		return
 	}
-	t0 := int32(load32(m.memory, uint32(i32(65544))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(65548)))))
 	if v0 != t0 {
 		return
 	}
-	store32(m.memory, uint32(i32(65536)), uint32(v0))
-	store32(m.memory, uint32(i32(65544)), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(65536))), uint32(v0))
+	store32(m.memory, uint64(uint32(i32(65548))), uint32(i32(0)))
 }
 func (m *Module) Xmalloc(v0 int32) int32 {
 	var v1, v2, v3, v4, v5, v6 int32
@@ -55,35 +55,42 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 			goto l0
 		}
 		v3 = (v0 + i32(15)) & i32(-16)
-		t0 := int32(load32(m.memory, uint32(i32(65540))))
+		t0 := int32(load32(m.memory, uint64(uint32(i32(65540)))))
 		v1 = t0
-		t1 := int32(load32(m.memory, uint32(i32(65536))))
+		t1 := int32(load32(m.memory, uint64(uint32(i32(65536)))))
 		v2 = t1
 		v0 = v2
 	l2:
-		v0 = v1 - v0
-		if uint32(v0) < uint32(v3) {
-			v5 = v3 - v0 + i32(0xffff)
-			v6 = int32(uint32(v5) >> 16)
-			t2 := int32(memory_grow(&m.memory, int64(v6), maxMem))
-			v4 = t2
-			if v4 == i32(-1) {
-				goto l0
+		{
+			v0 = v1 - v0
+			if uint32(v0) < uint32(v3) {
+				v5 = v3 - v0 + i32(0xffff)
+				v6 = int32(uint32(v5) >> 16)
+				t2 := int32(memory_grow(&m.memory, int64(v6), maxMem))
+				v4 = t2
+				if v4 == i32(-1) {
+					goto l0
+				}
+				t3 := v1
+				v0 = v4 << 16
+				if t3 != v0 {
+					store32(m.memory, uint64(uint32(i32(65536))), uint32(v0))
+					v1 = (v4 + v6) << 16
+					store32(m.memory, uint64(uint32(i32(65540))), uint32(v1))
+					v2 = v0
+					goto l2
+				}
+				store32(m.memory, uint64(uint32(i32(65540))), uint32(v1+v5&i32(-65536)))
 			}
-			t3 := v1
-			v0 = v4 << 16
-			if t3 != v0 {
-				store32(m.memory, uint32(i32(65536)), uint32(v0))
-				v1 = (v4 + v6) << 16
-				store32(m.memory, uint32(i32(65540)), uint32(v1))
-				v2 = v0
-				goto l2
+			store32(m.memory, uint64(uint32(i32(65548))), uint32(v2))
+			v0 = v2 + v3
+			store32(m.memory, uint64(uint32(i32(65536))), uint32(v0))
+			t4 := int32(load32(m.memory, uint64(uint32(i32(65544)))))
+			if uint32(t4) < uint32(v0) {
+				store32(m.memory, uint64(uint32(i32(65544))), uint32(v0))
 			}
-			store32(m.memory, uint32(i32(65540)), uint32(v1+v5&i32(-65536)))
+			return v2
 		}
-		store32(m.memory, uint32(i32(65544)), uint32(v2))
-		store32(m.memory, uint32(i32(65536)), uint32(v2+v3))
-		return v2
 	}
 l0:
 	return i32(0)
@@ -107,8 +114,8 @@ func (m *Module) Xmemalign(v0, v1 int32) int32 {
 			goto l0
 		}
 		v2 = (v0 + v3 - i32(1)) & (i32(0) - v0)
-		store32(m.memory, uint32(i32(65544)), uint32(v2))
-		store32(m.memory, uint32(i32(65536)), uint32((v1+v2+i32(15))&i32(-16)))
+		store32(m.memory, uint64(uint32(i32(65548))), uint32(v2))
+		store32(m.memory, uint64(uint32(i32(65536))), uint32((v1+v2+i32(15))&i32(-16)))
 	}
 l0:
 	return v2
@@ -121,15 +128,15 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 	}
 	{
 		if v1 == 0 {
-			t1 := int32(load32(m.memory, uint32(i32(65544))))
+			t1 := int32(load32(m.memory, uint64(uint32(i32(65548)))))
 			if v0 != t1 {
 				goto l0
 			}
-			store32(m.memory, uint32(i32(65536)), uint32(v0))
-			store32(m.memory, uint32(i32(65544)), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(i32(65536))), uint32(v0))
+			store32(m.memory, uint64(uint32(i32(65548))), uint32(i32(0)))
 			return i32(0)
 		}
-		t2 := int32(load32(m.memory, uint32(i32(65544))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(65548)))))
 		v2 = t2
 		if uint32(v1) > uint32(i32(16)) {
 			goto l1
@@ -139,26 +146,31 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 		}
 		return v0
 	l1:
-		t3 := int32(load32(m.memory, uint32(i32(65536))))
+		t3 := int32(load32(m.memory, uint64(uint32(i32(65536)))))
 		v3 = t3
 		if v0 == v2 {
-			store32(m.memory, uint32(i32(65536)), uint32(v0))
+			store32(m.memory, uint64(uint32(i32(65536))), uint32(v0))
 		}
 		t4 := m.Xmalloc(v1)
 		v2 = t4
 		if v2 == 0 {
-			store32(m.memory, uint32(i32(65536)), uint32(v3))
+			v2 = i32(0)
+			t5 := int32(load32(m.memory, uint64(uint32(i32(65536)))))
+			if t5 != v0 {
+				goto l0
+			}
+			store32(m.memory, uint64(uint32(i32(65536))), uint32(v3))
 			return i32(0)
 		}
 		if v0 == v2 {
 			goto l0
 		}
 		v3 = v3 - v0
-		p5 := v1
+		p6 := v1
 		if uint32(v1) > uint32(v3) {
-			p5 = v3
+			p6 = v3
 		}
-		v1 = p5
+		v1 = p6
 		if v1 == 0 {
 			goto l0
 		}
@@ -174,19 +186,29 @@ func (m *Module) Xmemory() Memory {
 // Compiler error if endianess is unknown.
 var _ = map[bool]struct{}{big: {}, little: {}}
 
-// go.dev/src/cmd/compile/internal/ssa/config.go
 const (
+	// go.dev/src/vendor/golang.org/x/sys/cpu/endian_big.go
 	big = false ||
-		runtime.GOARCH == "ppc64" || runtime.GOARCH == "s390x" ||
-		runtime.GOARCH == "mips" || runtime.GOARCH == "mips64"
+		runtime.GOARCH == "armbe" || runtime.GOARCH == "arm64be" ||
+		runtime.GOARCH == "m68k" || runtime.GOARCH == "mips" ||
+		runtime.GOARCH == "mips64" || runtime.GOARCH == "mips64p32" ||
+		runtime.GOARCH == "ppc" || runtime.GOARCH == "ppc64" ||
+		runtime.GOARCH == "s390" || runtime.GOARCH == "s390x" ||
+		runtime.GOARCH == "shbe" || runtime.GOARCH == "sparc" ||
+		runtime.GOARCH == "sparc64"
 
+	// go.dev/src/vendor/golang.org/x/sys/cpu/endian_little.go
 	little = false ||
 		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
+		runtime.GOARCH == "amd64p32" || runtime.GOARCH == "alpha" ||
 		runtime.GOARCH == "arm" || runtime.GOARCH == "arm64" ||
-		runtime.GOARCH == "riscv64" || runtime.GOARCH == "wasm" ||
-		runtime.GOARCH == "ppc64le" || runtime.GOARCH == "loong64" ||
-		runtime.GOARCH == "mipsle" || runtime.GOARCH == "mips64le"
+		runtime.GOARCH == "loong64" || runtime.GOARCH == "mipsle" ||
+		runtime.GOARCH == "mips64le" || runtime.GOARCH == "mips64p32le" ||
+		runtime.GOARCH == "nios2" || runtime.GOARCH == "ppc64le" ||
+		runtime.GOARCH == "riscv" || runtime.GOARCH == "riscv64" ||
+		runtime.GOARCH == "sh" || runtime.GOARCH == "wasm"
 
+	// go.dev/src/cmd/compile/internal/ssa/config.go
 	unalignedOK = false ||
 		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
 		runtime.GOARCH == "arm64" || runtime.GOARCH == "loong64" ||
@@ -257,4 +279,4 @@ func memory_copy[T uint32 | uint64](mem []byte, dest, src, n T) {
 	copy(mem[x:y:len(mem)], mem[z:w:len(mem)])
 }
 
-const data0 = "\x10\x00\x01\x00\x00\x00\x02"
+const data0 = "\x10\x00\x01\x00\x00\x00\x02\x00\x10\x00\x01"

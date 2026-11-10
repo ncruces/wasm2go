@@ -1,8 +1,11 @@
-// A simple bump allocator that never frees memory.
+// A simple bump allocator.
 // Takes over the initial heap, then grows it as needed.
 // Assumes that new memory is zero-initialized,
-// and that the heap base is aligned.
+// and that the heap base is aligned to max_align_t.
 // It allocates aligned chunks and keeps no size metadata.
+//
+// In a default build, the last allocation can be freed or resized in place.
+// With BUMP_NO_FREE, returned memory is never reclaimed.
 
 #include <stdalign.h>
 #include <stdint.h>
@@ -16,6 +19,7 @@ extern char __heap_end[];
 
 static char* bump_free_beg = __heap_base;
 static char* bump_free_end = __heap_end;
+static char* bump_high_ptr = __heap_base;
 static char* bump_last_ptr;
 
 void free(void* ptr) {
@@ -53,11 +57,15 @@ void* malloc(size_t size) {
     // Memory was grown elsewhere, this is a new arena.
     bump_free_beg = (char*)(old * PAGESIZE);
     bump_free_end = (char*)((old + npages) * PAGESIZE);
+    bump_last_ptr = NULL;  // Can't rewind into the old arena.
   }
 
   void* res = bump_free_beg;
   bump_free_beg += size;
   bump_last_ptr = res;
+#ifndef BUMP_NO_FREE
+  if (bump_free_beg > bump_high_ptr) bump_high_ptr = bump_free_beg;
+#endif
   return res;
 }
 
@@ -92,12 +100,17 @@ void* realloc(void* ptr, size_t size) {
   char* free_beg = bump_free_beg;
   // Worst case size of existing object.
   size_t copy = free_beg - (char*)ptr;
-  // If ptr is the last allocation, rewind to grow/shrink in place.
-  if (ptr == bump_last_ptr) bump_free_beg = (char*)ptr;
+  if (ptr == bump_last_ptr) {
+#ifdef BUMP_NO_FREE
+    if (size <= copy) return ptr;  // Never shrink.
+#endif
+    bump_free_beg = (char*)ptr;  // Rewind to grow/shrink in place.
+  }
 
   void* res = malloc(size);
   if (res == NULL) {  // Allocation failed.
-    bump_free_beg = free_beg;
+    // Undo the rewind, unless malloc moved to a new arena.
+    if (bump_free_beg == (char*)ptr) bump_free_beg = free_beg;
     return NULL;
   }
   if (res != ptr) {  // Allocation moved.
@@ -110,8 +123,18 @@ void* realloc(void* ptr, size_t size) {
 void* calloc(size_t nelem, size_t elsize) {
   size_t need;
   if (__builtin_mul_overflow(nelem, elsize, &need)) return NULL;
-  // Assumes new memory is zero-initialized.
-  return malloc(need);
+#ifndef BUMP_NO_FREE
+  char* high = bump_high_ptr;
+#endif
+  char* res = malloc(need);
+#ifndef BUMP_NO_FREE
+  // Clear memory that might've been reclaimed.
+  if (res != NULL && res < high) {
+    size_t dirty = high - res;
+    __builtin_memset(res, 0, dirty < need ? dirty : need);
+  }
+#endif
+  return res;
 }
 
 void* aligned_alloc(size_t align, size_t size) {

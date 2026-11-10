@@ -44,7 +44,7 @@ func (m *Module) Xfree(v0 int32) {
 			goto l0
 		}
 		v0 = v0 - i32(4)
-		t0 := int32(load32(m.memory, uint32(v0)))
+		t0 := int32(load32(m.memory, uint64(uint32(v0))))
 		if t0&i32(1) != 0 {
 			goto l0
 		}
@@ -59,21 +59,21 @@ func (m *Module) _tlsf_block_free(v0 int32) {
 	t0 := m.___stack_pointer
 	v4 = t0 - i32(16)
 	m.___stack_pointer = v4
-	t1 := int32(load32(m.memory, uint32(v0)))
+	t1 := int32(load32(m.memory, uint64(uint32(v0))))
 	t2 := v0
 	v2 = t1
 	v3 = t2 + v2&i32(-16)
-	t3 := int32(load32(m.memory, uint32(v3)))
+	t3 := int32(load32(m.memory, uint64(uint32(v3))))
 	if t3&i32(1) != 0 {
 		m._tlsf_remove_free_block(v3)
-		t4 := int32(load32(m.memory, uint32(v3)))
-		t5 := int32(load32(m.memory, uint32(v0)))
+		t4 := int32(load32(m.memory, uint64(uint32(v3))))
+		t5 := int32(load32(m.memory, uint64(uint32(v0))))
 		t6 := t4 & i32(-16)
 		v2 = t5
 		v1 = t6 + v2&i32(-16)
 		t7 := v0
 		v2 = v1 | v2&i32(15)
-		store32(m.memory, uint32(t7), uint32(v2))
+		store32(m.memory, uint64(uint32(t7)), uint32(v2))
 		v3 = v0 + v1
 	}
 	{
@@ -81,24 +81,24 @@ func (m *Module) _tlsf_block_free(v0 int32) {
 			v1 = v0
 			goto l0
 		}
-		t8 := int32(load32(m.memory, uint32(v0-i32(4))))
+		t8 := int32(load32(m.memory, uint64(uint32(v0-i32(4)))))
 		v1 = v0 - t8
 		m._tlsf_remove_free_block(v1)
-		t9 := int32(load32(m.memory, uint32(v0)))
-		t10 := int32(load32(m.memory, uint32(v1)))
+		t9 := int32(load32(m.memory, uint64(uint32(v0))))
+		t10 := int32(load32(m.memory, uint64(uint32(v1))))
 		t11 := v1
 		t12 := t9 & i32(-16)
 		v0 = t10
 		v2 = t12 + v0&i32(-16) | v0&i32(15)
-		store32(m.memory, uint32(t11), uint32(v2))
+		store32(m.memory, uint64(uint32(t11)), uint32(v2))
 	}
 l0:
-	store32(m.memory, uint32(v1), uint32(v2|i32(1)))
+	store32(m.memory, uint64(uint32(v1)), uint32(v2|i32(1)))
 	v0 = v2 & i32(-16)
-	store32(m.memory, uint32(v0+v1-i32(4)), uint32(v0))
-	t13 := int32(load32(m.memory, uint32(v3)))
-	store32(m.memory, uint32(v3), uint32(t13|i32(2)))
-	t14 := int32(load32(m.memory, uint32(v1)))
+	store32(m.memory, uint64(uint32(v0+v1-i32(4))), uint32(v0))
+	t13 := int32(load32(m.memory, uint64(uint32(v3))))
+	store32(m.memory, uint64(uint32(v3)), uint32(t13|i32(2)))
+	t14 := int32(load32(m.memory, uint64(uint32(v1))))
 	m._tlsf_mapping(t14&i32(-16), i32(1), v4+i32(12), v4+i32(8))
 	t15 := int32(load32(m.memory, uint64(uint32(v4))+12))
 	v2 = t15
@@ -106,19 +106,19 @@ l0:
 	t17 := v2 << 6
 	v3 = t16
 	v5 = t17 + v3<<2 + i32(65640)
-	t18 := int32(load32(m.memory, uint32(v5)))
+	t18 := int32(load32(m.memory, uint64(uint32(v5))))
 	v0 = t18
 	store32(m.memory, uint64(uint32(v1))+8, uint32(i32(0)))
 	store32(m.memory, uint64(uint32(v1))+4, uint32(v0))
-	store32(m.memory, uint32(v5), uint32(v1))
+	store32(m.memory, uint64(uint32(v5)), uint32(v1))
 	if v0 != 0 {
 		store32(m.memory, uint64(uint32(v0))+8, uint32(v1))
 	}
-	t19 := int32(load32(m.memory, uint32(i32(65536))))
-	store32(m.memory, uint32(i32(65536)), uint32(t19|i32_shl(i32(1), v2)))
+	t19 := int32(load32(m.memory, uint64(uint32(i32(65536)))))
+	store32(m.memory, uint64(uint32(i32(65536))), uint32(t19|i32_shl(i32(1), v2)))
 	v0 = v2<<2 + i32(65540)
-	t20 := int32(load32(m.memory, uint32(v0)))
-	store32(m.memory, uint32(v0), uint32(t20|i32_shl(i32(1), v3)))
+	t20 := int32(load32(m.memory, uint64(uint32(v0))))
+	store32(m.memory, uint64(uint32(v0)), uint32(t20|i32_shl(i32(1), v3)))
 	m.___stack_pointer = v4 + i32(16)
 }
 func (m *Module) _tlsf_remove_free_block(v0 int32) {
@@ -126,7 +126,7 @@ func (m *Module) _tlsf_remove_free_block(v0 int32) {
 	t0 := m.___stack_pointer
 	v2 = t0 - i32(16)
 	m.___stack_pointer = v2
-	t1 := int32(load32(m.memory, uint32(v0)))
+	t1 := int32(load32(m.memory, uint64(uint32(v0))))
 	m._tlsf_mapping(t1&i32(-16), i32(1), v2+i32(12), v2+i32(8))
 	t2 := int32(load32(m.memory, uint64(uint32(v0))+8))
 	v1 = t2
@@ -145,19 +145,19 @@ func (m *Module) _tlsf_remove_free_block(v0 int32) {
 		t5 := int32(load32(m.memory, uint64(uint32(v2))+8))
 		t6 := v3 << 6
 		v1 = t5
-		store32(m.memory, uint32(t6+v1<<2+i32(65640)), uint32(v0))
+		store32(m.memory, uint64(uint32(t6+v1<<2+i32(65640))), uint32(v0))
 		if v0 != 0 {
 			goto l0
 		}
 		v0 = v3<<2 + i32(65540)
-		t7 := int32(load32(m.memory, uint32(v0)))
+		t7 := int32(load32(m.memory, uint64(uint32(v0))))
 		v1 = t7 & i32_rotl(i32(-2), v1)
-		store32(m.memory, uint32(v0), uint32(v1))
+		store32(m.memory, uint64(uint32(v0)), uint32(v1))
 		if v1 != 0 {
 			goto l0
 		}
-		t8 := int32(load32(m.memory, uint32(i32(65536))))
-		store32(m.memory, uint32(i32(65536)), uint32(t8&i32_rotl(i32(-2), v3)))
+		t8 := int32(load32(m.memory, uint64(uint32(i32(65536)))))
+		store32(m.memory, uint64(uint32(i32(65536))), uint32(t8&i32_rotl(i32(-2), v3)))
 	}
 l0:
 	m.___stack_pointer = v2 + i32(16)
@@ -188,7 +188,7 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 			v1 = (v0 + v1) << 16
 			t3 := v1
 			v0 = v0 << 16
-			t4 := int32(load32(m.memory, uint32(i32(67240))))
+			t4 := int32(load32(m.memory, uint64(uint32(i32(67240)))))
 			var p5 int32
 			if v0 == t4 {
 				p5 = 1
@@ -201,18 +201,18 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 			v0 = p6 + v0
 			if t3-v0 >= i32(20) {
 				v4 = v1 - i32(4)
-				store32(m.memory, uint32(v4), uint32(i32(0)))
+				store32(m.memory, uint64(uint32(v4)), uint32(i32(0)))
 				t8 := v0
 				var p7 int32
 				if v3 != 0 {
-					t9 := int32(load32(m.memory, uint32(v0)))
+					t9 := int32(load32(m.memory, uint64(uint32(v0))))
 					p7 = t9 & i32(15)
 				} else {
 					p7 = i32(0)
 				}
-				store32(m.memory, uint32(t8), uint32(p7|(v4-v0)))
+				store32(m.memory, uint64(uint32(t8)), uint32(p7|(v4-v0)))
 				m._tlsf_block_free(v0)
-				store32(m.memory, uint32(i32(67240)), uint32(v1))
+				store32(m.memory, uint64(uint32(i32(67240))), uint32(v1))
 			}
 			t10 := m._tlsf_find_free_block(v2)
 			v1 = t10
@@ -221,13 +221,13 @@ func (m *Module) Xmalloc(v0 int32) int32 {
 			}
 		}
 		m._tlsf_remove_free_block(v1)
-		t11 := int32(load32(m.memory, uint32(v1)))
+		t11 := int32(load32(m.memory, uint64(uint32(v1))))
 		t12 := v1
 		v0 = t11
-		store32(m.memory, uint32(t12), uint32(v0&i32(-2)))
+		store32(m.memory, uint64(uint32(t12)), uint32(v0&i32(-2)))
 		v0 = v1 + v0&i32(-16)
-		t13 := int32(load32(m.memory, uint32(v0)))
-		store32(m.memory, uint32(v0), uint32(t13&i32(-3)))
+		t13 := int32(load32(m.memory, uint64(uint32(v0))))
+		store32(m.memory, uint64(uint32(v0)), uint32(t13&i32(-3)))
 		t14 := m._tlsf_block_split(v1, v2)
 		v0 = t14
 		if v0 != 0 {
@@ -252,11 +252,11 @@ func (m *Module) _tlsf_find_free_block(v0 int32) int32 {
 	{
 		t1 := int32(load32(m.memory, uint64(uint32(v1))+12))
 		v0 = t1
-		t2 := int32(load32(m.memory, uint32(v0<<2+i32(65540))))
+		t2 := int32(load32(m.memory, uint64(uint32(v0<<2+i32(65540)))))
 		t3 := int32(load32(m.memory, uint64(uint32(v1))+8))
 		v2 = t2 & i32_shl(i32(-1), t3)
 		if v2 == 0 {
-			t4 := int32(load32(m.memory, uint32(i32(65536))))
+			t4 := int32(load32(m.memory, uint64(uint32(i32(65536)))))
 			v0 = t4 & i32_shl(i32(-1), v0+i32(1))
 			if v0 == 0 {
 				goto l0
@@ -265,7 +265,7 @@ func (m *Module) _tlsf_find_free_block(v0 int32) int32 {
 			t5 := int32(load32(m.memory, uint64(uint32(v0<<2))+65540))
 			v2 = t5
 		}
-		t6 := int32(load32(m.memory, uint32(v0<<6+int32(bits.TrailingZeros32(uint32(v2)))<<2+i32(65640))))
+		t6 := int32(load32(m.memory, uint64(uint32(v0<<6+int32(bits.TrailingZeros32(uint32(v2)))<<2+i32(65640)))))
 		v3 = t6
 	}
 l0:
@@ -275,16 +275,16 @@ l0:
 func (m *Module) _tlsf_block_split(v0, v1 int32) int32 {
 	var v2, v3, v4 int32
 	{
-		t0 := int32(load32(m.memory, uint32(v0)))
+		t0 := int32(load32(m.memory, uint64(uint32(v0))))
 		v2 = t0
 		v3 = v2&i32(-16) - v1
 		if uint32(v3) >= uint32(i32(16)) {
 			if v1&i32(15) != 0 {
 				panic("unreachable")
 			}
-			store32(m.memory, uint32(v0), uint32(v2&i32(15)|v1))
+			store32(m.memory, uint64(uint32(v0)), uint32(v2&i32(15)|v1))
 			v4 = v0 + v1
-			store32(m.memory, uint32(v4), uint32(v3))
+			store32(m.memory, uint64(uint32(v4)), uint32(v3))
 		}
 		return v4
 	}
@@ -296,16 +296,16 @@ func (m *Module) _tlsf_mapping(v0, v1, v2, v3 int32) {
 			if v0&i32(15) != 0 {
 				panic("unreachable")
 			}
-			store32(m.memory, uint32(v2), uint32(i32(0)))
-			store32(m.memory, uint32(v3), uint32(int32(uint32(v0)>>4)))
+			store32(m.memory, uint64(uint32(v2)), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(v3)), uint32(int32(uint32(v0)>>4)))
 			return
 		}
 		t0 := v2
 		v4 = int32(bits.LeadingZeros32(uint32(v0)))
-		store32(m.memory, uint32(t0), uint32(i32(24)-v4))
+		store32(m.memory, uint64(uint32(t0)), uint32(i32(24)-v4))
 		t1 := v3
 		v5 = i32_shr_u(v0, i32(27)-v4) & i32(15)
-		store32(m.memory, uint32(t1), uint32(v5))
+		store32(m.memory, uint64(uint32(t1)), uint32(v5))
 		{
 			if v1 != 0 {
 				return
@@ -315,12 +315,12 @@ func (m *Module) _tlsf_mapping(v0, v1, v2, v3 int32) {
 			}
 			t2 := v3
 			v0 = v5 + i32(1)
-			store32(m.memory, uint32(t2), uint32(v0))
+			store32(m.memory, uint64(uint32(t2)), uint32(v0))
 			if v0 != i32(16) {
 				return
 			}
-			store32(m.memory, uint32(v3), uint32(i32(0)))
-			store32(m.memory, uint32(v2), uint32(i32(25)-v4))
+			store32(m.memory, uint64(uint32(v3)), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(v2)), uint32(i32(25)-v4))
 		}
 		return
 	}
@@ -343,7 +343,7 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 			goto l1
 		}
 		v2 = v0 - i32(4)
-		t1 := int32(load32(m.memory, uint32(v2)))
+		t1 := int32(load32(m.memory, uint64(uint32(v2))))
 		v3 = t1
 		if v3&i32(1) != 0 {
 			goto l1
@@ -362,7 +362,7 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 		}
 		{
 			v6 = v2 + v3
-			t4 := int32(load32(m.memory, uint32(v6)))
+			t4 := int32(load32(m.memory, uint64(uint32(v6))))
 			v7 = t4
 			if v7&i32(1) == 0 {
 				goto l3
@@ -371,14 +371,14 @@ func (m *Module) Xrealloc(v0, v1 int32) int32 {
 				goto l3
 			}
 			m._tlsf_remove_free_block(v6)
-			t5 := int32(load32(m.memory, uint32(v6)))
+			t5 := int32(load32(m.memory, uint64(uint32(v6))))
 			t6 := v2
 			v1 = t5&i32(-16) + v3
-			t7 := int32(load32(m.memory, uint32(v2)))
-			store32(m.memory, uint32(t6), uint32(v1|t7&i32(15)))
+			t7 := int32(load32(m.memory, uint64(uint32(v2))))
+			store32(m.memory, uint64(uint32(t6)), uint32(v1|t7&i32(15)))
 			v1 = v1 + v2
-			t8 := int32(load32(m.memory, uint32(v1)))
-			store32(m.memory, uint32(v1), uint32(t8&i32(-3)))
+			t8 := int32(load32(m.memory, uint64(uint32(v1))))
+			store32(m.memory, uint64(uint32(v1)), uint32(t8&i32(-3)))
 			t9 := m._tlsf_block_split(v2, v4)
 			v1 = t9
 			if v1 == 0 {
@@ -430,7 +430,7 @@ func (m *Module) Xmemalign(v0, v1 int32) int32 {
 			goto l1
 		}
 		v3 = v2 - i32(4)
-		t2 := int32(load32(m.memory, uint32(v3)))
+		t2 := int32(load32(m.memory, uint64(uint32(v3))))
 		if t2&i32(1) != 0 {
 			goto l1
 		}
@@ -483,19 +483,29 @@ func (m *Module) Xmemory() Memory {
 // Compiler error if endianess is unknown.
 var _ = map[bool]struct{}{big: {}, little: {}}
 
-// go.dev/src/cmd/compile/internal/ssa/config.go
 const (
+	// go.dev/src/vendor/golang.org/x/sys/cpu/endian_big.go
 	big = false ||
-		runtime.GOARCH == "ppc64" || runtime.GOARCH == "s390x" ||
-		runtime.GOARCH == "mips" || runtime.GOARCH == "mips64"
+		runtime.GOARCH == "armbe" || runtime.GOARCH == "arm64be" ||
+		runtime.GOARCH == "m68k" || runtime.GOARCH == "mips" ||
+		runtime.GOARCH == "mips64" || runtime.GOARCH == "mips64p32" ||
+		runtime.GOARCH == "ppc" || runtime.GOARCH == "ppc64" ||
+		runtime.GOARCH == "s390" || runtime.GOARCH == "s390x" ||
+		runtime.GOARCH == "shbe" || runtime.GOARCH == "sparc" ||
+		runtime.GOARCH == "sparc64"
 
+	// go.dev/src/vendor/golang.org/x/sys/cpu/endian_little.go
 	little = false ||
 		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
+		runtime.GOARCH == "amd64p32" || runtime.GOARCH == "alpha" ||
 		runtime.GOARCH == "arm" || runtime.GOARCH == "arm64" ||
-		runtime.GOARCH == "riscv64" || runtime.GOARCH == "wasm" ||
-		runtime.GOARCH == "ppc64le" || runtime.GOARCH == "loong64" ||
-		runtime.GOARCH == "mipsle" || runtime.GOARCH == "mips64le"
+		runtime.GOARCH == "loong64" || runtime.GOARCH == "mipsle" ||
+		runtime.GOARCH == "mips64le" || runtime.GOARCH == "mips64p32le" ||
+		runtime.GOARCH == "nios2" || runtime.GOARCH == "ppc64le" ||
+		runtime.GOARCH == "riscv" || runtime.GOARCH == "riscv64" ||
+		runtime.GOARCH == "sh" || runtime.GOARCH == "wasm"
 
+	// go.dev/src/cmd/compile/internal/ssa/config.go
 	unalignedOK = false ||
 		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
 		runtime.GOARCH == "arm64" || runtime.GOARCH == "loong64" ||

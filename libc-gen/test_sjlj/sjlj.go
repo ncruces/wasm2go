@@ -49,25 +49,25 @@ func (m *Module) Xtest() int32 {
 	t0 := m.___stack_pointer
 	v1 = t0 - i32(16)
 	m.___stack_pointer = v1
-	store32(m.memory, uint32(i32(65540)), uint32(i32(1)))
-	store32(m.memory, uint32(i32(65536)), uint32(v1+i32(12)))
+	store32(m.memory, uint64(uint32(i32(65540))), uint32(i32(1)))
+	store32(m.memory, uint64(uint32(i32(65536))), uint32(v1+i32(12)))
 l2:
 	if v0 == 0 {
-		store32(m.memory, uint32(i32(65544)), uint32(i32(0)))
+		store32(m.memory, uint64(uint32(i32(65544))), uint32(i32(0)))
 		m._invoke_vii(i32(1), i32(65536), i32(42))
-		t1 := int32(load32(m.memory, uint32(i32(65544))))
+		t1 := int32(load32(m.memory, uint64(uint32(i32(65544)))))
 		v0 = t1
-		store32(m.memory, uint32(i32(65544)), uint32(i32(0)))
+		store32(m.memory, uint64(uint32(i32(65544))), uint32(i32(0)))
 		{
 			if v0 == 0 {
 				goto l0
 			}
-			t2 := int32(load32(m.memory, uint32(i32(65548))))
+			t2 := int32(load32(m.memory, uint64(uint32(i32(65548)))))
 			v2 = t2
 			if v2 == 0 {
 				goto l0
 			}
-			t3 := int32(load32(m.memory, uint32(v0)))
+			t3 := int32(load32(m.memory, uint64(uint32(v0))))
 			var p4 int32
 			if t3 == v1+i32(12) {
 				t5 := int32(load32(m.memory, uint64(uint32(v0))+4))
@@ -79,10 +79,10 @@ l2:
 				m._emscripten_longjmp(v0, v2)
 				panic("unreachable")
 			}
-			store32(m.memory, uint32(i32(65552)), uint32(v2))
+			store32(m.memory, uint64(uint32(i32(65552))), uint32(v2))
 		}
 	l0:
-		t6 := int32(load32(m.memory, uint32(i32(65552))))
+		t6 := int32(load32(m.memory, uint64(uint32(i32(65552)))))
 		v0 = t6
 		goto l2
 	}
@@ -90,12 +90,12 @@ l2:
 	return v0
 }
 func (m *Module) _emscripten_longjmp(v0, v1 int32) {
-	store32(m.memory, uint32(i32(65544)), uint32(v0))
+	store32(m.memory, uint64(uint32(i32(65544))), uint32(v0))
 	p0 := v1
 	if uint32(v1) <= uint32(i32(1)) {
 		p0 = i32(1)
 	}
-	store32(m.memory, uint32(i32(65548)), uint32(p0))
+	store32(m.memory, uint64(uint32(i32(65548))), uint32(p0))
 	m.__throw_longjmp()
 }
 func (m *Module) X__indirect_function_table() *[]any {
@@ -111,19 +111,29 @@ func (m *Module) Xmemory() Memory {
 // Compiler error if endianess is unknown.
 var _ = map[bool]struct{}{big: {}, little: {}}
 
-// go.dev/src/cmd/compile/internal/ssa/config.go
 const (
+	// go.dev/src/vendor/golang.org/x/sys/cpu/endian_big.go
 	big = false ||
-		runtime.GOARCH == "ppc64" || runtime.GOARCH == "s390x" ||
-		runtime.GOARCH == "mips" || runtime.GOARCH == "mips64"
+		runtime.GOARCH == "armbe" || runtime.GOARCH == "arm64be" ||
+		runtime.GOARCH == "m68k" || runtime.GOARCH == "mips" ||
+		runtime.GOARCH == "mips64" || runtime.GOARCH == "mips64p32" ||
+		runtime.GOARCH == "ppc" || runtime.GOARCH == "ppc64" ||
+		runtime.GOARCH == "s390" || runtime.GOARCH == "s390x" ||
+		runtime.GOARCH == "shbe" || runtime.GOARCH == "sparc" ||
+		runtime.GOARCH == "sparc64"
 
+	// go.dev/src/vendor/golang.org/x/sys/cpu/endian_little.go
 	little = false ||
 		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
+		runtime.GOARCH == "amd64p32" || runtime.GOARCH == "alpha" ||
 		runtime.GOARCH == "arm" || runtime.GOARCH == "arm64" ||
-		runtime.GOARCH == "riscv64" || runtime.GOARCH == "wasm" ||
-		runtime.GOARCH == "ppc64le" || runtime.GOARCH == "loong64" ||
-		runtime.GOARCH == "mipsle" || runtime.GOARCH == "mips64le"
+		runtime.GOARCH == "loong64" || runtime.GOARCH == "mipsle" ||
+		runtime.GOARCH == "mips64le" || runtime.GOARCH == "mips64p32le" ||
+		runtime.GOARCH == "nios2" || runtime.GOARCH == "ppc64le" ||
+		runtime.GOARCH == "riscv" || runtime.GOARCH == "riscv64" ||
+		runtime.GOARCH == "sh" || runtime.GOARCH == "wasm"
 
+	// go.dev/src/cmd/compile/internal/ssa/config.go
 	unalignedOK = false ||
 		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
 		runtime.GOARCH == "arm64" || runtime.GOARCH == "loong64" ||
