@@ -114,8 +114,8 @@ func Test_strtoul(t *testing.T) {
 			store32(memory, cptr_t(endptr), 0)
 
 			got := strtoul(start, endptr, tc.base)
-			if got != tc.want {
-				t.Fatalf("got %v, want %v", got, tc.want)
+			if uint32(got) != tc.want {
+				t.Fatalf("got %v, want %v", uint32(got), tc.want)
 			}
 
 			end := sptr_t(load32(memory, cptr_t(endptr)))
