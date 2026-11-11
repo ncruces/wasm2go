@@ -310,7 +310,7 @@ func InlineGotoReturn(fn *ast.FuncDecl) {
 // into a plain function.
 // Returns true if we need to update call sites.
 func RemoveReceiver(fn *ast.FuncDecl) bool {
-	if ast.IsExported(fn.Name.Name) {
+	if fn.Recv == nil || ast.IsExported(fn.Name.Name) {
 		return false
 	}
 
