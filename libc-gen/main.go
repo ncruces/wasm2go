@@ -135,51 +135,21 @@ func main() {
 		}
 	}
 
-	queue := append([]string(nil), funcs...)
-	visited := make(map[string]bool)
-	var keep []*ast.FuncDecl
-
 	// Tree-shake the AST
-	for len(queue) > 0 {
-		name := queue[0]
-		queue = queue[1:]
-
-		if visited[name] {
-			continue
-		}
-		visited[name] = true
-
-		fd, ok := available[name]
-		if !ok && *wasm == "" {
+	var keep []*ast.FuncDecl
+	visited := make(set[string])
+	for _, name := range funcs {
+		if available[name] == nil && *wasm == "" {
 			log.Fatalf("function %s not found in templates", name)
-		} else if !ok {
-			continue
 		}
-		keep = append(keep, fd)
-
-		// Search for other internal dependencies inside this one's scope
-		ast.Inspect(fd, func(n ast.Node) bool {
-			if call, ok := n.(*ast.CallExpr); ok {
-				if id, ok := call.Fun.(*ast.Ident); ok {
-					if _, exists := available[id.Name]; exists {
-						queue = append(queue, id.Name)
-					}
-				}
-			}
-			return true
-		})
+		keep = appendDeps(keep, name, available, visited)
 	}
 
 	usedImports := make(set[string])
 
 	// Execute the rewriting permutations
 	for _, fd := range keep {
-		fd.Recv = &ast.FieldList{
-			List: []*ast.Field{{
-				Names: []*ast.Ident{ast.NewIdent("m")},
-				Type:  &ast.StarExpr{X: ast.NewIdent("Module")},
-			}},
-		}
+		fd.Name = mangle.ID(fd.Name.Name, mangle.Internal)
 
 		astutil.Apply(fd, nil, func(c *astutil.Cursor) bool {
 			if call, ok := c.Node().(*ast.CallExpr); ok {
@@ -194,6 +164,7 @@ func main() {
 			return true
 		})
 
+		var recv bool
 		ast.Inspect(fd, func(n ast.Node) bool {
 			switch x := n.(type) {
 			case *ast.SliceExpr:
@@ -206,7 +177,12 @@ func main() {
 				}
 			case *ast.CallExpr:
 				if id, ok := x.Fun.(*ast.Ident); ok && available[id.Name] != nil {
-					x.Fun = &ast.SelectorExpr{X: ast.NewIdent("m"), Sel: mangle.ID(id.Name, mangle.Internal)}
+					callee := available[id.Name]
+					if callee.Recv != nil {
+						x.Fun = &ast.SelectorExpr{X: ast.NewIdent("m"), Sel: callee.Name}
+					} else {
+						x.Fun = callee.Name
+					}
 				}
 				for i, arg := range x.Args {
 					if id, ok := arg.(*ast.Ident); ok && id.Name == "memory" {
@@ -222,6 +198,9 @@ func main() {
 				}
 			case *ast.SelectorExpr:
 				if id, ok := x.X.(*ast.Ident); ok {
+					if id.Name == "m" {
+						recv = true
+					}
 					if path, exists := allImports[id.Name]; exists {
 						usedImports.add(path)
 					}
@@ -230,8 +209,14 @@ func main() {
 			return true
 		})
 
-		// Finally mangle the function's own name
-		fd.Name = mangle.ID(fd.Name.Name, mangle.Internal)
+		if recv {
+			fd.Recv = &ast.FieldList{
+				List: []*ast.Field{{
+					Names: []*ast.Ident{ast.NewIdent("m")},
+					Type:  &ast.StarExpr{X: ast.NewIdent("Module")},
+				}},
+			}
+		}
 	}
 
 	// Write the unified file
@@ -271,6 +256,22 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+}
+
+func appendDeps(keep []*ast.FuncDecl, name string, available map[string]*ast.FuncDecl, visited set[string]) []*ast.FuncDecl {
+	fd := available[name]
+	if fd == nil || !visited.add(name) {
+		return keep
+	}
+	ast.Inspect(fd, func(n ast.Node) bool {
+		if call, ok := n.(*ast.CallExpr); ok {
+			if id, ok := call.Fun.(*ast.Ident); ok {
+				keep = appendDeps(keep, id.Name, available, visited)
+			}
+		}
+		return true
+	})
+	return append(keep, fd)
 }
 
 func makeMemoryExpr(deref bool) ast.Expr {

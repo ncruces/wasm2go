@@ -64,7 +64,7 @@ type translator struct {
 	out ast.File
 	// Dependencies.
 	packages set[string]
-	provided set[string]
+	provided map[string]bool
 	helpers  set[string]
 	// Sections.
 	types     []funcType
@@ -94,7 +94,7 @@ func translate(r io.Reader, w io.Writer) error {
 
 	fset := token.NewFileSet()
 	t.packages = set[string]{}
-	t.provided = set[string]{}
+	t.provided = map[string]bool{}
 	t.helpers = set[string]{}
 
 	helperNames, err := t.findHelpers(fset, helpersSrc, helpersAtomicsSrc)
@@ -108,12 +108,12 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 		for _, decl := range f.Decls {
 			if fn, ok := decl.(*ast.FuncDecl); ok {
-				// Check if the receiver type is *Module.
-				if fn.Recv != nil {
-					if star, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
-						if id, ok := star.X.(*ast.Ident); ok && id.Name == "Module" {
-							t.provided.add(fn.Name.Name)
-						}
+				// Check if fn is a plain function, or if the receiver type is *Module.
+				if fn.Recv == nil {
+					t.provided[fn.Name.Name] = false
+				} else if star, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
+					if id, ok := star.X.(*ast.Ident); ok && id.Name == "Module" {
+						t.provided[fn.Name.Name] = true
 					}
 				}
 				// Provided files may call helpers by name.
@@ -263,6 +263,15 @@ func translate(r io.Reader, w io.Writer) error {
 		}
 	}
 
+	for modified := !*noopt; modified; {
+		modified = false
+		for _, fn := range t.functions {
+			if passes.RemoveReceiver(fn.decl) {
+				fn.call.(*ast.ParenExpr).X = fn.decl.Name
+				modified = true
+			}
+		}
+	}
 	passes.RemoveParens(&t.out)
 
 	// Print Go.
@@ -469,11 +478,15 @@ func (t *translator) readImportSection() error {
 			}
 			typ := t.types[index]
 
-			if n := mangle.Name(name, mangle.Internal); t.provided.has(n) {
-				id := ast.NewIdent(n)
+			if recv, ok := t.provided[mangle.Name(name, mangle.Internal)]; ok {
+				id := mangle.ID(name, mangle.Internal)
+				var call ast.Expr = id
+				if recv {
+					call = modSel(id)
+				}
 				fn := funcCompiler{
 					typ:      typ,
-					call:     latecall(id),
+					call:     call,
 					decl:     &ast.FuncDecl{Name: id},
 					provided: true}
 				t.functions = append(t.functions, fn)
