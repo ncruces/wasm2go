@@ -21,16 +21,16 @@ func strtoll(s, endptr sptr_t, base int32) int64 {
 	return strtoll_helper(s, endptr, base, 64)
 }
 
-func strtoull(s, endptr sptr_t, base int32) uint64 {
-	return strtoull_helper(s, endptr, base, 64)
+func strtoull(s, endptr sptr_t, base int32) int64 {
+	return int64(strtoull_helper(s, endptr, base, 64))
 }
 
 func strtol(s, endptr sptr_t, base int32) int32 {
 	return int32(strtoll_helper(s, endptr, base, 32))
 }
 
-func strtoul(s, endptr sptr_t, base int32) uint32 {
-	return uint32(strtoull_helper(s, endptr, base, 32))
+func strtoul(s, endptr sptr_t, base int32) int32 {
+	return int32(strtoull_helper(s, endptr, base, 32))
 }
 
 func strtod_helper(s, endptr sptr_t, bitSize int) float64 {
