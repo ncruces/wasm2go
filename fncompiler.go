@@ -623,31 +623,23 @@ func (fn *funcCompiler) cleanup() {
 	// Switch from LoadOnRead to LoadOnWrite before RemoveReceiver,
 	// since loading m.memory into mem uses m.
 	if fn.memory != nil && !fn.memory.shared {
-		if passes.SelectMemoryMode(fn.decl, fn.memory.selector, fn.mayGrowMemory) == passes.LoadOnWrite {
-			passes.LoadMemoryOnWrite(fn.decl, fn.memory.selector, newID("mem"), fn.mayGrowMemory)
+		if passes.SelectMemoryMode(fn.decl, fn.memory.selector, mayGrowMemory) == passes.LoadOnWrite {
+			passes.LoadMemoryOnWrite(fn.decl, fn.memory.selector, newID("mem"), mayGrowMemory)
 		}
 	}
 }
 
 // Reports whether ce may grow linear memory.
-func (fn *funcCompiler) mayGrowMemory(ce *ast.CallExpr) bool {
+func mayGrowMemory(ce *ast.CallExpr) bool {
 	switch f := ce.Fun.(type) {
-	case *ast.ParenExpr:
-		// Module, provided, or imported function call: (m.fnN)(...)
-		// Receiverless (fnN)(...) calls cannot access m or grow memory.
-		_, ok := f.X.(*ast.SelectorExpr)
-		return ok
-	case *ast.TypeAssertExpr:
-		// Indirect table call: m.t0[i].(func(...))(...)
-		return true
 	case *ast.Ident:
-		return f.Name == "memory_grow"
+		return f.Name == "memory_grow" || f.Name == "atomic_memory_grow"
 	case *ast.SelectorExpr:
-		// Imported memory.grow: m.memImp.Grow(...)
-		_, ok := f.X.(*ast.SelectorExpr)
-		return ok && f.Sel.Name == "Grow"
+		id, ok := f.X.(*ast.Ident)
+		return !ok || stdlib[id.Name] == ""
+	default:
+		return true
 	}
-	return false
 }
 
 type funcBlock struct {
