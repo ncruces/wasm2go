@@ -47,7 +47,7 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 			X: &ast.CallExpr{
 				Fun: newID("memory_init"),
 				Args: []ast.Expr{
-					t.memory.selector,
+					fn.mem(),
 					t.dataExpr(int(i)), dst, src, n}}})
 
 	case 0x09: // data.drop
@@ -75,7 +75,7 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 			X: &ast.CallExpr{
 				Fun: newID("memory_copy"),
 				Args: []ast.Expr{
-					t.memory.selector,
+					fn.mem(),
 					dst, src, n}}})
 
 	case 0x0b: // memory.fill
@@ -93,7 +93,7 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 				X: &ast.CallExpr{
 					Fun: newID("memory_zero"),
 					Args: []ast.Expr{
-						t.memory.selector,
+						fn.mem(),
 						dest, n}}})
 		} else {
 			fn.helpers.add("memory_fill")
@@ -101,7 +101,7 @@ func (t *translator) readOpcodeExtended(fn *funcCompiler) error {
 				X: &ast.CallExpr{
 					Fun: newID("memory_fill"),
 					Args: []ast.Expr{
-						t.memory.selector,
+						fn.mem(),
 						dest, val, n}}})
 		}
 

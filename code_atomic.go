@@ -16,6 +16,7 @@ func (t *translator) readOpcodeAtomic(fn *funcCompiler) error {
 		_, err = t.in.ReadByte() // 0x00
 		fn.helpers.add("atomic_fence")
 		fn.emit(&ast.ExprStmt{X: &ast.CallExpr{Fun: newID("atomic_fence")}})
+		fn.memMayGrow()
 		return nil
 	}
 
@@ -170,6 +171,7 @@ func (t *translator) readOpcodeAtomic(fn *funcCompiler) error {
 	default:
 		return fmt.Errorf("unsupported opcode (atomic): 0xFE 0x%02X", code)
 	}
+	fn.memMayGrow()
 	return nil
 }
 
@@ -179,7 +181,7 @@ func (fn *funcCompiler) atomicLoad(typ, name string, offset uint64) ast.Expr {
 	fn.helpers.add(name)
 	return convert(&ast.CallExpr{
 		Fun:  newID(name),
-		Args: []ast.Expr{fn.memory.selector, addr},
+		Args: []ast.Expr{fn.mem(), addr},
 	}, typ)
 }
 
@@ -193,7 +195,7 @@ func (fn *funcCompiler) atomicStore(name string, offset uint64) ast.Stmt {
 	fn.helpers.add("atomic_ptr" + bits)
 	return &ast.ExprStmt{X: &ast.CallExpr{
 		Fun:  newID(name),
-		Args: []ast.Expr{fn.memory.selector, addr, val},
+		Args: []ast.Expr{fn.mem(), addr, val},
 	}}
 }
 
@@ -207,7 +209,7 @@ func (fn *funcCompiler) atomicRmw(typ, name string, offset uint64) ast.Expr {
 	fn.helpers.add("atomic_ptr" + bits)
 	return convert(&ast.CallExpr{
 		Fun:  newID(name),
-		Args: []ast.Expr{fn.memory.selector, addr, val},
+		Args: []ast.Expr{fn.mem(), addr, val},
 	}, typ)
 }
 
@@ -223,7 +225,7 @@ func (fn *funcCompiler) atomicCmpxchg(typ, name string, offset uint64) ast.Expr 
 	fn.helpers.add("atomic_ptr" + bits)
 	return convert(&ast.CallExpr{
 		Fun:  newID(name),
-		Args: []ast.Expr{fn.memory.selector, addr, old, new},
+		Args: []ast.Expr{fn.mem(), addr, old, new},
 	}, typ)
 }
 
@@ -237,7 +239,7 @@ func (fn *funcCompiler) atomicNotify(name string, offset uint64) ast.Expr {
 	return &ast.CallExpr{
 		Fun: newID(name),
 		Args: []ast.Expr{
-			fn.memory.selector, addr, count,
+			fn.mem(), addr, count,
 			modSel(newID("waiters"))}}
 }
 
@@ -255,6 +257,6 @@ func (fn *funcCompiler) atomicWait(name string, offset uint64) ast.Expr {
 	return &ast.CallExpr{
 		Fun: newID(name),
 		Args: []ast.Expr{
-			fn.memory.selector, addr, exp, timeout,
+			fn.mem(), addr, exp, timeout,
 			modSel(newID("waiters"))}}
 }
