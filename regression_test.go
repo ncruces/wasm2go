@@ -41,6 +41,12 @@ func Test_regression_store_grow(t *testing.T) {
 	if got := m.Xsize(); got != 2 {
 		t.Errorf("size = %d, want 2", got)
 	}
+	if got := m.Xgrow_mid(); got != 12345 {
+		t.Errorf("grow_mid() = %d, want 12345 (local mem must reload after memory.grow)", got)
+	}
+	if got := m.Xsize(); got != 3 {
+		t.Errorf("size = %d, want 3", got)
+	}
 }
 
 func Test_regression_oob_trap(t *testing.T) {

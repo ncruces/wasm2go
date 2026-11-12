@@ -3,6 +3,7 @@ package main
 import (
 	"go/ast"
 	"go/token"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -20,6 +21,12 @@ type funcCompiler struct {
 	blocks stack[funcBlock]
 	labels int
 	temps  int
+
+	memSlice    *ast.ParenExpr
+	memReloads  []memReload
+	memReads    int
+	memFirstTop int
+	memLastTop  int
 
 	provided bool
 }
@@ -132,7 +139,7 @@ func (fn *funcCompiler) branch(n uint64) (stmts []ast.Stmt) {
 // Returns an expression that loads a byte from memory (an l-value).
 func (fn *funcCompiler) load8(offset uint64) ast.Expr {
 	return &ast.IndexExpr{
-		X:     fn.memory.selector,
+		X:     fn.mem(),
 		Index: fn.popAddr(offset)}
 }
 
@@ -145,7 +152,7 @@ func (fn *funcCompiler) load(typ string, offset uint64) (expr ast.Expr) {
 	fn.helpers.add("load" + bits)
 	expr = &ast.CallExpr{
 		Fun:  newID("load" + bits),
-		Args: []ast.Expr{fn.memory.selector, addr}}
+		Args: []ast.Expr{fn.mem(), addr}}
 
 	switch {
 	case strings.HasPrefix(typ, "float"):
@@ -180,7 +187,7 @@ func (fn *funcCompiler) store(typ string, offset uint64) ast.Stmt {
 	fn.helpers.add("store" + bits)
 	return &ast.ExprStmt{X: &ast.CallExpr{
 		Fun:  newID("store" + bits),
-		Args: []ast.Expr{fn.memory.selector, addr, val}}}
+		Args: []ast.Expr{fn.mem(), addr, val}}}
 }
 
 // Pushes expr (a literal, constant or materialized temporary) to the value stack.
@@ -597,7 +604,110 @@ func (fn *funcCompiler) newLabel() *ast.Ident {
 	return id
 }
 
+const loopWeight = 8
+
+func (fn *funcCompiler) inLoop() bool {
+	for i := range fn.blocks {
+		if fn.blocks[i].loopPos != 0 {
+			return true
+		}
+	}
+	return false
+}
+
+type memReload struct {
+	body      *ast.BlockStmt
+	pos       int
+	topIdx    int
+	prevReads int
+	inLoop    bool
+}
+
+func (fn *funcCompiler) mem() ast.Expr {
+	if *noopt || fn.blocks.top().unreachable {
+		return fn.memory.selector
+	}
+	if fn.memSlice == nil {
+		fn.memSlice = &ast.ParenExpr{X: fn.memory.selector}
+	}
+	topIdx := len(fn.blocks[0].body.List)
+	if len(fn.blocks) > 1 {
+		topIdx--
+	}
+	if fn.memReads == 0 {
+		fn.memFirstTop = topIdx
+	}
+	if fn.inLoop() {
+		fn.memReads += loopWeight
+	} else {
+		fn.memReads += 1
+	}
+	fn.memLastTop = topIdx
+	return fn.memSlice
+}
+
+func (fn *funcCompiler) memMayGrow() {
+	blk := fn.blocks.top()
+	if *noopt || fn.memory == nil || blk.unreachable {
+		return
+	}
+	fn.memReloads = append(fn.memReloads, memReload{
+		body:      blk.body,
+		pos:       len(blk.body.List),
+		topIdx:    len(fn.blocks[0].body.List) - 1,
+		prevReads: fn.memReads,
+		inLoop:    fn.inLoop(),
+	})
+}
+
+func (fn *funcCompiler) memFinish() {
+	if fn.memReads == 0 {
+		return
+	}
+
+	cost := 1
+	var reloads []memReload
+	for _, r := range fn.memReloads {
+		// Skip reloads before the definition, and after the last use:
+		// only a loop can reach a use that comes earlier.
+		if fn.memFirstTop <= r.topIdx && r.topIdx <= fn.memLastTop &&
+			(r.inLoop || r.prevReads < fn.memReads) {
+			if r.inLoop {
+				cost += loopWeight
+			} else {
+				cost += 1
+			}
+			reloads = append(reloads, r)
+		}
+	}
+	if cost >= fn.memReads {
+		return
+	}
+
+	mem := newID("mem")
+	fn.memSlice.X = mem
+
+	// Backwards, so positions stay valid.
+	for _, r := range slices.Backward(reloads) {
+		r.body.List = slices.Insert(r.body.List, r.pos, ast.Stmt(&ast.AssignStmt{
+			Tok: token.ASSIGN,
+			Lhs: []ast.Expr{mem},
+			Rhs: []ast.Expr{fn.memory.selector},
+		}))
+	}
+
+	// Define at the top level, before the statement with the first use.
+	top := fn.blocks[0].body
+	top.List = slices.Insert(top.List, fn.memFirstTop, ast.Stmt(&ast.AssignStmt{
+		Tok: token.DEFINE,
+		Lhs: []ast.Expr{mem},
+		Rhs: []ast.Expr{fn.memory.selector},
+	}))
+}
+
 func (fn *funcCompiler) cleanup() {
+	fn.memFinish()
+
 	// Sanity checks.
 	passes.CheckMaterialized(fn.decl)
 

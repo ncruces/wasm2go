@@ -443,6 +443,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						fn.pushConst(r)
 					}
 				}
+				fn.memMayGrow()
 			}
 
 		case 0x0f: // return
@@ -720,7 +721,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 					&ast.BinaryExpr{
 						X: &ast.CallExpr{
 							Fun:  newID("len"),
-							Args: []ast.Expr{t.memory.selector}},
+							Args: []ast.Expr{fn.mem()}},
 						Op: token.SHR,
 						Y:  literal16,
 					}, t.memory.stype()))
@@ -732,6 +733,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						Sel: newID("Grow")},
 					Args: []ast.Expr{literal0, newID("maxMem")}},
 					t.memory.stype()))
+				fn.memMayGrow()
 
 			default:
 				needsUnsafe("shared memory")
@@ -742,6 +744,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						&ast.UnaryExpr{Op: token.AND, X: t.memory.selector},
 						literal0, newID("maxMem")}},
 					t.memory.stype()))
+				fn.memMayGrow()
 			}
 
 		case 0x40: // memory.grow
@@ -773,6 +776,7 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 						newID("maxMem")}},
 					t.memory.stype()))
 			}
+			fn.memMayGrow()
 
 		case 0x41: // i32.const
 			e, err := t.constI32()
