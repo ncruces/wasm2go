@@ -25,12 +25,14 @@ const (
 		runtime.GOARCH == "mips64le" || runtime.GOARCH == "mips64p32le" ||
 		runtime.GOARCH == "nios2" || runtime.GOARCH == "ppc64le" ||
 		runtime.GOARCH == "riscv" || runtime.GOARCH == "riscv64" ||
-		runtime.GOARCH == "sh" || runtime.GOARCH == "wasm"
+		runtime.GOARCH == "sh" || runtime.GOARCH == "wasm" ||
+		runtime.GOARCH == "wasm32"
 
 	// go.dev/src/cmd/compile/internal/ssa/config.go
 	unalignedOK = false ||
 		runtime.GOARCH == "386" || runtime.GOARCH == "amd64" ||
 		runtime.GOARCH == "arm64" || runtime.GOARCH == "loong64" ||
 		runtime.GOARCH == "ppc64" || runtime.GOARCH == "ppc64le" ||
-		runtime.GOARCH == "s390x" || runtime.GOARCH == "wasm"
+		runtime.GOARCH == "s390x" || runtime.GOARCH == "wasm" ||
+		runtime.GOARCH == "wasm32"
 )
