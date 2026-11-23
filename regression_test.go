@@ -8,6 +8,7 @@ import (
 
 	bulk_grow_test "github.com/ncruces/wasm2go/testdata/regression/bulk_grow"
 	loop_flush_test "github.com/ncruces/wasm2go/testdata/regression/loop_flush"
+	name_collision_test "github.com/ncruces/wasm2go/testdata/regression/name_collision"
 	oob_trap_test "github.com/ncruces/wasm2go/testdata/regression/oob_trap"
 	provided_helper_test "github.com/ncruces/wasm2go/testdata/regression/provided_helper"
 	select_test "github.com/ncruces/wasm2go/testdata/regression/select_effect"
@@ -175,5 +176,17 @@ func Test_regression_loop_flush(t *testing.T) {
 	}
 	if got := m.Xcond_before_loop(0); got != 1 {
 		t.Errorf("cond_before_loop(0) = %d, want 1", got)
+	}
+}
+
+type nameCollisionHost struct{}
+
+func (nameCollisionHost) Xext() int32 { return 100 }
+
+func Test_regression_name_collision(t *testing.T) {
+	m := name_collision_test.New(nameCollisionHost{})
+
+	if got := m.Xtest(); got != 118 {
+		t.Errorf("test() = %d, want 118", got)
 	}
 }

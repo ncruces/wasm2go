@@ -1140,7 +1140,28 @@ func (t *translator) readCustomSection(size int) error {
 }
 
 func (t *translator) readNameSection(r *bytes.Reader) error {
-	seen := set[string]{}
+	seen := set[string]{"_": {}}
+	for _, imp := range t.imports {
+		seen.add(mangle.Name(imp.module, mangle.Internal))
+	}
+	for name := range t.provided {
+		seen.add(name)
+	}
+	for _, fn := range t.functions {
+		if fn.decl != nil && fn.decl.Name.Name != "" {
+			seen.add(fn.decl.Name.Name)
+		}
+	}
+	for _, tb := range t.tables {
+		if tb.id.Name != "" {
+			seen.add(tb.id.Name)
+		}
+	}
+	for _, gv := range t.globals {
+		if gv.id.Name != "" {
+			seen.add(gv.id.Name)
+		}
+	}
 	for r.Len() > 0 {
 		kind, err := r.ReadByte()
 		if err != nil {
@@ -1198,8 +1219,10 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 						id = t.globals[index].id
 					}
 				}
-				if id.Name == "" && seen.add(buf.String()) {
-					id.Name = mangle.Name(buf.String(), mangle.Internal)
+				if id.Name == "" {
+					if name := mangle.Name(buf.String(), mangle.Internal); seen.add(name) {
+						id.Name = name
+					}
 				}
 			}
 

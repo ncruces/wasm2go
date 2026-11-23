@@ -48,25 +48,29 @@ func Test_translate(t *testing.T) {
 	}
 }
 
-// Translates a module together with a provided-imports file, which may
-// reference helpers the module itself does not use.
+// Translates modules together with their provided-imports files.
 func Test_translate_provided(t *testing.T) {
-	const path = "testdata/regression/provided_helper/provided_helper"
-	provided = stringFlags{"testdata/regression/provided_helper/provided.go"}
-	t.Cleanup(func() { provided = nil })
+	for _, name := range []string{"provided_helper", "name_collision"} {
+		t.Run(name, func(t *testing.T) {
+			dir := "testdata/regression/" + name
+			path := dir + "/" + name
+			provided = stringFlags{dir + "/provided.go"}
+			t.Cleanup(func() { provided = nil })
 
-	in, err := os.Open(path + ".wasm")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer in.Close()
+			in, err := os.Open(path + ".wasm")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer in.Close()
 
-	var out bytes.Buffer
-	if err := translate(in, &out); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(path+".go", out.Bytes(), 0644); err != nil {
-		t.Fatal(err)
+			var out bytes.Buffer
+			if err := translate(in, &out); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(path+".go", out.Bytes(), 0644); err != nil {
+				t.Fatal(err)
+			}
+		})
 	}
 }
 
