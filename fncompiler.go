@@ -397,11 +397,17 @@ func (fn *funcCompiler) bitOp(name string) {
 
 // Executes a unary float64 math call.
 func (fn *funcCompiler) uniMath64(name string) {
-	fn.pushPure(&ast.CallExpr{
+	var call ast.Expr = &ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   newID("math"),
 			Sel: newID(name)},
-		Args: []ast.Expr{fn.pop()}})
+		Args: []ast.Expr{fn.pop()}}
+	// Bitwise math.Abs preserves NaN payloads, whereas rounding and sqrt must canonicalize NaNs.
+	if *nanbox && name != "Abs" {
+		fn.helpers.add("f64_canon")
+		call = &ast.CallExpr{Fun: newID("f64_canon"), Args: []ast.Expr{call}}
+	}
+	fn.pushPure(call)
 }
 
 // Executes a binary float64 math call.
