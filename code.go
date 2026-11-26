@@ -180,6 +180,8 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 				stmt = childBlk.body
 
 			case 0x03: // loop
+				// Flush pending stack values before recording the loop position.
+				fn.flush()
 				// Remember the loop start position.
 				// Bitwise not makes the zero value useful (not a loop).
 				childBlk.loopPos = ^len(blk.body.List)

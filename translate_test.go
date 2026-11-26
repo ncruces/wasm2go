@@ -18,7 +18,7 @@ import (
 func Test_translate(t *testing.T) {
 	tests := []string{
 		"fib", "loops", "memory", "primes", "recursion", "stack", "table", "trig",
-		"regression/bulk_grow", "regression/oob_trap", "regression/select_effect", "regression/store_grow", "regression/tee_self_loop",
+		"regression/bulk_grow", "regression/loop_flush", "regression/oob_trap", "regression/select_effect", "regression/store_grow", "regression/tee_self_loop",
 	}
 	if *unsafe {
 		// Shared memory requires unsafe.

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	bulk_grow_test "github.com/ncruces/wasm2go/testdata/regression/bulk_grow"
+	loop_flush_test "github.com/ncruces/wasm2go/testdata/regression/loop_flush"
 	oob_trap_test "github.com/ncruces/wasm2go/testdata/regression/oob_trap"
 	provided_helper_test "github.com/ncruces/wasm2go/testdata/regression/provided_helper"
 	select_test "github.com/ncruces/wasm2go/testdata/regression/select_effect"
@@ -163,5 +164,16 @@ func Test_regression_provided_helper(t *testing.T) {
 
 	if got := m.Xtest(); got != 0x0807060504030201 {
 		t.Errorf("test() = %#x, want 0x0807060504030201 (provided import must be able to call load64)", got)
+	}
+}
+
+func Test_regression_loop_flush(t *testing.T) {
+	m := loop_flush_test.New()
+
+	if got := m.Xexpr_before_loop(0); got != 0 {
+		t.Errorf("expr_before_loop(0) = %d, want 0", got)
+	}
+	if got := m.Xcond_before_loop(0); got != 1 {
+		t.Errorf("cond_before_loop(0) = %d, want 1", got)
 	}
 }
