@@ -402,7 +402,7 @@ func (fn *funcCompiler) uniMath64(name string) {
 			X:   newID("math"),
 			Sel: newID(name)},
 		Args: []ast.Expr{fn.pop()}}
-	// Bitwise math.Abs preserves NaN payloads, whereas rounding and sqrt must canonicalize NaNs.
+	// Bitwise abs preserves NaN payloads; rounding and sqrt must canonicalize NaNs.
 	if *nanbox && name != "Abs" {
 		fn.helpers.add("f64_canon")
 		call = &ast.CallExpr{Fun: newID("f64_canon"), Args: []ast.Expr{call}}

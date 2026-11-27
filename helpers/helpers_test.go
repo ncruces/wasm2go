@@ -393,6 +393,29 @@ func Test_f64_max(t *testing.T) {
 	}
 }
 
+func Test_f32_canon(t *testing.T) {
+	tests := []struct {
+		in, want uint32
+	}{
+		{0x00000000, 0x00000000}, // +0
+		{0x80000000, 0x80000000}, // -0
+		{0x3fc00000, 0x3fc00000}, // 1.5
+		{0x7f800000, 0x7f800000}, // +Inf
+		{0xff800000, 0xff800000}, // -Inf
+		{0x7f800001, 0x7fc00000}, // +sNaN
+		{0xffa00000, 0x7fc00000}, // -sNaN
+		{0x7fc00001, 0x7fc00000}, // non-canonical qNaN (math.NaN)
+		{0x7fc00000, 0x7fc00000}, // +canonical qNaN
+		{0xffc00000, 0x7fc00000}, // -canonical qNaN
+	}
+	for _, tt := range tests {
+		got := math.Float32bits(f32_canon(math.Float32frombits(tt.in)))
+		if got != tt.want {
+			t.Errorf("f32_canon(%08x) = %08x, want %08x", tt.in, got, tt.want)
+		}
+	}
+}
+
 func Test_f64_canon(t *testing.T) {
 	tests := []struct {
 		in, want uint64

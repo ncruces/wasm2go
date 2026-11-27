@@ -261,7 +261,7 @@ func isInfOrNaN64[T int64 | uint64](bits T) bool {
 	return uint64(bits&0x7FFFFFFFFFFFFFFF) >= 0x7FF0000000000000
 }
 
-// We only check for canonical NaNs on amd64 and arm64.
+// We skip checking for canonical NaNs on MIPS.
 func skipCanonical() bool {
 	return strings.HasPrefix(runtime.GOARCH, "mips")
 }

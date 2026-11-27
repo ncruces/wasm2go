@@ -144,6 +144,25 @@ func f32_copysign(x, y float32) float32 {
 	return math.Float32frombits(math.Float32bits(x)&^(1<<31) | math.Float32bits(y)&(1<<31))
 }
 
+// Canonicalize NaNs from math functions.
+// Only used with nanbox.
+
+//go:nosplit
+func f32_canon(x float32) float32 {
+	if x == x {
+		return x
+	}
+	return math.Float32frombits(0x7fc00000)
+}
+
+//go:nosplit
+func f64_canon(x float64) float64 {
+	if x == x {
+		return x
+	}
+	return math.Float64frombits(0x7ff8000000000000)
+}
+
 // Must return canonical NaNs,
 // which they don't on amd64.
 // Only used with nanbox.
@@ -176,25 +195,6 @@ func f64_min(x, y float64) float64 {
 func f64_max(x, y float64) float64 {
 	if m := max(x, y); m == m {
 		return m
-	}
-	return math.Float64frombits(0x7ff8000000000000)
-}
-
-// Canonicalize NaNs from math functions.
-// Only used with nanbox.
-
-//go:nosplit
-func f32_canon(x float32) float32 {
-	if x == x {
-		return x
-	}
-	return math.Float32frombits(0x7fc00000)
-}
-
-//go:nosplit
-func f64_canon(x float64) float64 {
-	if x == x {
-		return x
 	}
 	return math.Float64frombits(0x7ff8000000000000)
 }
