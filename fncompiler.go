@@ -423,13 +423,17 @@ func (fn *funcCompiler) binMath64(name string) {
 
 // Executes a unary float32 math call.
 func (fn *funcCompiler) uniMath32(name string) {
-	fn.pushPure(
-		convert(&ast.CallExpr{
-			Fun: &ast.SelectorExpr{
-				X:   newID("math"),
-				Sel: newID(name)},
-			Args: []ast.Expr{convert(fn.pop(), "float64")},
-		}, "float32"))
+	var call = convert(&ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X:   newID("math"),
+			Sel: newID(name)},
+		Args: []ast.Expr{convert(fn.pop(), "float64")},
+	}, "float32")
+	if *nanbox {
+		fn.helpers.add("f32_canon")
+		call = &ast.CallExpr{Fun: newID("f32_canon"), Args: []ast.Expr{call}}
+	}
+	fn.pushPure(call)
 }
 
 // Executes a Float32bits call.

@@ -184,6 +184,14 @@ func f64_max(x, y float64) float64 {
 // Only used with nanbox.
 
 //go:nosplit
+func f32_canon(x float32) float32 {
+	if x == x {
+		return x
+	}
+	return math.Float32frombits(0x7fc00000)
+}
+
+//go:nosplit
 func f64_canon(x float64) float64 {
 	if x == x {
 		return x
