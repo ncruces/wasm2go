@@ -180,7 +180,7 @@ func f64_max(x, y float64) float64 {
 	return math.Float64frombits(0x7ff8000000000000)
 }
 
-// Canonicalizes NaNs from math functions.
+// Canonicalize NaNs from math functions.
 // Only used with nanbox.
 
 //go:nosplit

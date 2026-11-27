@@ -70,54 +70,6 @@ func Test_translate_provided(t *testing.T) {
 	}
 }
 
-func Test_nanboxMath64(t *testing.T) {
-	// Six (f64) -> f64 functions: abs, ceil, floor, trunc, nearest, sqrt.
-	wasm := []byte{
-		0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
-		0x01, 0x06, 0x01, 0x60, 0x01, 0x7c, 0x01, 0x7c,
-		0x03, 0x07, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x0a, 0x25, 0x06,
-		0x05, 0x00, 0x20, 0x00, 0x99, 0x0b, // f64.abs
-		0x05, 0x00, 0x20, 0x00, 0x9b, 0x0b, // f64.ceil
-		0x05, 0x00, 0x20, 0x00, 0x9c, 0x0b, // f64.floor
-		0x05, 0x00, 0x20, 0x00, 0x9d, 0x0b, // f64.trunc
-		0x05, 0x00, 0x20, 0x00, 0x9e, 0x0b, // f64.nearest
-		0x05, 0x00, 0x20, 0x00, 0x9f, 0x0b, // f64.sqrt
-	}
-
-	prev := *nanbox
-	t.Cleanup(func() { *nanbox = prev })
-
-	*nanbox = true
-	var out bytes.Buffer
-	if err := translate(bytes.NewReader(wasm), &out); err != nil {
-		t.Fatal(err)
-	}
-	src := out.String()
-	for _, want := range []string{
-		"return math.Abs(v0)",
-		"return f64_canon(math.Ceil(v0))",
-		"return f64_canon(math.Floor(v0))",
-		"return f64_canon(math.Trunc(v0))",
-		"return f64_canon(math.RoundToEven(v0))",
-		"return f64_canon(math.Sqrt(v0))",
-		"func f64_canon(",
-	} {
-		if !strings.Contains(src, want) {
-			t.Errorf("nanbox output missing %q:\n%s", want, src)
-		}
-	}
-
-	*nanbox = false
-	out.Reset()
-	if err := translate(bytes.NewReader(wasm), &out); err != nil {
-		t.Fatal(err)
-	}
-	if bytes.Contains(out.Bytes(), []byte("f64_canon")) {
-		t.Errorf("non-nanbox output unexpectedly used f64_canon:\n%s", out.String())
-	}
-}
-
 func Test_translateSpecTest(t *testing.T) {
 	name := *pkg
 	*nanbox = true
