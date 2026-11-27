@@ -38,8 +38,8 @@ var (
 var pureHelpers = set[string]{
 	"i32_shl": {}, "i32_shr_s": {}, "i32_shr_u": {}, "i32_rotl": {}, "i32_rotr": {},
 	"i64_shl": {}, "i64_shr_s": {}, "i64_shr_u": {}, "i64_rotl": {}, "i64_rotr": {},
-	"f32_abs": {}, "f32_copysign": {}, "f32_min": {}, "f32_max": {},
-	"f64_min": {}, "f64_max": {}, "min": {}, "max": {},
+	"f32_abs": {}, "f32_copysign": {}, "f32_canon": {}, "f64_canon": {},
+	"f32_min": {}, "f32_max": {}, "f64_min": {}, "f64_max": {}, "min": {}, "max": {},
 	"i32_trunc_sat_f32_s": {}, "i32_trunc_sat_f32_u": {},
 	"i32_trunc_sat_f64_s": {}, "i32_trunc_sat_f64_u": {},
 	"i64_trunc_sat_f32_s": {}, "i64_trunc_sat_f32_u": {},

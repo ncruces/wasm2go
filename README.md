@@ -82,8 +82,8 @@ and all memory accesses are still bounds checked.
 
 Another knob is whether to attempt to ensure float operations
 [canonicalize NaNs](https://github.com/WebAssembly/design/issues/1463).
-This is tested to work on both `amd64` and `arm64`,
-but is known to be broken on most other CPU architectures.
+This is tested to work on many CPU architectures,
+but is known to be broken on at least MIPS.
 
 ## Usage
 

@@ -1074,8 +1074,12 @@ func (t *translator) readCodeForFunction(fn *funcCompiler) error {
 		case 0xba: // f64.convert_i64_u
 			fn.convert("uint64", "float64")
 		case 0xbb: // f64.promote_f32
-			fn.convert("float64")
-
+			expr := convert(fn.pop(), "float64")
+			if *nanbox {
+				fn.helpers.add("f64_canon")
+				expr = &ast.CallExpr{Fun: newID("f64_canon"), Args: []ast.Expr{expr}}
+			}
+			fn.pushPure(expr)
 		case 0xbc: // i32.reinterpret_f32
 			fn.float32bits()
 		case 0xbd: // i64.reinterpret_f64
