@@ -1140,12 +1140,10 @@ func (t *translator) readCustomSection(size int) error {
 }
 
 func (t *translator) readNameSection(r *bytes.Reader) error {
+	// Reserve the empty identifier, and already used names.
 	seen := set[string]{"_": {}}
 	for _, imp := range t.imports {
 		seen.add(mangle.Name(imp.module, mangle.Internal))
-	}
-	for name := range t.provided {
-		seen.add(name)
 	}
 	for _, fn := range t.functions {
 		if fn.decl != nil && fn.decl.Name.Name != "" {
@@ -1162,6 +1160,10 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 			seen.add(gv.id.Name)
 		}
 	}
+	for name := range t.provided {
+		seen.add(name)
+	}
+
 	for r.Len() > 0 {
 		kind, err := r.ReadByte()
 		if err != nil {
@@ -1219,8 +1221,9 @@ func (t *translator) readNameSection(r *bytes.Reader) error {
 						id = t.globals[index].id
 					}
 				}
-				if id.Name == "" {
-					if name := mangle.Name(buf.String(), mangle.Internal); seen.add(name) {
+				if id.Name == "" { // Still unnamed.
+					name := mangle.Name(buf.String(), mangle.Internal)
+					if seen.add(name) { // Name unused.
 						id.Name = name
 					}
 				}
